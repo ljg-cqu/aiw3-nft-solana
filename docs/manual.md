@@ -6,7 +6,27 @@ This document details the business processes and rules for the AIW3 NFT on Solan
 
 AIW3 Equity NFTs are a series of NFTs with different levels that serve as a user's identity credential on the AIW3 platform. Holding higher-level NFTs grants users more platform benefits and privileges. While each token is a unique, ownable asset on the blockchain (non-fungible), all tokens of the same level grant identical rights and benefits, making their utility fungible within that tier.
 
-## 2. Core Business Processes
+## 2. NFT Types
+
+The AIW3 platform features two distinct categories of NFTs. It is crucial to understand their differences in purpose, acquisition, and utility.
+
+### 2.1 Equity NFTs (Primary Progression)
+This is the main category of NFTs on the platform, representing a user's level, status, and ongoing benefits.
+-   **Purpose:** To serve as a user's primary identity and status credential, unlocking progressively greater platform-wide benefits.
+-   **Acquisition:**
+    -   **Lv.1:** Claimed by new users.
+    -   **Lv.2 - Lv.5:** Acquired through **Synthesis**, which involves combining and consuming multiple lower-level Equity NFTs.
+    -   **Lv.6:** Awarded by the team for exceptional contributions; not synthesizable.
+-   **Function:** They form a clear progression ladder. Holding a higher-level Equity NFT grants significant advantages like trading fee discounts, airdrop bonuses, and enhanced community visibility via a "Micro Badge". The entire lifecycle of claiming, synthesizing, and activating revolves around this type.
+
+### 2.2 Special NFTs (Achievement-Based)
+This category includes unique NFTs awarded for specific, one-time achievements. They are separate from the main progression ladder.
+-   **Purpose:** To reward users for specific accomplishments, such as winning a competition or participating in a special event.
+-   **Acquisition:** Typically distributed via **Airdrop** to eligible users. They are not acquired through synthesis.
+-   **Function:** Their benefits are specific to the NFT itself and do not necessarily align with the tiered benefits of Equity NFTs. They serve as a trophy or badge of honor for a particular achievement.
+-   **Example:** The **Breeder Reward NFT**, which is airdropped to the top winners of trading competitions.
+
+## 3. Core Business Processes
 
 ```mermaid
 graph TD
@@ -30,7 +50,7 @@ graph TD
 
 This section outlines the primary end-to-end user journeys within the AIW3 NFT ecosystem.
 
-### 1. New User Onboarding and First NFT Acquisition
+### 3.1 New User Onboarding and First NFT Acquisition
 This process describes how a new user joins the platform and gets their initial identity credential.
 
 ```mermaid
@@ -49,7 +69,7 @@ graph TD
 3.  **[System & User] Activation:** The newly claimed Lv.1 NFT appears in the user's collection in an "Inactive" state. The **[System]** shows a popup prompting the user to activate it. The **[User]** confirms, and the NFT becomes "Active".
 4.  **[System] Outcome:** The user now has an active Lv.1 NFT. The **[System]** grants basic platform benefits and displays a "Micro Badge" on the user's profile.
 
-### 2. NFT Level Progression via Synthesis
+### 3.2 NFT Level Progression via Synthesis
 This is the core process for a user to upgrade their status on the platform.
 
 ```mermaid
@@ -81,7 +101,7 @@ graph TD
 4.  **[System & User] Outcome (Success):** The **[System]** consumes the 3 Lv.1 NFTs and creates a new Lv.2 NFT in the "Inactive" state. The **[User]** then activates it to receive enhanced benefits and an upgraded profile badge.
 5.  **[User] Progression Cycle:** The **[User]** repeats this cycle of acquiring materials and synthesizing to climb to higher levels (Lv.3, Lv.4, Lv.5).
 
-### 3. Community Status and Benefit Realization
+### 3.3 Community Status and Benefit Realization
 This process is ongoing and demonstrates the value of holding an active NFT.
 
 ```mermaid
@@ -92,7 +112,7 @@ graph TD
 1.  **[System] Public Display:** The **[System]** continuously displays the user's active NFT level as a "Micro Badge" on their profile, mini-homepage, and next to their name in community discussions, signaling their status to others.
 2.  **[System] Benefit Application:** The **[System]** automatically applies platform benefits, such as trading fee discounts or airdrop bonuses, to the user's account based on their active NFT's level.
 
-### 4. Exiting or Downgrading (Selling NFTs)
+### 3.4 Exiting or Downgrading (Selling NFTs)
 This process describes how a user can liquidate their NFT assets.
 
 ```mermaid
@@ -117,7 +137,7 @@ graph TD
 2.  **[External System] Sale:** Another user purchases the NFT on the marketplace.
 3.  **[System & External System] Outcome:** The NFT is transferred out of the original user's wallet by the **[External System]**. The **[System]** detects this change, revokes all associated benefits, and automatically downgrades the user's public "Micro Badge" to the next-highest NFT they hold (or removes it).
 
-## 3. NFT Levels, Benefits, and Acquisition
+## 4. NFT Levels, Benefits, and Acquisition
 
 There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 
@@ -156,7 +176,7 @@ This gives the following cumulative costs, which are also reflected in the "Equi
 - **Lv.4:** `C(4) = C(3) * M(4) = 9 * 2 = 18` Lv.1 NFTs
 - **Lv.5:** `C(5) = C(4) * M(5) = 18 * 2 = 36` Lv.1 NFTs
 
-## 4. NFT Status Lifecycle
+## 5. NFT Status Lifecycle
 
 An NFT can exist in several states throughout its lifecycle on the platform.
 
@@ -186,11 +206,11 @@ stateDiagram-v2
 
 -   **Consumed (Burned):** Upon completion of a synthesis process (whether successful or failed), the material NFTs are permanently "Consumed" or "Burned". They are removed from the user's wallet and effectively destroyed. This is a terminal state.
 
-## 5. User Actions and NFT Operations
+## 6. User Actions and NFT Operations
 
 This section details the specific actions users can take regarding their NFTs, outlining the conditions and outcomes for each operation.
 
-### 1. Claiming an NFT
+### 6.1 Claiming an NFT
 
 -   **Description:** A **user-initiated** action to mint an "Unlockable" NFT to their wallet. This applies to the initial Lv.1 NFT for new users, and can also apply to higher-level NFTs that are awarded or airdropped by the system.
 -   **Pre-condition:**
@@ -202,7 +222,7 @@ This section details the specific actions users can take regarding their NFTs, o
 -   **Rules/Constraints:**
     -   This action can typically only be performed once per user for the Lv.1 NFT.
 
-### 2. Activating an NFT
+### 6.2 Activating an NFT
 
 -   **Description:** A **user-initiated** action to enable the benefits of an owned NFT.
 -   **Pre-condition:**
@@ -215,7 +235,7 @@ This section details the specific actions users can take regarding their NFTs, o
 -   **Rules/Constraints:**
     -   An NFT must be activated for its benefits and public badge to apply.
 
-### 3. Synthesizing an NFT
+### 6.3 Synthesizing an NFT
 
 -   **Description:** A **user-initiated** process, managed by the **System**, to combine lower-level NFTs to create a higher-level one.
 -   **Pre-condition:**
@@ -249,7 +269,7 @@ This section details the specific actions users can take regarding their NFTs, o
     -   **Success:** The user receives a success notification/popup. The 3 Lv.1 NFTs and the fee are consumed. The new Lv.2 NFT appears in their Personal Center in an **Inactive** state, and the user is prompted to activate it.
     -   **Failure:** The user receives a failure notification. The 3 Lv.1 NFTs and the fee are consumed, and no new NFT is created.
 
-### 4. Selling/Transferring an NFT
+### 6.4 Selling/Transferring an NFT
 
 -   **Description:** A **user-initiated** action to trade an NFT on an **External System** (a marketplace). The AIW3 **System** reacts to the ownership change.
 -   **Pre-condition:**
@@ -263,7 +283,7 @@ This section details the specific actions users can take regarding their NFTs, o
     -   **Loss of Benefits:** When a user sells or transfers an NFT, they lose all associated platform benefits if they do not hold another active NFT that provides similar or lesser benefits.
     -   **Automatic Badge Updates:** If a user sells their highest-level NFT, their public-facing Micro Badge will automatically downgrade to reflect the next-highest level NFT they currently hold. If no other NFTs are held, the badge may be removed or revert to a default state.
 
-## 6. User Interface and Experience
+## 7. User Interface and Experience
 
 This section describes how users interact with their NFTs on the platform.
 
@@ -298,7 +318,7 @@ Users are kept informed of NFT-related events through system messages. These inc
 - **Active NFT Determines Benefits:** A user only receives the benefits (e.g., fee discounts, airdrop bonuses) associated with their currently *active* NFT.
 - **Highest Level Badge:** The Micro Badge displayed publicly on a user's profile always corresponds to their highest-level *active* NFT. If a user holds multiple NFTs (e.g., Lv.4 and Lv.2), only the Lv.4 badge will be shown.
 
-## 7. Terminologies
+## 8. Terminologies
 
 This section defines the core concepts used throughout this document.
 
