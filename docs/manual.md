@@ -6,7 +6,23 @@ This document details the business processes and rules for the AIW3 NFT on Solan
 
 AIW3 Tiered NFTs are a series of NFTs with different levels that serve as a user's identity credential on the AIW3 platform. Holding higher-level NFTs grants users more platform benefits and privileges.
 
-## 2. NFT Levels, Benefits, and Acquisition
+## 2. Terminologies
+
+This section defines the core concepts used throughout this document.
+
+-   **NFT (Non-Fungible Token):** A unique digital certificate of ownership for an asset, stored on a blockchain.
+    -   **Analogy:** Think of it as a digital deed or a one-of-a-kind collectible card. While anyone can have a copy of a digital image, the NFT is the proof of owning the original. It's like having the artist's signature on a print, certifying it as authentic.
+
+-   **Tiered NFTs:** A collection of NFTs organized into different levels or tiers. In this project, higher-tiered NFTs unlock greater benefits and privileges.
+    -   **Analogy:** This is similar to a customer loyalty program (e.g., Bronze, Silver, Gold status) or leveling up a character in a game. Each new tier provides enhanced status and perks.
+
+-   **Synthesis:** The process of combining (and consuming) multiple lower-level NFTs to create a single, more valuable higher-level NFT.
+    -   **Analogy:** This is like crafting in a video game. A player might combine three basic "wood" items to craft one stronger "plank" item. In our case, users combine lower-level NFTs to craft a higher-level one.
+
+-   **Solana:** A high-performance blockchain network on which the AIW3 NFTs are built, recorded, and traded.
+    -   **Analogy:** If an NFT is a valuable package, Solana is the global, super-fast, and secure courier service that handles its delivery and tracks its ownership history transparently.
+
+## 3. NFT Levels, Benefits, and Acquisition
 
 There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 
@@ -19,7 +35,7 @@ There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 | 5     | Grandmaster | Synthesize with 2 Lv.4 NFTs.                                   | Maximum airdrop bonus, 50% fee discount, direct line to the development team. | 36                   |
 | 6     | Legend      | Awarded for outstanding community contributions. Not synthesizable. | All Grandmaster benefits plus a share of platform revenue.                    | N/A                  |
 
-## 3. Synthesis Process
+## 4. Synthesis Process
 
 Synthesizing is the primary method for upgrading to a higher-level NFT (from Lv.2 to Lv.5).
 
@@ -39,7 +55,7 @@ From the acquisition table, we have:
 - `M(4) = 2`
 - `M(5) = 2`
 
-This gives the following cumulative costs, which are also reflected in the "Equivalent Lv.1 NFTs" column in the table in section 2:
+This gives the following cumulative costs, which are also reflected in the "Equivalent Lv.1 NFTs" column in the table in section 3:
 - **Lv.2:** `C(2) = C(1) * M(2) = 1 * 3 = 3` Lv.1 NFTs
 - **Lv.3:** `C(3) = C(2) * M(3) = 3 * 3 = 9` Lv.1 NFTs
 - **Lv.4:** `C(4) = C(3) * M(4) = 9 * 2 = 18` Lv.1 NFTs
@@ -60,12 +76,12 @@ This gives the following cumulative costs, which are also reflected in the "Equi
 6.  On success, the user receives a Lv.2 NFT, and the 3 Lv.1 NFTs and fee are consumed.
 7.  On failure, the 3 Lv.1 NFTs and fee are consumed, and the user does not receive the Lv.2 NFT.
 
-## 4. NFT Activation and Display
+## 5. NFT Activation and Display
 
 - **Activation:** After acquiring a new NFT, users may be prompted to "activate" it to begin receiving the associated benefits.
 - **Profile Display:** The user's current NFT level is displayed as a badge on their profile and mini-profile within the community.
 - **Personal Center:** Users can view their entire collection of NFTs in their Personal Center.
 
-## 5. NFT Trading
+## 6. NFT Trading
 
 AIW3 Tiered NFTs are tradable on any Solana-compatible NFT marketplace.
