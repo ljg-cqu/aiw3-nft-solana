@@ -6,7 +6,37 @@ This document details the business processes and rules for the AIW3 NFT on Solan
 
 AIW3 Tiered NFTs are a series of NFTs with different levels that serve as a user's identity credential on the AIW3 platform. Holding higher-level NFTs grants users more platform benefits and privileges.
 
-## 2. Terminologies
+## 2. Core Business Processes
+
+This section outlines the primary end-to-end user journeys within the AIW3 NFT ecosystem.
+
+### 1. New User Onboarding and First NFT Acquisition
+This process describes how a new user joins the platform and gets their initial identity credential.
+1.  **Registration:** A user creates an account on the AIW3 platform.
+2.  **Claiming:** The user navigates to their Personal Center, where a Lv.1 "Newbie" NFT is shown as "Unlockable". The user executes the "Claim" action.
+3.  **Activation:** The newly claimed Lv.1 NFT appears in their collection in an "Inactive" state. A popup prompts them to activate it. The user confirms, and the NFT becomes "Active".
+4.  **Outcome:** The user now has an active Lv.1 NFT, receives basic platform benefits, and has a "Micro Badge" displayed on their profile.
+
+### 2. NFT Level Progression via Synthesis
+This is the core process for a user to upgrade their status on the platform.
+1.  **Material Acquisition:** To synthesize a Lv.2 NFT, the user needs 3 Lv.1 NFTs. They already have one from onboarding. The user must acquire the remaining two by purchasing them from other users on a Solana-compatible NFT marketplace.
+2.  **Initiating Synthesis:** With the required materials (3 Lv.1 NFTs) and sufficient platform tokens for the fee, the user navigates to the Synthesis page in their Personal Center.
+3.  **Execution:** The user selects the target NFT (Lv.2), confirms the fee and success rate, and starts the synthesis.
+4.  **Outcome (Success):** The 3 Lv.1 NFTs are consumed, and a new Lv.2 NFT is created in the "Inactive" state. The user then activates it to receive enhanced benefits and an upgraded profile badge.
+5.  **Progression Cycle:** The user repeats this cycle of acquiring materials and synthesizing to climb to higher levels (Lv.3, Lv.4, Lv.5).
+
+### 3. Community Status and Benefit Realization
+This process is ongoing and demonstrates the value of holding an active NFT.
+1.  **Public Display:** The user's active NFT level is continuously displayed as a "Micro Badge" on their profile, mini-homepage, and next to their name in community discussions, signaling their status to others.
+2.  **Benefit Application:** Platform benefits, such as trading fee discounts or airdrop bonuses, are automatically applied to the user's account based on their active NFT's level.
+
+### 4. Exiting or Downgrading (Selling NFTs)
+This process describes how a user can liquidate their NFT assets.
+1.  **Listing on Marketplace:** The user lists their NFT (e.g., a Lv.4 "Master" NFT) for sale on an external Solana marketplace.
+2.  **Sale:** Another user purchases the NFT.
+3.  **Outcome:** The NFT is transferred out of the original user's wallet. They lose all associated benefits. Their public "Micro Badge" is automatically downgraded to the next-highest NFT they hold, or removed if they hold no others.
+
+## 3. Terminologies
 
 This section defines the core concepts used throughout this document.
 
@@ -28,7 +58,7 @@ This section defines the core concepts used throughout this document.
 -   **Micro Badge:** A small, icon-like representation of a user's highest-level NFT, displayed on their profile and in community spaces to signify their status.
     -   **Analogy:** This is like a digital lapel pin or a rank insignia on a uniform, quickly communicating a person's level or achievements to others.
 
-## 3. NFT Levels, Benefits, and Acquisition
+## 4. NFT Levels, Benefits, and Acquisition
 
 There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 
@@ -67,7 +97,7 @@ This gives the following cumulative costs, which are also reflected in the "Equi
 - **Lv.4:** `C(4) = C(3) * M(4) = 9 * 2 = 18` Lv.1 NFTs
 - **Lv.5:** `C(5) = C(4) * M(5) = 18 * 2 = 36` Lv.1 NFTs
 
-## 4. NFT Status Lifecycle
+## 5. NFT Status Lifecycle
 
 An NFT can exist in several states throughout its lifecycle on the platform.
 
@@ -97,7 +127,7 @@ stateDiagram-v2
 
 -   **Consumed (Burned):** Upon completion of a synthesis process (whether successful or failed), the material NFTs are permanently "Consumed" or "Burned". They are removed from the user's wallet and effectively destroyed. This is a terminal state.
 
-## 5. User Actions and NFT Operations
+## 6. User Actions and NFT Operations
 
 This section details the specific actions users can take regarding their NFTs, outlining the conditions and outcomes for each operation.
 
@@ -172,7 +202,7 @@ This section details the specific actions users can take regarding their NFTs, o
     -   **Loss of Benefits:** When a user sells or transfers an NFT, they lose all associated platform benefits if they do not hold another active NFT that provides similar or lesser benefits.
     -   **Automatic Badge Updates:** If a user sells their highest-level NFT, their public-facing Micro Badge will automatically downgrade to reflect the next-highest level NFT they currently hold. If no other NFTs are held, the badge may be removed or revert to a default state.
 
-## 6. User Interface and Experience
+## 7. User Interface and Experience
 
 This section describes how users interact with their NFTs on the platform.
 
