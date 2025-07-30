@@ -1,6 +1,6 @@
-# AIW3 NFT Solana - Business Process and Rules Manual
+# AIW3 NFT on Solana - Business Process and Rules Manual
 
-This document details the business processes and rules for the AIW3 NFT Solana project, as extracted from the project prototypes.
+This document details the business processes and rules for the AIW3 NFT on Solana project, as extracted from the project prototypes.
 
 ## 1. Overview of Tiered NFTs
 
