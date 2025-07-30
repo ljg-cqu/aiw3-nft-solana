@@ -12,6 +12,18 @@ This section outlines the primary end-to-end user journeys within the AIW3 NFT e
 
 ### 1. New User Onboarding and First NFT Acquisition
 This process describes how a new user joins the platform and gets their initial identity credential.
+
+```mermaid
+graph TD
+    A[User Registers] --> B{Personal Center};
+    B --> C[System shows Unlockable Lv.1 NFT];
+    C --> D{User Claims NFT};
+    D --> E[System Mints Inactive Lv.1 NFT];
+    E --> F[System Prompts for Activation];
+    F --> G{User Activates NFT};
+    G --> H[System sets NFT to Active];
+    H --> I[System grants benefits & displays badge];
+```
 1.  **[User] Registration:** A user creates an account on the AIW3 platform.
 2.  **[User] Claiming:** The user navigates to their Personal Center, where the **[System]** shows a Lv.1 "Newbie" NFT as "Unlockable". The user executes the "Claim" action.
 3.  **[System & User] Activation:** The newly claimed Lv.1 NFT appears in the user's collection in an "Inactive" state. The **[System]** shows a popup prompting the user to activate it. The **[User]** confirms, and the NFT becomes "Active".
@@ -19,6 +31,33 @@ This process describes how a new user joins the platform and gets their initial 
 
 ### 2. NFT Level Progression via Synthesis
 This is the core process for a user to upgrade their status on the platform.
+
+```mermaid
+graph TD
+    subgraph External
+        A[Acquire Material NFTs on Marketplace];
+    end
+    subgraph AIW3 Platform
+        B[Navigate to Synthesis Page];
+        C{Select Target NFT};
+        D[System shows Fee & Success Rate];
+        E{User Confirms Synthesis};
+        F{Synthesis Successful?};
+        G[System consumes materials & creates Inactive NFT];
+        H[System consumes materials & fee];
+        I{Activate New NFT};
+        J[Benefits & Badge Updated];
+    end
+    A --> B;
+    B --> C;
+    C --> D;
+    D --> E;
+    E --> F;
+    F -- Yes --> G;
+    F -- No --> H;
+    G --> I;
+    I --> J;
+```
 1.  **[User & External System] Material Acquisition:** To synthesize a Lv.2 NFT, the **[User]** needs 3 Lv.1 NFTs. They already have one from onboarding. The **[User]** must acquire the remaining two by purchasing them from other users on an **[External System]** (a Solana-compatible NFT marketplace).
 2.  **[User] Initiating Synthesis:** With the required materials and sufficient platform tokens for the fee, the **[User]** navigates to the Synthesis page in their Personal Center.
 3.  **[User & System] Execution:** The **[User]** selects the target NFT (Lv.2). The **[System]** displays the fee and success rate. The **[User]** confirms and starts the synthesis.
@@ -27,11 +66,36 @@ This is the core process for a user to upgrade their status on the platform.
 
 ### 3. Community Status and Benefit Realization
 This process is ongoing and demonstrates the value of holding an active NFT.
+
+```mermaid
+graph TD
+    A(User has Active NFT) --> B[System displays Micro Badge];
+    A --> C[System applies Benefits];
+```
 1.  **[System] Public Display:** The **[System]** continuously displays the user's active NFT level as a "Micro Badge" on their profile, mini-homepage, and next to their name in community discussions, signaling their status to others.
 2.  **[System] Benefit Application:** The **[System]** automatically applies platform benefits, such as trading fee discounts or airdrop bonuses, to the user's account based on their active NFT's level.
 
 ### 4. Exiting or Downgrading (Selling NFTs)
 This process describes how a user can liquidate their NFT assets.
+
+```mermaid
+graph TD
+    subgraph External Marketplace
+        A[User lists NFT for Sale];
+        B[Another User buys NFT];
+        C[NFT is Transferred];
+    end
+    subgraph AIW3 Platform
+        D[System detects Ownership Change];
+        E[System revokes Benefits];
+        F[System downgrades/removes Badge];
+    end
+    A --> B;
+    B --> C;
+    C --> D;
+    D --> E;
+    E --> F;
+```
 1.  **[User & External System] Listing on Marketplace:** The **[User]** lists their NFT (e.g., a Lv.4 "Master" NFT) for sale on an **[External System]** (a Solana marketplace).
 2.  **[External System] Sale:** Another user purchases the NFT on the marketplace.
 3.  **[System & External System] Outcome:** The NFT is transferred out of the original user's wallet by the **[External System]**. The **[System]** detects this change, revokes all associated benefits, and automatically downgrades the user's public "Micro Badge" to the next-highest NFT they hold (or removes it).
