@@ -75,7 +75,68 @@ stateDiagram-v2
 
 -   **Consumed (Burned):** Upon completion of a synthesis process (whether successful or failed), the material NFTs are permanently "Consumed" or "Burned". They are removed from the user's wallet and effectively destroyed. This is a terminal state.
 
-## 5. Synthesis Process
+## 5. User Actions and NFT Operations
+
+This section details the specific actions users can take regarding their NFTs, outlining the conditions and outcomes for each operation.
+
+### 1. Claiming an NFT
+
+-   **Description:** The action of minting an "Unlockable" NFT to the user's wallet. This is primarily for the initial Lv.1 "Newbie" NFT.
+-   **Pre-condition:**
+    -   User is registered on the platform.
+    -   The target NFT is in the **Unlockable** state for the user.
+-   **Post-condition:**
+    -   A new NFT is minted and sent to the user's connected wallet.
+    -   The NFT's status becomes **Inactive**.
+-   **Rules/Constraints:**
+    -   This action can typically only be performed once per user for the Lv.1 NFT.
+
+### 2. Activating an NFT
+
+-   **Description:** The user action to enable the benefits of an owned NFT.
+-   **Pre-condition:**
+    -   User owns the NFT.
+    -   The NFT is in the **Inactive** state.
+-   **Post-condition:**
+    -   The NFT's status changes to **Active**.
+    -   The user gains all associated benefits (e.g., fee discounts).
+    -   The user's public Micro Badge is updated if this NFT is their highest level.
+-   **Rules/Constraints:**
+    -   Only one NFT of a given level can be active at a time. Activating a new NFT may deactivate another.
+
+### 3. Synthesizing an NFT
+
+-   **Description:** The process of combining lower-level NFTs to create a higher-level one.
+-   **Pre-condition:**
+    -   User owns the required number of material NFTs.
+    -   The material NFTs are in the **Active** or **Inactive** state.
+    -   User has sufficient platform tokens to pay the synthesis fee.
+-   **Status Change During Operation:**
+    -   Upon initiation, the material NFTs' status changes to **Locked**.
+-   **Post-condition (Success):**
+    -   The material NFTs' status changes from **Locked** to **Consumed**.
+    -   A new, higher-level NFT is minted to the user's wallet with an initial status of **Inactive**.
+-   **Post-condition (Failure):**
+    -   The material NFTs' status changes from **Locked** to **Consumed**.
+    -   No new NFT is created.
+-   **Rules/Constraints:**
+    -   The process is irreversible once started.
+    -   Locked NFTs cannot be traded or used in other operations.
+
+### 4. Selling/Transferring an NFT
+
+-   **Description:** Trading an NFT on an external marketplace.
+-   **Pre-condition:**
+    -   User owns the NFT.
+    -   The NFT is in the **Active** or **Inactive** state (i.e., not Locked).
+-   **Post-condition:**
+    -   The NFT is removed from the user's wallet and platform account.
+    -   The NFT effectively leaves the lifecycle from the user's perspective.
+-   **Rules/Constraints:**
+    -   The user loses all benefits associated with the sold NFT.
+    -   The user's public Micro Badge will automatically downgrade to the next-highest active NFT they own.
+
+## 6. Synthesis Process
 
 Synthesizing is the primary method for upgrading to a higher-level NFT (from Lv.2 to Lv.5).
 
@@ -117,7 +178,7 @@ This gives the following cumulative costs, which are also reflected in the "Equi
     -   **Success:** The user receives a success notification/popup. The 3 Lv.1 NFTs and the fee are consumed. The new Lv.2 NFT appears in their Personal Center, potentially requiring activation.
     -   **Failure:** The user receives a failure notification. The 3 Lv.1 NFTs and the fee are consumed, and no new NFT is created.
 
-## 6. User Interface and Experience
+## 7. User Interface and Experience
 
 This section describes how users interact with their NFTs on the platform.
 
@@ -152,7 +213,7 @@ Users are kept informed of NFT-related events through system messages. These inc
 - **Active NFT Determines Benefits:** A user only receives the benefits (e.g., fee discounts, airdrop bonuses) associated with their currently *active* NFT.
 - **Highest Level Badge:** The Micro Badge displayed publicly on a user's profile always corresponds to their highest-level *active* NFT. If a user holds multiple NFTs (e.g., Lv.4 and Lv.2), only the Lv.4 badge will be shown.
 
-## 7. NFT Trading
+## 8. NFT Trading
 
 AIW3 Tiered NFTs are tradable on any Solana-compatible NFT marketplace.
 
