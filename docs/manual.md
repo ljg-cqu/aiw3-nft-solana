@@ -195,7 +195,7 @@ This section details the specific actions users can take regarding their NFTs, o
 
 ### 1. Claiming an NFT
 
--   **Description:** A **user-initiated** action to mint an "Unlockable" NFT to their wallet. This is primarily for the initial Lv.1 "Newbie" NFT.
+-   **Description:** A **user-initiated** action to mint an "Unlockable" NFT to their wallet. This applies to the initial Lv.1 NFT for new users, and can also apply to higher-level NFTs that are awarded or airdropped by the system.
 -   **Pre-condition:**
     -   User is registered on the platform.
     -   The target NFT is in the **Unlockable** state for the user.
