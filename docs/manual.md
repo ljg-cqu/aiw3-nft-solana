@@ -22,13 +22,19 @@ This section defines the core concepts used throughout this document.
 -   **Solana:** A high-performance blockchain network on which the AIW3 NFTs are built, recorded, and traded.
     -   **Analogy:** If an NFT is a valuable package, Solana is the global, super-fast, and secure courier service that handles its delivery and tracks its ownership history transparently.
 
+-   **Unlockable State:** A state where a user has met the conditions to acquire an NFT but has not yet claimed or minted it. This requires a user action to complete the acquisition.
+    -   **Analogy:** This is like having a coupon you are eligible for but haven't redeemed yet. You need to take the step to present the coupon to get the item.
+
+-   **Micro Badge:** A small, icon-like representation of a user's highest-level NFT, displayed on their profile and in community spaces to signify their status.
+    -   **Analogy:** This is like a digital lapel pin or a rank insignia on a uniform, quickly communicating a person's level or achievements to others.
+
 ## 3. NFT Levels, Benefits, and Acquisition
 
 There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 
 | Level | Name        | How to Get                                                     | Benefits                                                                      | Equivalent Lv.1 NFTs |
 |-------|-------------|----------------------------------------------------------------|-------------------------------------------------------------------------------|----------------------|
-| 1     | Newbie      | Free for all registered users.                                 | Basic access to platform features.                                            | 1                    |
+| 1     | Newbie      | Becomes "Unlockable" for all registered users, requires claiming. | Basic access to platform features.                                            | 1                    |
 | 2     | Apprentice  | Synthesize with 3 Lv.1 NFTs.                                   | Small airdrop bonus, 5% fee discount.                                         | 3                    |
 | 3     | Adept       | Synthesize with 3 Lv.2 NFTs.                                   | Medium airdrop bonus, 10% fee discount, access to exclusive chat groups.      | 9                    |
 | 4     | Master      | Synthesize with 2 Lv.3 NFTs.                                   | Large airdrop bonus, 20% fee discount, priority access to new features.       | 18                   |
@@ -68,19 +74,44 @@ This gives the following cumulative costs, which are also reflected in the "Equi
 - **Failure:** If synthesis fails, the consumed material NFTs and the synthesis fee are lost and not returned to the user.
 
 ### Example Flow (Synthesizing Lv.2 NFT):
-1.  The user navigates to the Synthesis page.
-2.  The target is set to "Lv.2 NFT".
-3.  The system checks if the user has the required materials: 3 Lv.1 NFTs.
-4.  The system displays the required fee (e.g., 100 AIW3) and the success rate (e.g., 80%).
-5.  The user initiates the synthesis.
-6.  On success, the user receives a Lv.2 NFT, and the 3 Lv.1 NFTs and fee are consumed.
-7.  On failure, the 3 Lv.1 NFTs and fee are consumed, and the user does not receive the Lv.2 NFT.
+1.  **Navigation:** The user navigates to their Personal Center and selects the Synthesis option.
+2.  **Selection:** The user selects the Lv.2 NFT as the synthesis target. The interface shows the required materials (3 Lv.1 NFTs) will be consumed.
+3.  **Confirmation:** The system displays the required synthesis fee (e.g., 100 AIW3) and the success rate (e.g., 80%). The user confirms to proceed.
+4.  **Processing:** The user initiates the synthesis. The 3 Lv.1 NFTs are locked, and the fee is paid.
+5.  **Outcome:**
+    -   **Success:** The user receives a success notification/popup. The 3 Lv.1 NFTs and the fee are consumed. The new Lv.2 NFT appears in their Personal Center, potentially requiring activation.
+    -   **Failure:** The user receives a failure notification. The 3 Lv.1 NFTs and the fee are consumed, and no new NFT is created.
 
-## 5. NFT Activation and Display
+## 5. User Interface and Experience
 
-- **Activation:** After acquiring a new NFT, users may be prompted to "activate" it to begin receiving the associated benefits.
-- **Profile Display:** The user's current NFT level is displayed as a badge on their profile and mini-profile within the community.
-- **Personal Center:** Users can view their entire collection of NFTs in their Personal Center.
+This section describes how users interact with their NFTs on the platform.
+
+### Personal Center
+
+The Personal Center is the main hub for a user to manage their NFTs. From here, they can:
+-   View their entire collection of owned NFTs.
+-   See which NFTs are "Unlockable" and claim them.
+-   Initiate the synthesis process to upgrade their NFTs.
+
+### Activation Process
+
+-   After acquiring a new, higher-level NFT (either through synthesis or other means), it may appear in an inactive state.
+-   A popup will prompt the user to "Activate" the NFT.
+-   Activating the NFT enables its associated benefits and updates the user's public-facing badge.
+
+### Profile and Community Display
+
+A user's status is visibly represented throughout the platform to signify their achievements and level.
+-   **Micro Badge:** The user's highest-level active NFT is displayed as a "Micro Badge" next to their username and on their avatar.
+-   **Personal Homepage:** The badge is prominently displayed on the user's personal homepage.
+-   **Community Mini-Homepage:** The badge is also visible on the user's "mini-homepage" card within community sections, making their status visible to other users.
+
+### System Notifications
+
+Users are kept informed of NFT-related events through system messages. These include notifications for:
+-   Successful or failed synthesis attempts.
+-   Acquisition of a new NFT.
+-   Prompts to activate a newly acquired NFT.
 
 ## 6. NFT Trading
 
