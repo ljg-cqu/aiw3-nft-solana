@@ -8,6 +8,26 @@ AIW3 Tiered NFTs are a series of NFTs with different levels that serve as a user
 
 ## 2. Core Business Processes
 
+```mermaid
+graph TD
+    A[New User Onboards & Claims Lv.1 NFT] --> B[Hold Active NFT];
+    
+    subgraph "Platform Core Loop"
+        B -- "Realize Benefits" --> B;
+        B --> C{Synthesize to Upgrade};
+        C -- "Success" --> B;
+    end
+
+    subgraph "External Marketplace Interaction"
+        M[Solana Marketplace];
+    end
+
+    C -- "Acquire Materials" --> M;
+    M -- "Provide Materials" --> C;
+    B -- "Sell NFT" --> M;
+    M -- "Acquire NFT" --> B;
+```
+
 This section outlines the primary end-to-end user journeys within the AIW3 NFT ecosystem.
 
 ### 1. New User Onboarding and First NFT Acquisition
