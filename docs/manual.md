@@ -1,10 +1,10 @@
 # AIW3 Equity NFT on Solana - Business Process and Rules Manual
 
-This document details the business processes and rules for the AIW3 NFT on Solana project, as extracted from the project prototypes.
+This document details the business processes and rules for the AIW3 **Equity NFT** system on Solana, which forms the basis of the platform's VIP level plan. The information is extracted from the project prototypes.
 
 ## 1. Overview of Equity NFTs
 
-AIW3 Equity NFTs are a series of NFTs with different levels that serve as a user's identity credential on the AIW3 platform. Holding higher-level NFTs grants users more platform benefits and privileges. While each token is a unique, ownable asset on the blockchain (non-fungible), all tokens of the same level grant identical rights and benefits, making their utility fungible within that tier.
+AIW3 Equity NFTs are a series of NFTs with different levels that serve as a user's identity credential on the AIW3 platform. Holding higher-level NFTs grants users more platform benefits and privileges, forming the core of the AIW3 VIP level plan. While each token is a unique, ownable asset on the blockchain (non-fungible), all tokens of the same level grant identical rights and benefits, making their utility fungible within that tier.
 
 ## 2. NFT Types
 
@@ -26,7 +26,7 @@ This category includes unique NFTs awarded for specific, one-time achievements. 
 -   **Function:** Their benefits are specific to the NFT itself and do not necessarily align with the tiered benefits of Equity NFTs. They serve as a trophy or badge of honor for a particular achievement.
 -   **Example:** The **Breeder Reward NFT**, which is airdropped to the top winners of trading competitions.
 
-## 3. Core Business Processes
+## 3. Equity NFT Lifecycle and User Journeys
 
 ```mermaid
 graph TD
@@ -206,7 +206,7 @@ stateDiagram-v2
 
 -   **Consumed (Burned):** Upon completion of a synthesis process (whether successful or failed), the material NFTs are permanently "Consumed" or "Burned". They are removed from the user's wallet and effectively destroyed. This is a terminal state.
 
-## 6. User Actions and NFT Operations
+## 6. Equity NFT Operations
 
 This section details the specific actions users can take regarding their NFTs, outlining the conditions and outcomes for each operation.
 
@@ -289,14 +289,14 @@ This section describes how users interact with their NFTs on the platform.
 
 ### Personal Center
 
-The Personal Center is the main hub for a user to manage their NFTs. From here, they can:
--   View their entire collection of owned NFTs.
+The Personal Center is the main hub for a user to manage their **Equity NFTs**. From here, they can:
+-   View their entire collection of owned Equity NFTs.
 -   See which NFTs are "Unlockable" and claim them.
 -   Initiate the synthesis process to upgrade their NFTs.
 
 ### Activation Process
 
--   After acquiring a new, higher-level NFT (either through synthesis or other means), it appears in an inactive state.
+-   After acquiring a new, higher-level **Equity NFT** (either through synthesis or other means), it appears in an inactive state.
 -   A popup will prompt the user to "Activate" the NFT.
 -   Activating the NFT enables its associated benefits and updates the user's public-facing badge.
 
@@ -315,8 +315,8 @@ Users are kept informed of NFT-related events through system messages. These inc
 -   Prompts to activate a newly acquired NFT.
 
 ### UI and Benefit Constraints
-- **Active NFT Determines Benefits:** A user only receives the benefits (e.g., fee discounts, airdrop bonuses) associated with their currently *active* NFT.
-- **Highest Level Badge:** The Micro Badge displayed publicly on a user's profile always corresponds to their highest-level *active* NFT. If a user holds multiple NFTs (e.g., Lv.4 and Lv.2), only the Lv.4 badge will be shown.
+- **Active Equity NFT Determines Benefits:** A user only receives the benefits (e.g., fee discounts, airdrop bonuses) associated with their currently *active* **Equity NFT**.
+- **Highest Level Badge:** The Micro Badge displayed publicly on a user's profile always corresponds to their highest-level *active* **Equity NFT**. If a user holds multiple NFTs (e.g., Lv.4 and Lv.2), only the Lv.4 badge will be shown.
 
 ## 8. Terminologies
 
