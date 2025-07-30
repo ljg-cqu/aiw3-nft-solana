@@ -45,6 +45,28 @@ There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 - **Lv.1 "Newbie" NFT:** This NFT is not automatically granted. A registered user must perform an explicit "claim" or "unlock" action to mint it to their wallet.
 - **Lv.6 "Legend" NFT:** This level is strictly honorary and cannot be acquired through synthesis. Its issuance is at the sole discretion of the AIW3 team based on a user's contributions to the community.
 
+### Cumulative Cost Formula
+
+The value of higher-level NFTs can be understood by calculating their total cost in terms of Lv.1 NFTs. This is also referred to as the cumulative cost.
+
+Let `C(L)` be the cost in Lv.1 NFTs to produce one NFT of level `L`.
+Let `M(L)` be the number of material NFTs of level `L-1` required to synthesize an NFT of level `L`.
+
+The formula is:
+`C(L) = C(L-1) * M(L)` for `L > 1`, with `C(1) = 1`.
+
+From the acquisition table, we have:
+- `M(2) = 3`
+- `M(3) = 3`
+- `M(4) = 2`
+- `M(5) = 2`
+
+This gives the following cumulative costs, which are also reflected in the "Equivalent Lv.1 NFTs" column in the table in this section:
+- **Lv.2:** `C(2) = C(1) * M(2) = 1 * 3 = 3` Lv.1 NFTs
+- **Lv.3:** `C(3) = C(2) * M(3) = 3 * 3 = 9` Lv.1 NFTs
+- **Lv.4:** `C(4) = C(3) * M(4) = 9 * 2 = 18` Lv.1 NFTs
+- **Lv.5:** `C(5) = C(4) * M(5) = 18 * 2 = 36` Lv.1 NFTs
+
 ## 4. NFT Status Lifecycle
 
 An NFT can exist in several states throughout its lifecycle on the platform.
@@ -102,7 +124,7 @@ This section details the specific actions users can take regarding their NFTs, o
     -   The user gains all associated benefits (e.g., fee discounts).
     -   The user's public Micro Badge is updated if this NFT is their highest level.
 -   **Rules/Constraints:**
-    -   Only one NFT of a given level can be active at a time. Activating a new NFT may deactivate another.
+    -   An NFT must be activated for its benefits and public badge to apply.
 
 ### 3. Synthesizing an NFT
 
@@ -120,8 +142,21 @@ This section details the specific actions users can take regarding their NFTs, o
     -   The material NFTs' status changes from **Locked** to **Consumed**.
     -   No new NFT is created.
 -   **Rules/Constraints:**
-    -   The process is irreversible once started.
-    -   Locked NFTs cannot be traded or used in other operations.
+    -   **Irreversibility:** The synthesis process is final. Once initiated, the consumption of material NFTs and fees is irreversible, regardless of the outcome.
+    -   **Material Ownership:** To synthesize a target NFT, a user must own the required number of material NFTs in their connected wallet.
+    -   **Fee Payment:** A synthesis fee must be paid in platform tokens (e.g., AIW3 tokens).
+    -   **Success Rate:** The synthesis process is not guaranteed to succeed. The success rate is displayed to the user before they start the process (e.g., 80% for Lv.2).
+    -   **Consequence of Failure:** If synthesis fails, the consumed material NFTs and the synthesis fee are permanently lost and not returned to the user.
+    -   **Locked State:** During the synthesis process, the material NFTs are in a **Locked** state and cannot be traded or used in other operations.
+
+#### Example Flow (Synthesizing Lv.2 NFT)
+1.  **Navigation:** The user navigates to their Personal Center and selects the Synthesis option.
+2.  **Selection:** The user selects the Lv.2 NFT as the synthesis target. The interface shows the required materials (3 Lv.1 NFTs) will be consumed.
+3.  **Confirmation:** The system displays the required synthesis fee (e.g., 100 AIW3) and the success rate (e.g., 80%). The user confirms to proceed.
+4.  **Processing:** The user initiates the synthesis. The 3 Lv.1 NFTs are locked, and the fee is paid.
+5.  **Outcome:**
+    -   **Success:** The user receives a success notification/popup. The 3 Lv.1 NFTs and the fee are consumed. The new Lv.2 NFT appears in their Personal Center, potentially requiring activation.
+    -   **Failure:** The user receives a failure notification. The 3 Lv.1 NFTs and the fee are consumed, and no new NFT is created.
 
 ### 4. Selling/Transferring an NFT
 
@@ -133,52 +168,11 @@ This section details the specific actions users can take regarding their NFTs, o
     -   The NFT is removed from the user's wallet and platform account.
     -   The NFT effectively leaves the lifecycle from the user's perspective.
 -   **Rules/Constraints:**
-    -   The user loses all benefits associated with the sold NFT.
-    -   The user's public Micro Badge will automatically downgrade to the next-highest active NFT they own.
+    -   **External Marketplace Rules:** All trading activities are subject to the terms, conditions, and fees of the external NFT marketplace where the transaction occurs.
+    -   **Loss of Benefits:** When a user sells or transfers an NFT, they lose all associated platform benefits if they do not hold another active NFT that provides similar or lesser benefits.
+    -   **Automatic Badge Updates:** If a user sells their highest-level NFT, their public-facing Micro Badge will automatically downgrade to reflect the next-highest level NFT they currently hold. If no other NFTs are held, the badge may be removed or revert to a default state.
 
-## 6. Synthesis Process
-
-Synthesizing is the primary method for upgrading to a higher-level NFT (from Lv.2 to Lv.5).
-
-### Cumulative Cost Formula
-
-The value of higher-level NFTs can be understood by calculating their total cost in terms of Lv.1 NFTs. This is also referred to as the cumulative cost.
-
-Let `C(L)` be the cost in Lv.1 NFTs to produce one NFT of level `L`.
-Let `M(L)` be the number of material NFTs of level `L-1` required to synthesize an NFT of level `L`.
-
-The formula is:
-`C(L) = C(L-1) * M(L)` for `L > 1`, with `C(1) = 1`.
-
-From the acquisition table, we have:
-- `M(2) = 3`
-- `M(3) = 3`
-- `M(4) = 2`
-- `M(5) = 2`
-
-This gives the following cumulative costs, which are also reflected in the "Equivalent Lv.1 NFTs" column in the table in section 3:
-- **Lv.2:** `C(2) = C(1) * M(2) = 1 * 3 = 3` Lv.1 NFTs
-- **Lv.3:** `C(3) = C(2) * M(3) = 3 * 3 = 9` Lv.1 NFTs
-- **Lv.4:** `C(4) = C(3) * M(4) = 9 * 2 = 18` Lv.1 NFTs
-- **Lv.5:** `C(5) = C(4) * M(5) = 18 * 2 = 36` Lv.1 NFTs
-
-### Rules and Constraints:
-- **Irreversibility:** The synthesis process is final. Once initiated, the consumption of material NFTs and fees is irreversible, regardless of the outcome.
-- **Material Ownership:** To synthesize a target NFT, a user must own the required number of material NFTs in their connected wallet.
-- **Fee Payment:** A synthesis fee must be paid in platform tokens (e.g., AIW3 tokens).
-- **Success Rate:** The synthesis process is not guaranteed to succeed. The success rate is displayed to the user before they start the process (e.g., 80% for Lv.2).
-- **Consequence of Failure:** If synthesis fails, the consumed material NFTs and the synthesis fee are permanently lost and not returned to the user.
-
-### Example Flow (Synthesizing Lv.2 NFT):
-1.  **Navigation:** The user navigates to their Personal Center and selects the Synthesis option.
-2.  **Selection:** The user selects the Lv.2 NFT as the synthesis target. The interface shows the required materials (3 Lv.1 NFTs) will be consumed.
-3.  **Confirmation:** The system displays the required synthesis fee (e.g., 100 AIW3) and the success rate (e.g., 80%). The user confirms to proceed.
-4.  **Processing:** The user initiates the synthesis. The 3 Lv.1 NFTs are locked, and the fee is paid.
-5.  **Outcome:**
-    -   **Success:** The user receives a success notification/popup. The 3 Lv.1 NFTs and the fee are consumed. The new Lv.2 NFT appears in their Personal Center, potentially requiring activation.
-    -   **Failure:** The user receives a failure notification. The 3 Lv.1 NFTs and the fee are consumed, and no new NFT is created.
-
-## 7. User Interface and Experience
+## 6. User Interface and Experience
 
 This section describes how users interact with their NFTs on the platform.
 
@@ -213,11 +207,3 @@ Users are kept informed of NFT-related events through system messages. These inc
 - **Active NFT Determines Benefits:** A user only receives the benefits (e.g., fee discounts, airdrop bonuses) associated with their currently *active* NFT.
 - **Highest Level Badge:** The Micro Badge displayed publicly on a user's profile always corresponds to their highest-level *active* NFT. If a user holds multiple NFTs (e.g., Lv.4 and Lv.2), only the Lv.4 badge will be shown.
 
-## 8. NFT Trading
-
-AIW3 Tiered NFTs are tradable on any Solana-compatible NFT marketplace.
-
-### Trading Constraints and Consequences
-- **External Marketplace Rules:** All trading activities are subject to the terms, conditions, and fees of the external NFT marketplace where the transaction occurs.
-- **Loss of Benefits:** When a user sells or transfers an NFT, they lose all associated platform benefits if they do not hold another active NFT that provides similar or lesser benefits.
-- **Automatic Badge Updates:** If a user sells their highest-level NFT, their public-facing Micro Badge will automatically downgrade to reflect the next-highest level NFT they currently hold. If no other NFTs are held, the badge may be removed or revert to a default state.
