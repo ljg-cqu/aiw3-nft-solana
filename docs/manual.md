@@ -49,6 +49,22 @@ There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 
 An NFT can exist in several states throughout its lifecycle on the platform.
 
+```mermaid
+stateDiagram-v2
+    [*] --> Unlockable: User meets criteria
+    Unlockable --> Inactive: User claims
+    
+    [*] --> Inactive: Acquired via Synthesis
+    
+    Inactive --> Active: User activates
+    
+    Active --> Locked: Used in new synthesis
+    Locked --> Consumed: Synthesis completes
+    
+    Active --> [*]: Sold or Transferred
+    Consumed --> [*]
+```
+
 -   **Unlockable:** This is a pre-mint state where a user has met the criteria to receive an NFT (e.g., by registering) but has not yet claimed it. The NFT does not exist on the blockchain at this point. The user must perform an action to mint it.
 
 -   **Inactive:** Once an NFT is minted to a user's wallet (either by claiming an unlockable one or through synthesis), it may start in an "Inactive" state. In this state, the user owns the NFT, but the associated benefits (like fee discounts) are not yet applied.
