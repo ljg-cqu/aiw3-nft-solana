@@ -54,11 +54,9 @@ This is the core process for a user to upgrade their status on the platform.
 
 ```mermaid
 graph TD
-    subgraph External
-        A[Acquire Material NFTs on Marketplace];
-    end
+    A[User Acquires Necessary<br>Material NFTs<br>(e.g., via Marketplace)] --> B[Navigate to Synthesis Page];
     subgraph AIW3 Platform
-        B[Navigate to Synthesis Page];
+        B;
         C{Select Target NFT};
         D[System shows Fee & Success Rate];
         E{User Confirms Synthesis};
@@ -68,7 +66,6 @@ graph TD
         I{Activate New NFT};
         J[Benefits & Badge Updated];
     end
-    A --> B;
     B --> C;
     C --> D;
     D --> E;
@@ -78,7 +75,7 @@ graph TD
     G --> I;
     I --> J;
 ```
-1.  **[User & External System] Material Acquisition:** To synthesize a Lv.2 NFT, the **[User]** needs 3 Lv.1 NFTs. They already have one from onboarding. The **[User]** must acquire the remaining two by purchasing them from other users on an **[External System]** (a Solana-compatible NFT marketplace).
+1.  **[User] Material Acquisition:** To synthesize a higher-level NFT, the **[User]** must first possess the required material NFTs. For example, to create a Lv.2 NFT, a user needs three Lv.1 NFTs. If they only have one from onboarding, they must acquire the other two. The most common method is purchasing them on an **[External System]** (a Solana-compatible NFT marketplace), but they could also be received from other users via direct wallet transfers.
 2.  **[User] Initiating Synthesis:** With the required materials and sufficient platform tokens for the fee, the **[User]** navigates to the Synthesis page in their Personal Center.
 3.  **[User & System] Execution:** The **[User]** selects the target NFT (Lv.2). The **[System]** displays the fee and success rate. The **[User]** confirms and starts the synthesis.
 4.  **[System & User] Outcome (Success):** The **[System]** consumes the 3 Lv.1 NFTs and creates a new Lv.2 NFT in the "Inactive" state. The **[User]** then activates it to receive enhanced benefits and an upgraded profile badge.
