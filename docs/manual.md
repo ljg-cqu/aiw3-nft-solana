@@ -63,7 +63,7 @@ graph TD
         D[System shows Fee & Success Rate];
         E{User Confirms Synthesis};
         F{Synthesis Successful?};
-        G[System consumes materials & creates Inactive NFT];
+        G[System consumes materials & fee, creates Inactive NFT];
         H[System consumes materials & fee];
         I{Activate New NFT};
         J[Benefits & Badge Updated];
@@ -228,9 +228,11 @@ This section details the specific actions users can take regarding their NFTs, o
 -   **Status Change During Operation:**
     -   Upon initiation, the material NFTs' status changes to **Locked**.
 -   **Post-condition (Success):**
+    -   The synthesis fee is consumed.
     -   The material NFTs' status changes from **Locked** to **Consumed**.
     -   A new, higher-level NFT is minted to the user's wallet with an initial status of **Inactive**.
 -   **Post-condition (Failure):**
+    -   The synthesis fee is consumed.
     -   The material NFTs' status changes from **Locked** to **Consumed**.
     -   No new NFT is created.
 -   **Rules/Constraints:**
