@@ -12,29 +12,29 @@ This section outlines the primary end-to-end user journeys within the AIW3 NFT e
 
 ### 1. New User Onboarding and First NFT Acquisition
 This process describes how a new user joins the platform and gets their initial identity credential.
-1.  **Registration:** A user creates an account on the AIW3 platform.
-2.  **Claiming:** The user navigates to their Personal Center, where a Lv.1 "Newbie" NFT is shown as "Unlockable". The user executes the "Claim" action.
-3.  **Activation:** The newly claimed Lv.1 NFT appears in their collection in an "Inactive" state. A popup prompts them to activate it. The user confirms, and the NFT becomes "Active".
-4.  **Outcome:** The user now has an active Lv.1 NFT, receives basic platform benefits, and has a "Micro Badge" displayed on their profile.
+1.  **[User] Registration:** A user creates an account on the AIW3 platform.
+2.  **[User] Claiming:** The user navigates to their Personal Center, where the **[System]** shows a Lv.1 "Newbie" NFT as "Unlockable". The user executes the "Claim" action.
+3.  **[System & User] Activation:** The newly claimed Lv.1 NFT appears in the user's collection in an "Inactive" state. The **[System]** shows a popup prompting the user to activate it. The **[User]** confirms, and the NFT becomes "Active".
+4.  **[System] Outcome:** The user now has an active Lv.1 NFT. The **[System]** grants basic platform benefits and displays a "Micro Badge" on the user's profile.
 
 ### 2. NFT Level Progression via Synthesis
 This is the core process for a user to upgrade their status on the platform.
-1.  **Material Acquisition:** To synthesize a Lv.2 NFT, the user needs 3 Lv.1 NFTs. They already have one from onboarding. The user must acquire the remaining two by purchasing them from other users on a Solana-compatible NFT marketplace.
-2.  **Initiating Synthesis:** With the required materials (3 Lv.1 NFTs) and sufficient platform tokens for the fee, the user navigates to the Synthesis page in their Personal Center.
-3.  **Execution:** The user selects the target NFT (Lv.2), confirms the fee and success rate, and starts the synthesis.
-4.  **Outcome (Success):** The 3 Lv.1 NFTs are consumed, and a new Lv.2 NFT is created in the "Inactive" state. The user then activates it to receive enhanced benefits and an upgraded profile badge.
-5.  **Progression Cycle:** The user repeats this cycle of acquiring materials and synthesizing to climb to higher levels (Lv.3, Lv.4, Lv.5).
+1.  **[User & External System] Material Acquisition:** To synthesize a Lv.2 NFT, the **[User]** needs 3 Lv.1 NFTs. They already have one from onboarding. The **[User]** must acquire the remaining two by purchasing them from other users on an **[External System]** (a Solana-compatible NFT marketplace).
+2.  **[User] Initiating Synthesis:** With the required materials and sufficient platform tokens for the fee, the **[User]** navigates to the Synthesis page in their Personal Center.
+3.  **[User & System] Execution:** The **[User]** selects the target NFT (Lv.2). The **[System]** displays the fee and success rate. The **[User]** confirms and starts the synthesis.
+4.  **[System & User] Outcome (Success):** The **[System]** consumes the 3 Lv.1 NFTs and creates a new Lv.2 NFT in the "Inactive" state. The **[User]** then activates it to receive enhanced benefits and an upgraded profile badge.
+5.  **[User] Progression Cycle:** The **[User]** repeats this cycle of acquiring materials and synthesizing to climb to higher levels (Lv.3, Lv.4, Lv.5).
 
 ### 3. Community Status and Benefit Realization
 This process is ongoing and demonstrates the value of holding an active NFT.
-1.  **Public Display:** The user's active NFT level is continuously displayed as a "Micro Badge" on their profile, mini-homepage, and next to their name in community discussions, signaling their status to others.
-2.  **Benefit Application:** Platform benefits, such as trading fee discounts or airdrop bonuses, are automatically applied to the user's account based on their active NFT's level.
+1.  **[System] Public Display:** The **[System]** continuously displays the user's active NFT level as a "Micro Badge" on their profile, mini-homepage, and next to their name in community discussions, signaling their status to others.
+2.  **[System] Benefit Application:** The **[System]** automatically applies platform benefits, such as trading fee discounts or airdrop bonuses, to the user's account based on their active NFT's level.
 
 ### 4. Exiting or Downgrading (Selling NFTs)
 This process describes how a user can liquidate their NFT assets.
-1.  **Listing on Marketplace:** The user lists their NFT (e.g., a Lv.4 "Master" NFT) for sale on an external Solana marketplace.
-2.  **Sale:** Another user purchases the NFT.
-3.  **Outcome:** The NFT is transferred out of the original user's wallet. They lose all associated benefits. Their public "Micro Badge" is automatically downgraded to the next-highest NFT they hold, or removed if they hold no others.
+1.  **[User & External System] Listing on Marketplace:** The **[User]** lists their NFT (e.g., a Lv.4 "Master" NFT) for sale on an **[External System]** (a Solana marketplace).
+2.  **[External System] Sale:** Another user purchases the NFT on the marketplace.
+3.  **[System & External System] Outcome:** The NFT is transferred out of the original user's wallet by the **[External System]**. The **[System]** detects this change, revokes all associated benefits, and automatically downgrades the user's public "Micro Badge" to the next-highest NFT they hold (or removes it).
 
 ## 3. Terminologies
 
@@ -133,7 +133,7 @@ This section details the specific actions users can take regarding their NFTs, o
 
 ### 1. Claiming an NFT
 
--   **Description:** The action of minting an "Unlockable" NFT to the user's wallet. This is primarily for the initial Lv.1 "Newbie" NFT.
+-   **Description:** A **user-initiated** action to mint an "Unlockable" NFT to their wallet. This is primarily for the initial Lv.1 "Newbie" NFT.
 -   **Pre-condition:**
     -   User is registered on the platform.
     -   The target NFT is in the **Unlockable** state for the user.
@@ -145,7 +145,7 @@ This section details the specific actions users can take regarding their NFTs, o
 
 ### 2. Activating an NFT
 
--   **Description:** The user action to enable the benefits of an owned NFT.
+-   **Description:** A **user-initiated** action to enable the benefits of an owned NFT.
 -   **Pre-condition:**
     -   User owns the NFT.
     -   The NFT is in the **Inactive** state.
@@ -158,7 +158,7 @@ This section details the specific actions users can take regarding their NFTs, o
 
 ### 3. Synthesizing an NFT
 
--   **Description:** The process of combining lower-level NFTs to create a higher-level one.
+-   **Description:** A **user-initiated** process, managed by the **System**, to combine lower-level NFTs to create a higher-level one.
 -   **Pre-condition:**
     -   User owns the required number of material NFTs.
     -   The material NFTs are in the **Active** or **Inactive** state.
@@ -190,7 +190,7 @@ This section details the specific actions users can take regarding their NFTs, o
 
 ### 4. Selling/Transferring an NFT
 
--   **Description:** Trading an NFT on an external marketplace.
+-   **Description:** A **user-initiated** action to trade an NFT on an **External System** (a marketplace). The AIW3 **System** reacts to the ownership change.
 -   **Pre-condition:**
     -   User owns the NFT.
     -   The NFT is in the **Active** or **Inactive** state (i.e., not Locked).
