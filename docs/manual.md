@@ -1,10 +1,10 @@
-# AIW3 NFT on Solana - Business Process and Rules Manual
+# AIW3 Equity NFT on Solana - Business Process and Rules Manual
 
 This document details the business processes and rules for the AIW3 NFT on Solana project, as extracted from the project prototypes.
 
-## 1. Overview of Tiered NFTs
+## 1. Overview of Equity NFTs
 
-AIW3 Tiered NFTs are a series of NFTs with different levels that serve as a user's identity credential on the AIW3 platform. Holding higher-level NFTs grants users more platform benefits and privileges. While each token is a unique, ownable asset on the blockchain (non-fungible), all tokens of the same level grant identical rights and benefits, making their utility fungible within that tier.
+AIW3 Equity NFTs are a series of NFTs with different levels that serve as a user's identity credential on the AIW3 platform. Holding higher-level NFTs grants users more platform benefits and privileges. While each token is a unique, ownable asset on the blockchain (non-fungible), all tokens of the same level grant identical rights and benefits, making their utility fungible within that tier.
 
 ## 2. Core Business Processes
 
@@ -305,8 +305,8 @@ This section defines the core concepts used throughout this document.
 -   **NFT (Non-Fungible Token):** A unique digital certificate of ownership for an asset, stored on a blockchain.
     -   **Analogy:** Think of it as a digital deed or a one-of-a-kind collectible card. While anyone can have a copy of a digital image, the NFT is the proof of owning the original. It's like having the artist's signature on a print, certifying it as authentic.
 
--   **Tiered NFTs:** A collection of NFTs organized into different levels or tiers. In this project, higher-tiered NFTs unlock greater benefits and privileges. It's important to note that while each individual token is a unique non-fungible asset on the blockchain, its utility is fungible within its tier. This means any Lv.2 NFT provides the exact same benefits as any other Lv.2 NFT.
-    -   **Analogy:** This is similar to a customer loyalty program (e.g., Bronze, Silver, Gold status) or leveling up a character in a game. Each new tier provides enhanced status and perks. Your "Gold" membership card is unique to you, but it gives you the same benefits as every other "Gold" member.
+-   **Equity NFTs:** A collection of NFTs organized into different levels or tiers. In this project, higher-tiered NFTs unlock greater benefits and privileges, with the highest "Legend" tier granting a share of platform revenue. While each individual token is a unique non-fungible asset on the blockchain, its utility is fungible within its tier. This means any Lv.2 NFT provides the exact same benefits as any other Lv.2 NFT.
+    -   **Analogy:** This is similar to a customer loyalty program (e.g., Bronze, Silver, Gold status) or leveling up a character in a game. Each new tier provides enhanced status and perks, with the top tier granting equity-like benefits. Your "Gold" membership card is unique to you, but it gives you the same benefits as every other "Gold" member.
 
 -   **Synthesis:** The process of combining (and consuming) multiple lower-level NFTs to create a single, more valuable higher-level NFT.
     -   **Analogy:** This is like crafting in a video game. A player might combine three basic "wood" items to craft one stronger "plank" item. In our case, users combine lower-level NFTs to craft a higher-level one.
