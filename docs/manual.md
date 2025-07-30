@@ -45,7 +45,21 @@ There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 - **Lv.1 "Newbie" NFT:** This NFT is not automatically granted. A registered user must perform an explicit "claim" or "unlock" action to mint it to their wallet.
 - **Lv.6 "Legend" NFT:** This level is strictly honorary and cannot be acquired through synthesis. Its issuance is at the sole discretion of the AIW3 team based on a user's contributions to the community.
 
-## 4. Synthesis Process
+## 4. NFT Status Lifecycle
+
+An NFT can exist in several states throughout its lifecycle on the platform.
+
+-   **Unlockable:** This is a pre-mint state where a user has met the criteria to receive an NFT (e.g., by registering) but has not yet claimed it. The NFT does not exist on the blockchain at this point. The user must perform an action to mint it.
+
+-   **Inactive:** Once an NFT is minted to a user's wallet (either by claiming an unlockable one or through synthesis), it may start in an "Inactive" state. In this state, the user owns the NFT, but the associated benefits (like fee discounts) are not yet applied.
+
+-   **Active:** The user must explicitly activate an "Inactive" NFT. Once active, the NFT grants all its associated benefits and privileges. The user's public-facing Micro Badge is updated to reflect this active NFT if it's their highest level.
+
+-   **Locked (During Synthesis):** When a user initiates a synthesis process, the material NFTs being used are temporarily "Locked". They cannot be traded, transferred, or used for other syntheses during this period.
+
+-   **Consumed (Burned):** Upon completion of a synthesis process (whether successful or failed), the material NFTs are permanently "Consumed" or "Burned". They are removed from the user's wallet and effectively destroyed. This is a terminal state.
+
+## 5. Synthesis Process
 
 Synthesizing is the primary method for upgrading to a higher-level NFT (from Lv.2 to Lv.5).
 
@@ -87,7 +101,7 @@ This gives the following cumulative costs, which are also reflected in the "Equi
     -   **Success:** The user receives a success notification/popup. The 3 Lv.1 NFTs and the fee are consumed. The new Lv.2 NFT appears in their Personal Center, potentially requiring activation.
     -   **Failure:** The user receives a failure notification. The 3 Lv.1 NFTs and the fee are consumed, and no new NFT is created.
 
-## 5. User Interface and Experience
+## 6. User Interface and Experience
 
 This section describes how users interact with their NFTs on the platform.
 
@@ -122,7 +136,7 @@ Users are kept informed of NFT-related events through system messages. These inc
 - **Active NFT Determines Benefits:** A user only receives the benefits (e.g., fee discounts, airdrop bonuses) associated with their currently *active* NFT.
 - **Highest Level Badge:** The Micro Badge displayed publicly on a user's profile always corresponds to their highest-level *active* NFT. If a user holds multiple NFTs (e.g., Lv.4 and Lv.2), only the Lv.4 badge will be shown.
 
-## 6. NFT Trading
+## 7. NFT Trading
 
 AIW3 Tiered NFTs are tradable on any Solana-compatible NFT marketplace.
 
