@@ -155,7 +155,7 @@ This section details the specific actions users can take regarding their NFTs, o
 3.  **Confirmation:** The system displays the required synthesis fee (e.g., 100 AIW3) and the success rate (e.g., 80%). The user confirms to proceed.
 4.  **Processing:** The user initiates the synthesis. The 3 Lv.1 NFTs are locked, and the fee is paid.
 5.  **Outcome:**
-    -   **Success:** The user receives a success notification/popup. The 3 Lv.1 NFTs and the fee are consumed. The new Lv.2 NFT appears in their Personal Center, potentially requiring activation.
+    -   **Success:** The user receives a success notification/popup. The 3 Lv.1 NFTs and the fee are consumed. The new Lv.2 NFT appears in their Personal Center in an **Inactive** state, and the user is prompted to activate it.
     -   **Failure:** The user receives a failure notification. The 3 Lv.1 NFTs and the fee are consumed, and no new NFT is created.
 
 ### 4. Selling/Transferring an NFT
@@ -185,7 +185,7 @@ The Personal Center is the main hub for a user to manage their NFTs. From here, 
 
 ### Activation Process
 
--   After acquiring a new, higher-level NFT (either through synthesis or other means), it may appear in an inactive state.
+-   After acquiring a new, higher-level NFT (either through synthesis or other means), it appears in an inactive state.
 -   A popup will prompt the user to "Activate" the NFT.
 -   Activating the NFT enables its associated benefits and updates the user's public-facing badge.
 
