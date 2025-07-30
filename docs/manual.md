@@ -10,18 +10,40 @@ AIW3 Tiered NFTs are a series of NFTs with different levels that serve as a user
 
 There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 
-| Level | Name        | How to Get                                                     | Benefits                                                                      |
-|-------|-------------|----------------------------------------------------------------|-------------------------------------------------------------------------------|
-| 1     | Newbie      | Free for all registered users.                                 | Basic access to platform features.                                            |
-| 2     | Apprentice  | Synthesize with 3 Lv.1 NFTs.                                   | Small airdrop bonus, 5% fee discount.                                         |
-| 3     | Adept       | Synthesize with 3 Lv.2 NFTs.                                   | Medium airdrop bonus, 10% fee discount, access to exclusive chat groups.      |
-| 4     | Master      | Synthesize with 2 Lv.3 NFTs.                                   | Large airdrop bonus, 20% fee discount, priority access to new features.       |
-| 5     | Grandmaster | Synthesize with 2 Lv.4 NFTs.                                   | Maximum airdrop bonus, 50% fee discount, direct line to the development team. |
-| 6     | Legend      | Awarded for outstanding community contributions. Not synthesizable. | All Grandmaster benefits plus a share of platform revenue.                    |
+| Level | Name        | How to Get                                                     | Benefits                                                                      | Equivalent Lv.1 NFTs |
+|-------|-------------|----------------------------------------------------------------|-------------------------------------------------------------------------------|----------------------|
+| 1     | Newbie      | Free for all registered users.                                 | Basic access to platform features.                                            | 1                    |
+| 2     | Apprentice  | Synthesize with 3 Lv.1 NFTs.                                   | Small airdrop bonus, 5% fee discount.                                         | 3                    |
+| 3     | Adept       | Synthesize with 3 Lv.2 NFTs.                                   | Medium airdrop bonus, 10% fee discount, access to exclusive chat groups.      | 9                    |
+| 4     | Master      | Synthesize with 2 Lv.3 NFTs.                                   | Large airdrop bonus, 20% fee discount, priority access to new features.       | 18                   |
+| 5     | Grandmaster | Synthesize with 2 Lv.4 NFTs.                                   | Maximum airdrop bonus, 50% fee discount, direct line to the development team. | 36                   |
+| 6     | Legend      | Awarded for outstanding community contributions. Not synthesizable. | All Grandmaster benefits plus a share of platform revenue.                    | N/A                  |
 
 ## 3. Synthesis Process
 
 Synthesizing is the primary method for upgrading to a higher-level NFT (from Lv.2 to Lv.5).
+
+### Cumulative Cost Formula
+
+The value of higher-level NFTs can be understood by calculating their total cost in terms of Lv.1 NFTs. This is also referred to as the cumulative cost.
+
+Let `C(L)` be the cost in Lv.1 NFTs to produce one NFT of level `L`.
+Let `M(L)` be the number of material NFTs of level `L-1` required to synthesize an NFT of level `L`.
+
+The formula is:
+`C(L) = C(L-1) * M(L)` for `L > 1`, with `C(1) = 1`.
+
+From the acquisition table, we have:
+- `M(2) = 3`
+- `M(3) = 3`
+- `M(4) = 2`
+- `M(5) = 2`
+
+This gives the following cumulative costs, which are also reflected in the "Equivalent Lv.1 NFTs" column in the table in section 2:
+- **Lv.2:** `C(2) = C(1) * M(2) = 1 * 3 = 3` Lv.1 NFTs
+- **Lv.3:** `C(3) = C(2) * M(3) = 3 * 3 = 9` Lv.1 NFTs
+- **Lv.4:** `C(4) = C(3) * M(4) = 9 * 2 = 18` Lv.1 NFTs
+- **Lv.5:** `C(5) = C(4) * M(5) = 18 * 2 = 36` Lv.1 NFTs
 
 ### Rules:
 - **Materials:** To synthesize a target NFT, a user must hold a specific number of lower-level NFTs.
