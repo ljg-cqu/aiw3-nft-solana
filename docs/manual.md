@@ -305,10 +305,14 @@ This section defines the core concepts used throughout this document.
 -   **NFT (Non-Fungible Token):** A unique digital certificate of ownership for an asset, stored on a blockchain.
     -   **Analogy:** Think of it as a digital deed or a one-of-a-kind collectible card. While anyone can have a copy of a digital image, the NFT is the proof of owning the original. It's like having the artist's signature on a print, certifying it as authentic.
 
--   **Equity NFTs:** A collection of NFTs organized into different levels or tiers. In this project, higher-tiered NFTs unlock greater benefits and privileges, with the highest "Legend" tier granting a share of platform revenue. While each individual token is a unique non-fungible asset on the blockchain, its utility is fungible within its tier. This means any Lv.2 NFT provides the exact same benefits as any other Lv.2 NFT.
+-   **Equity NFTs:** The official name for the platform's primary NFTs that represent user status and benefits. They are organized into different **Levels** (or **Tiers**).
+    -   **Synonyms:** You may see these referred to as **Tiered NFTs**, **Tier NFTs**, or **Level NFTs** in different contexts. "Equity NFT" is the canonical term for the main progression NFTs.
+    -   **Progression Model:** The primary way to acquire higher-level Equity NFTs is through **Synthesis**. Other acquisition models (like unlocking via trade volume) may be mentioned in auxiliary materials but are not part of the core process defined herein.
+    -   **Utility:** While each token is a unique non-fungible asset on the blockchain, its utility is fungible within its tier. This means any Lv.2 NFT provides the exact same benefits as any other Lv.2 NFT.
     -   **Analogy:** This is similar to a customer loyalty program (e.g., Bronze, Silver, Gold status) or leveling up a character in a game. Each new tier provides enhanced status and perks, with the top tier granting equity-like benefits. Your "Gold" membership card is unique to you, but it gives you the same benefits as every other "Gold" member.
 
--   **Synthesis:** The process of combining (and consuming) multiple lower-level NFTs to create a single, more valuable higher-level NFT.
+-   **Synthesis:** The process of combining (and consuming) multiple lower-level **Equity NFTs** to create a single, more valuable higher-level one.
+    -   **Materials:** The materials for synthesis are always lower-level Equity NFTs (e.g., 3x Lv.1 NFTs to make a Lv.2). Some older materials may refer to these as "Badge NFTs," but this document defines them simply as Equity NFTs.
     -   **Analogy:** This is like crafting in a video game. A player might combine three basic "wood" items to craft one stronger "plank" item. In our case, users combine lower-level NFTs to craft a higher-level one.
 
 -   **Solana:** A high-performance blockchain network on which the AIW3 NFTs are built, recorded, and traded.
@@ -319,4 +323,6 @@ This section defines the core concepts used throughout this document.
 
 -   **Micro Badge:** A small, icon-like representation of a user's highest-level NFT, displayed on their profile and in community spaces to signify their status.
     -   **Analogy:** This is like a digital lapel pin or a rank insignia on a uniform, quickly communicating a person's level or achievements to others.
+
+-   **Special NFTs (e.g., Breeder Reward NFT):** These are distinct NFTs awarded for specific achievements, such as winning a trading competition. They are acquired through airdrops, not synthesis, and may have their own unique benefits. They are separate from the main Equity NFT progression ladder.
 
