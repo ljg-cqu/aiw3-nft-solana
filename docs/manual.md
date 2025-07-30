@@ -18,6 +18,7 @@ This is the main category of NFTs on the platform, representing a user's level, 
     -   **Lv.2 - Lv.5:** Acquired through **Synthesis**, which involves combining and consuming multiple lower-level Equity NFTs.
     -   **Lv.6:** Awarded by the team for exceptional contributions; not synthesizable.
 -   **Function:** They form a clear progression ladder. Holding a higher-level Equity NFT grants significant advantages like trading fee discounts, airdrop bonuses, and enhanced community visibility via a "Micro Badge". The entire lifecycle of claiming, synthesizing, and activating revolves around this type.
+-   **Minting Authority:** All Equity NFTs are created (minted) exclusively by the AIW3 platform's official programs. A Lv.1 is minted upon a new user's claim, and higher-level NFTs are minted as the output of a successful synthesis. While NFTs can be freely traded between users on external marketplaces, the AIW3 system is the sole source of their creation.
 
 ### 2.2 Special NFTs (Achievement-Based)
 This category includes unique NFTs awarded for specific, one-time achievements. They are separate from the main progression ladder.
@@ -95,7 +96,7 @@ graph TD
     G --> I;
     I --> J;
 ```
-1.  **[User] Material Acquisition:** To synthesize a higher-level NFT, the **[User]** must first possess the required material NFTs. For example, to create a Lv.2 NFT, a user needs three Lv.1 NFTs. If they only have one from onboarding, they must acquire the other two. The most common method is purchasing them on an **[External System]** (a Solana-compatible NFT marketplace), but they could also be received from other users via direct wallet transfers.
+1.  **[User] Material Acquisition:** To synthesize a higher-level NFT, the **[User]** must possess the required material NFTs in their connected wallet. All Equity NFTs are initially minted by the AIW3 system (e.g., a Lv.1 NFT is minted when a new user claims it). To gather the necessary materials for synthesis (e.g., acquiring two additional Lv.1 NFTs to synthesize a Lv.2), a user must obtain them from other users. This is typically done by purchasing them on a Solana-compatible NFT marketplace (**[External System]**) or receiving them via a direct wallet transfer. The AIW3 platform simply verifies ownership of these system-minted NFTs in the user's wallet, it does not create them from an external source.
 2.  **[User] Initiating Synthesis:** With the required materials and sufficient platform tokens for the fee, the **[User]** navigates to the Synthesis page in their Personal Center.
 3.  **[User & System] Execution:** The **[User]** selects the target NFT (Lv.2). The **[System]** displays the fee and success rate. The **[User]** confirms and starts the synthesis.
 4.  **[System & User] Outcome (Success):** The **[System]** consumes the 3 Lv.1 NFTs and creates a new Lv.2 NFT in the "Inactive" state. The **[User]** then activates it to receive enhanced benefits and an upgraded profile badge.
