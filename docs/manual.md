@@ -41,6 +41,10 @@ There are 6 levels of NFTs, each with unique benefits and acquisition methods.
 | 5     | Grandmaster | Synthesize with 2 Lv.4 NFTs.                                   | Maximum airdrop bonus, 50% fee discount, direct line to the development team. | 36                   |
 | 6     | Legend      | Awarded for outstanding community contributions. Not synthesizable. | All Grandmaster benefits plus a share of platform revenue.                    | N/A                  |
 
+### Acquisition Constraints
+- **Lv.1 "Newbie" NFT:** This NFT is not automatically granted. A registered user must perform an explicit "claim" or "unlock" action to mint it to their wallet.
+- **Lv.6 "Legend" NFT:** This level is strictly honorary and cannot be acquired through synthesis. Its issuance is at the sole discretion of the AIW3 team based on a user's contributions to the community.
+
 ## 4. Synthesis Process
 
 Synthesizing is the primary method for upgrading to a higher-level NFT (from Lv.2 to Lv.5).
@@ -67,11 +71,12 @@ This gives the following cumulative costs, which are also reflected in the "Equi
 - **Lv.4:** `C(4) = C(3) * M(4) = 9 * 2 = 18` Lv.1 NFTs
 - **Lv.5:** `C(5) = C(4) * M(5) = 18 * 2 = 36` Lv.1 NFTs
 
-### Rules:
-- **Materials:** To synthesize a target NFT, a user must hold a specific number of lower-level NFTs.
-- **Fee:** A synthesis fee must be paid in platform tokens (e.g., AIW3 tokens).
+### Rules and Constraints:
+- **Irreversibility:** The synthesis process is final. Once initiated, the consumption of material NFTs and fees is irreversible, regardless of the outcome.
+- **Material Ownership:** To synthesize a target NFT, a user must own the required number of material NFTs in their connected wallet.
+- **Fee Payment:** A synthesis fee must be paid in platform tokens (e.g., AIW3 tokens).
 - **Success Rate:** The synthesis process is not guaranteed to succeed. The success rate is displayed to the user before they start the process (e.g., 80% for Lv.2).
-- **Failure:** If synthesis fails, the consumed material NFTs and the synthesis fee are lost and not returned to the user.
+- **Consequence of Failure:** If synthesis fails, the consumed material NFTs and the synthesis fee are permanently lost and not returned to the user.
 
 ### Example Flow (Synthesizing Lv.2 NFT):
 1.  **Navigation:** The user navigates to their Personal Center and selects the Synthesis option.
@@ -113,6 +118,15 @@ Users are kept informed of NFT-related events through system messages. These inc
 -   Acquisition of a new NFT.
 -   Prompts to activate a newly acquired NFT.
 
+### UI and Benefit Constraints
+- **Active NFT Determines Benefits:** A user only receives the benefits (e.g., fee discounts, airdrop bonuses) associated with their currently *active* NFT.
+- **Highest Level Badge:** The Micro Badge displayed publicly on a user's profile always corresponds to their highest-level *active* NFT. If a user holds multiple NFTs (e.g., Lv.4 and Lv.2), only the Lv.4 badge will be shown.
+
 ## 6. NFT Trading
 
 AIW3 Tiered NFTs are tradable on any Solana-compatible NFT marketplace.
+
+### Trading Constraints and Consequences
+- **External Marketplace Rules:** All trading activities are subject to the terms, conditions, and fees of the external NFT marketplace where the transaction occurs.
+- **Loss of Benefits:** When a user sells or transfers an NFT, they lose all associated platform benefits if they do not hold another active NFT that provides similar or lesser benefits.
+- **Automatic Badge Updates:** If a user sells their highest-level NFT, their public-facing Micro Badge will automatically downgrade to reflect the next-highest level NFT they currently hold. If no other NFTs are held, the badge may be removed or revert to a default state.
