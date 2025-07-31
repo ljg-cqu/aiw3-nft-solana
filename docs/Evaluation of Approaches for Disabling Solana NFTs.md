@@ -222,45 +222,51 @@ The AIW3 backend must implement a function to `verifyNftIsBurned`. This function
 
 ### Business Process: NFT Upgrade Sequence Diagram
 
-This diagram illustrates the end-to-end flow for the optimal approach. 
+This diagram illustrates the end-to-end flow for the optimal approach, including the frontend web application.
 
 **Diagram Participants:**
-*   **User**: The individual interacting with the AIW3 system.
-*   **Wallet (Phantom / Solflare)**: Represents the user's Solana wallet, which is the necessary tool for signing and approving all on-chain transactions, including the `burn` instruction.
-*   **Solana Blockchain**: The decentralized network where all transactions are recorded.
-*   **AIW3 Backend**: The centralized component of the AIW3 system responsible for off-chain logic, such as checking eligibility and orchestrating the upgrade process.
+*   **User**: The individual interacting with the AIW3 dApp in their browser.
+*   **Frontend**: The web application (running in the user's browser) that provides the user interface.
+*   **Wallet (Phantom / Solflare)**: The user's Solana wallet, which is prompted by the Frontend to sign and approve on-chain transactions.
+*   **AIW3 Backend**: The centralized server responsible for off-chain logic, such as checking eligibility and orchestrating the upgrade process.
+*   **Solana Blockchain**: The decentralized network where all on-chain actions are recorded.
 
 **Flow Explanation:**
-The process begins with the AIW3 backend verifying that the user meets the upgrade criteria (e.g., transaction volume). Once eligible, the user burns their old NFT. The AIW3 backend then programmatically confirms this burn by checking for the closure of the NFT's Associated Token Account (ATA). Only after this on-chain verification is successful does the backend proceed to mint the new, higher-level NFT to the user's wallet.
+The user initiates all actions through the Frontend. The Frontend communicates with the AIW3 Backend for off-chain tasks (like eligibility checks) and with the user's Wallet to request signatures for on-chain transactions (like burning). The Backend then independently verifies the on-chain result (ATA closure) before minting the new NFT.
 
 ```mermaid
 sequenceDiagram
     participant User
+    participant Frontend as AIW3 Frontend (in Browser)
     participant Wallet as Phantom / Solflare
-    participant Solana as Solana Blockchain
     participant AIW3 as AIW3 Backend
+    participant Solana as Solana Blockchain
 
-    %% Step 1: User requests an upgrade and AIW3 checks eligibility
-    Note over User, AIW3: Initial State: User holds Level 1 NFT.
-    User->>AIW3: Request eligibility check for upgrade
-    AIW3->>AIW3: Verify transaction volume and other criteria
-    AIW3-->>User: Confirms eligibility for Level 2 NFT
+    %% Step 1: User requests an upgrade via the Frontend
+    User->>Frontend: Click "Check Eligibility"
+    Frontend->>AIW3: GET /api/eligibility-check
+    AIW3->>AIW3: Verify transaction volume for user
+    AIW3-->>Frontend: {"eligible": true}
+    Frontend->>User: Display "You are eligible to upgrade!"
 
-    %% Step 2: User Burns the old NFT via their wallet
-    User->>Wallet: Initiate burn for Level 1 NFT
+    %% Step 2: User initiates the burn through the Frontend & Wallet
+    User->>Frontend: Click "Burn to Upgrade"
+    Frontend->>Wallet: Request signature for burn transaction
+    User->>Wallet: Approve Transaction
     Wallet->>Solana: Submit burn & close ATA transaction
     Solana-->>Wallet: Transaction Confirmed
-    note right of Solana: Level 1 NFT's ATA is now closed.
+    Wallet-->>Frontend: Burn transaction successful
 
-    %% Step 3: AIW3 Verifies the Burn on-chain
-    User->>AIW3: I have burned my NFT, please upgrade me.
+    %% Step 3: Frontend notifies Backend, which Verifies the Burn on-chain
+    Frontend->>AIW3: POST /api/request-upgrade {burnTx: '...'}
     AIW3->>Solana: getAccountInfo(user_L1_NFT_ata_address)
     Solana-->>AIW3: null (Confirms ATA is closed)
-    note left of AIW3: Verification Success!
+    note right of AIW3: On-chain verification success!
 
     %% Step 4: AIW3 Mints the New NFT
     AIW3->>Solana: Mint Level 2 NFT to new ATA for User
     Solana-->>AIW3: Mint Successful
-    AIW3-->>User: Upgrade Complete! You now have the Level 2 NFT.
+    AIW3-->>Frontend: {"upgradeStatus": "complete"}
+    Frontend->>User: Display "Upgrade Complete! You now have the Level 2 NFT."
 
 ```
