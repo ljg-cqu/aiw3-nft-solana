@@ -275,7 +275,7 @@ graph TD
     end
 
     subgraph AIW3 Services
-        Frontend -->|"HTTPS (REST API)"| AIW3_Backend[⚙️ AIW3 Backend]
+        Frontend -->|"HTTPS (REST API)"| AIW3_Backend
         AIW3_Backend -->|Database Queries| DB[(📦 Database)]
     end
 
