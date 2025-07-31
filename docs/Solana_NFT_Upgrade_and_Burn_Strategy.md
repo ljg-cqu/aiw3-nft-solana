@@ -259,17 +259,17 @@ This diagram provides a high-level overview of the system components and their c
 
 ```mermaid
 graph TD
-    subgraph User Environment
+    subgraph "User Environment"
         User[👤 User] -->|Interacts via Browser| Frontend[🌐 AIW3 Frontend]
         Frontend -->|Wallet Adapter| Wallet[🔒 Phantom / Solflare]
     end
 
-    subgraph AIW3 Services
-        Frontend -->|"HTTPS (REST API)"| AIW3_Backend
+    subgraph "AIW3 Services"
+        Frontend -->|HTTPS REST API| AIW3_Backend[🖥️ AIW3 Backend]
         AIW3_Backend -->|Database Queries| DB[(📦 Database)]
     end
 
-    subgraph Solana Network
+    subgraph "Solana Network"
         Wallet -->|RPC/WS| Solana_Node[⚡️ Solana RPC Node]
         AIW3_Backend -->|RPC/WS| Solana_Node
         Solana_Node -->|Gossip| Solana_Cluster[🌍 Solana Blockchain]
@@ -290,6 +290,67 @@ graph TD
 -   **AIW3 Backend to Solana**: The backend connects to a Solana RPC node (either a public one or a private one like QuickNode/Helius for better performance) to query on-chain data, specifically using the `getAccountInfo` method via RPC to verify the closure of an ATA.
 
 This architecture clearly separates the on-chain and off-chain responsibilities, providing a secure and robust model for the NFT upgrade process.
+
+### 9.1. Backend System Requirements
+
+The AIW3 Backend serves as the critical bridge between the user-facing frontend and the on-chain Solana network. To ensure a secure, reliable, and scalable NFT upgrade process, the backend must meet the following requirements:
+
+#### 9.1.1. Data Model and Persistency
+
+The backend must maintain a persistent database to store information about users, their NFTs, and the status of upgrade requests. This data is essential for tracking eligibility, managing the upgrade lifecycle, and providing a reliable history of events.
+
+**Entity Relationship Diagram (ERD):**
+
+```mermaid
+erDiagram
+    USER {
+        string userId
+        string walletAddress
+        datetime createdAt
+    }
+
+    NFT {
+        string nftId
+        string mintAddress
+        string ownerWalletAddress
+string status
+    }
+
+    UPGRADE_REQUEST {
+        string requestId
+        string userId
+        string originalNftId
+        string newNftId
+        string status (e.g., pending, verified, completed, failed)
+        datetime createdAt
+        datetime updatedAt
+    }
+
+USER ||--o{ UPGRADE_REQUEST : initiates
+    UPGRADE_REQUEST }|--|| NFT : for
+```
+
+**Data Entities:**
+
+*   **USER**: Represents a user of the AIW3 system, identified by a unique `userId` and their `walletAddress`.
+*   **NFT**: Represents an NFT managed by the system, with its `mintAddress`, current `ownerWalletAddress`, and `status`.
+*   **UPGRADE_REQUEST**: Tracks the entire lifecycle of an upgrade, from initiation to completion or failure. It links the `USER` to the `originalNftId` and the `newNftId`.
+
+#### 9.1.2. Blockchain Synchronization and Monitoring
+
+The backend must implement a robust mechanism for monitoring on-chain events and synchronizing the state of the database with the Solana network. This is critical for verifying NFT burns and ensuring data integrity.
+
+**Key Responsibilities:**
+
+1.  **On-Chain Monitoring**: The backend must continuously monitor the Solana blockchain for transactions related to NFT burns. This can be achieved by:
+    *   **Subscribing to Account Changes**: Using WebSocket subscriptions to receive real-time notifications when an Associated Token Account (ATA) is closed.
+    *   **Periodic Polling**: Regularly querying the blockchain to check the status of ATAs for pending upgrade requests.
+
+2.  **State Synchronization**: When an on-chain event is detected (e.g., an ATA is closed), the backend must update the corresponding records in its database. For example, upon verifying a burn, the `status` of the `NFT` should be updated to `burned` and the `status` of the `UPGRADE_REQUEST` should be updated to `verified`.
+
+3.  **Error Handling and Retries**: The backend must be designed to handle potential failures, such as network interruptions or failed transactions. This includes implementing retry mechanisms for on-chain queries and ensuring that the system can recover gracefully from errors.
+
+By implementing these backend requirements, the AIW3 system can provide a secure, reliable, and trustworthy NFT upgrade experience for its users.
 
 ## 10. Business Process: NFT Upgrade Sequence Diagram
 
@@ -329,7 +390,7 @@ sequenceDiagram
     Wallet-->>Frontend: Burn transaction successful
 
     %% Step 3: Frontend notifies Backend, which Verifies the Burn on-chain
-    Frontend->>AIW3: POST /api/request-upgrade {burnTx: '...'}
+    Frontend->>AIW3: POST /api/request-upgrade {burnTx: "..."}
     AIW3->>Solana: getAccountInfo(user_L1_NFT_ata_address)
     Solana-->>AIW3: null (Confirms ATA is closed)
     note right of AIW3: On-chain verification success!
@@ -339,5 +400,4 @@ sequenceDiagram
     Solana-->>AIW3: Mint Successful
     AIW3-->>Frontend: {"upgradeStatus": "complete"}
     Frontend->>User: Display "Upgrade Complete! You now have the Level 2 NFT."
-
 ```
