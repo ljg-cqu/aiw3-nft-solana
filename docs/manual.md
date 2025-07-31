@@ -26,7 +26,9 @@ This category includes unique NFTs awarded for specific, one-time achievements. 
 
 ## 3. Equity NFT Lifecycle and User Journeys
 
-![Equity NFT Lifecycle Overview](diagrams/lifecycle-overview.png)
+```mermaid
+{{#include diagrams/lifecycle-overview.mmd}}
+```
 
 This section outlines the primary end-to-end user journeys within the AIW3 NFT ecosystem.
 
@@ -34,19 +36,25 @@ This section outlines the primary end-to-end user journeys within the AIW3 NFT e
 
 The following diagram illustrates the primary use cases from a user's perspective.
 
-![Use Case Overview](diagrams/use-case-overview.png)
+```mermaid
+{{#include diagrams/use-case-overview.mmd}}
+```
 
 ### 3.2 New User Onboarding
 This process describes how a new user joins the platform. Acquiring an Equity NFT is a subsequent step that requires meeting platform criteria.
 
-![New User Onboarding Flow](diagrams/onboarding-flow.png)
+```mermaid
+{{#include diagrams/onboarding-flow.mmd}}
+```
 1.  **[User] Registration:** A user creates an account on the AIW3 platform.
 2.  **[System] Outcome:** The user has a standard account and can begin using platform features like trading. They do not hold any Equity NFT at this stage. The journey to acquire their first NFT begins when they start trading.
 
 ### 3.3 NFT Level Progression via Trading Volume
 This is the core process for a user to upgrade their status on the platform by meeting trading volume and other criteria.
 
-![NFT Level Progression Flow](diagrams/progression-flow.png)
+```mermaid
+{{#include diagrams/progression-flow.mmd}}
+```
 1.  **[User] Trading Activity:** The **[User]** engages in trading on the AIW3 platform. The **[System]** tracks their cumulative trading volume.
 2.  **[System] Threshold Check:** Once the user's volume reaches the threshold for the next NFT level (e.g., ≥ 100,000 USDT for Lv.1), the **[System]** checks for any other requirements.
 3.  **[User] Fulfilling Additional Requirements:** For Lv.2 and above, the **[User]** must also earn and bind a specific number of "Badge NFTs" by completing platform tasks or participating in campaigns.
@@ -56,14 +64,18 @@ This is the core process for a user to upgrade their status on the platform by m
 ### 3.4 Community Status and Benefit Realization
 This process is ongoing and demonstrates the value of holding an active NFT.
 
-![Benefit Realization Flow](diagrams/benefit-realization-flow.png)
+```mermaid
+{{#include diagrams/benefit-realization-flow.mmd}}
+```
 1.  **[System] Public Display:** The **[System]** continuously displays the user's active NFT level as a "Micro Badge" on their profile, mini-homepage, and next to their name in community discussions, signaling their status to others.
 2.  **[System] Benefit Application:** The **[System]** automatically applies platform benefits, such as trading fee discounts or airdrop bonuses, to the user's account based on their active NFT's level.
 
 ### 3.5 Exiting or Downgrading (Selling NFTs)
 This process describes how a user can liquidate their NFT assets.
 
-![Exit and Downgrade Flow](diagrams/exit-flow.png)
+```mermaid
+{{#include diagrams/exit-flow.mmd}}
+```
 1.  **[User & External System] Listing on Marketplace:** The **[User]** lists their NFT (e.g., a Lv.4 "Master" NFT) for sale on an **[External System]** (a Solana marketplace).
 2.  **[External System] Sale:** Another user purchases the NFT on the marketplace.
 3.  **[System & External System] Outcome:** The NFT is transferred out of the original user's wallet by the **[External System]**. The **[System]** detects this change, revokes all associated benefits, and automatically downgrades the user's public "Micro Badge" to the next-highest NFT they hold (or removes it).
@@ -91,7 +103,9 @@ There are 5 levels of Equity NFTs that users can unlock through platform activit
 
 An NFT can exist in several states throughout its lifecycle on the platform.
 
-![NFT Status Lifecycle](diagrams/status-lifecycle.png)
+```mermaid
+{{#include diagrams/status-lifecycle.mmd}}
+```
 
 -   **Unlockable:** This is a pre-mint state where a user has met the criteria to receive an NFT (e.g., by registering) but has not yet claimed it. The NFT does not exist on the blockchain at this point. The user must perform an action to mint it.
 
@@ -228,7 +242,9 @@ The AIW3 system interacts with the Solana blockchain in two ways: by calling cus
 
 The following diagram illustrates the interaction between the user, AIW3's off-chain services, and the on-chain Solana programs.
 
-![System Architecture Diagram](diagrams/system-architecture.png)
+```mermaid
+{{#include diagrams/system-architecture.mmd}}
+```
 
 **Interaction Flow:**
 1.  The **User** interacts with the **Frontend**.
@@ -249,7 +265,9 @@ The following diagram illustrates the interaction between the user, AIW3's off-c
 
 To execute the business logic described in this manual, the AIW3 smart contract must store and manage state on the Solana blockchain. This is achieved through several custom on-chain accounts (data structures). The following diagram illustrates the relationships between these core data models.
 
-![On-Chain Data Model ERD](diagrams/on-chain-data-model.png)
+```mermaid
+{{#include diagrams/on-chain-data-model.mmd}}
+```
 
 ### 11.1 Data Model Descriptions
 
