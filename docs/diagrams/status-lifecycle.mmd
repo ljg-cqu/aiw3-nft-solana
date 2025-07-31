@@ -1,2 +1,6 @@
 graph TD
-    A[Placeholder for status-lifecycle.png] --> B{Please provide Mermaid code};
+    title NFT Status Lifecycle
+    A[Unlockable] -- User Claims --> B[Inactive];
+    B -- User Activates --> C[Active];
+    B -- User Sells/Transfers --> D[Transferred Out];
+    C -- User Sells/Transfers --> D;

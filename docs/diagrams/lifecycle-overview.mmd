@@ -1,2 +1,8 @@
 graph TD
-    A[Placeholder for lifecycle-overview.png] --> B{Please provide Mermaid code};
+    title Equity NFT Lifecycle Overview
+    subgraph "User Journey"
+        A[New User Onboarding] --> B(NFT Level Progression);
+        B --> C(Benefit Realization);
+        C --> B;
+        C --> D(Exit / Downgrade);
+    end

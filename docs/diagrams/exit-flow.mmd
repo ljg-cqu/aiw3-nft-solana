@@ -1,2 +1,12 @@
 graph TD
-    A[Placeholder for exit-flow.png] --> B{Please provide Mermaid code};
+    title Exit and Downgrade Flow
+    subgraph "User Sells NFT"
+        A([User]) -- 1. Lists NFT for Sale --> B[External Marketplace];
+        C([Buyer]) -- 2. Purchases NFT --> B;
+    end
+    B -- Transfers NFT from User to Buyer --> C;
+    subgraph "AIW3 Platform Reaction"
+        D((System)) -- 3. Monitors Blockchain --> E{Detects Transfer};
+        E --> F[Revoke Benefits from Seller];
+        E --> G[Downgrade Seller's Micro Badge];
+    end

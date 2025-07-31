@@ -1,2 +1,8 @@
 graph TD
-    A[Placeholder for benefit-realization-flow.png] --> B{Please provide Mermaid code};
+    title Benefit Realization Flow
+    subgraph "Ongoing Value of Active NFT"
+        A((System)) -- 1. Displays "Micro Badge" --> B{Public Profile & Community};
+        A -- 2. Applies Tier Benefits --> C{User's Account};
+    end
+    B -- Signals Status --> D([Other Users]);
+    C -- e.g., Fee Discounts, Airdrop Bonuses --> E([User]);
