@@ -13,8 +13,8 @@ The AIW3 platform features two distinct categories of NFTs. It is crucial to und
 ### 2.1 Equity NFTs (Primary Progression)
 This is the main category of NFTs on the platform, representing a user's level, status, and ongoing benefits.
 -   **Purpose:** To serve as a user's primary identity and status credential, unlocking progressively greater platform-wide benefits.
--   **Acquisition:** Equity NFTs are **unlocked** when a user meets specific criteria, primarily based on their cumulative trading volume on the platform. For higher levels, users must also acquire and bind a number of "Badge NFTs" earned through platform tasks.
--   **Function:** They form a clear progression ladder. Holding a higher-level Equity NFT grants significant advantages like trading fee discounts, airdrop bonuses, and enhanced community visibility via a "Micro Badge". The entire lifecycle of claiming, synthesizing, and activating revolves around this type.
+-   **Acquisition:** Equity NFTs are **unlocked** when a user meets specific criteria, primarily based on their cumulative trading volume and by binding "Badge NFTs". This process does **not** involve consuming lower-level Equity NFTs (i.e., it is not synthesis).
+-   **Function:** They form a clear progression ladder. Holding a higher-level Equity NFT grants significant advantages like trading fee discounts, airdrop bonuses, and enhanced community visibility via a "Micro Badge". The entire lifecycle of unlocking and activating revolves around this type.
 -   **Minting Authority:** All Equity NFTs are created (minted) exclusively by the AIW3 platform's official programs when a user meets the unlock criteria. While these NFTs can be freely traded between users on external marketplaces *after* they are unlocked, the AIW3 system is the sole source of their creation.
 
 ### 2.2 Special NFTs (Achievement-Based)
@@ -28,22 +28,21 @@ This category includes unique NFTs awarded for specific, one-time achievements. 
 
 ```mermaid
 graph TD
-    A[New User Onboards & Claims Lv.1 NFT] --> B[Hold Active NFT];
+    A[New User Onboards] --> B[User Trades on Platform];
     
     subgraph "Platform Core Loop"
-        B -- "Realize Benefits" --> B;
-        B --> C{Synthesize to Upgrade};
-        C -- "Success" --> B;
+        B -- "Accumulate Volume" --> C{Meets Upgrade Criteria?};
+        C -- "Yes" --> D[User Unlocks New NFT Tier];
+        D --> E[Hold Active NFT];
+        E -- "Realize Benefits" --> B;
     end
 
     subgraph "External Marketplace Interaction"
         M[Solana Marketplace];
     end
 
-    C -- "Acquire Materials" --> M;
-    M -- "Provide Materials" --> C;
-    B -- "Sell NFT" --> M;
-    M -- "Acquire NFT" --> B;
+    E -- "Sell NFT" --> M;
+    M -- "Acquire NFT" --> E;
 ```
 
 This section outlines the primary end-to-end user journeys within the AIW3 NFT ecosystem.
@@ -68,7 +67,7 @@ graph TD
     B --> C{Meets Volume Threshold?};
     C -- Yes --> D{Meets Badge NFT<br>Requirement?};
     D -- Yes --> E[System shows NFT as Unlockable];
-    E --> F{User Unlocks & Activates NFT};
+    E --> F{User Pays CGas Fee<br>to Unlock & Activate};
     F --> G[Benefits & Badge Updated];
     C -- No --> A;
     D -- No --> H[User Earns Badge NFTs<br>via Tasks/Campaigns];
@@ -77,7 +76,7 @@ graph TD
 1.  **[User] Trading Activity:** The **[User]** engages in trading on the AIW3 platform. The **[System]** tracks their cumulative trading volume.
 2.  **[System] Threshold Check:** Once the user's volume reaches the threshold for the next NFT level (e.g., ≥ 100,000 USDT for Lv.1), the **[System]** checks for any other requirements.
 3.  **[User] Fulfilling Additional Requirements:** For Lv.2 and above, the **[User]** must also earn and bind a specific number of "Badge NFTs" by completing platform tasks or participating in campaigns.
-4.  **[User & System] Unlocking and Activation:** When all criteria are met, the **[System]** makes the corresponding Equity NFT available to the user as "Unlockable". The **[User]** must then perform an action to unlock and activate the NFT.
+4.  **[User & System] Unlocking and Activation:** When all criteria are met, the **[System]** makes the corresponding Equity NFT available to the user as "Unlockable". The **[User]** must then pay a small fee in **CGas** to perform the action that unlocks and activates the NFT.
 5.  **[System] Outcome:** Upon activation, the **[System]** grants the user the new tier's benefits (e.g., fee discounts) and updates their public "Micro Badge".
 
 ### 3.3 Community Status and Benefit Realization
@@ -142,22 +141,14 @@ An NFT can exist in several states throughout its lifecycle on the platform.
 ```mermaid
 stateDiagram-v2
     [*] --> Unlockable: User meets criteria
-    Unlockable --> Inactive: User claims
-    
-    [*] --> Inactive: Acquired via Synthesis
-    
+    Unlockable --> Inactive: User claims/unlocks
     Inactive --> Active: User activates
-    
-    Active --> Locked: Used in new synthesis
-    Locked --> Consumed: Synthesis completes
-    
     Active --> [*]: Sold or Transferred
-    Consumed --> [*]
 ```
 
 -   **Unlockable:** This is a pre-mint state where a user has met the criteria to receive an NFT (e.g., by registering) but has not yet claimed it. The NFT does not exist on the blockchain at this point. The user must perform an action to mint it.
 
--   **Inactive:** Once an NFT is minted to a user's wallet (either by claiming an unlockable one or through synthesis), it may start in an "Inactive" state. In this state, the user owns the NFT, but the associated benefits (like fee discounts) are not yet applied.
+-   **Inactive:** Once an NFT is minted to a user's wallet (by claiming an unlockable one), it may start in an "Inactive" state. In this state, the user owns the NFT, but the associated benefits (like fee discounts) are not yet applied.
 
 -   **Active:** The user must explicitly activate an "Inactive" NFT. Once active, the NFT grants all its associated benefits and privileges. The user's public-facing Micro Badge is updated to reflect this active NFT if it's their highest level.
 
@@ -193,11 +184,12 @@ This section details the specific actions users can take regarding their NFTs, o
 
 ### 6.3 Unlocking an Equity NFT
 
--   **Description:** A **user-initiated** action to claim and activate an Equity NFT after meeting the required criteria.
+-   **Description:** A **user-initiated** action to claim and activate an Equity NFT after meeting the required criteria, which involves paying a small fee in CGas.
 -   **Pre-condition:**
     -   User's cumulative trading volume has met the threshold for the target NFT level.
     -   User has acquired and bound the required number of Badge NFTs (for Lv.2+).
     -   The target NFT is in the **Unlockable** state for the user.
+    -   User has sufficient **CGas** to pay the unlock fee.
 -   **Post-condition:**
     -   A new Equity NFT is minted to the user's wallet (or its state is updated if they already hold a lower level).
     -   The NFT's status becomes **Active**.
@@ -229,11 +221,11 @@ This section describes how users interact with their NFTs on the platform.
 The Personal Center is the main hub for a user to manage their **Equity NFTs**. From here, they can:
 -   View their entire collection of owned Equity NFTs.
 -   See which NFTs are "Unlockable" and claim them.
--   Initiate the synthesis process to upgrade their NFTs.
+-   View their progress towards unlocking the next NFT tier.
 
 ### Activation Process
 
--   After acquiring a new, higher-level **Equity NFT** (either through synthesis or other means), it appears in an inactive state.
+-   After unlocking a new, higher-level **Equity NFT**, it appears in an inactive state.
 -   A popup will prompt the user to "Activate" the NFT.
 -   Activating the NFT enables its associated benefits and updates the user's public-facing badge.
 
@@ -247,7 +239,7 @@ A user's status is visibly represented throughout the platform to signify their 
 ### System Notifications
 
 Users are kept informed of NFT-related events through system messages. These include notifications for:
--   Successful or failed synthesis attempts.
+-   Successful NFT tier upgrades.
 -   Acquisition of a new NFT.
 -   Prompts to activate a newly acquired NFT.
 
@@ -268,6 +260,11 @@ This section defines the core concepts used throughout this document.
     -   **Utility:** While each token is a unique non-fungible asset on the blockchain, its utility is fungible within its tier. This means any Lv.2 NFT provides the exact same benefits as any other Lv.2 NFT.
     -   **Analogy:** This is similar to a customer loyalty program (e.g., Bronze, Silver, Gold status) or leveling up a character in a game. Each new tier provides enhanced status and perks, with the top tier granting equity-like benefits. Your "Gold" membership card is unique to you, but it gives you the same benefits as every other "Gold" member.
 
+
+-   **Synthesis (Legacy Term):** This term may appear in some older materials and refers to the process of combining and consuming lower-level NFTs to create a higher-level one. **This progression model is not in use for Equity NFTs.** The current and correct progression model is **Unlocking** via trading volume and binding Badge NFTs. The FAQ question "How to Obtain the Required Badge NFTs for Synthesis?" should be interpreted as "How to Obtain the Required Badge NFTs for *upgrading*?".
+
+-   **CGas:** A platform-specific token required to pay for certain transactions, such as unlocking a new Equity NFT tier.
+    -   **Analogy:** Similar to "gas" on Ethereum, CGas is the fuel for specific platform operations.
 
 -   **Solana:** A high-performance blockchain network on which the AIW3 NFTs are built, recorded, and traded.
     -   **Analogy:** If an NFT is a valuable package, Solana is the global, super-fast, and secure courier service that handles its delivery and tracks its ownership history transparently.
