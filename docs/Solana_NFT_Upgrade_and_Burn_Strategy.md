@@ -326,8 +326,8 @@ string status
         datetime updatedAt
     }
 
-USER ||--o{ UPGRADE_REQUEST : initiates
-    UPGRADE_REQUEST }|--|| NFT : for
+    USER ||--o{ UPGRADE_REQUEST : "initiates"
+    UPGRADE_REQUEST }|--|| NFT : "for"
 ```
 
 **Data Entities:**
