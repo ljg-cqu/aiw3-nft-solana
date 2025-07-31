@@ -1,3 +1,23 @@
+### Overview
+
+This document outlines the definitive method for managing the lifecycle of upgradeable NFTs within the AIW3 DeFi system. 
+
+**The Problem**: To upgrade a user from a lower-level NFT to a higher-level one, the lower-level NFT must be permanently and verifiably disabled to prevent its continued use or sale.
+
+**The Optimal Solution**: The most secure and reliable approach is to have the user burn their existing NFT. The AIW3 system then programmatically verifies this burn on-chain by confirming that the NFT's specific Associated Token Account (ATA) has been closed. This method is unambiguous, aligns with Solana standards, and empowers the user.
+
+This document provides a detailed analysis of this approach, a comparison with less secure alternatives, and a technical implementation guide with code samples and a sequence diagram to ensure clarity.
+
+### Overview
+
+This document outlines the definitive method for managing the lifecycle of upgradeable NFTs within the AIW3 DeFi system. 
+
+**The Problem**: To upgrade a user from a lower-level NFT to a higher-level one, the lower-level NFT must be permanently and verifiably disabled to prevent its continued use or sale.
+
+**The Optimal Solution**: The most secure and reliable approach is to have the user burn their existing NFT. The AIW3 system then programmatically verifies this burn on-chain by confirming that the NFT's specific Associated Token Account (ATA) has been closed. This method is unambiguous, aligns with Solana standards, and empowers the user.
+
+This document provides a detailed analysis of this approach, a comparison with less secure alternatives, and a technical implementation guide with code samples and a sequence diagram to ensure clarity.
+
 ### Core Solana NFT Mechanics: Mint Accounts and ATAs
 
 To understand how to properly invalidate an NFT on Solana, it is essential to first understand two core concepts:
