@@ -32,13 +32,13 @@ Given the mechanics above, the only truly reliable way to confirm an NFT is perm
 ## Quick Comparison Table
 
 | Approach | Technical Feasibility | Cost (Gas Fee) | Implementation Difficulty | Future Maintenance | Business Logic Compliance | Trust | True Invalidation | Recommendation |
-|----------|----------------------|----------------|---------------------------|--------------------|-----------------------------|-------------------|----------------|
-| **1. Public Blackhole Address** | ✅ High - Standard transfer | 💰 Very Low (~$0.0005) | 🟢 Low - Simple transfer | 🟢 Low - Fixed address check | ⚠️ Partial - NFT still exists on-chain | ⚠️ Low - Relies on public knowledge | ❌ No | Not Recommended |
-| **2. Custom Blackhole Address** | ✅ High - Standard transfer | 💰 Very Low (~$0.0005) | 🟡 Moderate - Need secure address generation | 🟢 Low - Fixed address check | ⚠️ Partial - NFT still exists on-chain | 🟡 Medium - Requires secure setup | ❌ No | Not Recommended |
-| **3. AIW3 System Wallet** | ✅ High - Standard transfer | 💰 Very Low (~$0.0005) | 🟡 Moderate - Wallet management | 🔴 High - NFT inventory management | ⚠️ Partial - Centralized control needed | 🔴 Low - Relies on system integrity | ❌ No | Not Recommended |
-| **4. Dedicated Wallet** | ✅ High - Standard transfer | 💰 Very Low (~$0.0005) | 🟡 Moderate - Additional wallet management | 🔴 High - NFT inventory management | ⚠️ Partial - Centralized control needed | 🟡 Medium - Separate internal control | ❌ No | Not Recommended |
-| **5. User Burns NFT Directly** | ✅ High - Native Solana operation | 💰 Very Low + SOL rent recovery | 🟡 Moderate - Burn verification | 🟢 Low - Simple verification | ✅ Strong - Permanent removal | ✅ High - User-managed process | ✅ Yes | **⭐ RECOMMENDED** |
-| **6. Transfer + System Burns** | ✅ High - Transfer + burn | 💰 Low - Double transaction | 🔴 High - Complex flow management | 🔴 High - Trust and complexity | ✅ Strong - Permanent removal | 🔴 Low - System-managed process | ⚠️ Partial | Consider as alternative |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **1. Public Blackhole Address** | ✅ High | 💰 Very Low | 🟢 Low | 🟢 Low | ⚠️ Partial | ⚠️ Low | ❌ No | Not Recommended |
+| **2. Custom Blackhole Address** | ✅ High | 💰 Very Low | 🟡 Moderate | 🟢 Low | ⚠️ Partial | 🟡 Medium | ❌ No | Not Recommended |
+| **3. AIW3 System Wallet** | ✅ High | 💰 Very Low | 🟡 Moderate | 🔴 High | ⚠️ Partial | 🔴 Low | ❌ No | Not Recommended |
+| **4. Dedicated Wallet** | ✅ High | 💰 Very Low | 🟡 Moderate | 🔴 High | ⚠️ Partial | 🟡 Medium | ❌ No | Not Recommended |
+| **5. User Burns NFT Directly** | ✅ High | 💰 Very Low | 🟡 Moderate | 🟢 Low | ✅ Strong | ✅ High | ✅ Yes | **⭐ RECOMMENDED** |
+| **6. Transfer + System Burns** | ✅ High | 💰 Low | 🔴 High | 🔴 High | ✅ Strong | 🔴 Low | ⚠️ Partial | Consider as alternative |
 
 **Legend:**
 - ✅ Excellent/Yes  ⚠️ Moderate/Partial  ❌ Poor/No
