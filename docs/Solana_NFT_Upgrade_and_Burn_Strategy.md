@@ -334,7 +334,16 @@ erDiagram
 
 *   **USER**: Represents a user of the AIW3 system, identified by a unique `userId` and their `walletAddress`.
 *   **NFT**: Represents an NFT managed by the system, with its `mintAddress`, current `ownerWalletAddress`, and `status`.
+    *   **status**: The current state of the NFT within the system.
+        *   `active`: The NFT is held by a user and is valid for use.
+        *   `burning`: The user has initiated the burn process for an upgrade.
+        *   `burned`: The system has verified on-chain that the NFT has been permanently burned.
 *   **UPGRADE_REQUEST**: Tracks the entire lifecycle of an upgrade, from initiation to completion or failure. It links the `USER` to the `originalNftId` and the `newNftId`.
+    *   **status**: The current state of the upgrade request.
+        *   `pending`: The user has initiated the upgrade, but the burn has not yet been verified by the backend.
+        *   `verified`: The backend has confirmed the original NFT's burn on-chain.
+        *   `completed`: The new, higher-level NFT has been successfully minted to the user.
+        *   `failed`: The upgrade process failed (e.g., burn verification timed out, minting failed).
 
 #### 9.1.2. Blockchain Synchronization and Monitoring
 
