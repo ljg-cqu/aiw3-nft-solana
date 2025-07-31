@@ -219,3 +219,38 @@ async function verifyNftIsBurned(connection, userWallet, nftMint) {
 
 **Implementation:**
 The AIW3 backend must implement a function to `verifyNftIsBurned`. This function will deterministically find the address of the NFT's ATA and confirm that the account no longer exists by checking that `getAccountInfo` returns `null`. Minting of the new, upgraded NFT should only proceed after this verification is successful. All other approaches are not recommended as they introduce unnecessary risk, complexity, and ambiguity.
+
+### Business Process: NFT Upgrade Sequence Diagram
+
+This diagram illustrates the end-to-end flow of the recommended approach.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Wallet as Phantom / Solflare
+    participant Solana as Solana Blockchain
+    participant AIW3 as AIW3 Backend
+
+    %% Step 1: Initial State - User has a Level 1 NFT
+    Note over User, AIW3: Initial State: User holds Level 1 NFT.
+    User->>AIW3: Check eligibility for upgrade
+    AIW3-->>User: Confirms eligibility
+
+    %% Step 2: User Burns the old NFT
+    User->>Wallet: Initiate burn for Level 1 NFT
+    Wallet->>Solana: Submit burn & close ATA transaction
+    Solana-->>Wallet: Transaction Confirmed
+    note right of Solana: Level 1 NFT's ATA is now closed.
+
+    %% Step 3: AIW3 Verifies the Burn
+    User->>AIW3: Request NFT upgrade
+    AIW3->>Solana: getAccountInfo(user_L1_NFT_ata_address)
+    Solana-->>AIW3: null (Account not found)
+    note left of AIW3: Verification Success!
+
+    %% Step 4: AIW3 Mints the New NFT
+    AIW3->>Solana: Mint Level 2 NFT to new ATA for User
+    Solana-->>AIW3: Mint Successful
+    AIW3-->>User: Upgrade Complete! You now have the Level 2 NFT.
+
+```
