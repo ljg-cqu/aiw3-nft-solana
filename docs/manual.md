@@ -47,7 +47,27 @@ graph TD
 
 This section outlines the primary end-to-end user journeys within the AIW3 NFT ecosystem.
 
-### 3.1 New User Onboarding
+### 3.1 Use Case Overview
+
+The following diagram illustrates the primary use cases from a user's perspective.
+
+```mermaid
+left to right direction
+actor User
+
+rectangle "AIW3 Equity NFT System" {
+  User -- (Unlock Equity NFT)
+  User -- (Bind Badge NFT)
+  User -- (Activate Special NFT)
+  User -- (Sell/Transfer NFT)
+
+  (Unlock Equity NFT) ..> (Meet Trading Volume) : <<include>>
+  (Unlock Equity NFT) ..> (Pay CGas Fee) : <<include>>
+  (Unlock Equity NFT) ..> (Bind Badge NFT) : <<include>>
+}
+```
+
+### 3.2 New User Onboarding
 This process describes how a new user joins the platform. Acquiring an Equity NFT is a subsequent step that requires meeting platform criteria.
 
 ```mermaid
@@ -58,7 +78,7 @@ graph TD
 1.  **[User] Registration:** A user creates an account on the AIW3 platform.
 2.  **[System] Outcome:** The user has a standard account and can begin using platform features like trading. They do not hold any Equity NFT at this stage. The journey to acquire their first NFT begins when they start trading.
 
-### 3.2 NFT Level Progression via Trading Volume
+### 3.3 NFT Level Progression via Trading Volume
 This is the core process for a user to upgrade their status on the platform by meeting trading volume and other criteria.
 
 ```mermaid
@@ -79,7 +99,7 @@ graph TD
 4.  **[User & System] Unlocking and Activation:** When all criteria are met, the **[System]** makes the corresponding Equity NFT available to the user as "Unlockable". The **[User]** must then pay a small fee in **CGas** to perform the action that unlocks and activates the NFT.
 5.  **[System] Outcome:** Upon activation, the **[System]** grants the user the new tier's benefits (e.g., fee discounts) and updates their public "Micro Badge".
 
-### 3.3 Community Status and Benefit Realization
+### 3.4 Community Status and Benefit Realization
 This process is ongoing and demonstrates the value of holding an active NFT.
 
 ```mermaid
@@ -90,7 +110,7 @@ graph TD
 1.  **[System] Public Display:** The **[System]** continuously displays the user's active NFT level as a "Micro Badge" on their profile, mini-homepage, and next to their name in community discussions, signaling their status to others.
 2.  **[System] Benefit Application:** The **[System]** automatically applies platform benefits, such as trading fee discounts or airdrop bonuses, to the user's account based on their active NFT's level.
 
-### 3.4 Exiting or Downgrading (Selling NFTs)
+### 3.5 Exiting or Downgrading (Selling NFTs)
 This process describes how a user can liquidate their NFT assets.
 
 ```mermaid
@@ -263,17 +283,76 @@ Users are kept informed of NFT-related events through system messages. These inc
 
 This section outlines the high-level architecture of the Solana smart contract (program) that governs the AIW3 Equity NFT system. All operations that change the state or ownership of an NFT are handled by this on-chain program, which is written in Rust. The AIW3 backend and frontend are responsible for calling these on-chain functions in response to user actions.
 
-### Mapping User Operations to On-Chain Functions
+### Mapping User Operations to On-Chain Interactions
 
-| User Operation (from Section 6) | On-Chain Program Function | Description |
-|---------------------------------|---------------------------|-------------|
-| **Unlocking an Equity NFT**     | `unlock_tier(level)`      | The core progression function. The AIW3 backend first verifies off-chain criteria (trading volume). If met, it authorizes the user to call this function. The program then performs on-chain checks: verifies ownership of the required *bound* Badge NFTs, confirms the user is unlocking the next sequential level, transfers the CGas fee, and mints the new Equity NFT directly into the `Active` state. |
-| **Binding a Badge NFT**         | `bind_badge(badge_nft_mint)` | A prerequisite for unlocking higher tiers. The user initiates this action for a Badge NFT they own. The program verifies the user's ownership of the `badge_nft_mint` and records it in a user-specific on-chain account, marking it as "bound" and available for `unlock_tier` checks. |
-| **Activating an NFT**           | `activate_nft(nft_mint)`  | Used for special, airdropped NFTs (like the Breeder Reward NFT) that are minted in an `Inactive` state. The program verifies the user owns the `nft_mint` and flips its on-chain status from `Inactive` to `Active`, enabling its benefits. |
-| **Claiming an NFT**             | `claim_reward(reward_id)` | A system-controlled minting function for special awards. The AIW3 backend whitelists a user for a `reward_id`. The user then calls this function, which verifies their eligibility on-chain and mints the corresponding NFT to their wallet in an `Inactive` state. |
-| **Selling/Transferring an NFT** | `N/A (Standard SPL Transfer)` | This is **not** a function of the AIW3 program. It is a standard Solana token transfer handled by external marketplace programs. The AIW3 backend must **monitor** the blockchain for transfer events involving its NFTs to reactively update user benefits and badges. |
+The AIW3 system interacts with the Solana blockchain in two ways: by calling custom-built smart contract functions for its unique business logic, and by utilizing standard Solana programs (like the SPL Token program) for common tasks.
 
-## 10. Project Roadmap, Scope, and Timeline
+| User Operation                  | On-Chain Interaction            | Interaction Type                | Description |
+|---------------------------------|---------------------------------|---------------------------------|-------------|
+| **Unlocking an Equity NFT**     | `unlock_tier(level)`            | **Custom Smart Contract**       | The core progression function. The AIW3 backend first verifies off-chain criteria (trading volume). If met, it authorizes the user to call this function. The program then performs on-chain checks: verifies ownership of the required *bound* Badge NFTs, confirms the user is unlocking the next sequential level, transfers the CGas fee, and mints the new Equity NFT directly into the `Active` state by calling the SPL Token program. |
+| **Binding a Badge NFT**         | `bind_badge(badge_nft_mint)`    | **Custom Smart Contract**       | A prerequisite for unlocking higher tiers. The user initiates this action for a Badge NFT they own. The program verifies the user's ownership of the `badge_nft_mint` and records it in a user-specific on-chain state account, marking it as "bound" and available for `unlock_tier` checks. |
+| **Activating an NFT**           | `activate_nft(nft_mint)`        | **Custom Smart Contract**       | Used for special, airdropped NFTs (like the Breeder Reward NFT) that are minted in an `Inactive` state. The program verifies the user owns the `nft_mint` and flips its on-chain status from `Inactive` to `Active`, enabling its benefits. |
+| **Claiming an NFT**             | `claim_reward(reward_id)`       | **Custom Smart Contract**       | A system-controlled minting function for special awards. The AIW3 backend whitelists a user for a `reward_id`. The user then calls this function, which verifies their eligibility on-chain and mints the corresponding NFT to their wallet in an `Inactive` state. |
+| **Selling/Transferring an NFT** | Standard `spl-token` transfer   | **Standard Solana Program**     | This is **not** a function of the AIW3 program. It is a standard Solana token transfer handled by external marketplace programs. The AIW3 backend must **monitor** the blockchain for transfer events involving its NFTs to reactively update user benefits and badges. |
+
+## 10. System Architecture and Technology Stack
+
+### 10.1 Architectural Diagram
+
+The following diagram illustrates the interaction between the user, AIW3's off-chain services, and the on-chain Solana programs.
+
+```mermaid
+graph TD
+    subgraph "User Environment"
+        User(👤 User)
+        Frontend[🌐 Frontend <br> (Web/Mobile App)]
+    end
+
+    subgraph "AIW3 Off-Chain Infrastructure"
+        Backend[⚙️ AIW3 Backend]
+        DB[(📄 Database<br>Trade Volume, User Data)]
+    end
+
+    subgraph "Solana Blockchain (On-Chain)"
+        RPC[Solana JSON RPC API]
+        subgraph "Custom Programs"
+            AIW3Contract[📜 AIW3 Equity NFT Program<br>(unlock_tier, bind_badge)]
+        end
+        subgraph "Standard Programs"
+            SPLToken[spl-token<br>(transfer, mint)]
+        end
+    end
+
+    User --> Frontend
+    Frontend <--> Backend
+    Backend <--> DB
+
+    Backend -- "1. Verify Off-Chain Conditions (e.g., Volume)" --> DB
+    Backend -- "2. Construct & Sign Transaction" --> RPC
+    RPC -- "3. Submit to Network" --> AIW3Contract
+    RPC -- "3. Submit to Network" --> SPLToken
+    
+    AIW3Contract -- "Calls" --> SPLToken
+    
+    Backend -- "Reads On-Chain State" --> RPC
+```
+
+**Interaction Flow:**
+1.  The **User** interacts with the **Frontend**.
+2.  The **Frontend** sends requests to the **AIW3 Backend**.
+3.  For operations like unlocking, the **Backend** first verifies off-chain data (e.g., cumulative trade volume from its **Database**).
+4.  If conditions are met, the **Backend** constructs a transaction to call the appropriate on-chain program and sends it via the **Solana JSON RPC API**.
+5.  The transaction is processed by the network, executing functions in either the **Custom AIW3 Program** (for business logic) or the **Standard SPL Token Program** (for simple transfers).
+6.  The **Backend** also monitors the blockchain via the **RPC API** to read on-chain state and react to events like NFT transfers.
+
+### 10.2 Core Technology Stack
+
+-   **Rust:** The programming language used to write secure and high-performance Solana smart contracts.
+-   **Anchor Framework:** A framework for Solana's Sealevel runtime that simplifies writing Rust-based smart contracts by handling boilerplate, providing a domain-specific language (DSL), and ensuring security best practices.
+-   **Solana Program Library (SPL):** A collection of pre-audited, standard on-chain programs for common tasks. We will primarily use the `spl-token` program for creating, minting, and transferring NFTs, which are a type of SPL token.
+-   **Solana JSON RPC API:** The primary interface for off-chain clients (like the AIW3 backend) to interact with the Solana blockchain—sending transactions and querying on-chain data.
+
+## 11. Project Roadmap, Scope, and Timeline
 
 This section provides a high-level roadmap for the implementation of the Equity NFT smart contract system on Solana. The timeline is an estimate and subject to change based on development complexity, audit findings, and integration challenges.
 
@@ -290,7 +369,7 @@ This section provides a high-level roadmap for the implementation of the Equity 
 | 7     | Mainnet Soft Launch & Monitoring    | - Deploy the final, audited contract to the Solana Mainnet under controlled access (e.g., internal team or beta testers).<br>- Perform final validation and monitor for any unexpected behavior in a live environment.<br>- Prepare public-facing documentation and support materials.                 | 1 Week             |
 | 8     | Official Public Launch              | - Announce the official launch of the Equity NFT system to all users.<br>- Enable all features for the public.<br>- The development team provides heightened monitoring and support during the initial launch period.                                                                                 | Launch Day         |
 
-## 11. Terminologies
+## 12. Terminologies
 
 This section defines the core concepts used throughout this document.
 
