@@ -245,7 +245,37 @@ The following diagram illustrates the interaction between the user, AIW3's off-c
 -   **Solana Program Library (SPL):** A collection of pre-audited, standard on-chain programs for common tasks. We will primarily use the `spl-token` program for creating, minting, and transferring NFTs, which are a type of SPL token.
 -   **Solana JSON RPC API:** The primary interface for off-chain clients (like the AIW3 backend) to interact with the Solana blockchain—sending transactions and querying on-chain data.
 
-## 11. Project Roadmap, Scope, and Timeline
+## 11. On-Chain Data Models
+
+To execute the business logic described in this manual, the AIW3 smart contract must store and manage state on the Solana blockchain. This is achieved through several custom on-chain accounts (data structures). The following diagram illustrates the relationships between these core data models.
+
+![On-Chain Data Model ERD](diagrams/on-chain-data-model.png)
+
+### 11.1 Data Model Descriptions
+
+#### UserNftState Account
+This is the most critical account for tracking a user's progress. A unique `UserNftState` account is created for each user who interacts with the NFT system, typically as a Program Derived Address (PDA) derived from the user's public key.
+-   **`owner: PublicKey`**: The wallet address of the user this state belongs to.
+-   **`current_level: u8`**: The user's current active Equity NFT level (e.g., 1 for "Tech Chicken"). A value of 0 indicates they hold no Equity NFT.
+-   **`active_nft_mint: PublicKey`**: The mint address of the user's currently active Equity NFT. This allows for quick verification of their highest-tier NFT.
+-   **`bound_badges: Vec<PublicKey>`**: A list of the mint addresses of the Badge NFTs the user has permanently bound to their account to meet upgrade requirements.
+
+#### TierConfiguration Account
+This is a singleton account (only one exists per program deployment) that acts as the global configuration for the entire Equity NFT system. It is controlled by a central authority key.
+-   **`authority: PublicKey`**: The wallet address with permission to update this configuration.
+-   **`unlock_fee_cgas: u64`**: The amount of CGas required for a user to execute the `unlock_tier` function.
+-   **`tier_requirements: Vec<TierRequirement>`**: A list defining the upgrade conditions for each level. Each `TierRequirement` struct would contain:
+    -   `level: u8`: The tier this requirement is for.
+    -   `required_badges: u8`: The number of badges that must be in the `UserNftState.bound_badges` vector to unlock this level.
+
+### 11.2 Model Relationships and Interaction
+
+-   **User and State:** Each **User** (identified by their wallet `PublicKey`) has a one-to-one relationship with a `UserNftState` account. This account acts as their profile within the AIW3 NFT system.
+-   **State and Badges:** The `UserNftState` account holds a list of `bound_badges`, representing a one-to-many relationship. This list is checked by the smart contract during an upgrade attempt.
+-   **Program Governance:** The `TierConfiguration` account governs the rules of the **AIW3 Program**. When a user calls `unlock_tier`, the program reads this account to verify the fee and badge requirements for the target level.
+-   **Interaction with Standard Programs:** The custom **AIW3 Program** does not handle token transfers itself. When `unlock_tier` is successful, it makes a cross-program invocation to the standard **SPL Token Program** to mint the new Equity NFT to the user's wallet. This separates our unique business logic from standard token operations.
+
+## 12. Project Roadmap, Scope, and Timeline
 
 This section provides a high-level roadmap for the implementation of the Equity NFT smart contract system on Solana. The timeline is an estimate and subject to change based on development complexity, audit findings, and integration challenges.
 
@@ -262,7 +292,7 @@ This section provides a high-level roadmap for the implementation of the Equity 
 | 7     | Mainnet Soft Launch & Monitoring    | - Deploy the final, audited contract to the Solana Mainnet under controlled access (e.g., internal team or beta testers).<br>- Perform final validation and monitor for any unexpected behavior in a live environment.<br>- Prepare public-facing documentation and support materials.                 | 1 Week             |
 | 8     | Official Public Launch              | - Announce the official launch of the Equity NFT system to all users.<br>- Enable all features for the public.<br>- The development team provides heightened monitoring and support during the initial launch period.                                                                                 | Launch Day         |
 
-## 12. Terminologies
+## 13. Terminologies
 
 This section defines the core concepts used throughout this document.
 
