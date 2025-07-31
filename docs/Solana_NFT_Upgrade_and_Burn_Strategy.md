@@ -313,7 +313,7 @@ erDiagram
         string nftId
         string mintAddress
         string ownerWalletAddress
-string status
+        string status
     }
 
     UPGRADE_REQUEST {
@@ -321,13 +321,13 @@ string status
         string userId
         string originalNftId
         string newNftId
-        string status (e.g., pending, verified, completed, failed)
+        string status
         datetime createdAt
         datetime updatedAt
     }
 
-    USER ||--o{ UPGRADE_REQUEST : "initiates"
-    UPGRADE_REQUEST }|--|| NFT : "for"
+    USER ||--o{ UPGRADE_REQUEST : initiates
+    UPGRADE_REQUEST }|--|| NFT : for
 ```
 
 **Data Entities:**
