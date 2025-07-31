@@ -13,12 +13,9 @@ The AIW3 platform features two distinct categories of NFTs. It is crucial to und
 ### 2.1 Equity NFTs (Primary Progression)
 This is the main category of NFTs on the platform, representing a user's level, status, and ongoing benefits.
 -   **Purpose:** To serve as a user's primary identity and status credential, unlocking progressively greater platform-wide benefits.
--   **Acquisition:**
-    -   **Lv.1:** Claimed by new users.
-    -   **Lv.2 - Lv.5:** Acquired through **Synthesis**, which involves combining and consuming multiple lower-level Equity NFTs.
-    -   **Lv.6:** Awarded by the team for exceptional contributions; not synthesizable.
+-   **Acquisition:** Equity NFTs are **unlocked** when a user meets specific criteria, primarily based on their cumulative trading volume on the platform. For higher levels, users must also acquire and bind a number of "Badge NFTs" earned through platform tasks.
 -   **Function:** They form a clear progression ladder. Holding a higher-level Equity NFT grants significant advantages like trading fee discounts, airdrop bonuses, and enhanced community visibility via a "Micro Badge". The entire lifecycle of claiming, synthesizing, and activating revolves around this type.
--   **Minting Authority:** All Equity NFTs are created (minted) exclusively by the AIW3 platform's official programs. A Lv.1 is minted upon a new user's claim, and higher-level NFTs are minted as the output of a successful synthesis. While NFTs can be freely traded between users on external marketplaces, the AIW3 system is the sole source of their creation.
+-   **Minting Authority:** All Equity NFTs are created (minted) exclusively by the AIW3 platform's official programs when a user meets the unlock criteria. While these NFTs can be freely traded between users on external marketplaces *after* they are unlocked, the AIW3 system is the sole source of their creation.
 
 ### 2.2 Special NFTs (Achievement-Based)
 This category includes unique NFTs awarded for specific, one-time achievements. They are separate from the main progression ladder.
@@ -51,56 +48,37 @@ graph TD
 
 This section outlines the primary end-to-end user journeys within the AIW3 NFT ecosystem.
 
-### 3.1 New User Onboarding and First NFT Acquisition
-This process describes how a new user joins the platform and gets their initial identity credential.
+### 3.1 New User Onboarding
+This process describes how a new user joins the platform. Acquiring an Equity NFT is a subsequent step that requires meeting platform criteria.
 
 ```mermaid
 graph TD
-    A[User Registers] --> B{Personal Center};
-    B --> C[System shows Unlockable Lv.1 NFT];
-    C --> D{User Claims NFT};
-    D --> E[System Mints Inactive Lv.1 NFT];
-    E --> F[System Prompts for Activation];
-    F --> G{User Activates NFT};
-    G --> H[System sets NFT to Active];
-    H --> I[System grants benefits & displays badge];
+    A[User Registers] --> B[Account Created];
+    B --> C[User begins trading];
 ```
 1.  **[User] Registration:** A user creates an account on the AIW3 platform.
-2.  **[User] Claiming:** The user navigates to their Personal Center, where the **[System]** shows a Lv.1 "Newbie" NFT as "Unlockable". The user executes the "Claim" action.
-3.  **[System & User] Activation:** The newly claimed Lv.1 NFT appears in the user's collection in an "Inactive" state. The **[System]** shows a popup prompting the user to activate it. The **[User]** confirms, and the NFT becomes "Active".
-4.  **[System] Outcome:** The user now has an active Lv.1 NFT. The **[System]** grants basic platform benefits and displays a "Micro Badge" on the user's profile.
+2.  **[System] Outcome:** The user has a standard account and can begin using platform features like trading. They do not hold any Equity NFT at this stage. The journey to acquire their first NFT begins when they start trading.
 
-### 3.2 NFT Level Progression via Synthesis
-This is the core process for a user to upgrade their status on the platform.
+### 3.2 NFT Level Progression via Trading Volume
+This is the core process for a user to upgrade their status on the platform by meeting trading volume and other criteria.
 
 ```mermaid
 graph TD
-    A[User Acquires Necessary<br>Material NFTs<br>(e.g., via Marketplace)] --> B[Navigate to Synthesis Page];
-    subgraph AIW3 Platform
-        B;
-        C{Select Target NFT};
-        D[System shows Fee & Success Rate];
-        E{User Confirms Synthesis};
-        F{Synthesis Successful?};
-        G[System consumes materials & fee, creates Inactive NFT];
-        H[System consumes materials & fee];
-        I{Activate New NFT};
-        J[Benefits & Badge Updated];
-    end
-    B --> C;
-    C --> D;
-    D --> E;
-    E --> F;
-    F -- Yes --> G;
-    F -- No --> H;
-    G --> I;
-    I --> J;
+    A[User Trades on Platform] --> B{Cumulative Trading<br>Volume Increases};
+    B --> C{Meets Volume Threshold?};
+    C -- Yes --> D{Meets Badge NFT<br>Requirement?};
+    D -- Yes --> E[System shows NFT as Unlockable];
+    E --> F{User Unlocks & Activates NFT};
+    F --> G[Benefits & Badge Updated];
+    C -- No --> A;
+    D -- No --> H[User Earns Badge NFTs<br>via Tasks/Campaigns];
+    H --> D;
 ```
-1.  **[User] Material Acquisition:** To synthesize a higher-level NFT, the **[User]** must possess the required material NFTs in their connected wallet. All Equity NFTs are initially minted by the AIW3 system (e.g., a Lv.1 NFT is minted when a new user claims it). To gather the necessary materials for synthesis (e.g., acquiring two additional Lv.1 NFTs to synthesize a Lv.2), a user must obtain them from other users. This is typically done by purchasing them on a Solana-compatible NFT marketplace (**[External System]**) or receiving them via a direct wallet transfer. The AIW3 platform simply verifies ownership of these system-minted NFTs in the user's wallet, it does not create them from an external source.
-2.  **[User] Initiating Synthesis:** With the required materials and sufficient platform tokens for the fee, the **[User]** navigates to the Synthesis page in their Personal Center.
-3.  **[User & System] Execution:** The **[User]** selects the target NFT (Lv.2). The **[System]** displays the fee and success rate. The **[User]** confirms and starts the synthesis.
-4.  **[System & User] Outcome (Success):** The **[System]** consumes the 3 Lv.1 NFTs and creates a new Lv.2 NFT in the "Inactive" state. The **[User]** then activates it to receive enhanced benefits and an upgraded profile badge.
-5.  **[User] Progression Cycle:** The **[User]** repeats this cycle of acquiring materials and synthesizing to climb to higher levels (Lv.3, Lv.4, Lv.5).
+1.  **[User] Trading Activity:** The **[User]** engages in trading on the AIW3 platform. The **[System]** tracks their cumulative trading volume.
+2.  **[System] Threshold Check:** Once the user's volume reaches the threshold for the next NFT level (e.g., ≥ 100,000 USDT for Lv.1), the **[System]** checks for any other requirements.
+3.  **[User] Fulfilling Additional Requirements:** For Lv.2 and above, the **[User]** must also earn and bind a specific number of "Badge NFTs" by completing platform tasks or participating in campaigns.
+4.  **[User & System] Unlocking and Activation:** When all criteria are met, the **[System]** makes the corresponding Equity NFT available to the user as "Unlockable". The **[User]** must then perform an action to unlock and activate the NFT.
+5.  **[System] Outcome:** Upon activation, the **[System]** grants the user the new tier's benefits (e.g., fee discounts) and updates their public "Micro Badge".
 
 ### 3.3 Community Status and Benefit Realization
 This process is ongoing and demonstrates the value of holding an active NFT.
@@ -138,44 +116,24 @@ graph TD
 2.  **[External System] Sale:** Another user purchases the NFT on the marketplace.
 3.  **[System & External System] Outcome:** The NFT is transferred out of the original user's wallet by the **[External System]**. The **[System]** detects this change, revokes all associated benefits, and automatically downgrades the user's public "Micro Badge" to the next-highest NFT they hold (or removes it).
 
-## 4. NFT Levels, Benefits, and Acquisition
+## 4. Equity NFT Levels, Benefits, and Upgrade Conditions
 
-There are 6 levels of NFTs, each with unique benefits and acquisition methods.
+There are 5 levels of Equity NFTs that users can unlock through platform activity, plus a special "Trophy Breeder" NFT. Each level has specific upgrade conditions and provides unique benefits.
 
-| Level | Name        | How to Get                                                     | Benefits                                                                      | Equivalent Lv.1 NFTs |
-|-------|-------------|----------------------------------------------------------------|-------------------------------------------------------------------------------|----------------------|
-| 1     | Newbie      | Becomes "Unlockable" for all registered users, requires claiming. | Basic access to platform features.                                            | 1                    |
-| 2     | Apprentice  | Synthesize with 3 Lv.1 NFTs.                                   | Small airdrop bonus, 5% fee discount.                                         | 3                    |
-| 3     | Adept       | Synthesize with 3 Lv.2 NFTs.                                   | Medium airdrop bonus, 10% fee discount, access to exclusive chat groups.      | 9                    |
-| 4     | Master      | Synthesize with 2 Lv.3 NFTs.                                   | Large airdrop bonus, 20% fee discount, priority access to new features.       | 18                   |
-| 5     | Grandmaster | Synthesize with 2 Lv.4 NFTs.                                   | Maximum airdrop bonus, 50% fee discount, direct line to the development team. | 36                   |
-| 6     | Legend      | Awarded for outstanding community contributions. Not synthesizable. | All Grandmaster benefits plus a share of platform revenue.                    | N/A                  |
+| Level | Name              | Upgrade Conditions                                                              | Tier Benefits                                           |
+|-------|-------------------|---------------------------------------------------------------------------------|---------------------------------------------------------|
+| 1     | Tech Chicken      | Total transaction volume ≥ 100,000 USDT                                         | 10% reduction in handling fees, 10 free uses of AIagent per week |
+| 2     | Quant Ape         | Total transaction volume ≥ 500,000 USDT, bind two designated badge-type NFTs      | 20% reduction in handling fees, 20 free uses of AIagent per week |
+| 3     | On-chain Hunter   | Total transaction volume ≥ 5,000,000 USDT, bind four designated badge-type NFTs   | 30% reduction in transaction fees, 30 free uses of AIagent per week |
+| 4     | Alpha Alchemist   | Total transaction volume ≥ 10,000,000 USDT, binding to six designated badge-type NFTs | 40% reduction in transaction fees, 40 free uses of AIagent per week |
+| 5     | Quantum Alchemist | Total transaction volume ≥ 50,000,000 USDT, bound to eight designated badge-type NFTs | 55% reduction in transaction fees, 50 free uses of AIagent per week |
+
+### Special Tier
+- **Trophy Breeder:** This is a distinct NFT, not part of the main progression ladder. It is airdropped to the top three participants in trading competitions and provides a 25% reduction in handling fees.
 
 ### Acquisition Constraints
-- **Lv.1 "Newbie" NFT:** This NFT is not automatically granted. A registered user must perform an explicit "claim" or "unlock" action to mint it to their wallet.
-- **Lv.6 "Legend" NFT:** This level is strictly honorary and cannot be acquired through synthesis. Its issuance is at the sole discretion of the AIW3 team based on a user's contributions to the community.
-
-### Cumulative Cost Formula
-
-The value of higher-level NFTs can be understood by calculating their total cost in terms of Lv.1 NFTs. This is also referred to as the cumulative cost.
-
-Let `C(L)` be the cost in Lv.1 NFTs to produce one NFT of level `L`.
-Let `M(L)` be the number of material NFTs of level `L-1` required to synthesize an NFT of level `L`.
-
-The formula is:
-`C(L) = C(L-1) * M(L)` for `L > 1`, with `C(1) = 1`.
-
-From the acquisition table, we have:
-- `M(2) = 3`
-- `M(3) = 3`
-- `M(4) = 2`
-- `M(5) = 2`
-
-This gives the following cumulative costs, which are also reflected in the "Equivalent Lv.1 NFTs" column in the table in this section:
-- **Lv.2:** `C(2) = C(1) * M(2) = 1 * 3 = 3` Lv.1 NFTs
-- **Lv.3:** `C(3) = C(2) * M(3) = 3 * 3 = 9` Lv.1 NFTs
-- **Lv.4:** `C(4) = C(3) * M(4) = 9 * 2 = 18` Lv.1 NFTs
-- **Lv.5:** `C(5) = C(4) * M(5) = 18 * 2 = 36` Lv.1 NFTs
+- **Trading Volume:** This is the primary requirement for unlocking higher NFT tiers. It is cumulative.
+- **Badge NFTs:** For Lv.2 and above, users must also acquire and "bind" a specified number of designated Badge NFTs. These are earned by completing platform tasks and participating in official campaigns.
 
 ## 5. NFT Status Lifecycle
 
@@ -203,9 +161,6 @@ stateDiagram-v2
 
 -   **Active:** The user must explicitly activate an "Inactive" NFT. Once active, the NFT grants all its associated benefits and privileges. The user's public-facing Micro Badge is updated to reflect this active NFT if it's their highest level.
 
--   **Locked (During Synthesis):** When a user initiates a synthesis process, the material NFTs being used are temporarily "Locked". They cannot be traded, transferred, or used for other syntheses during this period.
-
--   **Consumed (Burned):** Upon completion of a synthesis process (whether successful or failed), the material NFTs are permanently "Consumed" or "Burned". They are removed from the user's wallet and effectively destroyed. This is a terminal state.
 
 ## 6. Equity NFT Operations
 
@@ -236,39 +191,20 @@ This section details the specific actions users can take regarding their NFTs, o
 -   **Rules/Constraints:**
     -   An NFT must be activated for its benefits and public badge to apply.
 
-### 6.3 Synthesizing an NFT
+### 6.3 Unlocking an Equity NFT
 
--   **Description:** A **user-initiated** process, managed by the **System**, to combine lower-level NFTs to create a higher-level one.
+-   **Description:** A **user-initiated** action to claim and activate an Equity NFT after meeting the required criteria.
 -   **Pre-condition:**
-    -   User owns the required number of material NFTs.
-    -   The material NFTs are in the **Active** or **Inactive** state.
-    -   User has sufficient platform tokens to pay the synthesis fee.
--   **Status Change During Operation:**
-    -   Upon initiation, the material NFTs' status changes to **Locked**.
--   **Post-condition (Success):**
-    -   The synthesis fee is consumed.
-    -   The material NFTs' status changes from **Locked** to **Consumed**.
-    -   A new, higher-level NFT is minted to the user's wallet with an initial status of **Inactive**.
--   **Post-condition (Failure):**
-    -   The synthesis fee is consumed.
-    -   The material NFTs' status changes from **Locked** to **Consumed**.
-    -   No new NFT is created.
+    -   User's cumulative trading volume has met the threshold for the target NFT level.
+    -   User has acquired and bound the required number of Badge NFTs (for Lv.2+).
+    -   The target NFT is in the **Unlockable** state for the user.
+-   **Post-condition:**
+    -   A new Equity NFT is minted to the user's wallet (or its state is updated if they already hold a lower level).
+    -   The NFT's status becomes **Active**.
+    -   The user gains all associated benefits.
 -   **Rules/Constraints:**
-    -   **Irreversibility:** The synthesis process is final. Once initiated, the consumption of material NFTs and fees is irreversible, regardless of the outcome.
-    -   **Material Ownership:** To synthesize a target NFT, a user must own the required number of material NFTs in their connected wallet.
-    -   **Fee Payment:** A synthesis fee must be paid in platform tokens (e.g., AIW3 tokens).
-    -   **Success Rate:** The synthesis process is not guaranteed to succeed. The success rate is displayed to the user before they start the process (e.g., 80% for Lv.2).
-    -   **Consequence of Failure:** If synthesis fails, the consumed material NFTs and the synthesis fee are permanently lost and not returned to the user.
-    -   **Locked State:** During the synthesis process, the material NFTs are in a **Locked** state and cannot be traded or used in other operations.
-
-#### Example Flow (Synthesizing Lv.2 NFT)
-1.  **Navigation:** The user navigates to their Personal Center and selects the Synthesis option.
-2.  **Selection:** The user selects the Lv.2 NFT as the synthesis target. The interface shows the required materials (3 Lv.1 NFTs) will be consumed.
-3.  **Confirmation:** The system displays the required synthesis fee (e.g., 100 AIW3) and the success rate (e.g., 80%). The user confirms to proceed.
-4.  **Processing:** The user initiates the synthesis. The 3 Lv.1 NFTs are locked, and the fee is paid.
-5.  **Outcome:**
-    -   **Success:** The user receives a success notification/popup. The 3 Lv.1 NFTs and the fee are consumed. The new Lv.2 NFT appears in their Personal Center in an **Inactive** state, and the user is prompted to activate it.
-    -   **Failure:** The user receives a failure notification. The 3 Lv.1 NFTs and the fee are consumed, and no new NFT is created.
+    -   Progression is linear; a user must unlock levels in order.
+    -   The unlock criteria (volume, badges) are defined by the system and displayed to the user.
 
 ### 6.4 Selling/Transferring an NFT
 
@@ -328,13 +264,10 @@ This section defines the core concepts used throughout this document.
 
 -   **Equity NFTs:** The official name for the platform's primary NFTs that represent user status and benefits. They are organized into different **Levels** (or **Tiers**).
     -   **Synonyms:** You may see these referred to as **Tiered NFTs**, **Tier NFTs**, or **Level NFTs** in different contexts. "Equity NFT" is the canonical term for the main progression NFTs.
-    -   **Progression Model:** The primary way to acquire higher-level Equity NFTs is through **Synthesis**. Other acquisition models (like unlocking via trade volume) may be mentioned in auxiliary materials but are not part of the core process defined herein.
+    -   **Progression Model:** The primary way to acquire higher-level Equity NFTs is by meeting cumulative **trading volume** thresholds and binding a required number of **Badge NFTs**.
     -   **Utility:** While each token is a unique non-fungible asset on the blockchain, its utility is fungible within its tier. This means any Lv.2 NFT provides the exact same benefits as any other Lv.2 NFT.
     -   **Analogy:** This is similar to a customer loyalty program (e.g., Bronze, Silver, Gold status) or leveling up a character in a game. Each new tier provides enhanced status and perks, with the top tier granting equity-like benefits. Your "Gold" membership card is unique to you, but it gives you the same benefits as every other "Gold" member.
 
--   **Synthesis:** The process of combining (and consuming) multiple lower-level **Equity NFTs** to create a single, more valuable higher-level one.
-    -   **Materials:** The materials for synthesis are always lower-level Equity NFTs (e.g., 3x Lv.1 NFTs to make a Lv.2). Some older materials may refer to these as "Badge NFTs," but this document defines them simply as Equity NFTs.
-    -   **Analogy:** This is like crafting in a video game. A player might combine three basic "wood" items to craft one stronger "plank" item. In our case, users combine lower-level NFTs to craft a higher-level one.
 
 -   **Solana:** A high-performance blockchain network on which the AIW3 NFTs are built, recorded, and traded.
     -   **Analogy:** If an NFT is a valuable package, Solana is the global, super-fast, and secure courier service that handles its delivery and tracks its ownership history transparently.
