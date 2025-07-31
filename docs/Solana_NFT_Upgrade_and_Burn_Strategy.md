@@ -242,7 +242,44 @@ async function verifyNftIsBurned(connection, userWallet, nftMint) {
 **Implementation:**
 The AIW3 backend must implement a function to `verifyNftIsBurned`. This function will deterministically find the address of the NFT's ATA and confirm that the account no longer exists by checking that `getAccountInfo` returns `null`. Minting of the new, upgraded NFT should only proceed after this verification is successful. All other approaches are not recommended as they introduce unnecessary risk, complexity, and ambiguity.
 
-### Business Process: NFT Upgrade Sequence Diagram
+
+### System Architecture for NFT Upgrades
+
+This diagram provides a high-level overview of the system components and their communication protocols.
+
+```mermaid
+graph TD
+    subgraph User Environment
+        User[👤 User] -->|Interacts via Browser| Frontend[🌐 AIW3 Frontend]
+        Frontend -->|Wallet Adapter| Wallet[🔒 Phantom / Solflare]
+    end
+
+    subgraph AIW3 Services
+        Frontend -->|HTTPS (REST API)| AIW3_Backend[⚙️ AIW3 Backend]
+        AIW3_Backend -->|Database Queries| DB[(📦 Database)]
+    end
+
+    subgraph Solana Network
+        Wallet -->|RPC/WS| Solana_Node[⚡️ Solana RPC Node]
+        AIW3_Backend -->|RPC/WS| Solana_Node
+        Solana_Node -->|Gossip| Solana_Cluster[🌍 Solana Blockchain]
+    end
+
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+    style Frontend fill:#ccf,stroke:#333,stroke-width:2px
+    style AIW3_Backend fill:#cfc,stroke:#333,stroke-width:2px
+    style Solana_Node fill:#f96,stroke:#333,stroke-width:2px
+```
+
+**Component Communication Protocols:**
+
+-   **User to Frontend**: Standard browser interaction (HTTPS).
+-   **Frontend to AIW3 Backend**: Secure RESTful API calls over HTTPS for all off-chain operations (e.g., checking eligibility, initiating the upgrade process).
+-   **Frontend to Wallet**: The frontend uses a wallet adapter (like the Solana Wallet-Adapter library) to send transaction signing requests to the user's wallet. The user approves these directly in the wallet extension.
+-   **Wallet to Solana**: The user's wallet submits the signed `burn` and `closeAccount` transactions to a Solana RPC node via RPC (Remote Procedure Call) over HTTPS or WebSocket (WS) for real-time updates.
+-   **AIW3 Backend to Solana**: The backend connects to a Solana RPC node (either a public one or a private one like QuickNode/Helius for better performance) to query on-chain data, specifically using the `getAccountInfo` method via RPC to verify the closure of an ATA.
+
+This architecture clearly separates the on-chain and off-chain responsibilities, providing a secure and robust model for the NFT upgrade process.
 
 This diagram illustrates the end-to-end flow for the optimal approach, including the frontend web application.
 
