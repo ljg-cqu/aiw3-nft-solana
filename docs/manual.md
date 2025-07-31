@@ -273,7 +273,24 @@ This section outlines the high-level architecture of the Solana smart contract (
 | **Claiming an NFT**             | `claim_reward(reward_id)` | A system-controlled minting function for special awards. The AIW3 backend whitelists a user for a `reward_id`. The user then calls this function, which verifies their eligibility on-chain and mints the corresponding NFT to their wallet in an `Inactive` state. |
 | **Selling/Transferring an NFT** | `N/A (Standard SPL Transfer)` | This is **not** a function of the AIW3 program. It is a standard Solana token transfer handled by external marketplace programs. The AIW3 backend must **monitor** the blockchain for transfer events involving its NFTs to reactively update user benefits and badges. |
 
-## 10. Terminologies
+## 10. Project Roadmap, Scope, and Timeline
+
+This section provides a high-level roadmap for the implementation of the Equity NFT smart contract system on Solana. The timeline is an estimate and subject to change based on development complexity, audit findings, and integration challenges.
+
+**Total Estimated Timeline:** 12 Weeks
+
+| Phase | Title                               | Scope of Work                                                                                                                                                                                                                                                                                       | Estimated Timeline |
+|-------|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| 1     | Requirements & System Specification | - Finalize all business logic from this manual.<br>- Define all on-chain states, data structures, and NFT metadata.<br>- Specify the precise logic for all on-chain functions (`unlock_tier`, `bind_badge`, etc.).<br>- Document all edge cases and system constraints.                               | 1 Week             |
+| 2     | Technical Design & Architecture     | - Design the detailed smart contract architecture and program interfaces.<br>- Define account structures and data serialization methods.<br>- Plan the interaction model between the on-chain program and the AIW3 backend.<br>- Create sequence diagrams for key user journeys.                         | 1 Week             |
+| 3     | On-Chain Program Development        | - Write the Rust code for the Solana smart contract based on the design specifications.<br>- Implement all core functions for minting, unlocking, binding, and activating NFTs.<br>- Integrate logic for handling CGas fees and managing on-chain state accounts.                                          | 3 Weeks            |
+| 4     | Local Testing & Internal Review     | - Develop a comprehensive suite of unit and integration tests using the Solana Program Test framework.<br>- Conduct thorough internal code reviews for logic, security, and adherence to standards.<br>- Perform functional testing of all user operations in a local validator environment.             | 2 Weeks            |
+| 5     | External Security Audit             | - Engage a reputable third-party security firm to perform a full audit of the smart contract codebase.<br>- The audit will identify potential vulnerabilities, logic errors, and deviations from Solana best practices.                                                                              | 2 Weeks            |
+| 6     | Testnet Deployment & Integration    | - Deploy the audited smart contract to the Solana Testnet.<br>- Address any findings or recommendations from the security audit.<br>- AIW3 backend and frontend teams integrate their components with the Testnet program.<br>- Conduct end-to-end testing of the complete user journey.                 | 2 Weeks            |
+| 7     | Mainnet Soft Launch & Monitoring    | - Deploy the final, audited contract to the Solana Mainnet under controlled access (e.g., internal team or beta testers).<br>- Perform final validation and monitor for any unexpected behavior in a live environment.<br>- Prepare public-facing documentation and support materials.                 | 1 Week             |
+| 8     | Official Public Launch              | - Announce the official launch of the Equity NFT system to all users.<br>- Enable all features for the public.<br>- The development team provides heightened monitoring and support during the initial launch period.                                                                                 | Launch Day         |
+
+## 11. Terminologies
 
 This section defines the core concepts used throughout this document.
 
