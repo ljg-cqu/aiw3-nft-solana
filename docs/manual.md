@@ -182,7 +182,19 @@ This section details the specific actions users can take regarding their NFTs, o
 -   **Rules/Constraints:**
     -   An NFT must be activated for its benefits and public badge to apply.
 
-### 6.3 Unlocking an Equity NFT
+### 6.3 Binding a Badge NFT
+
+-   **Description:** A **user-initiated** action to link a required Badge NFT to their account, making it available as a condition for a future tier upgrade.
+-   **Pre-condition:**
+    -   User owns a designated Badge NFT.
+    -   The Badge NFT is not already bound.
+-   **Post-condition:**
+    -   The Badge NFT is registered as "bound" in the user's on-chain state account.
+-   **Rules/Constraints:**
+    -   A bound NFT cannot be unbound.
+    -   Binding is required before the `unlock_tier` function can succeed for Lv.2+.
+
+### 6.4 Unlocking an Equity NFT
 
 -   **Description:** A **user-initiated** action to claim and activate an Equity NFT after meeting the required criteria, which involves paying a small fee in CGas.
 -   **Pre-condition:**
@@ -198,7 +210,7 @@ This section details the specific actions users can take regarding their NFTs, o
     -   Progression is linear; a user must unlock levels in order.
     -   The unlock criteria (volume, badges) are defined by the system and displayed to the user.
 
-### 6.4 Selling/Transferring an NFT
+### 6.5 Selling/Transferring an NFT
 
 -   **Description:** A **user-initiated** action to trade an NFT on an **External System** (a marketplace). The AIW3 **System** reacts to the ownership change.
 -   **Pre-condition:**
@@ -247,7 +259,21 @@ Users are kept informed of NFT-related events through system messages. These inc
 - **Active Equity NFT Determines Benefits:** A user only receives the benefits (e.g., fee discounts, airdrop bonuses) associated with their currently *active* **Equity NFT**.
 - **Highest Level Badge:** The Micro Badge displayed publicly on a user's profile always corresponds to their highest-level *active* **Equity NFT**. If a user holds multiple NFTs (e.g., Lv.4 and Lv.2), only the Lv.4 badge will be shown.
 
-## 8. Terminologies
+## 9. On-Chain Program Architecture
+
+This section outlines the high-level architecture of the Solana smart contract (program) that governs the AIW3 Equity NFT system. All operations that change the state or ownership of an NFT are handled by this on-chain program, which is written in Rust. The AIW3 backend and frontend are responsible for calling these on-chain functions in response to user actions.
+
+### Mapping User Operations to On-Chain Functions
+
+| User Operation (from Section 6) | On-Chain Program Function | Description |
+|---------------------------------|---------------------------|-------------|
+| **Unlocking an Equity NFT**     | `unlock_tier(level)`      | The core progression function. The AIW3 backend first verifies off-chain criteria (trading volume). If met, it authorizes the user to call this function. The program then performs on-chain checks: verifies ownership of the required *bound* Badge NFTs, confirms the user is unlocking the next sequential level, transfers the CGas fee, and mints the new Equity NFT directly into the `Active` state. |
+| **Binding a Badge NFT**         | `bind_badge(badge_nft_mint)` | A prerequisite for unlocking higher tiers. The user initiates this action for a Badge NFT they own. The program verifies the user's ownership of the `badge_nft_mint` and records it in a user-specific on-chain account, marking it as "bound" and available for `unlock_tier` checks. |
+| **Activating an NFT**           | `activate_nft(nft_mint)`  | Used for special, airdropped NFTs (like the Breeder Reward NFT) that are minted in an `Inactive` state. The program verifies the user owns the `nft_mint` and flips its on-chain status from `Inactive` to `Active`, enabling its benefits. |
+| **Claiming an NFT**             | `claim_reward(reward_id)` | A system-controlled minting function for special awards. The AIW3 backend whitelists a user for a `reward_id`. The user then calls this function, which verifies their eligibility on-chain and mints the corresponding NFT to their wallet in an `Inactive` state. |
+| **Selling/Transferring an NFT** | `N/A (Standard SPL Transfer)` | This is **not** a function of the AIW3 program. It is a standard Solana token transfer handled by external marketplace programs. The AIW3 backend must **monitor** the blockchain for transfer events involving its NFTs to reactively update user benefits and badges. |
+
+## 10. Terminologies
 
 This section defines the core concepts used throughout this document.
 
