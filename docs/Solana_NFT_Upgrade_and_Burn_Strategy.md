@@ -1,5 +1,25 @@
 # A Definitive Guide to Solana NFT Upgrades via a Burn-and-Mint Mechanism
 
+### Purpose of This Document
+
+This document serves as the definitive technical guide for developers, architects, and stakeholders responsible for implementing the NFT upgrade functionality within the AIW3 DeFi system. Its primary purpose is to:
+
+1.  **Establish a single, correct, and secure strategy** for invalidating a lower-level NFT when a user upgrades to a higher-level one.
+2.  **Provide a clear technical explanation** of the underlying Solana NFT mechanics (specifically Associated Token Accounts) that make this strategy reliable.
+3.  **Offer a ready-to-use, programmable implementation**, including code samples and diagrams, to ensure a consistent and error-free execution of the burn-and-mint process.
+
+By consolidating this information, this document aims to eliminate ambiguity, prevent the implementation of less secure alternatives, and provide a clear roadmap for building a robust and trustworthy NFT upgrade feature.
+
+### Purpose of This Document
+
+This document serves as the definitive technical guide for developers, architects, and stakeholders responsible for implementing the NFT upgrade functionality within the AIW3 DeFi system. Its primary purpose is to:
+
+1.  **Establish a single, correct, and secure strategy** for invalidating a lower-level NFT when a user upgrades to a higher-level one.
+2.  **Provide a clear technical explanation** of the underlying Solana NFT mechanics (specifically Associated Token Accounts) that make this strategy reliable.
+3.  **Offer a ready-to-use, programmable implementation**, including code samples and diagrams, to ensure a consistent and error-free execution of the burn-and-mint process.
+
+By consolidating this information, this document aims to eliminate ambiguity, prevent the implementation of less secure alternatives, and provide a clear roadmap for building a robust and trustworthy NFT upgrade feature.
+
 ### Overview
 
 This document outlines the definitive method for managing the lifecycle of upgradeable NFTs within the AIW3 DeFi system. 
@@ -255,7 +275,7 @@ graph TD
     end
 
     subgraph AIW3 Services
-        Frontend -->|HTTPS (REST API)| AIW3_Backend[⚙️ AIW3 Backend]
+        Frontend -->|"HTTPS (REST API)"| AIW3_Backend[⚙️ AIW3 Backend]
         AIW3_Backend -->|Database Queries| DB[(📦 Database)]
     end
 
