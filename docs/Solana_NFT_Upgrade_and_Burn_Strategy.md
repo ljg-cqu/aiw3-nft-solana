@@ -1,3 +1,5 @@
+# A Definitive Guide to Solana NFT Upgrades via a Burn-and-Mint Mechanism
+
 ### Overview
 
 This document outlines the definitive method for managing the lifecycle of upgradeable NFTs within the AIW3 DeFi system. 
