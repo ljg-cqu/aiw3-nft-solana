@@ -78,42 +78,58 @@ For POC purposes, using a local Solana network is the easiest and safest option.
     *   Replace `YOUR_WALLET_ADDRESS` with the public key displayed by `solana-test-validator`.
     *   Replace `YOUR_SECRET_KEY` with the *private key* corresponding to that public key. The `solana-test-validator` usually tells you the location of the keypair file (e.g., `~/.config/solana/validator-keypair.json`). You can use `solana-keygen pubkey <keypair_file>` to get the public key, and then use `solana-keygen recover <keypair_file>` to get the private key (as a comma-separated list of numbers).
     *   You'll need to create an NFT mint address on your local network. We will use the validator's keypair to create the NFT mint. See the next step.
++
++   (Optional - for reference only. We are reusing the validator's keypair for this POC.)
++
++   Open a *new* terminal window for the following commands. We will use the validator's keypair to create the NFT mint, so we don't need to airdrop SOL.
++
++   Before running the following commands, make sure your Solana CLI is configured to use the localnet:
++
++   ```bash
++   solana config set --url http://localhost:8899
++   ```
++
++   Create a new keypair for the NFT mint authority:
++
++   ```bash
++   solana-keygen new -o mint.json
++   ```
++
++   Get the public key of the mint authority:
++
++   ```bash
++   solana-keygen pubkey mint.json
++   ```
++
++   Airdrop some SOL to the mint authority:
++
++   ```bash
++   solana airdrop 2 mint.json
++   ```
++
++   Create the NFT mint:
++
++   ```bash
++   spl-token create-mint --decimals 0 --mint-authority mint.json --freeze-authority mint.json mint.json
++   ```
++
++   This command will output the mint address. You will need this address for the next step.
++
++   Create an Associated Token Account (ATA) for your wallet:
++
++   ```bash
++   spl-token create-account <MINT_ADDRESS>
++   ```
++
++   Mint the NFT to your ATA:
++
++   ```bash
++   spl-token mint <MINT_ADDRESS> 1 <YOUR_ATA>
++   ```
++
++   Replace `<MINT_ADDRESS>` with the mint address you created in the previous step. Replace `<YOUR_ATA>` with the ATA you created in the previous step.
+ 
 
 ## 6. Running the POC
 
 1.  Make sure you have set the correct environment variables in the `.env` file.
-2.  Navigate to the `poc/solana-nft-burn-mint` directory:
-
-    ```bash
-    cd poc/solana-nft-burn-mint
-    ```
-
-3.  Run the script:
-
-    ```bash
-    npm install # To ensure all dependencies are installed
-    node index.js
-    ```
-
-## 7. Interpreting the Output
-
-The program will print output to the console indicating the result of the burn process. Examine the console output for details on the transaction and any errors that may occur.
-*   **Successful Burn:** The console will output the burn transaction ID.
-*   **Insufficient SOL Balance:** The console will output an error message indicating that the payer account does not have enough SOL to pay for the transaction.
-*   **TokenAccountNotFoundError:** The console will output an error message indicating that either:
-    *   The specified NFT mint address is not owned by the user wallet address.
-    *   The user wallet address does not have an associated token account for the specified NFT mint address.
-*   **Other Errors:** The console will output a generic error message. Check the environment variables and ensure the NFT mint address and user wallet address are correct.
-
-Make sure the payer account has enough SOL to pay for the transaction.
-## 8. Next Steps (Beyond the POC)
-
-*   Implement Actual Minting: Integrate the minting of a new NFT after successful burn verification. This would require using a library like `@metaplex-foundation/js`.
-*   Integrate with Frontend: Connect this backend logic to a frontend application that allows users to initiate the burn and upgrade process.
-*   Error Handling: Implement more robust error handling and logging.
-*   Security: Implement security best practices, such as input validation and protection against common web vulnerabilities.
-*   Database Integration: Integrate with a database to store the state of upgrade requests and NFT ownership.
-
-## 9. Conclusion
-
-This POC demonstrates the feasibility of burning and verifying NFT burns on Solana using a Node.js backend. This approach provides a secure and reliable way to manage NFT upgrades in the AIW3 system.
