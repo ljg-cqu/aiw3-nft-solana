@@ -4,7 +4,7 @@
   "description": "Proof of Concept for Solana NFT Burn and Mint",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node nft-manager.js"
   },
   "keywords": [
     "solana",

@@ -1,4 +1,4 @@
-# Proof of Concept: Solana NFT Burn Verification via Node.js
+# Proof of Concept: Solana NFT Burn and Mint via Node.js
 
 ## 1. Introduction
 
@@ -153,6 +153,11 @@ After running the POC, you can use the Solana CLI to verify the burn:
     ```bash
     solana transaction <TRANSACTION_ID>
     ```
+
+## 8. Implementing the Minting
+
+Implement the minting logic inside the `mintNFT` function in `nft-manager.js`. You'll likely need to use the Token program and Metaplex SDK.
+ 
 
 ## 8. Verifying the Minting with Solana CLI
 
