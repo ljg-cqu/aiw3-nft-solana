@@ -62,63 +62,22 @@ For POC purposes, using a local Solana network is the easiest and safest option.
     solana-test-validator
     ```
 
-    This starts a local Solana cluster with a single validator node. It also creates a default keypair and provides you with its address and airdrop authority. Keep this terminal window open while running your POC.
+    This starts a local Solana cluster with a single validator node. It also creates a default keypair and provides you with its address and airdrop authority. We will use the validator's keypair as the payer for simplicity. Keep the solana-test-validator running in its own terminal window.
 
 3.  **Configure your `.env` file:**
 
     ```
     SOLANA_NETWORK="localnet"
-    USER_WALLET_ADDRESS="YOUR_WALLET_ADDRESS" # Use the key from the solana-test-validator output
-    NFT_MINT_ADDRESS="YOUR_NFT_MINT_ADDRESS" # You'll need to create an NFT mint (see below)
-    PAYER_SECRET_KEY="YOUR_SECRET_KEY" # Use the secret key from the solana-test-validator output
+    USER_WALLET_ADDRESS="YOUR_WALLET_ADDRESS"
+    NFT_MINT_ADDRESS="YOUR_NFT_MINT_ADDRESS"
+    PAYER_SECRET_KEY="YOUR_PAYER_SECRET_KEY"
     ```
 
     **Important:**
-    After running `solana-test-validator`, carefully note the public key and private key (secret key) it generates. You'll need these for the next steps. The validator also outputs a command to airdrop SOL to a specific key. Keep the solana-test-validator running in its own terminal window.
+    After running `solana-test-validator`, carefully note the public key and private key (secret key) it generates. You'll need these for the next steps. The validator also outputs a command to airdrop SOL to a specific key. We will use the validator's keypair as the payer for simplicity. Keep the solana-test-validator running in its own terminal window.
     *   Replace `YOUR_WALLET_ADDRESS` with the public key displayed by `solana-test-validator`.
     *   Replace `YOUR_SECRET_KEY` with the *private key* corresponding to that public key. The `solana-test-validator` usually tells you the location of the keypair file (e.g., `~/.config/solana/validator-keypair.json`). You can use `solana-keygen pubkey <keypair_file>` to get the public key, and then use `solana-keygen recover <keypair_file>` to get the private key (as a comma-separated list of numbers).
-    *   You'll need to create an NFT mint address on your local network. See the next step.
-
-4.  **Create an NFT Mint Address (if you don't have one):**
-
-    You'll need an NFT mint address to test the burn functionality. You can create one using the Solana CLI. First, airdrop some SOL to your wallet:
-
-    Open a *new* terminal window for the following commands.
-
-    Before running the following commands, make sure your Solana CLI is configured to use the localnet:
-
-    ```bash
-    solana config set --url http://localhost:8899
-    ```
-    ```bash
-    solana airdrop 5 YOUR_WALLET_ADDRESS # Replace with your wallet address
-    ```
-
-    Then, use the following commands to create a mint account and mint an NFT:
-
-    ```bash
-    spl-token create-mint --decimals 0 --enable-freeze --initial-authority YOUR_WALLET_ADDRESS
-    ```
-
-    This will output the new mint address. Copy this address and use it as the `NFT_MINT_ADDRESS` in your `.env` file.
-
-    Next, create an associated token account (ATA) for your wallet:
-
-    ```bash
-    spl-token create-account MINT_ADDRESS
-    ```
-
-    Replace `MINT_ADDRESS` with the mint address you just created. This will output the ATA address.
-
-    Finally, mint one token to the ATA:
-
-    ```bash
-    spl-token mint MINT_ADDRESS 1 ACCOUNT_ADDRESS
-    ```
-
-    Replace `MINT_ADDRESS` with the mint address and `ACCOUNT_ADDRESS` with the ATA address.
-
-    Now, return to the terminal where you are running the `poc/solana-nft-burn-mint` application.
+    *   You'll need to create an NFT mint address on your local network. We will use the validator's keypair to create the NFT mint. See the next step.
 
 ## 6. Running the POC
 
