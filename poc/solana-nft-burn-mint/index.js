@@ -15,8 +15,20 @@ function validateEnvironmentVariables() {
     const nftMintAddress = process.env.NFT_MINT_ADDRESS;
     const payerSecretKey = process.env.PAYER_SECRET_KEY;
 
-    if (!solanaNetwork || !userWalletAddress || !nftMintAddress || !payerSecretKey) {
-        console.error('Please set SOLANA_NETWORK, USER_WALLET_ADDRESS, NFT_MINT_ADDRESS and PAYER_SECRET_KEY in .env file');
+    if (!solanaNetwork) {
+        console.error('Please set SOLANA_NETWORK in .env file');
+        return false;
+    }
+    if (!userWalletAddress) {
+        console.error('Please set USER_WALLET_ADDRESS in .env file');
+        return false;
+    }
+    if (!nftMintAddress) {
+        console.error('Please set NFT_MINT_ADDRESS in .env file');
+        return false;
+    }
+    if (!payerSecretKey) {
+        console.error('Please set PAYER_SECRET_KEY in .env file');
         return false;
     }
     return true;
