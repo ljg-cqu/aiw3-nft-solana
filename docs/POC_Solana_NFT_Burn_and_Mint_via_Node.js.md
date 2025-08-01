@@ -133,3 +133,23 @@ For POC purposes, using a local Solana network is the easiest and safest option.
 ## 6. Running the POC
 
 1.  Make sure you have set the correct environment variables in the `.env` file.
+
+## 7. Verifying the Burn with Solana CLI
+
+After running the POC, you can use the Solana CLI to verify the burn:
+
+1.  **Check the User's ATA Balance:**
+
+    ```bash
+    spl-token accounts
+    ```
+
+    This command will list all token accounts associated with your configured Solana CLI wallet.  If the burn was successful, the ATA associated with the burned NFT should no longer appear in the list (or its balance will be 0).
+
+2.  **Examine the Transaction:**
+
+    Copy the transaction ID from the POC's output.  You can use the `solana transaction` command to view the details of the transaction:
+
+    ```bash
+    solana transaction <TRANSACTION_ID>
+    ```
