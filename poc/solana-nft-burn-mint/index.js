@@ -3,6 +3,7 @@ const { Connection, Keypair, PublicKey } = require('@solana/web3.js');
 const { burn, getOrCreateAssociatedTokenAccount } = require('@solana/spl-token');
 
 // Function to generate a keypair from a secret key
+// The secret key is a comma-separated list of numbers
 function generateKeypairFromSecretKey(secretKey) {
     const secretKeyUint8Array = new Uint8Array(secretKey.split(',').map(Number));
     return Keypair.fromSecretKey(secretKeyUint8Array);
@@ -35,6 +36,8 @@ function validateEnvironmentVariables() {
 }
 
 // Function to establish connection to Solana network
+// Tries to connect to the specified Solana network
+// Throws an error if the connection fails
 async function establishConnection(solanaNetwork) {
     try {
         return new Connection(`https://api.${solanaNetwork}.solana.com`);
@@ -45,6 +48,9 @@ async function establishConnection(solanaNetwork) {
 }
 
 // Function to get or create associated token account
+// Gets the associated token account for the given user wallet and NFT mint address
+// If the associated token account doesn't exist, it creates one
+// Throws an error if the operation fails
 async function getAssociatedAccount(connection, payerKeypair, nftMintAddress, userWalletAddress) {
     try {
         return await getOrCreateAssociatedTokenAccount(
@@ -60,6 +66,8 @@ async function getAssociatedAccount(connection, payerKeypair, nftMintAddress, us
 }
 
 // Function to burn the NFT
+// Burns one NFT from the user's associated token account
+// Throws an error if the burn fails
 async function burnNFT(connection, payerKeypair, nftMintAddress, userAssociatedTokenAccount) {
     try {
         return await burn(
@@ -76,6 +84,8 @@ async function burnNFT(connection, payerKeypair, nftMintAddress, userAssociatedT
     }
 }
 
+// Function to check the SOL balance of a given public key
+// Returns the balance in lamports
 async function checkSolBalance(connection, publicKey) {
     try {
         const balance = await connection.getBalance(publicKey);
