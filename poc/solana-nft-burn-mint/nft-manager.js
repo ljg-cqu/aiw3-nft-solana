@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Connection, Keypair, PublicKey } = require('@solana/web3.js');
-const { burn, getOrCreateAssociatedTokenAccount } = require('@solana/spl-token');
+const { burn, getOrCreateAssociatedTokenAccount, mintTo } = require('@solana/spl-token');
+const { Metaplex, keypairIdentity, bundlrStorage } = require("@metaplex-foundation/js");
 
 // Function to generate a keypair from a secret key
 // The secret key is a comma-separated list of numbers
@@ -108,30 +109,54 @@ async function burnNFT(connection, payerKeypair, nftMintAddress, userAssociatedT
     }
 }
 
+
 // Function to mint new NFT
 async function mintNFT(connection, payerKeypair, nftMintAddress, userAssociatedTokenAccount) {
     try {
-        // Implement the minting logic here
-        // This is a placeholder, replace with actual minting code
-        // You'll likely need to use the Token program and Metaplex SDK
-
-        // **Minting Logic Implementation Guide:**
-        // 1.  **Import necessary modules:** Import the required modules from `@solana/web3.js` and `@metaplex-foundation/js`.
-        // 2.  **Create a Metaplex instance:** Instantiate a Metaplex object using your connection and payer keypair.
-        // 3.  **Define metadata:** Define the metadata for your NFT, such as name, symbol, and URI.
-        // 4.  **Mint the NFT:** Use the `create` method from the Metaplex SDK to mint the NFT.
-        // 5.  **Return the transaction ID:** Return the transaction ID of the minting transaction.
-
-        // For now, let's just log a message
         console.log("Minting new NFT...");
 
-        // Example: (This is not a real minting transaction, just a placeholder)
-        // const mintTransaction = await mintTo(...);
+        const metaplex = Metaplex.make(connection)
+            .use(keypairIdentity(payerKeypair))
+            .use(bundlrStorage({
+                address: 'https://devnet.bundlr.network',
+                providerUrl: 'https://api.devnet.solana.com',
+                timeout: 60000,
+            }));
 
-        // Replace this with the actual mint transaction
-        const mintTransaction = "FakeMintTransactionId";
+        const { nft } = await metaplex.nfts().create({
+            uri: 'https://arweave.net/example_metadata.json',  // Replace with your metadata URI
+            name: 'Example NFT',
+            symbol: 'EXMPL',
+            sellerFeeBasisPoints: 500, // Represents 5.00%.
+            isMutable: true,
+        });
 
-        console.log("Mint transaction:", mintTransaction);
+        console.log(`NFT Minted! Mint Address: ${nft.address.toBase58()}`);
+
+        // Mint one token to the associated token account
+        const mintTransaction = await mintTo(
+            connection,
+            payerKeypair,
+            new PublicKey(nft.address), // Mint address
+            userAssociatedTokenAccount.address, // Destination account
+            payerKeypair, // Authority
+            1 // Amount
+        );
+
+        console.log(`Mint transaction ID: ${mintTransaction}`);
+
+        // Fetch the token
+        const token = await metaplex.nfts().findByMint({ mintAddress: nft.address });
+
+        console.log("Token: ", token);
+
+        // Verify the owner
+        const owner = token.owner;
+
+        console.log("Owner: ", owner);
+
+
+
 
         return mintTransaction;
 
@@ -216,6 +241,7 @@ async function main() {
         );
 
         console.log("User associated token account:", userAssociatedTokenAccount.address.toBase58());
+
         console.log("Starting mint and burn process...");
 
         // Mint the NFT
@@ -227,9 +253,8 @@ async function main() {
         );
 
         console.log("Mint transaction:", mintTransaction);
+
         console.log("Minting completed. Starting burning process...");
-
-
 
 
         // Burn the NFT
@@ -258,3 +283,4 @@ async function main() {
 }
 
 main();
+

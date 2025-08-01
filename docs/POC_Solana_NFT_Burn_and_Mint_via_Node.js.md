@@ -18,6 +18,7 @@ This document outlines a Proof of Concept (POC) for demonstrating the core funct
 *   **@solana/spl-token**: Solana Program Library for Token operations.
 *   **dotenv**: For managing environment variables.
 *   **@solana/test-validator**: Local Solana cluster for testing.
+*   **@metaplex-foundation/js**: Metaplex SDK for minting NFTs.
 
 ## 4. Prerequisites
 
@@ -157,7 +158,10 @@ After running the POC, you can use the Solana CLI to verify the burn:
 
 ## 8. Implementing the Minting
 
-Implement the minting logic inside the `mintNFT` function in `nft-manager.js`. You'll likely need to use the Token program and Metaplex SDK. The current implementation includes a placeholder function that needs to be replaced with actual minting code.
+Implement the minting logic inside the `mintNFT` function in `nft-manager.js`. You'll need to use the Token program and Metaplex SDK. The current implementation includes a function that mints a new NFT.
+
+Make sure you have installed `@metaplex-foundation/js` by running `npm install @metaplex-foundation/js`.
+Also, make sure you have a valid metadata URI that points to a JSON file conforming to the Metaplex metadata standard.
  
 
 ## 8. Verifying the Minting with Solana CLI
