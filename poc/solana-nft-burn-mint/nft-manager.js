@@ -40,6 +40,7 @@ function validateEnvironmentVariables() {
 // Throws an error if the connection fails
 async function establishConnection(solanaNetwork) {
     try {
+        console.log(`Establishing connection to Solana network: ${solanaNetwork}`);
         let endpoint = `https://api.${solanaNetwork}.solana.com`;
         if (solanaNetwork === 'localnet') {
             endpoint = 'http://localhost:8899';
@@ -58,6 +59,7 @@ async function establishConnection(solanaNetwork) {
 // Throws an error if the operation fails
 async function getAssociatedAccount(connection, payerKeypair, nftMintAddress, userWalletAddress) {
     try {
+        console.log(`Getting or creating associated token account for NFT mint: ${nftMintAddress} and user wallet: ${userWalletAddress}`);
         try {
             new PublicKey(nftMintAddress);
         } catch (error) {
@@ -91,6 +93,7 @@ async function getAssociatedAccount(connection, payerKeypair, nftMintAddress, us
 // Throws an error if the burn fails
 async function burnNFT(connection, payerKeypair, nftMintAddress, userAssociatedTokenAccount) {
     try {
+        console.log(`Burning NFT with mint address: ${nftMintAddress} from associated token account: ${userAssociatedTokenAccount.address.toBase58()}`);
         return await burn(
             connection,
             payerKeypair,
@@ -144,6 +147,7 @@ async function mintNFT(connection, payerKeypair, nftMintAddress, userAssociatedT
 // Returns the balance in lamports
 async function checkSolBalance(connection, publicKey) {
     try {
+        console.log(`Checking SOL balance for public key: ${publicKey.toBase58()}`);
         const balance = await connection.getBalance(publicKey);
         console.log(`SOL balance: ${balance / 1000000000} SOL`); // Convert from lamports to SOL
         return balance;
@@ -211,6 +215,7 @@ async function main() {
         );
 
         console.log("User associated token account:", userAssociatedTokenAccount.address.toBase58());
+        console.log("Starting mint and burn process...");
 
         // Mint the NFT
         const mintTransaction = await mintNFT(
@@ -221,7 +226,7 @@ async function main() {
         );
 
         console.log("Mint transaction:", mintTransaction);
-
+        console.log("Minting completed. Starting burning process...");
 
 
 
@@ -235,6 +240,7 @@ async function main() {
         );
 
         console.log("Burn transaction:", burnTransaction);
+        console.log("Burning completed successfully!");
 
     } catch (error) {
         console.error("Error during burn:", error);
