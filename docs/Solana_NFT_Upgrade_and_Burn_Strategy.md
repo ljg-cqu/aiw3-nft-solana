@@ -410,3 +410,59 @@ sequenceDiagram
     AIW3-->>Frontend: {"upgradeStatus": "complete"}
     Frontend->>User: Display "Upgrade Complete! You now have the Level 2 NFT."
 ```
+
+## 11. Testing the NFT Burn Verification (POC)
+
+This section provides instructions on how to test the `poc/solana-nft-burn-mint/index.js` program to verify the NFT burn verification logic.
+
+**Prerequisites:**
+
+*   Node.js and npm installed.
+*   Solana CLI installed and configured (for local testing).
+*   A Solana wallet with some SOL for transaction fees.
+*   An existing NFT mint address for testing the burn verification.
+*   The `.env` file configured with the correct environment variables (see below).
+
+**Configuration:**
+
+1.  Create a `.env` file in the `poc/solana-nft-burn-mint` directory.
+2.  Add the following environment variables to the `.env` file:
+
+    ```
+    SOLANA_NETWORK="devnet"  # or "mainnet-beta" or "localnet"
+    USER_WALLET_ADDRESS="YOUR_WALLET_ADDRESS"
+    NFT_MINT_ADDRESS="YOUR_NFT_MINT_ADDRESS"
+    PAYER_SECRET_KEY="YOUR_PAYER_SECRET_KEY" # Add this line
+    ```
+
+    Replace `YOUR_WALLET_ADDRESS`, `YOUR_NFT_MINT_ADDRESS`, and `YOUR_PAYER_SECRET_KEY` with your actual wallet address, NFT mint address, and the secret key of the payer.
+
+**Running the Test:**
+
+1.  Open a terminal and navigate to the `poc/solana-nft-burn-mint` directory.
+2.  Run the command `npm install` to install the dependencies.
+3.  Run the command `node index.js` to execute the program.
+
+**Expected Outputs:**
+
+The output will vary depending on whether the NFT has been burned or not, and whether the environment variables are set correctly.
+
+*   **Scenario 1: NFT has been burned (ATA is closed) and environment variables are set correctly:**
+
+    The program will output details of the burn transaction.
+
+*   **Scenario 2: NFT has not been burned (ATA still exists) and environment variables are set correctly:**
+
+    The program will output an error message indicating that the burn failed.
+
+*   **Scenario 3: Environment variables are not set:**
+
+    ```
+    Please set SOLANA_NETWORK, USER_WALLET_ADDRESS, NFT_MINT_ADDRESS and PAYER_SECRET_KEY in .env file
+    ```
+
+*   **Scenario 4: Error during burn:**
+
+    ```
+    Error during burn: [Error message]
+    ```
