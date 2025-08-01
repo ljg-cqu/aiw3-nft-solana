@@ -58,6 +58,18 @@ async function establishConnection(solanaNetwork) {
 // Throws an error if the operation fails
 async function getAssociatedAccount(connection, payerKeypair, nftMintAddress, userWalletAddress) {
     try {
+        try {
+            new PublicKey(nftMintAddress);
+        } catch (error) {
+            console.error("Error: Invalid NFT mint address. Please provide a valid public key.");
+            throw error;
+        }
+        try {
+            new PublicKey(userWalletAddress);
+        } catch (error) {
+            console.error("Error: Invalid user wallet address. Please provide a valid public key.");
+            throw error;
+        }
         return await getOrCreateAssociatedTokenAccount(
             connection,
             payerKeypair,
@@ -65,7 +77,11 @@ async function getAssociatedAccount(connection, payerKeypair, nftMintAddress, us
             new PublicKey(userWalletAddress)
         );
     } catch (error) {
-        console.error("Error getting or creating associated token account:", error);
+        console.error("Error getting or creating associated token account:", error.message);
+        if (error.message.includes("owner or delegate")) {
+            console.error("Possible cause: The specified user wallet address is not the owner or delegate of the associated token account.");
+        }
+
         throw error;
     }
 }
