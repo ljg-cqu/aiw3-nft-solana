@@ -73,6 +73,11 @@ For POC purposes, using a local Solana network is the easiest and safest option.
 
     You'll need an NFT mint address to test the burn functionality. You can create one using the Solana CLI. First, airdrop some SOL to your wallet:
 
+    Before running the following commands, make sure your Solana CLI is configured to use the localnet:
+
+    ```bash
+    solana config set --url http://localhost:8899
+    ```
     ```bash
     solana airdrop 5 YOUR_WALLET_ADDRESS # Replace with your wallet address
     ```
@@ -126,15 +131,6 @@ The program will print output to the console indicating the result of the burn p
     *   The specified NFT mint address is not owned by the user wallet address.
     *   The user wallet address does not have an associated token account for the specified NFT mint address.
 *   **Other Errors:** The console will output a generic error message. Check the environment variables and ensure the NFT mint address and user wallet address are correct.
-
-## 8. Common Issues and Solutions
-
-*   **"Error: account X already in use":** This usually means you're trying to create a mint address that already exists.  Try a different wallet or reset your localnet.
-*   **"Error: Insufficient funds":**  Make sure you've airdropped enough SOL to your wallet using `solana airdrop 5 YOUR_WALLET_ADDRESS`.
-*   **"TokenAccountNotFoundError":**
-    *   Double-check that the `NFT_MINT_ADDRESS` is correct.
-    *   Ensure that the `USER_WALLET_ADDRESS` actually owns the NFT with the specified `NFT_MINT_ADDRESS`. You can verify this using the Solana Explorer (for devnet/mainnet) or by inspecting the token accounts on your localnet.
-*   **"Program log: Error: Invalid instruction":** This can be a generic error. Double check all your environment variables and make sure you are using the correct versions of the Solana CLI and `@solana/web3.js`.
 
 Make sure the payer account has enough SOL to pay for the transaction.
 ## 8. Next Steps (Beyond the POC)
