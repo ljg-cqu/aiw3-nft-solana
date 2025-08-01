@@ -156,27 +156,56 @@ After running the POC, you can use the Solana CLI to verify the burn:
     solana transaction <TRANSACTION_ID>
     ```
 
-## 8. Implementing the Minting
-
-Implement the minting logic inside the `mintNFT` function in `nft-manager.js`. You'll need to use the Token program and Metaplex SDK. The current implementation includes a function that mints a new NFT.
-
-Make sure you have installed `@metaplex-foundation/js` by running `npm install @metaplex-foundation/js`.
-Also, make sure you have a valid metadata URI that points to a JSON file conforming to the Metaplex metadata standard.
++## 8. Verifying the Minting with Solana CLI
++
++If you choose to implement minting, you can verify the mint using the Solana CLI:
++
++1.  **Check the User's ATA Balance:**
++
++    ```bash
++    spl-token accounts
++    ```
++
++    This command will list all token accounts associated with your configured Solana CLI wallet. After minting, the ATA associated with the minted NFT should appear in the list with a balance of 1.
++
++## 9. Inspecting Token Accounts
++
++You can use the `spl-token account-info` command to get detailed information about a specific token account:
++
++```bash
++spl-token account-info <ACCOUNT_ADDRESS>
++```
++
++Replace `<ACCOUNT_ADDRESS>` with the address of the account you want to inspect. This will show you all the transactions that have affected the account, including minting and burning events.
++
++## 10. Using the Solana Explorer (Devnet/Testnet)
++
++If you deploy your POC to devnet or testnet, you can use the Solana Explorer (https://explorer.solana.com/) to examine transactions and accounts. Simply enter the transaction ID or account address in the search bar to view its details.
++
++To use the Solana Explorer, make sure your `.env` file is configured to use either `SOLANA_NETWORK="devnet"` or `SOLANA_NETWORK="testnet"`.
++
++## 11. Third-Party Solana Explorers (Localnet - Use with Caution)
++
++Some third-party Solana explorers claim to support localnet connections. However, their reliability can vary. Use these tools with caution and verify the information they provide.
++
+ ## 8. Implementing the Minting
  
-
-## 8. Verifying the Minting with Solana CLI
-
-If you choose to implement minting, you can verify the mint using the Solana CLI:
-
-1.  **Check the User's ATA Balance:**
-
-    ```bash
-    spl-token accounts
-    ```
-
-    This command will list all token accounts associated with your configured Solana CLI wallet. After minting, the ATA associated with the minted NFT should appear in the list with a balance of 1.
-
-## 9. Inspecting Token Accounts
-
-You can use the `spl-token account-info` command to get detailed information about a specific token account:
-
+ Implement the minting logic inside the `mintNFT` function in `nft-manager.js`. You'll need to use the Token program and Metaplex SDK. The current implementation includes a function that mints a new NFT.
+@@ -158,16 +168,3 @@
+ Make sure you have installed `@metaplex-foundation/js` by running `npm install @metaplex-foundation/js`.
+ Also, make sure you have a valid metadata URI that points to a JSON file conforming to the Metaplex metadata standard.
+  
+-
+-## 8. Verifying the Minting with Solana CLI
+-
+-If you choose to implement minting, you can verify the mint using the Solana CLI:
+-
+-1.  **Check the User's ATA Balance:**
+-
+-    ```bash
+-    spl-token accounts
+-    ```
+-
+-    This command will list all token accounts associated with your configured Solana CLI wallet. After minting, the ATA associated with the minted NFT should appear in the list with a balance of 1.
+-
+-## 9. Inspecting Token Accounts
