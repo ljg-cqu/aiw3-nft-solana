@@ -76,6 +76,17 @@ async function burnNFT(connection, payerKeypair, nftMintAddress, userAssociatedT
     }
 }
 
+async function checkSolBalance(connection, publicKey) {
+    try {
+        const balance = await connection.getBalance(publicKey);
+        console.log(`SOL balance: ${balance / 1000000000} SOL`); // Convert from lamports to SOL
+        return balance;
+    } catch (error) {
+        console.error("Error checking SOL balance:", error);
+        throw error;
+    }
+}
+
 async function main() {
     // Validate environment variables
     if (!validateEnvironmentVariables()) {
@@ -113,6 +124,16 @@ async function main() {
     console.log("NFT mint address:", nftMintAddress);
     console.log("Payer public key:", payerPublicKey.toBase58());
 
+    // Check SOL balance before proceeding
+    try {
+        const balance = await checkSolBalance(connection, payerPublicKey);
+        if (balance < 0.001 * 1000000000) { // Check if balance is less than 0.001 SOL
+            throw new Error("Insufficient SOL balance. Please ensure the payer account has enough SOL to pay for the transaction.");
+        }
+    } catch (error) {
+        console.error("Error checking SOL balance:", error.message);
+        return;
+    }
     try {
         // Get the user's associated token account address
         const userAssociatedTokenAccount = await getAssociatedAccount(
@@ -137,7 +158,9 @@ async function main() {
     } catch (error) {
         console.error("Error during burn:", error);
         if (error.message && error.message.includes("TokenAccountNotFoundError")) {
-            console.error("Possible cause: The specified NFT mint address is not owned by the user wallet address.");
+            console.error("Possible causes:\n" +
+                "1. The specified NFT mint address is not owned by the user wallet address.\n" +
+                "2. The user wallet address does not have an associated token account for the specified NFT mint address.");
         } else if (error.message && error.message.includes("InsufficientFunds")) {
             console.error("Possible cause: The payer account does not have enough SOL to pay for the transaction.");
         } else {

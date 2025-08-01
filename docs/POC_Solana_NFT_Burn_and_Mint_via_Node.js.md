@@ -49,7 +49,14 @@ The code for this POC is located in the `poc/solana-nft-burn-mint/index.js` file
 ## 7. Interpreting the Output
 
 The program will print output to the console indicating the result of the burn process. Examine the console output for details on the transaction and any errors that may occur.
+*   **Successful Burn:** The console will output the burn transaction ID.
+*   **Insufficient SOL Balance:** The console will output an error message indicating that the payer account does not have enough SOL to pay for the transaction.
+*   **TokenAccountNotFoundError:** The console will output an error message indicating that either:
+    *   The specified NFT mint address is not owned by the user wallet address.
+    *   The user wallet address does not have an associated token account for the specified NFT mint address.
+*   **Other Errors:** The console will output a generic error message. Check the environment variables and ensure the NFT mint address and user wallet address are correct.
 
+Make sure the payer account has enough SOL to pay for the transaction.
 ## 8. Next Steps (Beyond the POC)
 
 *   Implement Actual Minting: Integrate the minting of a new NFT after successful burn verification. This would require using a library like `@metaplex-foundation/js`.
