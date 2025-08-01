@@ -132,7 +132,7 @@ For POC purposes, using a local Solana network is the easiest and safest option.
 
 ## 6. Running the POC
 
-1.  Make sure you have set the correct environment variables in the `.env` file.
+1. Make sure you have set the correct environment variables in the `.env` file.
 
 ## 7. Verifying the Burn with Solana CLI
 
@@ -156,7 +156,7 @@ After running the POC, you can use the Solana CLI to verify the burn:
 
 ## 8. Implementing the Minting
 
-Implement the minting logic inside the `mintNFT` function in `nft-manager.js`. You'll likely need to use the Token program and Metaplex SDK.
+Implement the minting logic inside the `mintNFT` function in `nft-manager.js`. You'll likely need to use the Token program and Metaplex SDK. The current implementation includes a placeholder function that needs to be replaced with actual minting code.
  
 
 ## 8. Verifying the Minting with Solana CLI
