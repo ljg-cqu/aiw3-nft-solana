@@ -2,7 +2,7 @@
   "name": "solana-nft-poc",
   "version": "1.0.0",
   "description": "Proof of Concept for Solana NFT Burn and Mint",
-  "main": "index.js",
+  "main": "nft-manager.js",
   "scripts": {
     "start": "node nft-manager.js"
   },

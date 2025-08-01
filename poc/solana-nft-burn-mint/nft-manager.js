@@ -158,6 +158,7 @@ async function checkSolBalance(connection, publicKey) {
 }
 
 async function main() {
+    console.log("Starting Solana NFT Burn and Mint POC...");
 
     // Validate environment variables
     if (!validateEnvironmentVariables()) {
