@@ -32,6 +32,18 @@ This document outlines a Proof of Concept (POC) for demonstrating the core funct
 
     **Important Security Note:** Treat the `PAYER_SECRET_KEY` with utmost care. Never commit it to version control or share it publicly.
 
+## 5. Understanding Solana Accounts
+
+Solana's account model is fundamental to how data is stored and accessed on the blockchain. Here's a simplified overview relevant to this POC:
+
+*   **Account:** A container for data on the Solana blockchain. Every account has an address (a public key) and stores data, such as SOL balance, program code, or token information.
+*   **Program Account:** An account that contains executable code (a program). Programs define the rules for modifying other accounts.
+*   **Data Account:** An account that stores data. In the context of NFTs, these include:
+    *   **Mint Account:** Stores metadata about the NFT, such as its total supply and decimals.
+    *   **Token Account:** Stores the balance of a specific token (NFT) held by a specific user. Also known as an Associated Token Account (ATA).
+*   **System Program:** The core program on Solana responsible for basic account management, such as creating accounts and transferring SOL.
+*   **Token Program:** A program that defines the rules for creating and managing tokens (including NFTs) on Solana.
+
 ## 5. Setting up a Local Solana Testing Network
 
 For POC purposes, using a local Solana network is the easiest and safest option. Here's how to set it up:
