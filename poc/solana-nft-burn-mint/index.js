@@ -40,7 +40,12 @@ function validateEnvironmentVariables() {
 // Throws an error if the connection fails
 async function establishConnection(solanaNetwork) {
     try {
-        return new Connection(`https://api.${solanaNetwork}.solana.com`);
+        let endpoint = `https://api.${solanaNetwork}.solana.com`;
+        if (solanaNetwork === 'localnet') {
+            endpoint = 'http://localhost:8899';
+        }
+        // Consider using a dedicated RPC provider for better reliability and performance in production.
+        return new Connection(endpoint);
     } catch (error) {
         console.error(`Error establishing connection to Solana network ${solanaNetwork}. Please ensure the network name is correct and the Solana network is accessible:`, error);
         throw error;
