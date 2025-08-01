@@ -1,7 +1,14 @@
 
-Replace `<TOKEN_ACCOUNT_ADDRESS>` with the address of the token account you want to inspect. This will show you the account's balance, mint address, and owner.
+## 10. Troubleshooting
 
-## 10. Examining Transaction History
+Here are some common issues you might encounter and how to resolve them:
+
+*   **`TokenAccountNotFoundError`:** This error usually indicates that the specified NFT mint address is not owned by the user wallet address, or that the user wallet address does not have an associated token account for the specified NFT mint address. Double-check that the `NFT_MINT_ADDRESS` and `USER_WALLET_ADDRESS` are correct and that the user wallet owns the NFT.
+*   **`InsufficientFunds`:** This error indicates that the payer account does not have enough SOL to pay for the transaction. Make sure the payer account has enough SOL. If you are using `localnet`, you can airdrop SOL to the payer account using the `solana airdrop` command.
+*   **Connection Errors:** If you are having trouble connecting to the Solana network, make sure your internet connection is working and that the `SOLANA_NETWORK` environment variable is set correctly. If you are using `localnet`, make sure the `solana-test-validator` is running.
+*   **Invalid Secret Key:** If you are getting an error related to the secret key, make sure you have copied the secret key correctly from the `solana-test-validator` output or your keypair file. The secret key should be a comma-separated list of numbers.
+
+## 11. Examining Transaction History:**
 
 You can view the transaction history of an account using the `solana account` command with the `--log` option:
 

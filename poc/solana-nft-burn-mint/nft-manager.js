@@ -112,6 +112,13 @@ async function mintNFT(connection, payerKeypair, nftMintAddress, userAssociatedT
         // This is a placeholder, replace with actual minting code
         // You'll likely need to use the Token program and Metaplex SDK
 
+        // **Minting Logic Implementation Guide:**
+        // 1.  **Import necessary modules:** Import the required modules from `@solana/web3.js` and `@metaplex-foundation/js`.
+        // 2.  **Create a Metaplex instance:** Instantiate a Metaplex object using your connection and payer keypair.
+        // 3.  **Define metadata:** Define the metadata for your NFT, such as name, symbol, and URI.
+        // 4.  **Mint the NFT:** Use the `create` method from the Metaplex SDK to mint the NFT.
+        // 5.  **Return the transaction ID:** Return the transaction ID of the minting transaction.
+
         // For now, let's just log a message
         console.log("Minting new NFT...");
 

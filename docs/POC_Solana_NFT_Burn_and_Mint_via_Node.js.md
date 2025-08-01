@@ -2,12 +2,13 @@
 
 ## 1. Introduction
 
-This document outlines a Proof of Concept (POC) for demonstrating the core functionality of burning a Solana NFT using a Node.js backend. This POC validates the feasibility of burning an NFT and verifying the burn on-chain.
+This document outlines a Proof of Concept (POC) for demonstrating the core functionality of burning and minting a Solana NFT using a Node.js backend. This POC validates the feasibility of burning an NFT, minting a new NFT, and verifying these actions on-chain.
 
 ## 2. Objectives
 
 *   Demonstrate the ability to connect to the Solana blockchain using Node.js.
 *   Implement the function to burn an NFT using the `@solana/spl-token` library.
+*   Implement the function to mint an NFT using the `@solana/spl-token` library.
 *   Implement the function to verify the NFT burn by checking for the closure of the Associated Token Account (ATA).
 
 ## 3. Technologies Used
@@ -62,7 +63,7 @@ For POC purposes, using a local Solana network is the easiest and safest option.
     solana-test-validator
     ```
 
-    This starts a local Solana cluster with a single validator node. It also creates a default keypair and provides you with its address and airdrop authority. We will use the validator's keypair as the payer for simplicity. Keep the solana-test-validator running in its own terminal window.
+    This starts a local Solana cluster with a single validator node. It also creates a default keypair and provides you with its address and airdrop authority. We will use the validator's keypair as the payer for simplicity. Keep the solana-test-validator running in its own terminal window. **Important: Keep this terminal window open while running the POC.**
 
 3.  **Configure your `.env` file:**
 
