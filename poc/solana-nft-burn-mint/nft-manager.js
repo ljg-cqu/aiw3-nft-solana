@@ -14,7 +14,8 @@ function generateKeypairFromSecretKey(secretKey) {
 function validateEnvironmentVariables() {
     const solanaNetwork = process.env.SOLANA_NETWORK;
     const userWalletAddress = process.env.USER_WALLET_ADDRESS;
-    const payerSecretKey = process.env.PAYER_SECRET_KEY;
+    const userSecretKey = process.env.USER_SECRET_KEY;
+    const systemSecretKey = process.env.SYSTEM_SECRET_KEY;
 
     if (!solanaNetwork) {
         console.error('Please set SOLANA_NETWORK in .env file');
@@ -24,8 +25,12 @@ function validateEnvironmentVariables() {
         console.error('Please set USER_WALLET_ADDRESS in .env file');
         return false;
     }
-    if (!payerSecretKey) {
-        console.error('Please set PAYER_SECRET_KEY in .env file');
+    if (!userSecretKey) {
+        console.error('Please set USER_SECRET_KEY in .env file');
+        return false;
+    }
+    if (!systemSecretKey) {
+        console.error('Please set SYSTEM_SECRET_KEY in .env file');
         return false;
     }
     return true;
@@ -53,7 +58,7 @@ async function establishConnection(solanaNetwork) {
 // Gets the associated token account for the given user wallet and NFT mint address
 // If the associated token account doesn't exist, it creates one
 // Throws an error if the operation fails
-async function getAssociatedAccount(connection, payerKeypair, nftMintAddress, userWalletAddress) {
+async function getAssociatedAccount(connection, systemKeypair, nftMintAddress, userWalletAddress) {
     try {
         console.log(`Getting or creating associated token account for NFT mint: ${nftMintAddress} and user wallet: ${userWalletAddress}`);
         try {
@@ -70,9 +75,9 @@ async function getAssociatedAccount(connection, payerKeypair, nftMintAddress, us
         }
         return await getOrCreateAssociatedTokenAccount(
             connection,
-            payerKeypair,
+            systemKeypair, // System pays for account creation
             new PublicKey(nftMintAddress),
-            new PublicKey(userWalletAddress)
+            new PublicKey(userWalletAddress) // But account belongs to user
         );
     } catch (error) {
         console.error("Error getting or creating associated token account:", error.message);
@@ -169,7 +174,8 @@ async function main() {
     // Load environment variables
     const solanaNetwork = process.env.SOLANA_NETWORK;
     const userWalletAddress = process.env.USER_WALLET_ADDRESS;
-    const payerSecretKey = process.env.PAYER_SECRET_KEY;
+    const userSecretKey = process.env.USER_SECRET_KEY;
+    const systemSecretKey = process.env.SYSTEM_SECRET_KEY;
 
     // Establish connection to Solana network
     let connection;
@@ -180,75 +186,114 @@ async function main() {
         return;
     }
 
-    // Generate keypair from the provided secret key
-    let payerKeypair;
+    // Generate keypairs from the provided secret keys
+    let systemKeypair, userKeypair;
     try {
-        payerKeypair = generateKeypairFromSecretKey(payerSecretKey);
+        systemKeypair = generateKeypairFromSecretKey(systemSecretKey);
+        userKeypair = generateKeypairFromSecretKey(userSecretKey);
     } catch (error) {
         console.error("Error generating keypair from secret key:", error);
         return;
     }
-    const payerPublicKey = payerKeypair.publicKey;
+
+    // Verify that USER_WALLET_ADDRESS matches the public key from USER_SECRET_KEY
+    const derivedUserAddress = userKeypair.publicKey.toBase58();
+    if (derivedUserAddress !== userWalletAddress) {
+        console.error(`Error: USER_WALLET_ADDRESS (${userWalletAddress}) does not match the public key derived from USER_SECRET_KEY (${derivedUserAddress})`);
+        console.error("Please ensure USER_WALLET_ADDRESS and USER_SECRET_KEY correspond to the same wallet.");
+        return;
+    }
 
     // Log some details
     console.log("Solana network:", solanaNetwork);
-    console.log("User wallet address:", userWalletAddress);
-    console.log("Payer public key:", payerPublicKey.toBase58());
+    console.log("System public key (minting authority):", systemKeypair.publicKey.toBase58());
+    console.log("User wallet address (NFT owner):", userWalletAddress);
 
-    // Check SOL balance before proceeding
+    // Check SOL balance of system account before proceeding
     try {
-        const balance = await checkSolBalance(connection, payerPublicKey);
-        if (balance < 0.001 * 1000000000) { // Check if balance is less than 0.001 SOL
-            throw new Error("Insufficient SOL balance. Please ensure the payer account has enough SOL to pay for the transaction.");
+        const balance = await checkSolBalance(connection, systemKeypair.publicKey);
+        if (balance < 0.01 * 1000000000) { // Check if balance is less than 0.01 SOL (minting requires more)
+            throw new Error("Insufficient SOL balance in system account. Please ensure the system account has enough SOL to pay for minting transactions.");
         }
     } catch (error) {
-        console.error("Error checking SOL balance:", error.message);
+        console.error("Error checking system account SOL balance:", error.message);
+        return;
+    }
+
+    // Check SOL balance of user account
+    try {
+        const userBalance = await checkSolBalance(connection, userKeypair.publicKey);
+        if (userBalance < 0.001 * 1000000000) { // Check if balance is less than 0.001 SOL
+            console.warn("Warning: User account has low SOL balance. This may affect burn transactions.");
+        }
+    } catch (error) {
+        console.error("Error checking user account SOL balance:", error.message);
         return;
     }
     try {
-        console.log("Starting mint and burn process...");
+        console.log("\n=== BUSINESS FLOW: MINT-TO-USER + BURN-BY-USER ===");
+        console.log("1. System mints NFT directly to user's wallet");
+        console.log("2. User burns the NFT from their own account\n");
 
-        // Mint the NFT (this creates a new NFT with a new mint address)
+        // Step 1: System mints NFT directly to user's wallet
+        console.log("Step 1: System minting NFT to user's wallet...");
         const mintResult = await mintNFT(
             connection,
-            payerKeypair,
-            userWalletAddress
+            systemKeypair, // System keypair pays for minting
+            userWalletAddress // NFT is minted directly to user's wallet
         );
 
         console.log("NFT minted successfully!");
         console.log("New NFT mint address:", mintResult.newNftMintAddress.toBase58());
 
-        console.log("Minting completed. Starting burning process...");
-
-        // Create ATA for the newly minted NFT
-        const newUserAssociatedTokenAccount = await getAssociatedAccount(
+        // Step 2: Transfer NFT to user's associated token account (if not already there)
+        console.log("\nStep 2: Creating/verifying user's associated token account...");
+        const userAssociatedTokenAccount = await getAssociatedAccount(
             connection,
-            payerKeypair,
+            systemKeypair, // System pays for ATA creation if needed
             mintResult.newNftMintAddress.toBase58(),
             userWalletAddress
         );
 
-        // Burn the newly minted NFT
+        // Mint the NFT token to the user's ATA
+        console.log("Minting NFT token to user's associated token account...");
+        await mintTo(
+            connection,
+            systemKeypair, // System keypair has mint authority
+            mintResult.newNftMintAddress,
+            userAssociatedTokenAccount.address,
+            systemKeypair, // System is the mint authority
+            1 // Amount (1 for NFT)
+        );
+
+        console.log("NFT successfully transferred to user's account!");
+
+        // Step 3: User burns the NFT from their own account
+        console.log("\nStep 3: User burning NFT from their account...");
         const burnTransaction = await burnNFT(
             connection,
-            payerKeypair,
+            userKeypair, // User keypair burns their own NFT
             mintResult.newNftMintAddress.toBase58(),
-            newUserAssociatedTokenAccount
+            userAssociatedTokenAccount
         );
 
         console.log("Burn transaction:", burnTransaction);
-        console.log("Burning completed successfully!");
+        console.log("\n✅ COMPLETE FLOW SUCCESSFUL!");
+        console.log("- System minted NFT to user ✅");
+        console.log("- User burned their own NFT ✅");
 
     } catch (error) {
-        console.error("Error during burn:", error);
+        console.error("\n❌ Error during mint and burn process:", error);
         if (error.message && error.message.includes("TokenAccountNotFoundError")) {
             console.error("Possible causes:\n" +
                 "1. The specified NFT mint address is not owned by the user wallet address.\n" +
                 "2. The user wallet address does not have an associated token account for the specified NFT mint address.");
         } else if (error.message && error.message.includes("InsufficientFunds")) {
-            console.error("Possible cause: The payer account does not have enough SOL to pay for the transaction.");
+            console.error("Possible cause: The account does not have enough SOL to pay for the transaction.");
+        } else if (error.message && error.message.includes("InvalidAccountOwner")) {
+            console.error("Possible cause: The user account is not the owner of the NFT or associated token account.");
         } else {
-            console.error("Please check the environment variables and ensure the NFT mint address and user wallet address are correct.");
+            console.error("Please check the environment variables and ensure all keypairs and addresses are correct.");
         }
     }
 }

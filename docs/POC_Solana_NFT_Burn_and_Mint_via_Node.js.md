@@ -24,15 +24,31 @@ This document outlines a Proof of Concept (POC) for demonstrating the core funct
 
 - Node.js and npm installed.
 - Solana CLI installed and configured.
-- A Solana wallet with some SOL for transaction fees (for devnet/mainnet testing).
-- The POC mints a new NFT to the user's wallet, which is then burned.
+- Two Solana wallets with some SOL for transaction fees (for devnet/mainnet testing).
+- The POC implements a complete **mint-to-user + burn-by-user** business flow.
 - The `.env` file configured with the correct environment variables.
-  Namely: `SOLANA_NETWORK`, `USER_WALLET_ADDRESS`, `NFT_MINT_ADDRESS`, `PAYER_SECRET_KEY`.
-  - **Mint Address:** The unique identifier of the NFT you want to burn.
-  - **Associated Token Account (ATA):** An account that links a specific wallet address to a specific NFT mint address. It represents ownership of the NFT.
-  - **Payer:** The Solana account that will pay the transaction fees for burning the NFT. This is typically your wallet.
 
-  **Important Security Note:** Treat the `PAYER_SECRET_KEY` with utmost care. Never commit it to version control or share it publicly.
+### 4.1 Business Flow Overview
+
+This POC demonstrates a realistic business scenario:
+1. **System mints NFT**: Backend system creates and mints NFT directly to user's wallet
+2. **User owns NFT**: The NFT is owned by the user's wallet (not the system)
+3. **User burns NFT**: The user burns their own NFT using their private key
+
+### 4.2 Required Environment Variables
+
+- `SOLANA_NETWORK`: Target Solana network ("devnet", "testnet", "mainnet-beta")
+- `SYSTEM_SECRET_KEY`: Backend system keypair for minting operations
+- `USER_WALLET_ADDRESS`: User's public wallet address (must match USER_SECRET_KEY)
+- `USER_SECRET_KEY`: User's private key for burning operations
+
+### 4.3 Account Roles
+
+- **System Account**: Mints NFTs, pays for minting transactions, acts as mint authority
+- **User Account**: Owns NFTs, performs burn operations, must have matching public/private keys
+- **Associated Token Account (ATA)**: Links user wallet to specific NFT mint addresses
+
+**Important Security Note:** Treat both secret keys with utmost care. Never commit them to version control or share them publicly.
 
 ## 5. Understanding Solana Accounts
 
