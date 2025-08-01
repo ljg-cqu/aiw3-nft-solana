@@ -177,6 +177,153 @@ This structure directly enables the recommended solution:
 - **Authenticity Verification**: Partners check the `creators` array in the **on-chain** metadata for a verified AIW3 address.
 - **Level Information Storage**: Partners read the `attributes` array from the **off-chain** JSON metadata to find the "Level" or "Tier".
 
+## AIW3 NFT Ecosystem Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    UserWallet ||--o{ TokenAccount : owns
+    TokenAccount ||--|| MintAccount : "linked to"
+    MintAccount ||--|| MetadataPDA : "described by"
+    AIW3SystemWallet ||--o{ MetadataPDA : creates
+    MetadataPDA ||--|| JSONMetadata : "points to"
+    JSONMetadata }o--|| ArweaveStorage : "references images in"
+
+    UserWallet {
+        string publicKey "7kX9...ABC123"
+        string privateKey "encrypted"
+        string type "Solana Wallet Account"
+        string purpose "Proves NFT ownership"
+    }
+
+    TokenAccount {
+        int balance "1 (for NFTs)"
+        string tokenType "NFT"
+        string associatedMint "Mint Account Address"
+        string owner "User Wallet Address"
+        string purpose "Holds NFT tokens"
+    }
+
+    MintAccount {
+        int supply "1 (unique)"
+        int decimals "0"
+        string mintAuthority "AIW3 System Wallet"
+        string freezeAuthority "null or AIW3"
+        string purpose "Defines NFT uniqueness"
+    }
+
+    MetadataPDA {
+        string updateAuthority "AIW3 System Wallet"
+        string mint "Mint Account Address"
+        string name "AIW3 Equity NFT #1234"
+        string symbol "AIW3E"
+        string uri "Arweave JSON URI"
+        string creators "AIW3 verified address"
+        boolean isMutable "false"
+        string purpose "Stores verifiable NFT info"
+    }
+
+    AIW3SystemWallet {
+        string publicKey "9pY8...XYZ789"
+        string privateKey "secured"
+        string role "Creator and Minting Authority"
+        string purpose "Mints NFTs, proves authenticity"
+    }
+
+    JSONMetadata {
+        string name "AIW3 Equity NFT #1234"
+        string description "Equity representation"
+        string image "Arweave image URI"
+        json attributes "Level, Tier traits"
+        json properties "Files, creators"
+        string storage "Arweave"
+        string purpose "Rich NFT data and level info"
+    }
+
+    ArweaveStorage {
+        string imageFile "level-gold.png"
+        string access "HTTPS URI"
+        string durability "200+ years"
+        string type "Decentralized permanent storage"
+        string purpose "Permanent image storage"
+    }
+```
+
+### Verification Flow Diagram
+
+```mermaid
+flowchart TD
+    A[User provides Wallet Address] --> B[Query Solana: Find Token Accounts]
+    B --> C[Filter: Token Accounts with balance = 1]
+    C --> D[Extract: Mint Account addresses]
+    D --> E[Derive: Metadata PDA from Mint]
+    E --> F[Verify: creators[0] == AIW3 address && verified == true]
+    F --> |Valid| G[Read: URI field from metadata]
+    F --> |Invalid| H[❌ Reject: Not authentic AIW3 NFT]
+    G --> I[Fetch: JSON metadata from Arweave URI]
+    I --> J[Extract: Level from attributes array]
+    I --> K[Extract: Image URI from image field]
+    J --> L[✅ Display: User's NFT level]
+    K --> M[✅ Display: NFT image]
+    
+    style A fill:#e1f5fe
+    style L fill:#c8e6c9
+    style M fill:#c8e6c9
+    style H fill:#ffcdd2
+```
+
+### Data Flow Architecture
+
+```mermaid
+graph LR
+    subgraph "On-Chain (Solana)"
+        PDA[Metadata PDA<br/>- creators: AIW3<br/>- uri: arweave://...]
+        MINT[Mint Account<br/>- supply: 1<br/>- decimals: 0]
+        TOKEN[Token Account<br/>- balance: 1<br/>- owner: user]
+    end
+    
+    subgraph "Off-Chain (Arweave)"
+        JSON[JSON Metadata<br/>- attributes: Level<br/>- image: arweave://...]
+        IMG[Image File<br/>level-gold.png]
+    end
+    
+    subgraph "Actors"
+        USER[User Wallet]
+        AIW3[AIW3 System]
+        PARTNER[Third-Party Partner]
+    end
+    
+    USER ---|owns| TOKEN
+    TOKEN ---|linked to| MINT
+    MINT ---|described by| PDA
+    AIW3 ---|creates| PDA
+    PDA ---|points to| JSON
+    JSON ---|references| IMG
+    PARTNER ---|verifies| PDA
+    PARTNER ---|fetches| JSON
+    PARTNER ---|displays| IMG
+    
+    style USER fill:#e3f2fd
+    style AIW3 fill:#fff3e0
+    style PARTNER fill:#f3e5f5
+```
+
+### Key Relationships and Principles
+
+**Entity Relationships:**
+- `User Wallet` **1:N** `Token Account` (one wallet can own multiple NFTs)
+- `Token Account` **1:1** `Mint Account` (each token account holds one specific mint)
+- `Mint Account` **1:1** `Metadata PDA` (each NFT has one metadata account)
+- `AIW3 System Wallet` **1:N** `Metadata PDA` (system creates multiple NFTs)
+- `Metadata PDA` **1:1** `JSON Metadata` (each metadata points to one JSON file)
+- `JSON Metadata` **N:1** `Arweave Storage` (multiple JSONs can reference same images)
+
+**Key Principles:**
+- **Ownership**: Proven by Token Account possession in User Wallet
+- **Authenticity**: Verified through AIW3 address in Metadata PDA creators field
+- **Level Data**: Stored as attributes in off-chain JSON Metadata
+- **Images**: Referenced via URIs pointing to Arweave Storage
+- **No Transfer**: Direct minting to user wallet ensures immediate ownership
+
 ## Key Challenges
 1. **Level Information Storage**: Efficiently storing and accessing NFT level information without centralized bottlenecks
 2. **Authenticity Verification**: Ensuring third parties can validate that an NFT originated from AIW3 and not another platform
@@ -316,10 +463,10 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 
 | Solution                   | Verify Issuer        | NFT Tier Query        | Image Retrieval       |
 |----------------------------|----------------------|-----------------------|-----------------------|
-| **On-Chain Creator Check** | Check creator field in NFT metadata. Requires a known public key. | Yes, if included in on-chain metadata as a trait. | Yes, if URI is stored in metadata (typically via Arweave/IPFS). |
+| **On-Chain Creator Check** | Check creator field in NFT metadata. Requires a known public key. | Read level from off-chain JSON metadata attributes. | Yes, if URI is stored in metadata (typically via Arweave/IPFS). |
 | **Smart Contract Registry**| Deploy a smart contract to record and verify issuers. | Can query using contract functions. | Yes, if images' URIs are stored on-chain. |
 | **Smart Contract Signature** | NFT signed by AIW3's private key. Verify using AIW3's public key. | Not applicable; separate solution needed. | Not directly related; complementary metadata needed. |
-| **Metadata with Attributes**| Use known attributes (e.g., creator ID) in metadata. | Include level as a metadata trait. | Common practice to include URI in metadata. |
+| **Metadata with Attributes**| Use known attributes (e.g., creator ID) in metadata. | Include level as a metadata trait in off-chain JSON. | Common practice to include URI in metadata. |
 | **Ecosystem Validation API** | Centralized API checks NFT authenticity via AIW3 registry. | API can provide tier info. | API can serve or link images. |
 
 ### SWOT Analysis by Solution
@@ -327,7 +474,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 | Solution                   | Strengths                     | Weaknesses                | Opportunities              | Threats                         |
 |----------------------------|-------------------------------|---------------------------|----------------------------|---------------------------------|
 | **On-Chain Creator Check** | Fully decentralized, reliable | Requires known public key | Leverages existing metadata | Possible public key compromise. |
-| **Smart Contract Registry**| Transparent, trustless        | Costs for deploying contracts | Enhances on-chain trust   | Smart contract bugs             |
+| **Smart Contract Registry**| Transparent, trustless        | High development/maintenance costs | Enhances on-chain trust   | Smart contract bugs             |
 | **Smart Contract Signature** | Provides cryptographic proof | Not scalable alone        | Enhances credibility         | Key management issues           |
 | **Metadata with Attributes**| Simple to implement          | Relies on off-chain data  | Wide tool support            | Manipulation of metadata        |
 | **Ecosystem Validation API** | Easy integration            | Centralized control       | Provides additional context  | API may become obsolete         |
@@ -336,7 +483,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 
 **Primary Approach**: **Metadata Attributes + Creator Address Verification**
 
-1. **Metadata Attributes**: Store tier/level information directly in NFT metadata as traits
+1. **Metadata Attributes**: Store tier/level information in off-chain JSON metadata as traits
 2. **Creator Address Verification**: Partners verify authenticity by checking the creator field against AIW3's well-known system address
 3. **Arweave Storage**: Use Arweave URIs in metadata for permanent image storage
 
@@ -349,9 +496,29 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 **Implementation Requirements**:
 - Maintain a consistent, well-known AIW3 system address for minting
 - Publish the official AIW3 creator address publicly for partner verification
-- Embed tier information as standard metadata traits
+- Embed tier information as standard metadata traits in off-chain JSON
+
+**Alternative Supplementary Approach**: **Ecosystem Validation API**
+- Can be implemented as an optional integration layer for traditional systems
+- Provides centralized convenience while maintaining on-chain verification as primary method
+- Useful for partners who prefer REST API integration over direct blockchain queries
 
 ---
+
+## Implementation Requirements Summary
+
+### For AIW3 System:
+1. **System Wallet**: Maintain consistent public key for creator verification
+2. **Metadata Standards**: Follow Metaplex Token Metadata format
+3. **Image Storage**: Upload images to Arweave before minting
+4. **JSON Metadata**: Include level as trait in off-chain JSON metadata
+5. **Public Documentation**: Publish official creator address for partner verification
+
+### For Ecosystem Partners:
+1. **Creator Verification**: Check `creators[0].address` in on-chain metadata
+2. **Level Access**: Fetch JSON metadata and parse `attributes` array
+3. **Image Display**: Use `image` field URI from JSON metadata
+4. **Fallback Options**: Implement error handling for network issues
 
 ### Conclusion
 The recommended approach prioritizes simplicity and cost-effectiveness while maintaining full decentralization. By using **creator address verification** combined with **metadata attributes**, AIW3 achieves robust authenticity verification without the overhead of custom smart contracts. This approach leverages existing Solana/Metaplex standards, making integration straightforward for ecosystem partners while minimizing development and maintenance costs.
