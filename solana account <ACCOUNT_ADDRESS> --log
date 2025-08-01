@@ -1,0 +1,19 @@
+
+Replace `<ACCOUNT_ADDRESS>` with the address of the account you want to inspect. This will show you all the transactions that have affected the account, including minting and burning events.
+
+## 11. Using the Solana Explorer (Devnet)
+
+If you deploy your POC to devnet, you can use the Solana Explorer (https://explorer.solana.com/) to examine transactions and accounts. Simply enter the transaction ID or account address in the search bar to view its details.
+
+## 12. Using the Account Inspection Script
+
+You can use the `inspect-account.js` script to get detailed information about a specific account:
+
+1.  Save the script as `inspect-account.js` in the `poc/solana-nft-burn-mint` directory.
+2.  Run the script from the command line, providing the account address as an argument:
+
+    ```bash
+    node inspect-account.js <ACCOUNT_ADDRESS>
+    ```
+
+    Replace `<ACCOUNT_ADDRESS>` with the address of the account you want to inspect.

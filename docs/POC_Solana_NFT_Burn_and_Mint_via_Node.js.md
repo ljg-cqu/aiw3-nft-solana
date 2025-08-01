@@ -153,3 +153,20 @@ After running the POC, you can use the Solana CLI to verify the burn:
     ```bash
     solana transaction <TRANSACTION_ID>
     ```
+
+## 8. Verifying the Minting with Solana CLI
+
+If you choose to implement minting, you can verify the mint using the Solana CLI:
+
+1.  **Check the User's ATA Balance:**
+
+    ```bash
+    spl-token accounts
+    ```
+
+    This command will list all token accounts associated with your configured Solana CLI wallet. After minting, the ATA associated with the minted NFT should appear in the list with a balance of 1.
+
+## 9. Inspecting Token Accounts
+
+You can use the `spl-token account-info` command to get detailed information about a specific token account:
+

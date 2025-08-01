@@ -1,0 +1,7 @@
+
+Replace `<TOKEN_ACCOUNT_ADDRESS>` with the address of the token account you want to inspect. This will show you the account's balance, mint address, and owner.
+
+## 10. Examining Transaction History
+
+You can view the transaction history of an account using the `solana account` command with the `--log` option:
+
