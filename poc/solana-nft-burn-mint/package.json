@@ -1,0 +1,27 @@
+{
+  "name": "solana-nft-burn-mint-poc",
+  "version": "1.0.0",
+  "description": "Proof of Concept for Solana NFT Burn and Mint Operations",
+  "main": "nft-manager.js",
+  "scripts": {
+    "start": "node nft-manager.js",
+    "burn-only": "node index.js",
+    "inspect": "node inspect-account.js"
+  },
+  "keywords": [
+    "solana",
+    "nft",
+    "burn",
+    "mint",
+    "poc",
+    "metaplex"
+  ],
+  "author": "AIW3",
+  "license": "MIT",
+  "dependencies": {
+    "@solana/spl-token": "^0.3.8",
+    "@solana/web3.js": "^1.87.6",
+    "@metaplex-foundation/js": "^0.19.4",
+    "dotenv": "^16.3.1"
+  }
+}
