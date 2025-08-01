@@ -14,7 +14,6 @@ function generateKeypairFromSecretKey(secretKey) {
 function validateEnvironmentVariables() {
     const solanaNetwork = process.env.SOLANA_NETWORK;
     const userWalletAddress = process.env.USER_WALLET_ADDRESS;
-    const nftMintAddress = process.env.NFT_MINT_ADDRESS;
     const payerSecretKey = process.env.PAYER_SECRET_KEY;
 
     if (!solanaNetwork) {
@@ -23,10 +22,6 @@ function validateEnvironmentVariables() {
     }
     if (!userWalletAddress) {
         console.error('Please set USER_WALLET_ADDRESS in .env file');
-        return false;
-    }
-    if (!nftMintAddress) {
-        console.error('Please set NFT_MINT_ADDRESS in .env file');
         return false;
     }
     if (!payerSecretKey) {
@@ -111,7 +106,7 @@ async function burnNFT(connection, payerKeypair, nftMintAddress, userAssociatedT
 
 
 // Function to mint new NFT
-async function mintNFT(connection, payerKeypair, nftMintAddress, userAssociatedTokenAccount) {
+async function mintNFT(connection, payerKeypair, userWalletAddress) {
     try {
         console.log("Minting new NFT...");
 
@@ -132,33 +127,14 @@ async function mintNFT(connection, payerKeypair, nftMintAddress, userAssociatedT
         });
 
         console.log(`NFT Minted! Mint Address: ${nft.address.toBase58()}`);
+        console.log(`NFT Owner: ${nft.updateAuthorityAddress.toBase58()}`);
 
-        // Mint one token to the associated token account
-        const mintTransaction = await mintTo(
-            connection,
-            payerKeypair,
-            new PublicKey(nft.address), // Mint address
-            userAssociatedTokenAccount.address, // Destination account
-            payerKeypair, // Authority
-            1 // Amount
-        );
-
-        console.log(`Mint transaction ID: ${mintTransaction}`);
-
-        // Fetch the token
+        // Fetch the token to verify creation
         const token = await metaplex.nfts().findByMint({ mintAddress: nft.address });
+        console.log("Token created successfully:", token.name);
+        console.log("Token owner:", token.updateAuthorityAddress.toBase58());
 
-        console.log("Token: ", token);
-
-        // Verify the owner
-        const owner = token.owner;
-
-        console.log("Owner: ", owner);
-
-
-
-
-        return mintTransaction;
+        return { nft, newNftMintAddress: nft.address };
 
     } catch (error) {
         console.error("Error minting NFT:", error);
@@ -193,7 +169,6 @@ async function main() {
     // Load environment variables
     const solanaNetwork = process.env.SOLANA_NETWORK;
     const userWalletAddress = process.env.USER_WALLET_ADDRESS;
-    const nftMintAddress = process.env.NFT_MINT_ADDRESS;
     const payerSecretKey = process.env.PAYER_SECRET_KEY;
 
     // Establish connection to Solana network
@@ -218,7 +193,6 @@ async function main() {
     // Log some details
     console.log("Solana network:", solanaNetwork);
     console.log("User wallet address:", userWalletAddress);
-    console.log("NFT mint address:", nftMintAddress);
     console.log("Payer public key:", payerPublicKey.toBase58());
 
     // Check SOL balance before proceeding
@@ -232,37 +206,34 @@ async function main() {
         return;
     }
     try {
-        // Get the user's associated token account address
-        const userAssociatedTokenAccount = await getAssociatedAccount(
+        console.log("Starting mint and burn process...");
+
+        // Mint the NFT (this creates a new NFT with a new mint address)
+        const mintResult = await mintNFT(
             connection,
             payerKeypair,
-            nftMintAddress,
             userWalletAddress
         );
 
-        console.log("User associated token account:", userAssociatedTokenAccount.address.toBase58());
-
-        console.log("Starting mint and burn process...");
-
-        // Mint the NFT
-        const mintTransaction = await mintNFT(
-            connection,
-            payerKeypair,
-            nftMintAddress,
-            userAssociatedTokenAccount
-        );
-
-        console.log("Mint transaction:", mintTransaction);
+        console.log("NFT minted successfully!");
+        console.log("New NFT mint address:", mintResult.newNftMintAddress.toBase58());
 
         console.log("Minting completed. Starting burning process...");
 
+        // Create ATA for the newly minted NFT
+        const newUserAssociatedTokenAccount = await getAssociatedAccount(
+            connection,
+            payerKeypair,
+            mintResult.newNftMintAddress.toBase58(),
+            userWalletAddress
+        );
 
-        // Burn the NFT
+        // Burn the newly minted NFT
         const burnTransaction = await burnNFT(
             connection,
             payerKeypair,
-            nftMintAddress,
-            userAssociatedTokenAccount
+            mintResult.newNftMintAddress.toBase58(),
+            newUserAssociatedTokenAccount
         );
 
         console.log("Burn transaction:", burnTransaction);

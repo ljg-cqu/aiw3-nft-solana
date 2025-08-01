@@ -25,7 +25,7 @@ This document outlines a Proof of Concept (POC) for demonstrating the core funct
 - Node.js and npm installed.
 - Solana CLI installed and configured.
 - A Solana wallet with some SOL for transaction fees (for devnet/mainnet testing).
-- An existing NFT mint address for testing the burn verification. The `USER_WALLET_ADDRESS` must own this NFT.
+- The POC mints a new NFT to the user's wallet, which is then burned.
 - The `.env` file configured with the correct environment variables.
   Namely: `SOLANA_NETWORK`, `USER_WALLET_ADDRESS`, `NFT_MINT_ADDRESS`, `PAYER_SECRET_KEY`.
   - **Mint Address:** The unique identifier of the NFT you want to burn.

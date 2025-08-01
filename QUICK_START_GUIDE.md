@@ -20,7 +20,6 @@ Edit the `.env` file with your actual values:
 ```env
 SOLANA_NETWORK="devnet"
 USER_WALLET_ADDRESS="YOUR_ACTUAL_WALLET_ADDRESS"
-NFT_MINT_ADDRESS="YOUR_ACTUAL_NFT_MINT_ADDRESS"
 PAYER_SECRET_KEY="YOUR_ACTUAL_SECRET_KEY"
 ```
 
@@ -34,7 +33,7 @@ npm start
 1. **Node.js** (v16+ recommended)
 2. **Solana CLI** installed
 3. **A Solana wallet** with some SOL for fees
-4. **An existing NFT** that you own (for burn testing)
+4. **The POC will automatically mint and then burn an NFT** to demonstrate the complete flow
 
 ## 🛠️ Detailed Setup Instructions
 
@@ -82,7 +81,7 @@ solana airdrop 2
 ```
 
 #### 4. Create a Test NFT (Optional)
-If you don't have an NFT, you can create one:
+Follow these steps to mint and burn an NFT:
 ```bash
 # Switch to devnet
 solana config set --url https://api.devnet.solana.com
@@ -210,7 +209,7 @@ SOLANA_NETWORK="localnet"
 - [ ] Dependencies installed (`npm install` completed)
 - [ ] `.env` file configured with real values
 - [ ] Wallet has sufficient SOL balance
-- [ ] NFT exists and is owned by your wallet
+- [ ] POC will create and burn NFT automatically
 - [ ] Network connection is stable
 
 Once all items are checked, run `npm start` and you should see successful output!
