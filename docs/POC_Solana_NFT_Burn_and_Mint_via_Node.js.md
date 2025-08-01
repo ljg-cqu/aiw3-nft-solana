@@ -26,6 +26,7 @@ This document outlines a Proof of Concept (POC) for demonstrating the core funct
 *   An existing NFT mint address for testing the burn verification. The `USER_WALLET_ADDRESS` must own this NFT.
 *   The `.env` file configured with the correct environment variables.
     Namely: `SOLANA_NETWORK`, `USER_WALLET_ADDRESS`, `NFT_MINT_ADDRESS`, `PAYER_SECRET_KEY`.
+    **Important Security Note:** Treat the `PAYER_SECRET_KEY` with utmost care. Never commit it to version control or share it publicly.
 
 ## 5. Setting up a Local Solana Testing Network
 

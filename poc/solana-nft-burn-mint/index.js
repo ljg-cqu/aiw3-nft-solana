@@ -39,7 +39,7 @@ async function establishConnection(solanaNetwork) {
     try {
         return new Connection(`https://api.${solanaNetwork}.solana.com`);
     } catch (error) {
-        console.error(`Error establishing connection to Solana network ${solanaNetwork}:`, error);
+        console.error(`Error establishing connection to Solana network ${solanaNetwork}. Please ensure the network name is correct and the Solana network is accessible:`, error);
         throw error;
     }
 }
