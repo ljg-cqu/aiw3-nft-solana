@@ -36,29 +36,44 @@ function validateEnvironmentVariables() {
 
 // Function to establish connection to Solana network
 async function establishConnection(solanaNetwork) {
-    return new Connection(`https://api.${solanaNetwork}.solana.com`);
+    try {
+        return new Connection(`https://api.${solanaNetwork}.solana.com`);
+    } catch (error) {
+        console.error(`Error establishing connection to Solana network ${solanaNetwork}:`, error);
+        throw error;
+    }
 }
 
 // Function to get or create associated token account
 async function getAssociatedAccount(connection, payerKeypair, nftMintAddress, userWalletAddress) {
-    return await getOrCreateAssociatedTokenAccount(
-        connection,
-        payerKeypair,
-        new PublicKey(nftMintAddress),
-        new PublicKey(userWalletAddress)
-    );
+    try {
+        return await getOrCreateAssociatedTokenAccount(
+            connection,
+            payerKeypair,
+            new PublicKey(nftMintAddress),
+            new PublicKey(userWalletAddress)
+        );
+    } catch (error) {
+        console.error("Error getting or creating associated token account:", error);
+        throw error;
+    }
 }
 
 // Function to burn the NFT
 async function burnNFT(connection, payerKeypair, nftMintAddress, userAssociatedTokenAccount) {
-    return await burn(
-        connection,
-        payerKeypair,
-        new PublicKey(nftMintAddress),
-        userAssociatedTokenAccount.address,
-        payerKeypair,
-        1 // amount
-    );
+    try {
+        return await burn(
+            connection,
+            payerKeypair,
+            new PublicKey(nftMintAddress),
+            userAssociatedTokenAccount.address,
+            payerKeypair,
+            1 // amount
+        );
+    } catch (error) {
+        console.error("Error burning NFT:", error);
+        throw error;
+    }
 }
 
 async function main() {
@@ -74,10 +89,22 @@ async function main() {
     const payerSecretKey = process.env.PAYER_SECRET_KEY;
 
     // Establish connection to Solana network
-    const connection = await establishConnection(solanaNetwork);
+    let connection;
+    try {
+        connection = await establishConnection(solanaNetwork);
+    } catch (err) {
+        console.error("Failed to establish connection:", err);
+        return;
+    }
 
     // Generate keypair from the provided secret key
-    const payerKeypair = generateKeypairFromSecretKey(payerSecretKey);
+    let payerKeypair;
+    try {
+        payerKeypair = generateKeypairFromSecretKey(payerSecretKey);
+    } catch (error) {
+        console.error("Error generating keypair from secret key:", error);
+        return;
+    }
     const payerPublicKey = payerKeypair.publicKey;
 
     // Log some details
@@ -109,6 +136,13 @@ async function main() {
 
     } catch (error) {
         console.error("Error during burn:", error);
+        if (error.message && error.message.includes("TokenAccountNotFoundError")) {
+            console.error("Possible cause: The specified NFT mint address is not owned by the user wallet address.");
+        } else if (error.message && error.message.includes("InsufficientFunds")) {
+            console.error("Possible cause: The payer account does not have enough SOL to pay for the transaction.");
+        } else {
+            console.error("Please check the environment variables and ensure the NFT mint address and user wallet address are correct.");
+        }
     }
 }
 
