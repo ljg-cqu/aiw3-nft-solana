@@ -1,0 +1,26 @@
+{
+  "name": "solana-nft-poc",
+  "version": "1.0.0",
+  "description": "Proof of Concept for Solana NFT Burn and Mint",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "solana",
+    "nft",
+    "burn",
+    "mint",
+    "poc"
+  ],
+  "author": "AIW3",
+  "license": "MIT",
+  "dependencies": {
+    "@solana/spl-token": "^0.3.8",
+    "@solana/web3.js": "^1.87.6",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0"
+  }
+}
