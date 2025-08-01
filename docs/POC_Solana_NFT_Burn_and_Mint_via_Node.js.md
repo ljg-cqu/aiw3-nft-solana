@@ -34,52 +34,52 @@ This document outlines a Proof of Concept (POC) for demonstrating the core funct
 
     **Important Security Note:** Treat the `PAYER_SECRET_KEY` with utmost care. Never commit it to version control or share it publicly.
 
-## 5. Understanding Solana Accounts
+### Solana Accounts
 
 Solana's account model is fundamental to how data is stored and accessed on the blockchain. Here's a simplified overview relevant to this POC:
 
-*   **Account:** A container for data on the Solana blockchain. Every account has an address (a public key) and stores data, such as SOL balance, program code, or token information.
-*   **Program Account:** An account that contains executable code (a program). Programs define the rules for modifying other accounts.
-*   **Data Account:** An account that stores data. In the context of NFTs, these include:
-    *   **Mint Account:** Stores metadata about the NFT, such as its total supply and decimals.
-    *   **Token Account:** Stores the balance of a specific token (NFT) held by a specific user. Also known as an Associated Token Account (ATA).
-*   **System Program:** The core program on Solana responsible for basic account management, such as creating accounts and transferring SOL.
-*   **Token Program:** A program that defines the rules for creating and managing tokens (including NFTs) on Solana.
+- **Account:** A container for data on the Solana blockchain. Every account has an address (a public key) and stores data, such as SOL balance, program code, or token information.
+- **Program Account:** An account that contains executable code (a program). Programs define the rules for modifying other accounts.
+- **Data Account:** An account that stores data. In the context of NFTs, these include:
+  - **Mint Account:** Stores metadata about the NFT, such as its total supply and decimals.
+  - **Token Account:** Stores the balance of a specific token (NFT) held by a specific user. Also known as an Associated Token Account (ATA).
+- **System Program:** The core program on Solana responsible for basic account management, such as creating accounts and transferring SOL.
+- **Token Program:** A program that defines the rules for creating and managing tokens (including NFTs) on Solana.
 
-## 5. Setting up a Local Solana Testing Network
+### Setting up a Local Solana Testing Network
 
 For POC purposes, using a local Solana network is the easiest and safest option. Here's how to set it up:
 
-1.  **Install `@solana/test-validator`:**
+1. **Install `@solana/test-validator`:**
 
-    ```bash
-    npm install -g @solana/test-validator
-    ```
+   ```bash
+   npm install -g @solana/test-validator
+   ```
 
-2.  **Run the Test Validator:**
+2. **Run the Test Validator:**
 
-    Open a terminal and run:
+   Open a terminal and run:
 
-    ```bash
-    solana-test-validator
-    ```
+   ```bash
+   solana-test-validator
+   ```
 
-    This starts a local Solana cluster with a single validator node. It also creates a default keypair and provides you with its address and airdrop authority. We will use the validator's keypair as the payer for simplicity. Keep the solana-test-validator running in its own terminal window. **Important: Keep this terminal window open while running the POC.**
+   This starts a local Solana cluster with a single validator node. It also creates a default keypair and provides you with its address and airdrop authority. We will use the validator's keypair as the payer for simplicity. Keep the solana-test-validator running in its own terminal window. **Important: Keep this terminal window open while running the POC.**
 
-3.  **Configure your `.env` file:**
+3. **Configure your `.env` file:**
 
-    ```
-    SOLANA_NETWORK="localnet"
-    USER_WALLET_ADDRESS="YOUR_WALLET_ADDRESS"
-    NFT_MINT_ADDRESS="YOUR_NFT_MINT_ADDRESS"
-    PAYER_SECRET_KEY="YOUR_PAYER_SECRET_KEY"
-    ```
+   ```env
+   SOLANA_NETWORK="localnet"
+   USER_WALLET_ADDRESS="YOUR_WALLET_ADDRESS"
+   NFT_MINT_ADDRESS="YOUR_NFT_MINT_ADDRESS"
+   PAYER_SECRET_KEY="YOUR_PAYER_SECRET_KEY"
+   ```
 
-    **Important:**
-    After running `solana-test-validator`, carefully note the public key and private key (secret key) it generates. You'll need these for the next steps. The validator also outputs a command to airdrop SOL to a specific key. We will use the validator's keypair as the payer for simplicity. Keep the solana-test-validator running in its own terminal window.
-    *   Replace `YOUR_WALLET_ADDRESS` with the public key displayed by `solana-test-validator`.
-    *   Replace `YOUR_SECRET_KEY` with the *private key* corresponding to that public key. The `solana-test-validator` usually tells you the location of the keypair file (e.g., `~/.config/solana/validator-keypair.json`). You can use `solana-keygen pubkey <keypair_file>` to get the public key, and then use `solana-keygen recover <keypair_file>` to get the private key (as a comma-separated list of numbers).
-    *   You'll need to create an NFT mint address on your local network. We will use the validator's keypair to create the NFT mint. See the next step.
+   **Important:**
+   After running `solana-test-validator`, carefully note the public key and private key (secret key) it generates. You'll need these for the next steps. The validator also outputs a command to airdrop SOL to a specific key. We will use the validator's keypair as the payer for simplicity. Keep the solana-test-validator running in its own terminal window.
+   - Replace `YOUR_WALLET_ADDRESS` with the public key displayed by `solana-test-validator`.
+   - Replace `YOUR_SECRET_KEY` with the *private key* corresponding to that public key. The `solana-test-validator` usually tells you the location of the keypair file (e.g., `~/.config/solana/validator-keypair.json`). You can use `solana-keygen pubkey \u003ckeypair_file\u003e` to get the public key, and then use `solana-keygen recover \u003ckeypair_file\u003e` to get the private key (as a comma-separated list of numbers).
+   - You'll need to create an NFT mint address on your local network. We will use the validator's keypair to create the NFT mint. See the next step.
 +
 +   (Optional - for reference only. We are reusing the validator's keypair for this POC.)
 +
