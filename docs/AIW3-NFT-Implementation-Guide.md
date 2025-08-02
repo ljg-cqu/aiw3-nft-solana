@@ -1,20 +1,50 @@
-# AIW3 NFT Ecosystem Integration: Decentralized Level Storage and Authenticity Verification
+# AIW3 NFT Implementation Guide
+## Complete Lifecycle Management for Solana-Based Equity NFTs
 
-## Executive Summary
-This document analyzes the optimal hybrid approach for AIW3's Equity NFT lifecycle management, where the AIW3 system mints NFTs directly to user wallets (ensuring creator authenticity) while users retain full control over burning their NFTs. This hybrid model solves the critical authenticity verification challenge by maintaining a consistent, verifiable creator address while preserving user autonomy. The document evaluates alternative approaches for comprehensive decision-making and explains why this hybrid model is the recommended solution.
+---
 
-## NFT Lifecycle Overview
+## 📋 Table of Contents
 
-The complete AIW3 NFT lifecycle consists of three phases:
-1. **MINT**: Creation of NFTs with embedded level/tier information
-2. **USE**: Ecosystem integration where partners verify authenticity and access NFT data
-3. **BURN**: Destruction of NFTs when users upgrade or exit
+1. [Executive Summary](#executive-summary)
+2. [NFT Lifecycle Overview](#nft-lifecycle-overview)
+3. [Technical Architecture](#technical-architecture)
+4. [Implementation Guide](#implementation-guide)
+5. [Integration Patterns](#integration-patterns)
+6. [Detailed Process Flows](#detailed-process-flows)
+7. [Source Code References](#source-code-references)
+8. [Recommendations](#recommendations)
 
-**Current Focus**: This document primarily addresses the **USE** phase (ecosystem integration), while also analyzing viable patterns for the complete lifecycle.
+---
 
-## NFT Lifecycle Patterns Analysis
+## 🎯 Executive Summary
 
-### Minting Patterns
+This document provides a comprehensive technical guide for implementing AIW3's Equity NFT system on Solana. The recommended approach uses **system-direct minting** combined with **user-controlled burning**, leveraging the Metaplex Token Metadata standard for maximum ecosystem compatibility.
+
+### Key Benefits
+- ✅ **Authenticity Guaranteed**: Creator verification through on-chain metadata
+- ✅ **User Autonomy**: Full user control over NFT ownership and burning
+- ✅ **Cost Effective**: No custom smart contracts required
+- ✅ **Industry Standard**: Compatible with all major Solana NFT tools
+
+---
+
+## 🔄 NFT Lifecycle Overview
+
+The AIW3 NFT ecosystem operates through three distinct phases:
+
+| Phase | Description | Control | Key Technology |
+|-------|-------------|---------|----------------|
+| **🏗️ MINT** | NFT creation with embedded level data | AIW3 System | Solana Token Program + Metaplex |
+| **🔍 USE** | Verification and data access by partners | Ecosystem Partners | Metadata queries + Arweave |
+| **🔥 BURN** | NFT destruction for upgrades/exits | User Wallet | User-initiated transactions |
+
+---
+
+## 📊 Integration Patterns
+
+### Lifecycle Pattern Analysis
+
+#### 🏗️ Minting Patterns
 
 | Pattern | Description | AIW3 Implementation | Pros | Cons |
 |---------|-------------|---------------------|------|------|
@@ -25,7 +55,7 @@ The complete AIW3 NFT lifecycle consists of three phases:
 
 **Key Point**: With Solana/Metaplex, when minting an NFT, you can specify the owner wallet directly during creation. This means **no ownership transfer occurs** - the user becomes the initial and immediate owner upon minting.
 
-### Burning Patterns
+#### 🔥 Burning Patterns
 
 | Pattern | Description | AIW3 Implementation | Pros | Cons |
 |---------|-------------|---------------------|------|------|
@@ -34,7 +64,7 @@ The complete AIW3 NFT lifecycle consists of three phases:
 | **Time-Based Burning** | NFTs auto-burn after expiration | Not adopted | Automatic cleanup | Smart contract complexity |
 | **Conditional Burning** | Burn triggered by specific events/conditions | Not adopted | Advanced automation | High complexity, potential bugs |
 
-### Use Phase Integration Patterns
+#### 🔍 Use Phase Integration Patterns
 
 | Pattern | Description | Implementation Status | Ecosystem Benefit |
 |---------|-------------|----------------------|-------------------|
@@ -43,32 +73,63 @@ The complete AIW3 NFT lifecycle consists of three phases:
 | **API Gateway** | Centralized API for ecosystem integration | 🔄 **Optional** | Easy integration for traditional systems |
 | **Direct Blockchain Queries** | Partners query blockchain directly | ✅ **Always Available** | No intermediaries, most decentralized |
 
-### Recommended Lifecycle Pattern for AIW3
+### ⭐ Recommended AIW3 NFT Lifecycle Implementation
 
+The optimal approach for AIW3 uses a **hybrid lifecycle pattern** that balances authenticity, user autonomy, and ecosystem compatibility:
+
+```mermaid
+graph TD
+    subgraph "Phase 1: 🏗️ MINT (System-Controlled)"
+        A1[AIW3 system mints NFT directly to user wallet]
+        A2[User becomes immediate owner - no transfer]
+        A3[Level data stored in off-chain JSON metadata]
+        A4[Images stored on Arweave with URIs in off-chain JSON]
+        A5[Creator verification data embedded in on-chain metadata]
+    end
+    
+    subgraph "Phase 2: 🔍 USE (Partner-Initiated)"
+        B1[Partners verify authenticity via on-chain creator field]
+        B2[Level queried from off-chain JSON metadata attributes]
+        B3[Images retrieved via Arweave URIs in off-chain JSON]
+        B4[Optional API for traditional system integration]
+    end
+    
+    subgraph "Phase 3: 🔥 BURN (User-Controlled)"
+        C1[User initiates burn transaction]
+        C2[Token supply reduced to zero]
+        C3[Associated Token Account closed]
+        C4[SOL rent returned to user]
+    end
+    
+    A1 --> A2 --> A3 --> A4 --> A5
+    A5 --> B1
+    B1 --> B2 --> B3 --> B4
+    B4 --> C1
+    C1 --> C2 --> C3 --> C4
+    
+    style A1 fill:#fff3e0
+    style B1 fill:#f3e5f5  
+    style C1 fill:#ffebee
 ```
-1. MINT: System-Direct Minting
-   └── AIW3 system mints NFT directly to user wallet
-   └── User becomes immediate owner (no transfer)
-   └── Level embedded in metadata as trait
-   └── Image stored on Arweave with URI in metadata
 
-2. USE: Creator + Metadata Verification
-   └── Partners verify authenticity via creator field check
-   └── Level queried from metadata attributes
-   └── Images retrieved via Arweave URIs in metadata
-   └── Optional API for traditional system integration
+**Key Characteristics:**
+- **🏗️ MINT Phase**: System-controlled for authenticity guarantee
+  - Creator address stored in **on-chain** Solana metadata for verification
+  - Level data stored in **off-chain** JSON metadata for cost efficiency
+- **🔍 USE Phase**: Partner-driven verification and data access
+  - Authenticity verified via **on-chain** creator field check
+  - Level information accessed from **off-chain** JSON metadata
+- **🔥 BURN Phase**: User-controlled for true ownership autonomy
 
-3. BURN: User-Controlled Burning
-   └── User initiates burn transaction
-   └── Associated Token Account closed
-   └── Burn verifiable via blockchain state
-```
+---
 
-## Solana NFT Data Structure and Ownership (Metaplex Standard)
+## 🏗️ Technical Architecture
+
+### 📚 Solana NFT Data Structure (Metaplex Standard)
 
 To correctly implement the solution, it's crucial to understand how Solana NFTs work. An NFT isn't a single object but a system of related accounts on the blockchain, governed by standards like Metaplex Token Metadata. This structure clearly separates the NFT's descriptive data from its ownership.
 
-### Core Concepts and Relationships
+#### 🔑 Core Concepts and Relationships
 
 1.  **Who owns the NFT? (The Token Account)**: The actual owner of an NFT is the wallet that holds the **Token Account** associated with that NFT's Mint. This Token Account contains a balance of 1 token. For our use case, when the **AIW3 system mints the NFT**, it creates the Mint and then directly creates the associated Token Account in the **user's wallet**, making them the immediate owner. There is no separate "owner" field in the metadata; ownership is proven by possession of the token.
 
@@ -78,7 +139,7 @@ To correctly implement the solution, it's crucial to understand how Solana NFTs 
 
 4.  **Where is the rich data? (The Off-Chain JSON Metadata)**: The on-chain Metadata PDA contains a `uri` field. This URI points to an external JSON file stored on a decentralized network like Arweave. This JSON file contains richer details like the description, image link, and custom attributes (e.g., "Level").
 
-### Data Flow for Verification
+#### 🔄 Data Flow for Verification
 
 Here is the step-by-step flow a third-party partner would use to verify an NFT and get its level:
 
@@ -102,9 +163,9 @@ Here is the step-by-step flow a third-party partner would use to verify an NFT a
                        └── 9. Retrieve NFT Image: Parse the JSON and get the URI from the `image` field to display the corresponding image.
 ```
 
-### 1. On-Chain Metadata Account Details
+#### 📊 On-Chain Metadata Account Details
 
-This data is stored directly on the Solana blockchain and is the foundation of trust.
+This data is stored directly on the **Solana blockchain** and serves as the foundation of trust and authenticity verification. **Note**: Level information is NOT stored here - it's in the off-chain JSON file referenced by the `uri` field.
 
 | Field | Type | Source | Required | Description & AIW3 Usage |
 |---|---|---|---|---|
@@ -116,27 +177,29 @@ This data is stored directly on the Solana blockchain and is the foundation of t
 | `data.creators` | `Vec<Creator>` | AIW3 | Yes | A list of creators. **This is the core of authenticity verification.** The first creator will be the AIW3 system's public key, which must be signed and verified (`verified: true`) during the minting process. Partners check this verified address. |
 | `is_mutable` | `bool` | AIW3 | Yes | A flag indicating if the metadata can be changed. For AIW3 Equity NFTs, this should be set to `false` after minting to guarantee data permanence and trust. |
 
-### 2. Off-Chain JSON Metadata Details
+#### 📄 Off-Chain JSON Metadata Details
 
-The `uri` from the on-chain data points to this JSON file. Its structure should follow the Metaplex Token Metadata Standard to ensure compatibility with wallets, explorers, and marketplaces. While you can add custom attributes, the base structure is conventional.
+The `uri` from the **on-chain Solana metadata** points to this JSON file stored on decentralized storage (Arweave/IPFS). **This is where the Level information is actually stored.** The structure follows the Metaplex Token Metadata Standard to ensure compatibility with wallets, explorers, and marketplaces.
 
-**Example JSON Structure (Stored on Arweave):**
+**Example JSON Structure (Stored on Arweave/IPFS):**
 
 ```json
 {
   "name": "AIW3 Equity NFT #1234",
   "symbol": "AIW3E",
-  "description": "Represents a user's equity and status within the AIW3 ecosystem. Authenticity is verified by the creator address on-chain.",
+  "description": "Represents a user's equity and status within the AIW3 ecosystem. Authenticity is verified by the creator address in on-chain Solana metadata.",
   "image": "https://arweave.net/ARWEAVE_IMAGE_HASH",
   "external_url": "https://aiw3.io",
   "attributes": [
     {
       "trait_type": "Level",
-      "value": "Gold"
+      "value": "Gold",
+      "display_type": "string"
     },
     {
-      "trait_type": "Tier",
-      "value": "3"
+      "trait_type": "Tier", 
+      "value": "3",
+      "display_type": "number"
     }
   ],
   "properties": {
@@ -156,28 +219,36 @@ The `uri` from the on-chain data points to this JSON file. Its structure should 
 }
 ```
 
-### How NFT Images are Handled
+#### 🖼️ How NFT Images are Handled
 
 Just like the "Level" attribute, the NFT's image is linked via the off-chain JSON metadata. Storing large files like images directly on the blockchain is prohibitively expensive.
 
 The process is as follows:
 1.  **Upload Image**: The image file for each level (e.g., `level-gold.png`) is uploaded to a permanent, decentralized storage network like Arweave. This upload provides a unique and immutable URI for the image (e.g., `https://arweave.net/ARWEAVE_IMAGE_HASH`).
 2.  **Link in JSON**: This Arweave URI is placed into the `image` field of the off-chain JSON metadata file. The `properties.files` array also references this URI, providing additional context like the file type.
-3.  **Link to On-Chain**: The JSON file itself is then uploaded to Arweave, and its URI is stored in the `data.uri` field of the on-chain metadata account during the minting process.
+3.  **Link to On-Chain**: The JSON file itself is then uploaded to Arweave/IPFS, and its URI is stored in the `data.uri` field of the **on-chain Solana metadata account** during the minting process.
 
 This creates a verifiable chain of pointers:
-`On-Chain Metadata` → `Off-Chain JSON URI` → `JSON File` → `Image URI` → `Image File`
+`On-Chain Solana Metadata` → `Off-Chain JSON URI` → `JSON File (Arweave/IPFS)` → `Image URI` → `Image File`
 
 An ecosystem partner, wallet, or marketplace follows this chain to reliably fetch and display the correct image for the NFT, ensuring the visual representation matches the on-chain asset.
 
 **Clarification on Storing NFT Level:**
-The NFT "Level" is **not stored directly on-chain**. It is stored in the `attributes` array of the **off-chain** JSON metadata file. Third parties access this information by following the data flow described above: they get the `uri` from the on-chain data and then fetch the JSON file from that `uri` to read the level. This is the standard, scalable, and cost-effective method used across the NFT ecosystem.
+The NFT "Level" is **NOT stored directly on the Solana blockchain**. It is stored in the `attributes` array of the **off-chain** JSON metadata file hosted on Arweave/IPFS. Third parties access this information by following the data flow described above: they get the `uri` from the **on-chain** Solana metadata and then fetch the JSON file from that `uri` to read the level. This hybrid approach is the standard, scalable, and cost-effective method used across the NFT ecosystem.
+
+**Two-Layer Architecture:**
+- **On-Chain (Solana)**: Creator verification, ownership proof, URI pointer to off-chain data
+- **Off-Chain (Arweave/IPFS)**: Level attributes, images, rich metadata content
 
 This structure directly enables the recommended solution:
-- **Authenticity Verification**: Partners check the `creators` array in the **on-chain** metadata for a verified AIW3 address.
-- **Level Information Storage**: Partners read the `attributes` array from the **off-chain** JSON metadata to find the "Level" or "Tier".
+- **Authenticity Verification**: Partners check the `creators` array in the **on-chain Solana metadata** for a verified AIW3 address
+- **Level Information Storage**: Partners read the `attributes` array from the **off-chain JSON metadata** to find the "Level" or "Tier"
 
-## AIW3 NFT Ecosystem Entity Relationship Diagram
+---
+
+## 📈 Visual Architecture Diagrams
+
+### 🏛️ AIW3 NFT Ecosystem Entity Relationship Diagram
 
 ```mermaid
 erDiagram
@@ -243,7 +314,7 @@ erDiagram
     }
 ```
 
-### Verification Flow Diagram
+### 🔍 Verification Flow Diagram
 
 ```mermaid
 flowchart TD
@@ -266,7 +337,7 @@ flowchart TD
     style H fill:#ffcdd2
 ```
 
-### Data Flow Architecture
+### 🔄 Data Flow Architecture
 
 ```mermaid
 graph LR
@@ -304,7 +375,7 @@ graph LR
     style PARTNER fill:#f3e5f5
 ```
 
-### Minting Flow Diagram
+### 🏗️ Minting Flow Diagram
 
 ```mermaid
 flowchart TD
@@ -348,7 +419,7 @@ flowchart TD
     style H fill:#c8e6c9
 ```
 
-### Burning Flow Diagram
+### 🔥 Burning Flow Diagram
 
 ```mermaid
 flowchart TD
@@ -379,7 +450,7 @@ flowchart TD
     style G fill:#c8e6c9
 ```
 
-### Key Relationships and Principles
+### 🔗 Key Relationships and Principles
 
 **Entity Relationships:**
 - `User Wallet` **1:N** `Token Account` (one wallet can own multiple NFTs)
@@ -396,24 +467,28 @@ flowchart TD
 - **Images**: Referenced via URIs pointing to Arweave Storage
 - **No Transfer**: Direct minting to user wallet ensures immediate ownership
 
-## Key Challenges
+---
+
+## 🎯 Implementation Guide
+
+### 🚧 Key Challenges
 1. **Level Information Storage**: Efficiently storing and accessing NFT level information without centralized bottlenecks
 2. **Authenticity Verification**: Ensuring third parties can validate that an NFT originated from AIW3 and not another platform
 3. **Image/Artwork Storage**: Properly storing visual assets while maintaining decentralization and cost-effectiveness
 4. **Ecosystem Integration**: Enabling seamless verification by DeFi protocols, marketplaces, and other blockchain applications
 
-## Image/Artwork Storage Solutions
+### 🖼️ Image/Artwork Storage Solutions
 
-### Challenge Overview
+#### 🎯 Challenge Overview
 Each AIW3 Equity NFT requires visual representation (artwork/images) that must be:
 - Permanently accessible
 - Tamper-resistant
 - Cost-effective to store
 - Decentralized to avoid single points of failure
 
-### Storage Options Analysis
+#### 📊 Storage Options Analysis
 
-#### Option 1: Arweave Permanent Storage
+##### Option 1: Arweave Permanent Storage
 - **Description**: Store images on Arweave's permanent, pay-once storage network
 - **Advantages**:
   - Truly permanent storage (200+ years guaranteed)
@@ -429,7 +504,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
   - **Cost**: Moderate (one-time) 💰💰
   - **Recommendation**: **✅ Recommended** for high-value, permanent NFTs
 
-#### Option 2: IPFS (InterPlanetary File System)
+##### Option 2: IPFS (InterPlanetary File System)
 - **Description**: Store images on IPFS, the distributed peer-to-peer file system
 - **Sub-options**:
   - **2a. IPFS with Pinning Services**: Use services like Pinata, Infura, or Web3.Storage
@@ -454,7 +529,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
   - **Ecosystem Support**: Excellent ✅
   - **Recommendation**: **✅ Recommended** for projects prioritizing cost-effectiveness and ecosystem compatibility
 
-#### Option 3: Hybrid Approach
+##### Option 3: Hybrid Approach
 - **Description**: Use IPFS for immediate availability, migrate to Arweave for permanence
 - **Advantages**:
   - Best of both worlds
@@ -468,7 +543,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
   - **Complexity**: Higher 🔴
   - **Recommendation**: For sophisticated implementations
 
-### **Recommended Image Storage Strategy**
+#### ⭐ **Recommended Image Storage Strategy**
 
 **For AIW3 Equity NFTs**: Use **Arweave** for the following reasons:
 1. **Permanence**: Equity NFTs represent long-term value and status
@@ -476,26 +551,27 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 3. **Ecosystem Integration**: Many Solana NFT tools expect Arweave URIs
 4. **Cost Justification**: One-time cost for permanent storage aligns with NFT value proposition
 
-## Level Information Storage Solutions
+### 📊 Level Information Storage Solutions
 
-### 1. Metadata Attributes (Recommended)
-- **Description**: Use the existing Metaplex Metadata standard to include "Level" as a trait in each NFT's off-chain JSON metadata, following industry standards.
+#### 1. ⭐ Metadata Attributes (Recommended)
+- **Description**: Use the existing Metaplex Metadata standard to store Level information in off-chain JSON metadata as traits, while storing authenticity verification data in on-chain Solana metadata.
 - **How it addresses requirements**:
-  - **Issuer Verification**: Check the creator field in on-chain NFT metadata against known AIW3 system public key
-  - **NFT Tier Access**: Read level/tier from off-chain JSON metadata attributes
-  - **Image Retrieval**: Access image URI stored in off-chain JSON metadata, pointing to Arweave storage
+  - **Issuer Verification**: Check the creator field in **on-chain Solana metadata** against known AIW3 system public key
+  - **NFT Tier Access**: Read level/tier from **off-chain JSON metadata** attributes stored on Arweave/IPFS
+  - **Image Retrieval**: Access image URI stored in **off-chain JSON metadata**, pointing to Arweave/IPFS storage
 - **Advantages**:
-  - Decentralized access to level information via standard metadata queries
+  - Decentralized access to level information via standard off-chain metadata queries
+  - Authenticity verification through on-chain Solana metadata creator field
   - Fully compatible with existing NFT ecosystem tools and wallets
-  - Cost-effective as level data is stored in off-chain JSON (not directly on blockchain)
+  - Cost-effective: level data stored off-chain, only verification data on-chain
   - Leverages proven Metaplex Token Metadata standard
 - **Evaluation**:
-  - **Trust**: High, with authenticity verified via on-chain creator address
+  - **Trust**: High, with authenticity verified via on-chain Solana creator address
   - **Compatibility**: Excellent - works with all standard NFT tools
-  - **Cost**: Very low - no additional blockchain storage costs
+  - **Cost**: Very low - only verification data on-chain, level data off-chain
   - **Recommendation**: **✅ Recommended** as the primary solution
 
-### 2. Smart Contract Verification
+#### 2. ❌ Smart Contract Verification
 - **Description**: Deploy a smart contract on Solana specifically to manage and verify NFT level information.
 - **How it addresses requirements**:
   - **Issuer Verification**: Smart contract maintains registry of authorized AIW3 mints and creators
@@ -514,7 +590,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
   - **Cost-Effectiveness**: Poor due to development and maintenance overhead
   - **Recommendation**: **❌ Not Recommended** - Creator address verification is simpler and equally effective
 
-### 3. Ecosystem Validation API (Supplementary)
+#### 3. 🔄 Ecosystem Validation API (Supplementary)
 - **Description**: Build a standardized REST API that provides additional validation and convenience features for ecosystem partners.
 - **How it addresses requirements**:
   - **Issuer Verification**: API validates NFT against AIW3's registry while also checking on-chain creator data
@@ -534,9 +610,11 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
   - **Integration**: Excellent for traditional systems
   - **Recommendation**: **🔄 Optional** - Implement as supplementary service, not primary verification method
 
-## Solution Architecture Analysis
+---
 
-### MECE Framework Application
+## 📊 Solution Architecture Analysis
+
+### 📋 MECE Framework Application
 
 **Mutually Exclusive Categories:**
 1. **On-Chain Verification** (Creator address check)
@@ -553,7 +631,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 - ✅ **Decentralization**: Covered by avoiding custom smart contracts
 - ✅ **Standards Compliance**: Covered by Metaplex Token Metadata standard
 
-### Solution Comparison Table
+### 📊 Solution Comparison Table
 
 | Solution                   | Verify Issuer        | NFT Tier Query        | Image Retrieval       |
 |----------------------------|----------------------|-----------------------|-----------------------|
@@ -563,7 +641,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 | **Metadata with Attributes**| Use known attributes (e.g., creator ID) in metadata. | Include level as a metadata trait in off-chain JSON. | Common practice to include URI in metadata. |
 | **Ecosystem Validation API** | Centralized API checks NFT authenticity via AIW3 registry. | API can provide tier info. | API can serve or link images. |
 
-### SWOT Analysis by Solution
+### 📈 SWOT Analysis by Solution
 
 | Solution                   | Strengths                     | Weaknesses                | Opportunities              | Threats                         |
 |----------------------------|-------------------------------|---------------------------|----------------------------|---------------------------------|
@@ -573,13 +651,17 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 | **Metadata with Attributes**| Simple to implement          | Relies on off-chain data  | Wide tool support            | Manipulation of metadata        |
 | **Ecosystem Validation API** | Easy integration            | Centralized control       | Provides additional context  | API may become obsolete         |
 
-### Recommended Solution
+---
+
+## 🎯 Recommendations
+
+### ⭐ Recommended Solution
 
 **Primary Approach**: **Metadata Attributes + Creator Address Verification**
 
-1. **Metadata Attributes**: Store tier/level information in off-chain JSON metadata as traits
-2. **Creator Address Verification**: Partners verify authenticity by checking the creator field against AIW3's well-known system address
-3. **Arweave Storage**: Use Arweave URIs in metadata for permanent image storage
+1. **Metadata Attributes**: Store tier/level information in **off-chain JSON metadata** as traits (on Arweave/IPFS)
+2. **Creator Address Verification**: Partners verify authenticity by checking the creator field in **on-chain Solana metadata** against AIW3's well-known system address
+3. **Arweave Storage**: Use Arweave URIs in **off-chain JSON metadata** for permanent image storage
 
 **Key Benefits**:
 - ✅ **Cost-Effective**: No smart contract development, audit, or maintenance costs
@@ -588,9 +670,9 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 - ✅ **Industry Standard**: Leverages existing NFT verification patterns
 
 **Implementation Requirements**:
-- Maintain a consistent, well-known AIW3 system address for minting
+- Maintain a consistent, well-known AIW3 system address for minting (stored in on-chain metadata)
 - Publish the official AIW3 creator address publicly for partner verification
-- Embed tier information as standard metadata traits in off-chain JSON
+- Embed tier information as standard metadata traits in **off-chain JSON** files on Arweave/IPFS
 
 **Alternative Supplementary Approach**: **Ecosystem Validation API**
 - Can be implemented as an optional integration layer for traditional systems
@@ -599,9 +681,11 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 
 ---
 
-## Implementation Requirements Summary
+---
 
-### A. For AIW3 System Implementation:
+## 📋 Implementation Requirements Summary
+
+### A. 🏗️ For AIW3 System Implementation:
 
 **1. System Wallet Management**
 - Maintain consistent public key for creator verification across all NFT mints
@@ -623,7 +707,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 - Include AIW3 system wallet as first creator with `verified: true`
 - Mint directly to user wallet (no ownership transfer required)
 
-### B. For Ecosystem Partners Integration:
+### B. 🤝 For Ecosystem Partners Integration:
 
 **1. Authenticity Verification Process**
 - Query user's wallet for Token Accounts with balance = 1 (NFTs)
@@ -646,7 +730,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 - Cache frequently accessed metadata for performance
 - Provide graceful degradation when off-chain data temporarily unavailable
 
-### C. Technical Implementation Details:
+### C. 🔧 Technical Implementation Details:
 
 **1. Required Dependencies**
 - Solana Web3.js or Rust SDK for blockchain interactions
@@ -666,7 +750,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 - **API Integration**: Use optional AIW3 validation API for simplified implementation
 - **Hybrid Approach**: Combine direct verification with API convenience features
 
-### Final Recommendation & Next Steps
+### 🎯 Final Recommendation & Next Steps
 
 The recommended approach prioritizes **simplicity, cost-effectiveness, and standards compliance** while maintaining full decentralization. 
 
@@ -689,7 +773,11 @@ The recommended approach prioritizes **simplicity, cost-effectiveness, and stand
 
 This approach ensures AIW3 NFTs integrate seamlessly with the broader Solana ecosystem while providing partners with reliable, decentralized access to authenticity verification and level information.
 
-### How System-Direct Minting Works on Solana: A Deeper Look
+---
+
+## 🔍 Detailed Process Flows
+
+### 🏗️ How System-Direct Minting Works on Solana: A Deeper Look
 
 The statement "the AIW3 system mints the NFT directly to the user's wallet" can seem counter-intuitive. How can one wallet (the system) create something inside another wallet (the user's) without having its private key? The answer lies in Solana's powerful and flexible account model, specifically through the **Associated Token Account (ATA) Program**.
 
@@ -809,11 +897,15 @@ This entire process happens in one or more transactions initiated and paid for b
 
 ---
 
-## Source Code Deep Dive: The On-Chain Instructions
+---
+
+## 💻 Source Code References
+
+### 🏗️ Source Code Deep Dive: The On-Chain Instructions
 
 To provide definitive evidence of the process described, this section presents the core functions from the official Solana and Metaplex program libraries that a developer would use to implement system-direct minting. These are not just examples; they are the foundational, on-chain instructions that execute the logic.
 
-### Step 1 & 3: Creating the Mint and Minting the Token (`spl-token`)
+#### Step 1 & 3: Creating the Mint and Minting the Token (`spl-token`)
 
 The Solana Program Library (`spl-token`) provides the instructions for creating a new token mint and then minting a token to a destination account.
 
@@ -851,7 +943,7 @@ pub fn mint_to(
 *   **Citation**:
     > Solana Labs. (2024). *Solana Program Library: Token Program*. GitHub. Retrieved August 2, 2025, from https://github.com/solana-labs/solana-program-library/blob/master/token/program/src/instruction.rs.
 
-### Step 2: Creating the Associated Token Account (`spl-associated-token-account`)
+#### Step 2: Creating the Associated Token Account (`spl-associated-token-account`)
 
 This program is responsible for creating the user's token account at a predictable address. The system wallet calls this to create the account on the user's behalf, assigning the user as the owner.
 
@@ -874,7 +966,7 @@ pub fn create_associated_token_account(
 *   **Citation**:
     > Solana Labs. (2024). *Solana Program Library: Associated Token Account Program*. GitHub. Retrieved August 2, 2025, from https://github.com/solana-labs/solana-program-library/blob/master/associated-token-account/program/src/instruction.rs.
 
-### Step 4: Creating the Metaplex Metadata (`mpl-token-metadata`)
+#### Step 4: Creating the Metaplex Metadata (`mpl-token-metadata`)
 
 After the token exists in the user's ATA, the Metaplex Token Metadata program is called to attach the NFT-specific data, like the name, symbol, and URI pointing to the off-chain JSON file.
 
@@ -907,7 +999,7 @@ pub fn create_metadata_accounts_v3(
 *   **Citation**:
     > Metaplex Foundation. (2024). *Metaplex Token Metadata*. GitHub. Retrieved August 2, 2025, from https://github.com/metaplex-foundation/mpl-token-metadata/blob/main/programs/token-metadata/program/src/instruction.rs.
 
-### Step 5: Revoking Authority (`spl-token`)
+#### Step 5: Revoking Authority (`spl-token`)
 
 Finally, to make the NFT immutable, the system wallet can renounce its control over the mint and metadata accounts. This is done via the `set_authority` instruction.
 
@@ -935,7 +1027,7 @@ These code references demonstrate that the entire minting flow is constructed by
 
 ---
 
-### How NFT Burning Works on Solana: A Deeper Look
+### 🔥 How NFT Burning Works on Solana: A Deeper Look
 
 Burning an NFT is the process of permanently destroying it. Unlike minting, which is initiated by the AIW3 system, burning is a user-controlled action. The owner of the NFT is the only one who can authorize its destruction. This ensures user autonomy and control over their digital assets. The process involves two main instructions: `burn` and `close_account`.
 
@@ -990,7 +1082,7 @@ After the token is burned, the Associated Token Account that held it is now empt
 
 ---
 
-### Source Code Deep Dive: The On-Chain Instructions for Burning
+#### 🔥 Source Code Deep Dive: The On-Chain Instructions for Burning
 
 The burning process is handled by the same `spl-token` library that governs minting.
 
@@ -1030,7 +1122,7 @@ This demonstrates that burning is a standard, user-initiated operation defined w
 
 ---
 
-### How NFT Usage and Verification Works: A Deeper Look
+### 🔍 How NFT Usage and Verification Works: A Deeper Look
 
 This section details the process from the perspective of an ecosystem partner (e.g., a DeFi protocol, a game, or another application) that needs to verify the authenticity of an AIW3 NFT and access its data, such as the user's level. This flow combines on-chain verification with off-chain data retrieval from Arweave/IPFS.
 
@@ -1108,7 +1200,7 @@ Once the NFT is verified as authentic, the partner can safely retrieve and use t
 
 ---
 
-### Source Code Deep Dive: The Client-Side SDKs for Using NFTs
+#### 🔍 Source Code Deep Dive: The Client-Side SDKs for Using NFTs
 
 Unlike minting and burning, which are defined by on-chain programs, using an NFT is primarily a client-side process of reading and interpreting data. Developers typically use SDKs (Software Development Kits) to simplify these interactions.
 
