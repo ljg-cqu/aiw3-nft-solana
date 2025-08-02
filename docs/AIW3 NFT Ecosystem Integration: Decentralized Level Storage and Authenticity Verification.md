@@ -696,7 +696,7 @@ Now that the user has an account ready to receive the NFT, the AIW3 system execu
 #### **Step 4: Create and Link Metaplex Metadata**
 To make this token a proper NFT recognized by wallets and marketplaces, the system creates and links its metadata.
 
-*   **Purpose**: To attach rich data (name, image, attributes) to the on-chain token.
+*   **Purpose**: To attach rich data (name, symbol, and URI pointing to the off-chain JSON file) to the on-chain token.
 *   **Pre-conditions**:
     *   The Mint Account exists.
     *   The off-chain JSON metadata file has been uploaded to Arweave and its URI is available.
