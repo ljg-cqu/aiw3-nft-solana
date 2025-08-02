@@ -8,6 +8,11 @@
 
 1. [Overview](#overview)
 2. [Minting Operations](#minting-operations)
+   - [SPL Token Standard Overview](#spl-token-standard-overview)
+   - [Core Technical Components](#core-technical-components)
+   - [Complete NFT Creation Workflow](#complete-nft-creation-workflow)
+   - [Production Deployment Considerations](#production-deployment-considerations)
+   - [On-Chain Instructions Deep Dive](#on-chain-instructions-deep-dive)
 3. [Burning Operations](#burning-operations)
 4. [NFT Verification & Usage](#nft-verification--usage)
 
@@ -22,6 +27,178 @@ The examples shown are not theoretical - they are the foundational, on-chain ins
 ---
 
 ## 🏗️ Minting Operations
+
+### SPL Token Standard Overview
+
+SPL NFTs on Solana are non-fungible tokens built using the Solana Program Library (SPL). The SPL standard provides a framework for creating and managing tokens, including both fungible and non-fungible tokens. Solana NFTs, adhering to the SPL standard, are unique digital assets with distinct properties and metadata.
+
+**Key NFT Characteristics:**
+- **Decimals: 0** - Cannot be divided into smaller units, ensuring non-fungible nature
+- **Supply: 1** - Only one unit of this specific token can ever be minted
+- **Metadata Program** - Metaplex Token Metadata associates off-chain data with on-chain tokens
+- **Master Edition Account** - Signifies NFT status and enables limited editions
+
+### Core Technical Components
+
+#### SPL Token Program
+The fundamental program on Solana for creating and managing tokens (both fungible and non-fungible).
+
+#### Metaplex Token Metadata Program  
+An on-chain program that allows you to attach additional properties (like name, symbol, description, and a link to off-chain artwork) to your token mint.
+
+#### Off-chain Storage (Arweave/IPFS)
+NFTs typically store their actual artwork and rich metadata (JSON files) off-chain on decentralized storage solutions. The on-chain metadata then points to this off-chain URI.
+
+#### Umi SDK
+A tool by Metaplex for interacting with on-chain programs, providing simplified NFT creation workflows.
+
+### Complete NFT Creation Workflow
+
+#### Step 1: Development Environment Setup
+
+**Required Dependencies:**
+
+```bash
+npm install @solana/web3.js @metaplex-foundation/umi @metaplex-foundation/mpl-token-metadata @metaplex-foundation/umi-uploader-irys
+```
+
+**Alternative for direct SPL interactions:**
+```bash
+npm install @solana/spl-token
+```
+
+#### Step 2: Wallet and Network Configuration
+
+**Initialize Umi Connection:**
+
+```typescript
+import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { clusterApiUrl } from "@solana/web3.js";
+
+const umi = createUmi(clusterApiUrl("mainnet-beta"));
+// Load your keypair (signer)
+// const myKeypair = ... // your keypair (from secret key or file)
+// umi.use(keypairIdentity(myKeypair));
+```
+
+**Add Metaplex Plugins:**
+
+```typescript
+import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
+import { irysUploader } from "@metaplex-foundation/umi-uploader-irys";
+
+umi.use(mplTokenMetadata()).use(irysUploader());
+```
+
+#### Step 3: Metadata Preparation
+
+**NFT Metadata JSON Structure:**
+
+```json
+{
+  "name": "My Awesome NFT",
+  "symbol": "MAN",
+  "description": "A brief description of the NFT",
+  "image": "https://arweave.net/your-image-uri",
+  "seller_fee_basis_points": 500,
+  "attributes": [
+    { "trait_type": "Background", "value": "Blue" },
+    { "trait_type": "Level", "value": "1" }
+  ],
+  "properties": {
+    "files": [{ 
+      "uri": "https://arweave.net/your-image-uri", 
+      "type": "image/png" 
+    }],
+    "creators": [
+      {
+        "address": "YOUR_CREATOR_ADDRESS",
+        "verified": true,
+        "share": 100
+      }
+    ]
+  },
+  "collection": {
+    "name": "AIW3 Equity NFTs",
+    "family": "AIW3"
+  }
+}
+```
+
+#### Step 4: Asset Upload to Decentralized Storage
+
+1. **Upload image file to Arweave** → Get image URI
+2. **Update metadata JSON** with image URI  
+3. **Upload metadata JSON to Arweave** → Get metadata URI
+
+#### Step 5: NFT Creation with Metaplex Umi
+
+**Complete NFT Minting Implementation:**
+
+```typescript
+import { createNft } from "@metaplex-foundation/mpl-token-metadata";
+import { generateSigner, percentAmount } from "@metaplex-foundation/umi";
+
+// Generate a new keypair for the NFT mint
+const mint = generateSigner(umi);
+
+const { signature } = await createNft(umi, {
+    mint,
+    name: "AIW3 Level 1 NFT",
+    symbol: "AIW3L1", 
+    uri: "https://arweave.net/your-metadata-uri", // From Step 4
+    sellerFeeBasisPoints: percentAmount(5, 2), // 5% royalties
+    isMutable: true, // Set to false for immutable NFTs
+    creators: [
+      {
+        address: "AIW3_CREATOR_ADDRESS",
+        verified: true,
+        percentageShare: 100,
+      }
+    ]
+}).sendAndConfirm(umi);
+
+console.log(`NFT created! Mint Address: ${mint.publicKey.toString()}`);
+console.log(`Transaction Signature: ${signature}`);
+```
+
+#### Step 6: Authority Management (Optional)
+
+**Disable Minting Authority for True NFT Immutability:**
+
+```typescript
+import { setAuthority, AuthorityType } from "@solana/spl-token";
+
+await setAuthority(
+    connection,
+    payer,
+    mint.publicKey, // The NFT mint account
+    payer.publicKey, // Current mint authority (your wallet)
+    AuthorityType.MintTokens,
+    null // Set new authority to null to disable minting
+);
+console.log("Minting authority disabled for the NFT.");
+```
+
+### Production Deployment Considerations
+
+#### Security Best Practices
+
+- **Private Key Management**: Handle private keys with extreme care, never expose them
+- **Environment Separation**: Use dedicated devnet wallets for testing
+- **Error Handling**: Implement robust error handling for network issues and transaction failures
+
+#### Testing Requirements
+
+- **Devnet Testing**: Always test NFT creation process thoroughly on Devnet before Mainnet
+- **Transaction Cost Planning**: Ensure sufficient SOL for transaction fees and rent
+- **Marketplace Integration**: Verify NFT visibility on Solana block explorers and marketplaces
+
+#### Cost Management
+
+- **Transaction Fees**: Every transaction costs a small amount of SOL
+- **Rent Exemption**: Account rent for token accounts and metadata accounts
+- **Storage Costs**: Arweave storage fees for images and metadata
 
 ### 🏗️ On-Chain Instructions Deep Dive
 
@@ -241,6 +418,377 @@ This demonstrates that burning is a standard, user-initiated operation defined w
 ---
 
 ## 🔍 NFT Verification & Usage
+
+## 🔍 NFT Verification & Usage
+
+### Complete Verification Logic Implementation
+
+#### Core Burn Verification System
+
+The following TypeScript implementation provides production-ready verification logic for partners to validate NFT burn status:
+
+```typescript
+import { PublicKey, Connection } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
+
+/**
+ * Finds the Associated Token Account (ATA) address for a given mint and owner
+ */
+async function findAssociatedTokenAddress(
+  owner: PublicKey,
+  mint: PublicKey
+): Promise<PublicKey> {
+  const [address] = await PublicKey.findProgramAddress(
+    [owner.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+    ASSOCIATED_TOKEN_PROGRAM_ID
+  );
+  return address;
+}
+
+/**
+ * Verifies that an NFT has been burned by checking if its ATA has been closed
+ * @param connection - The Solana JSON RPC connection
+ * @param userWallet - The public key of the user's main wallet
+ * @param nftMint - The public key of the NFT's mint account
+ * @returns {Promise<boolean>} - True if NFT is burned, false otherwise
+ */
+async function verifyNftIsBurned(
+  connection: Connection,
+  userWallet: string,
+  nftMint: string
+): Promise<boolean> {
+  
+  // 1. Find the expected address of the NFT's ATA
+  const ataAddress = await findAssociatedTokenAddress(
+    new PublicKey(userWallet),
+    new PublicKey(nftMint)
+  );
+
+  try {
+    // 2. Query Solana to check if the ATA still exists
+    const accountInfo = await connection.getAccountInfo(ataAddress);
+    
+    // 3. If accountInfo is null, the ATA has been closed (NFT is burned)
+    if (accountInfo === null) {
+      console.log(`✅ Verification Successful: ATA ${ataAddress.toString()} is closed. NFT is burned.`);
+      return true;
+    } else {
+      console.log(`❌ Verification Failed: ATA ${ataAddress.toString()} still exists. NFT not burned.`);
+      return false;
+    }
+  } catch (error) {
+    console.error(`🔌 Network Error: Failed to verify burn status for ${ataAddress.toString()}`);
+    console.error('Error details:', error);
+    throw error;
+  }
+}
+
+// Advanced verification with retry logic
+async function verifyNftIsBurnedWithRetry(
+  connection: Connection,
+  userWallet: string,
+  nftMint: string,
+  maxRetries: number = 3
+): Promise<boolean> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await verifyNftIsBurned(connection, userWallet, nftMint);
+    } catch (error) {
+      console.warn(`Attempt ${attempt} failed, retrying...`);
+      if (attempt === maxRetries) throw error;
+      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+    }
+  }
+}
+```
+
+### Detailed Minting Process Implementation
+
+#### System-Direct Minting Technical Flow
+
+**Step 1: Create Mint Account**
+
+```typescript
+import { SystemProgram, Transaction, Keypair } from '@solana/web3.js';
+import { createInitializeMintInstruction, MINT_SIZE, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+
+async function createMintAccount(
+  connection: Connection,
+  payer: Keypair,
+  mintAuthority: PublicKey,
+  freezeAuthority: PublicKey | null,
+  decimals: number = 0
+): Promise<Keypair> {
+  
+  const mintKeypair = Keypair.generate();
+  const lamports = await connection.getMinimumBalanceForRentExemption(MINT_SIZE);
+  
+  const transaction = new Transaction().add(
+    SystemProgram.createAccount({
+      fromPubkey: payer.publicKey,
+      newAccountPubkey: mintKeypair.publicKey,
+      space: MINT_SIZE,
+      lamports,
+      programId: TOKEN_PROGRAM_ID,
+    }),
+    createInitializeMintInstruction(
+      mintKeypair.publicKey,
+      decimals,
+      mintAuthority,
+      freezeAuthority,
+      TOKEN_PROGRAM_ID
+    )
+  );
+  
+  await connection.sendTransaction(transaction, [payer, mintKeypair]);
+  return mintKeypair;
+}
+```
+
+**Step 2: Create User's Associated Token Account**
+
+```typescript
+import { createAssociatedTokenAccountInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
+
+async function createUserATA(
+  connection: Connection,
+  payer: Keypair,
+  mint: PublicKey,
+  owner: PublicKey
+): Promise<PublicKey> {
+  
+  const associatedTokenAddress = await getAssociatedTokenAddress(
+    mint,
+    owner,
+    false,
+    TOKEN_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID
+  );
+  
+  const transaction = new Transaction().add(
+    createAssociatedTokenAccountInstruction(
+      payer.publicKey,
+      associatedTokenAddress,
+      owner,
+      mint,
+      TOKEN_PROGRAM_ID,
+      ASSOCIATED_TOKEN_PROGRAM_ID
+    )
+  );
+  
+  await connection.sendTransaction(transaction, [payer]);
+  return associatedTokenAddress;
+}
+```
+
+**Step 3: Mint NFT to User's ATA**
+
+```typescript
+import { createMintToInstruction } from '@solana/spl-token';
+
+async function mintToUser(
+  connection: Connection,
+  payer: Keypair,
+  mint: PublicKey,
+  destination: PublicKey,
+  authority: Keypair,
+  amount: number = 1
+): Promise<string> {
+  
+  const transaction = new Transaction().add(
+    createMintToInstruction(
+      mint,
+      destination,
+      authority.publicKey,
+      amount,
+      [],
+      TOKEN_PROGRAM_ID
+    )
+  );
+  
+  const signature = await connection.sendTransaction(transaction, [payer, authority]);
+  return signature;
+}
+```
+
+### Testing Framework Implementation
+
+#### Comprehensive Test Suite
+
+```typescript
+// test-nft-operations.ts
+import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+import { Connection, Keypair, clusterApiUrl, LAMPORTS_PER_SOL } from '@solana/web3.js';
+
+describe('NFT Burn Verification System', () => {
+  let connection: Connection;
+  let testWallet: Keypair;
+  let systemWallet: Keypair;
+  let testNftMint: PublicKey;
+
+  beforeAll(async () => {
+    // Setup test environment
+    connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+    testWallet = Keypair.generate();
+    systemWallet = Keypair.generate();
+    
+    // Fund test wallets
+    await Promise.all([
+      connection.requestAirdrop(testWallet.publicKey, LAMPORTS_PER_SOL),
+      connection.requestAirdrop(systemWallet.publicKey, LAMPORTS_PER_SOL)
+    ]);
+    
+    // Wait for funding confirmation
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  });
+
+  test('Complete NFT Lifecycle', async () => {
+    // 1. Create and mint test NFT
+    const mintKeypair = await createMintAccount(
+      connection,
+      systemWallet,
+      systemWallet.publicKey,
+      null
+    );
+    
+    const userATA = await createUserATA(
+      connection,
+      systemWallet,
+      mintKeypair.publicKey,
+      testWallet.publicKey
+    );
+    
+    await mintToUser(
+      connection,
+      systemWallet,
+      mintKeypair.publicKey,
+      userATA,
+      systemWallet
+    );
+    
+    // 2. Verify NFT exists before burn
+    const beforeBurn = await verifyNftIsBurned(
+      connection,
+      testWallet.publicKey.toString(),
+      mintKeypair.publicKey.toString()
+    );
+    expect(beforeBurn).toBe(false);
+    
+    // 3. Execute burn transaction
+    await burnAndCloseATA(connection, testWallet, mintKeypair.publicKey, userATA);
+    
+    // 4. Verify NFT is burned
+    const afterBurn = await verifyNftIsBurned(
+      connection,
+      testWallet.publicKey.toString(),
+      mintKeypair.publicKey.toString()
+    );
+    expect(afterBurn).toBe(true);
+  });
+
+  test('Error Handling', async () => {
+    // Test invalid wallet addresses
+    await expect(verifyNftIsBurned(
+      connection,
+      'invalid-address',
+      'invalid-mint'
+    )).rejects.toThrow();
+  });
+
+  test('Network Resilience', async () => {
+    // Test with retry mechanism
+    const result = await verifyNftIsBurnedWithRetry(
+      connection,
+      testWallet.publicKey.toString(),
+      Keypair.generate().publicKey.toString(),
+      2
+    );
+    expect(result).toBe(true); // Non-existent NFT should return burned
+  });
+});
+```
+
+### Performance Monitoring & Metrics
+
+#### Production Monitoring Implementation
+
+```typescript
+interface VerificationMetrics {
+  timestamp: Date;
+  userWallet: string;
+  nftMint: string;
+  verificationResult: boolean;
+  responseTime: number;
+  errorMessage?: string;
+}
+
+class NFTVerificationMonitor {
+  private metrics: VerificationMetrics[] = [];
+  
+  async monitoredVerify(
+    connection: Connection,
+    userWallet: string,
+    nftMint: string
+  ): Promise<boolean> {
+    const startTime = Date.now();
+    
+    try {
+      const result = await verifyNftIsBurned(connection, userWallet, nftMint);
+      
+      this.logMetrics({
+        timestamp: new Date(),
+        userWallet,
+        nftMint,
+        verificationResult: result,
+        responseTime: Date.now() - startTime
+      });
+      
+      return result;
+    } catch (error) {
+      this.logMetrics({
+        timestamp: new Date(),
+        userWallet,
+        nftMint,
+        verificationResult: false,
+        responseTime: Date.now() - startTime,
+        errorMessage: error.message
+      });
+      
+      throw error;
+    }
+  }
+  
+  private logMetrics(metric: VerificationMetrics): void {
+    this.metrics.push(metric);
+    
+    // Performance alerts
+    if (metric.responseTime > 5000) {
+      console.warn(`⚠️ Slow verification: ${metric.responseTime}ms for ${metric.nftMint}`);
+    }
+    
+    // Error tracking
+    if (metric.errorMessage) {
+      console.error(`❌ Verification error: ${metric.errorMessage}`);
+    }
+  }
+  
+  getPerformanceReport(): {
+    averageResponseTime: number;
+    errorRate: number;
+    totalVerifications: number;
+  } {
+    const total = this.metrics.length;
+    const errors = this.metrics.filter(m => m.errorMessage).length;
+    const avgTime = this.metrics.reduce((sum, m) => sum + m.responseTime, 0) / total;
+    
+    return {
+      averageResponseTime: avgTime,
+      errorRate: errors / total,
+      totalVerifications: total
+    };
+  }
+}
+```
 
 This section details the process from the perspective of an ecosystem partner (e.g., a DeFi protocol, a game, or another application) that needs to verify the authenticity of an AIW3 NFT and access its data, such as the user's level. This flow combines on-chain verification with off-chain data retrieval from Arweave/IPFS.
 

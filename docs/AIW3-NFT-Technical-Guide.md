@@ -13,9 +13,9 @@
 6. [Implementation Guide](#implementation-guide)
 7. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
 8. [Detailed Process Flows](#detailed-process-flows)
-9. [Recommendations](#recommendations)
-10. [Implementation Requirements](#implementation-requirements)
-11. [Testing and Validation](#testing-and-validation)
+9. [Testing and Validation](#testing-and-validation)
+10. [Recommendations](#recommendations)
+11. [Implementation Requirements](#implementation-requirements)
 12. [Appendix](#appendix)
 
 ---
@@ -460,61 +460,19 @@ Wallets like Phantom abstract this complexity, but on-chain, each NFT exists in 
 
 ### Technical Implementation: Burn Verification
 
-#### Core Verification Logic
+#### Core Verification Approach
 
-```typescript
-import { PublicKey } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
+The AIW3 system implements burn verification through Associated Token Account (ATA) closure detection. When an NFT is burned, the user's ATA is permanently closed and removed from the blockchain, providing definitive proof of destruction.
 
-/**
- * Finds the Associated Token Account (ATA) address for a given mint and owner
- */
-async function findAssociatedTokenAddress(
-  owner: PublicKey,
-  mint: PublicKey
-): Promise<PublicKey> {
-  const [address] = await PublicKey.findProgramAddress(
-    [owner.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
-    ASSOCIATED_TOKEN_PROGRAM_ID
-  );
-  return address;
-}
+**Verification Method:**
+- Query Solana for the expected ATA address using the user's wallet and NFT mint
+- If `getAccountInfo()` returns `null`, the ATA is closed and NFT is burned
+- This provides unambiguous, on-chain proof of NFT destruction
 
-/**
- * Verifies that an NFT has been burned by checking if its ATA has been closed
- * @param connection - The Solana JSON RPC connection
- * @param userWallet - The public key of the user's main wallet
- * @param nftMint - The public key of the NFT's mint account
- * @returns {Promise<boolean>} - True if NFT is burned, false otherwise
- */
-async function verifyNftIsBurned(
-  connection: Connection,
-  userWallet: string,
-  nftMint: string
-): Promise<boolean> {
-  
-  // 1. Find the expected address of the NFT's ATA
-  const ataAddress = await findAssociatedTokenAddress(
-    new PublicKey(userWallet),
-    new PublicKey(nftMint)
-  );
-
-  // 2. Check if an account exists at that address
-  const accountInfo = await connection.getAccountInfo(ataAddress);
-
-  // 3. If accountInfo is null, account is closed, confirming burn
-  if (accountInfo === null) {
-    console.log(`✅ Verification Successful: ATA ${ataAddress.toBase58()} is closed. NFT is burned.`);
-    return true;
-  }
-  
-  console.log(`❌ Verification Failed: ATA ${ataAddress.toBase58()} still exists. NFT not burned.`);
-  return false;
-}
-
-// Example Usage
-// const isBurned = await verifyNftIsBurned(connection, 'USER_WALLET_ADDRESS', 'NFT_MINT_ADDRESS');
-```
+**Implementation Reference:**
+- Complete verification logic: See [Solana NFT Technical Reference](./Solana-NFT-Technical-Reference.md)
+- Testing procedures: Comprehensive test suites available in technical reference
+- Performance monitoring: Production-ready monitoring implementations provided
 
 #### System Architecture for Upgrades
 
@@ -603,61 +561,17 @@ erDiagram
    - Graceful recovery from network interruptions
    - Timeout handling for stalled upgrade processes
 
-### Business Process: NFT Upgrade Flow
+### Business Process Integration
 
-#### Complete Upgrade Sequence
+**Upgrade Workflow Reference:**
+- Complete business sequence: See [AIW3 NFT Upgrade Business Logic](./AIW3-NFT-Upgrade-Business-Logic.md)
+- Communication protocols: Detailed integration patterns in business logic guide
+- Critical success factors: Business requirements and validation procedures
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend as AIW3 Frontend
-    participant Wallet as Phantom/Solflare
-    participant Backend as AIW3 Backend
-    participant Solana as Solana Blockchain
-
-    %% Step 1: Eligibility Check
-    User->>Frontend: Click "Check Eligibility"
-    Frontend->>Backend: GET /api/eligibility-check
-    Backend->>Backend: Verify transaction volume for user
-    Backend-->>Frontend: {"eligible": true}
-    Frontend->>User: Display "You are eligible to upgrade!"
-
-    %% Step 2: Burn Initiation
-    User->>Frontend: Click "Burn to Upgrade"
-    Frontend->>Wallet: Request signature for burn transaction
-    User->>Wallet: Approve Transaction
-    Wallet->>Solana: Submit burn & close ATA transaction
-    Solana-->>Wallet: Transaction Confirmed
-    Wallet-->>Frontend: Burn transaction successful
-
-    %% Step 3: Burn Verification
-    Frontend->>Backend: POST /api/request-upgrade {burnTx: "..."}
-    Backend->>Solana: getAccountInfo(user_L1_NFT_ata_address)
-    Solana-->>Backend: null (Confirms ATA is closed)
-    note right of Backend: ✅ On-chain verification success!
-
-    %% Step 4: New NFT Minting
-    Backend->>Solana: Mint Level 2 NFT to new ATA for User
-    Solana-->>Backend: Mint Successful
-    Backend-->>Frontend: {"upgradeStatus": "complete"}
-    Frontend->>User: Display "Upgrade Complete! You now have Level 2 NFT."
-```
-
-#### Communication Protocols
-
-- **User ↔ Frontend**: Standard browser interaction (HTTPS)
-- **Frontend ↔ Backend**: Secure RESTful API calls over HTTPS
-- **Frontend ↔ Wallet**: Wallet adapter for transaction signing requests
-- **Wallet ↔ Solana**: RPC/WebSocket for transaction submission
-- **Backend ↔ Solana**: RPC queries for on-chain verification and minting
-
-#### Critical Success Factors
-
-1. **Atomic Verification**: Ensure burn verification completes before new NFT minting
-2. **User Experience**: Minimize transaction steps while maintaining security
-3. **Error Recovery**: Handle partial failures gracefully with clear user feedback
-4. **Performance**: Optimize verification speed without compromising reliability
-5. **Security**: Validate all burn transactions before proceeding with upgrades
+**Technical Integration Points:**
+- Frontend ↔ Backend: RESTful API for eligibility and upgrade requests
+- Backend ↔ Solana: RPC queries for verification and minting operations
+- User ↔ Wallet: Standard wallet adapter for transaction signing
 
 ---
 
@@ -829,254 +743,63 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 ## Testing and Validation
 
-### NFT Burn Verification Testing
+### Testing Framework Overview
 
-This section provides comprehensive testing procedures for validating the NFT burn verification logic using the proof-of-concept implementation.
+The AIW3 NFT system includes comprehensive testing procedures to validate all critical operations:
 
-#### Prerequisites
+**Testing Components:**
+- **Burn Verification Testing**: Validate NFT destruction detection
+- **Minting Process Testing**: Verify complete NFT creation workflows  
+- **Integration Testing**: End-to-end system validation
+- **Performance Testing**: Monitor system response times and reliability
+
+**Implementation Reference:**
+- Complete testing procedures: See [Solana NFT Technical Reference](./Solana-NFT-Technical-Reference.md)
+- Test environments: Configuration and setup guides in technical reference
+- Performance monitoring: Production-ready monitoring implementations
+
+**Key Testing Areas:**
+- ✅ Burn verification accuracy (zero false positives/negatives)
+- ✅ Network resilience and error handling
+- ✅ Performance metrics and response times
+- ✅ Integration with wallet adapters and RPC endpoints
+
+---
+
+## Recommendations
+
+---
+
+## Implementation Requirements
+
+### Technical Prerequisites
 
 **Development Environment**:
-- Node.js (v16+) and npm installed
-- Solana CLI installed and configured
-- Access to Solana network (devnet recommended for testing)
+- Node.js (v16+) and npm
+- Solana CLI and development tools
+- Access to Solana devnet/mainnet
+- Wallet integration libraries
 
-**Test Assets**:
-- Solana wallet with sufficient SOL for transaction fees
-- Existing NFT mint address for burn verification testing
-- Test environment configured with proper RPC endpoints
+**System Requirements**:
+- Solana RPC access (public or private endpoints)
+- Arweave/IPFS for metadata storage
+- Backend infrastructure for business logic
+- Frontend wallet adapter integration
 
-#### Configuration Setup
+**Security Considerations**:
+- Secure private key management
+- Environment variable protection
+- Rate limiting for RPC calls
+- Comprehensive error handling
 
-**Environment Configuration** (`.env` file):
+### Deployment Checklist
 
-```bash
-# Network Configuration
-SOLANA_NETWORK="devnet"  # Options: "devnet", "mainnet-beta", "localnet"
-
-# Test Wallet Configuration
-USER_WALLET_ADDRESS="YOUR_WALLET_ADDRESS"
-PAYER_SECRET_KEY="YOUR_PAYER_SECRET_KEY"
-
-# Test NFT Configuration
-NFT_MINT_ADDRESS="YOUR_NFT_MINT_ADDRESS"
-
-# RPC Configuration (Optional)
-SOLANA_RPC_URL="https://api.devnet.solana.com"  # Custom RPC endpoint
-```
-
-**Security Note**: Never use mainnet private keys in testing environments. Use dedicated devnet wallets only.
-
-#### Test Execution Procedures
-
-**Basic Test Execution**:
-
-```bash
-# Navigate to POC directory
-cd poc/solana-nft-burn-mint
-
-# Install dependencies
-npm install
-
-# Execute burn verification test
-node index.js
-```
-
-#### Expected Test Scenarios
-
-**Scenario 1: Successful Burn Verification**
-```bash
-✅ Verification Successful: ATA Gu7X...8kL2 is closed. NFT is burned.
-Burn verification completed successfully.
-Transaction details: [Transaction signature and metadata]
-```
-
-**Scenario 2: NFT Not Burned (ATA Still Exists)**
-```bash
-❌ Verification Failed: ATA Gu7X...8kL2 still exists. NFT not burned.
-Error: Associated Token Account is still active.
-```
-
-**Scenario 3: Configuration Error**
-```bash
-❌ Configuration Error: Please set required environment variables
-Missing: SOLANA_NETWORK, USER_WALLET_ADDRESS, NFT_MINT_ADDRESS, PAYER_SECRET_KEY
-```
-
-**Scenario 4: Network/Connection Error**
-```bash
-❌ Network Error: Failed to connect to Solana RPC
-Error details: [Connection timeout or RPC error message]
-```
-
-#### Advanced Testing Procedures
-
-**End-to-End Integration Testing**:
-
-```typescript
-// Advanced test suite for burn verification
-describe('NFT Burn Verification', () => {
-  let connection: Connection;
-  let testWallet: Keypair;
-  let testNftMint: PublicKey;
-
-  beforeAll(async () => {
-    // Setup test environment
-    connection = new Connection(clusterApiUrl('devnet'));
-    testWallet = Keypair.generate();
-    
-    // Fund test wallet
-    await connection.requestAirdrop(testWallet.publicKey, LAMPORTS_PER_SOL);
-    
-    // Create test NFT
-    testNftMint = await createTestNFT(connection, testWallet);
-  });
-
-  test('should detect active NFT before burn', async () => {
-    const isBurned = await verifyNftIsBurned(
-      connection,
-      testWallet.publicKey.toString(),
-      testNftMint.toString()
-    );
-    expect(isBurned).toBe(false);
-  });
-
-  test('should detect burned NFT after burn transaction', async () => {
-    // Execute burn transaction
-    await burnTestNFT(connection, testWallet, testNftMint);
-    
-    // Verify burn detection
-    const isBurned = await verifyNftIsBurned(
-      connection,
-      testWallet.publicKey.toString(),
-      testNftMint.toString()
-    );
-    expect(isBurned).toBe(true);
-  });
-
-  test('should handle non-existent NFT gracefully', async () => {
-    const fakeMint = Keypair.generate().publicKey;
-    const isBurned = await verifyNftIsBurned(
-      connection,
-      testWallet.publicKey.toString(),
-      fakeMint.toString()
-    );
-    expect(isBurned).toBe(true); // Non-existent ATA = burned
-  });
-});
-```
-
-#### Performance Testing
-
-**Load Testing for Verification System**:
-
-```typescript
-// Performance test for burn verification at scale
-async function performanceTest() {
-  const testCases = 1000;
-  const startTime = Date.now();
-  
-  const results = await Promise.all(
-    Array(testCases).fill(0).map(async (_, index) => {
-      const testWallet = `wallet_${index}`;
-      const testMint = `mint_${index}`;
-      return verifyNftIsBurned(connection, testWallet, testMint);
-    })
-  );
-  
-  const endTime = Date.now();
-  const averageTime = (endTime - startTime) / testCases;
-  
-  console.log(`Performance Test Results:`);
-  console.log(`- Total tests: ${testCases}`);
-  console.log(`- Total time: ${endTime - startTime}ms`);
-  console.log(`- Average time per verification: ${averageTime}ms`);
-  console.log(`- Successful verifications: ${results.filter(r => r === true).length}`);
-}
-```
-
-#### Monitoring and Observability
-
-**Test Metrics to Track**:
-
-- **Verification Accuracy**: Percentage of correct burn detections
-- **Response Time**: Average time for burn verification completion
-- **Error Rate**: Frequency of network or RPC errors
-- **False Positives**: Incorrect burn detections (should be zero)
-- **False Negatives**: Missed burn detections (should be zero)
-
-**Integration with Monitoring Systems**:
-
-```typescript
-// Example monitoring integration
-interface VerificationMetrics {
-  timestamp: Date;
-  userWallet: string;
-  nftMint: string;
-  verificationResult: boolean;
-  responseTime: number;
-  errorMessage?: string;
-}
-
-async function monitoredVerifyNftIsBurned(
-  connection: Connection,
-  userWallet: string,
-  nftMint: string
-): Promise<boolean> {
-  const startTime = Date.now();
-  
-  try {
-    const result = await verifyNftIsBurned(connection, userWallet, nftMint);
-    
-    // Log successful verification
-    logMetrics({
-      timestamp: new Date(),
-      userWallet,
-      nftMint,
-      verificationResult: result,
-      responseTime: Date.now() - startTime
-    });
-    
-    return result;
-  } catch (error) {
-    // Log failed verification
-    logMetrics({
-      timestamp: new Date(),
-      userWallet,
-      nftMint,
-      verificationResult: false,
-      responseTime: Date.now() - startTime,
-      errorMessage: error.message
-    });
-    
-    throw error;
-  }
-}
-```
-
-#### Troubleshooting Guide
-
-**Common Issues and Solutions**:
-
-| Issue | Symptoms | Solution |
-|-------|----------|----------|
-| **RPC Rate Limiting** | Frequent timeout errors | Implement request throttling, use paid RPC |
-| **Stale Account Data** | Inconsistent verification results | Add retry logic with delays |
-| **Network Latency** | Slow verification times | Use geographically closer RPC endpoints |
-| **Invalid Wallet Address** | Address format errors | Validate address format before verification |
-| **Missing Environment Variables** | Configuration errors | Verify all required variables are set |
-
-**Debug Mode Execution**:
-
-```bash
-# Enable verbose logging for troubleshooting
-DEBUG=true node index.js
-
-# Test with specific network
-SOLANA_NETWORK=localnet node index.js
-
-# Test with custom RPC endpoint
-SOLANA_RPC_URL="https://custom-rpc.solana.com" node index.js
-```
+- ✅ Smart contract deployment (if using custom logic)
+- ✅ Metadata storage infrastructure setup
+- ✅ RPC endpoint configuration and monitoring
+- ✅ Wallet adapter integration testing
+- ✅ Business logic validation procedures
+- ✅ Performance monitoring and alerting
 
 ---
 

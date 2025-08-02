@@ -58,6 +58,90 @@ Unlike simple NFT collections, AIW3 equity NFTs control access to real business 
 - Unqualified users accessing higher tiers without meeting volume requirements
 - System integrity violations in the tiered equity structure
 
+## 🔄 System Verification Workflow
+
+### 🛡️ Verification Requirements
+
+**The Business Requirement:**
+Unlike simple NFT collections, AIW3 equity NFTs control access to real business benefits and rights. The system must actively verify multiple conditions before allowing upgrades:
+
+- **Burned NFT Validation**: Ensure old NFTs are truly invalidated
+- **Transaction Volume Verification**: Confirm user meets volume thresholds for target level
+- **Platform Engagement**: Validate user's activity and participation on AIW3 platform
+
+**This prevents:**
+- Users continuing to receive benefits from "obsoleted" NFTs
+- Double-claiming rights during upgrade transitions
+- Unqualified users accessing higher tiers without meeting volume requirements
+- System integrity violations in the tiered equity structure
+
+### 🔄 Complete Upgrade Sequence Workflow
+
+#### Business Process Integration Pattern
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend as AIW3 Frontend
+    participant Wallet as Phantom/Solflare
+    participant Backend as AIW3 Backend
+    participant Solana as Solana Blockchain
+
+    %% Step 1: Eligibility Check
+    User->>Frontend: Click "Check Eligibility"
+    Frontend->>Backend: GET /api/eligibility-check
+    Backend->>Backend: Verify transaction volume for user
+    Backend-->>Frontend: {"eligible": true}
+    Frontend->>User: Display "You are eligible to upgrade!"
+
+    %% Step 2: Burn Initiation
+    User->>Frontend: Click "Burn to Upgrade"
+    Frontend->>Wallet: Request signature for burn transaction
+    User->>Wallet: Approve Transaction
+    Wallet->>Solana: Submit burn & close ATA transaction
+    Solana-->>Wallet: Transaction Confirmed
+    Wallet-->>Frontend: Burn transaction successful
+
+    %% Step 3: Burn Verification
+    Frontend->>Backend: POST /api/request-upgrade {burnTx: "..."}
+    Backend->>Solana: getAccountInfo(user_L1_NFT_ata_address)
+    Solana-->>Backend: null (Confirms ATA is closed)
+    note right of Backend: ✅ On-chain verification success!
+
+    %% Step 4: New NFT Minting
+    Backend->>Solana: Mint Level 2 NFT to new ATA for User
+    Solana-->>Backend: Mint Successful
+    Backend-->>Frontend: {"upgradeStatus": "complete"}
+    Frontend->>User: Display "Upgrade Complete! You now have Level 2 NFT."
+```
+
+#### Communication Protocols & Integration Points
+
+**System Integration Architecture:**
+
+- **User ↔ Frontend**: Standard browser interaction (HTTPS)
+- **Frontend ↔ Backend**: Secure RESTful API calls over HTTPS
+- **Frontend ↔ Wallet**: Wallet adapter for transaction signing requests
+- **Wallet ↔ Solana**: RPC/WebSocket for transaction submission
+- **Backend ↔ Solana**: RPC queries for on-chain verification and minting
+
+#### Upgrade Verification Decision Matrix
+
+| Condition | Check Method | Success Criteria | Failure Action |
+|-----------|--------------|------------------|----------------|
+| **Transaction Volume** | AIW3 Platform API | `volume >= threshold` | Display volume requirement |
+| **NFT Ownership** | Solana ATA Query | `balance == 1` | Request correct NFT |
+| **Burn Completion** | ATA Existence Check | `accountInfo == null` | Wait for burn completion |
+| **Upgrade Eligibility** | Business Logic Rules | `all_conditions_met` | Show specific failure reason |
+
+#### Critical Success Factors
+
+1. **Atomic Verification**: Ensure burn verification completes before new NFT minting
+2. **User Experience**: Minimize transaction steps while maintaining security
+3. **Error Recovery**: Handle partial failures gracefully with clear user feedback
+4. **Performance**: Optimize verification speed without compromising reliability
+5. **Security**: Validate all burn transactions before proceeding with upgrades
+
 ### 🔄 Implementation Workflow
 
 #### Step 1: User Initiates Upgrade Request
