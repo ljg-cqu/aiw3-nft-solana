@@ -304,6 +304,81 @@ graph LR
     style PARTNER fill:#f3e5f5
 ```
 
+### Minting Flow Diagram
+
+```mermaid
+flowchart TD
+    subgraph "AIW3 System Actions"
+        A["1. Initiate Mint for User"]
+        B["2. Create Mint Account"]
+        C["3. Create User's Associated Token Account (ATA)"]
+        D["4. Mint Token (Supply: 1) to User's ATA"]
+        E["5. Create Metaplex Metadata PDA"]
+        F["6. (Optional) Revoke Authorities"]
+    end
+
+    subgraph "User Interaction"
+        G["Provides Public Key"]
+        H["✅ NFT appears in wallet"]
+    end
+
+    subgraph "Blockchain State Changes"
+        I["Mint Account Created"]
+        J["User's ATA Created & Owned by User"]
+        K["User's ATA Balance becomes 1"]
+        L["Metadata PDA Linked to Mint"]
+        M["NFT is Immutable"]
+    end
+
+    G --> A
+    A --> B
+    B --> I
+    I --> C
+    C --> J
+    J --> D
+    D --> K
+    K --> E
+    E --> L
+    L --> F
+    F --> M
+    M --> H
+
+    style A fill:#fff3e0
+    style G fill:#e3f2fd
+    style H fill:#c8e6c9
+```
+
+### Burning Flow Diagram
+
+```mermaid
+flowchart TD
+    subgraph "User Actions"
+        A["1. User initiates 'Burn' transaction in their wallet"]
+    end
+
+    subgraph "On-Chain Process"
+        B["2. Wallet calls 'burn' instruction on Token Program"]
+        C["3. Token Account balance is reduced to 0"]
+        D["4. Wallet calls 'closeAccount' instruction"]
+    end
+
+    subgraph "Blockchain State Changes"
+        E["NFT Token is destroyed"]
+        F["Token Account is removed from blockchain"]
+        G["SOL rent from Token Account is returned to User's Wallet"]
+    end
+    
+    A --> B
+    B --> C
+    C --> E
+    C --> D
+    D --> F
+    F --> G
+
+    style A fill:#e3f2fd
+    style G fill:#c8e6c9
+```
+
 ### Key Relationships and Principles
 
 **Entity Relationships:**
