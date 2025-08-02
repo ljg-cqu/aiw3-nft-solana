@@ -181,70 +181,65 @@ This structure directly enables the recommended solution:
 
 ```mermaid
 erDiagram
-    UserWallet ||--o{ TokenAccount : owns
-    TokenAccount ||--|| MintAccount : "linked to"
-    MintAccount ||--|| MetadataPDA : "described by"
-    AIW3SystemWallet ||--o{ MetadataPDA : creates
+    AIW3SystemWallet ||--o{ MintAccount : "creates"
+    AIW3SystemWallet ||--o{ TokenAccount : "pays for creation"
+    AIW3SystemWallet ||--o{ MetadataPDA : "creates"
+    AIW3SystemWallet ||--o{ TokenAccount : "mints to"
+
+    UserWallet ||--o{ TokenAccount : "owns"
+    TokenAccount ||--|| MintAccount : "is for"
+    MintAccount ||--|| MetadataPDA : "is described by"
     MetadataPDA ||--|| JSONMetadata : "points to"
     JSONMetadata }o--|| ArweaveStorage : "references images in"
 
     UserWallet {
-        string publicKey "7kX9...ABC123"
-        string privateKey "encrypted"
-        string type "Solana Wallet Account"
-        string purpose "Proves NFT ownership"
+        string publicKey "User's public key"
+        string purpose "Proves NFT ownership via control of private key"
     }
 
     TokenAccount {
+        string owner "UserWallet public key"
+        string associatedMint "MintAccount public key"
         int balance "1 (for NFTs)"
-        string tokenType "NFT"
-        string associatedMint "Mint Account Address"
-        string owner "User Wallet Address"
-        string purpose "Holds NFT tokens"
+        string purpose "Holds the NFT token, proving user ownership"
     }
 
     MintAccount {
+        string mintAuthority "AIW3SystemWallet public key"
+        string freezeAuthority "null or AIW3SystemWallet"
         int supply "1 (unique)"
         int decimals "0"
-        string mintAuthority "AIW3 System Wallet"
-        string freezeAuthority "null or AIW3"
-        string purpose "Defines NFT uniqueness"
+        string purpose "Defines the NFT's uniqueness and core identity"
     }
 
     MetadataPDA {
-        string updateAuthority "AIW3 System Wallet"
-        string mint "Mint Account Address"
-        string name "AIW3 Equity NFT #1234"
-        string symbol "AIW3E"
-        string uri "Arweave JSON URI"
-        string creators "AIW3 verified address"
-        boolean isMutable "false"
-        string purpose "Stores verifiable NFT info"
+        string updateAuthority "AIW3SystemWallet public key"
+        string mint "MintAccount public key"
+        string creators "Array, with AIW3SystemWallet as verified creator"
+        string uri "Arweave URI for JSONMetadata"
+        boolean isMutable "false (after finalization)"
+        string purpose "Stores verifiable, on-chain NFT data"
     }
 
     AIW3SystemWallet {
-        string publicKey "9pY8...XYZ789"
-        string privateKey "secured"
-        string role "Creator and Minting Authority"
-        string purpose "Mints NFTs, proves authenticity"
+        string publicKey "System's public key"
+        string role "Payer, Creator, and Minting Authority"
+        string purpose "Initiates and pays for all minting transactions"
     }
 
     JSONMetadata {
-        string name "AIW3 Equity NFT #1234"
-        string description "Equity representation"
+        string name "NFT Name"
         string image "Arweave image URI"
-        json attributes "Level, Tier traits"
-        json properties "Files, creators"
+        json attributes "Level, Tier, and other traits"
         string storage "Arweave"
-        string purpose "Rich NFT data and level info"
+        string purpose "Stores rich, off-chain data and level info"
     }
 
     ArweaveStorage {
-        string imageFile "level-gold.png"
-        string access "HTTPS URI"
-        string durability "200+ years"
-        string type "Decentralized permanent storage"
-        string purpose "Permanent image storage"
+        string file "Image (e.g., level-gold.png) or JSON"
+        string durability "Permanent"
+        string type "Decentralized storage"
+        string purpose "Ensures permanent availability of NFT assets"
     }
 ```
 
