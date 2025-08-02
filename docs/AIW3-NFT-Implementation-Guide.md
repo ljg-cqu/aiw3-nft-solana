@@ -179,7 +179,8 @@ This data is stored directly on the **Solana blockchain** and serves as the foun
 
 #### 📄 Off-Chain JSON Metadata Details
 
-The `uri` from the **on-chain Solana metadata** points to this JSON file stored on decentralized storage (Arweave/IPFS). **This is where the Level information is actually stored.** The structure follows the Metaplex Token Metadata Standard to ensure compatibility with wallets, explorers, and marketplaces.
+The `uri` from the **on-chain Solana metadata** points to this JSON file stored on decentralized storage (Arweave/IPFS). **This is where the Level information is actually stored.**
++**Note**: Both the off-chain JSON metadata file and the image assets it references are stored on decentralized networks such as Arweave or IPFS.
 
 **Example JSON Structure (Stored on Arweave/IPFS):**
 
@@ -221,7 +222,7 @@ The `uri` from the **on-chain Solana metadata** points to this JSON file stored 
 
 #### 🖼️ How NFT Images are Handled
 
-Just like the "Level" attribute, the NFT's image is linked via the off-chain JSON metadata. Storing large files like images directly on the blockchain is prohibitively expensive.
+- Just like the "Level" attribute, the NFT's image is linked via the off-chain JSON metadata. +Both the JSON metadata and the image files themselves can be hosted on Arweave or IPFS, ensuring decentralized storage of all off-chain assets. Storing large files like images directly on the blockchain is prohibitively expensive.
 
 The process is as follows:
 1.  **Upload Image**: The image file for each level (e.g., `level-gold.png`) is uploaded to a permanent, decentralized storage network like Arweave. This upload provides a unique and immutable URI for the image (e.g., `https://arweave.net/ARWEAVE_IMAGE_HASH`).
@@ -463,7 +464,7 @@ flowchart TD
 **Key Principles:**
 - **Ownership**: Proven by Token Account possession in User Wallet
 - **Authenticity**: Verified through AIW3 address in Metadata PDA creators field
-- **Level Data**: Stored as attributes in off-chain JSON Metadata
+- **Level Data**: Stored as attributes in off-chain JSON metadata
 - **Images**: Referenced via URIs pointing to Arweave Storage
 - **No Transfer**: Direct minting to user wallet ensures immediate ownership
 
@@ -557,8 +558,8 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 - **Description**: Use the existing Metaplex Metadata standard to store Level information in off-chain JSON metadata as traits, while storing authenticity verification data in on-chain Solana metadata.
 - **How it addresses requirements**:
   - **Issuer Verification**: Check the creator field in **on-chain Solana metadata** against known AIW3 system public key
-  - **NFT Tier Access**: Read level/tier from **off-chain JSON metadata** attributes stored on Arweave/IPFS
-  - **Image Retrieval**: Access image URI stored in **off-chain JSON metadata**, pointing to Arweave/IPFS storage
+  - **NFT Tier Access**: Read level from off-chain JSON metadata attributes stored on Arweave/IPFS
+  - **Image Retrieval**: Access image URI stored in off-chain JSON metadata, pointing to Arweave/IPFS storage
 - **Advantages**:
   - Decentralized access to level information via standard off-chain metadata queries
   - Authenticity verification through on-chain Solana metadata creator field
@@ -695,7 +696,7 @@ Each AIW3 Equity NFT requires visual representation (artwork/images) that must b
 **2. Metadata Standards Compliance**  
 - Follow Metaplex Token Metadata standard for full ecosystem compatibility
 - Structure off-chain JSON metadata with required fields: name, symbol, description, image, attributes
-- Include level information as trait in attributes array: `{"trait_type": "Level", "value": "Gold"}`
+- Include level information as a trait in attributes array: `{"trait_type": "Level", "value": "Gold"}`
 
 **3. Storage Implementation**
 - Upload images to Arweave before minting to obtain permanent storage URIs
@@ -831,8 +832,7 @@ This is the most critical step where the "magic" happens. The AIW3 system create
     *   A new token account now exists, and its `owner` field is officially set to the **User's Wallet Address**.
     *   The system wallet that paid for the creation has no control over this account. Only the user's private key can authorize transactions from it.
     *   The account's token balance is 0.
-
----
+    *   **Note on SOL Rent**: On Solana, each account must maintain a minimum rent-exempt balance (paid in SOL) to remain active. The AIW3 system wallet funds this reserve when creating the ATA, so it is transparent to users and does not affect business logic or NFT ownership.
 
 #### **Step 3: Mint the NFT into the User's ATA**
 Now that the user has an account ready to receive the NFT, the AIW3 system executes the final minting instruction.
@@ -1077,8 +1077,7 @@ After the token is burned, the Associated Token Account that held it is now empt
     *   A successful transaction confirmation.
 *   **Post-conditions**:
     *   The Associated Token Account is permanently removed from the Solana blockchain.
-    *   The SOL rent that was used to create the account is refunded to the User's Wallet.
-    *   The NFT is now completely gone. The Mint Account and Metadata PDA may still exist, but they are effectively orphaned and point to a token that no longer exists.
+    *   **Note on Rent Refund**: When the ATA is closed, the rent-exempt reserve is automatically returned to the user's wallet. This refund is handled by Solana and requires no additional business steps.
 
 ---
 
