@@ -309,17 +309,17 @@ graph LR
 ```mermaid
 flowchart TD
     subgraph "AIW3 System Actions"
-        A["1. Initiate Mint for User"]
-        B["2. Create Mint Account"]
-        C["3. Create User's Associated Token Account (ATA)"]
-        D["4. Mint Token (Supply: 1) to User's ATA"]
-        E["5. Create Metaplex Metadata PDA"]
-        F["6. (Optional) Revoke Authorities"]
+        A["Initiate Mint for User"]
+        B["Create Mint Account"]
+        C["Create User's Associated Token Account"]
+        D["Mint Token to User's ATA"]
+        E["Create Metaplex Metadata PDA"]
+        F["Revoke Authorities (Optional)"]
     end
 
     subgraph "User Interaction"
         G["Provides Public Key"]
-        H["✅ NFT appears in wallet"]
+        H["NFT appears in wallet"]
     end
 
     subgraph "Blockchain State Changes"
@@ -353,19 +353,19 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph "User Actions"
-        A["1. User initiates 'Burn' transaction in their wallet"]
+        A["User initiates Burn transaction in wallet"]
     end
 
     subgraph "On-Chain Process"
-        B["2. Wallet calls 'burn' instruction on Token Program"]
-        C["3. Token Account balance is reduced to 0"]
-        D["4. Wallet calls 'closeAccount' instruction"]
+        B["Wallet calls burn instruction on Token Program"]
+        C["Token Account balance reduced to 0"]
+        D["Wallet calls closeAccount instruction"]
     end
 
     subgraph "Blockchain State Changes"
         E["NFT Token is destroyed"]
-        F["Token Account is removed from blockchain"]
-        G["SOL rent from Token Account is returned to User's Wallet"]
+        F["Token Account removed from blockchain"]
+        G["SOL rent returned to User's Wallet"]
     end
     
     A --> B
@@ -773,7 +773,7 @@ To make this token a proper NFT recognized by wallets and marketplaces, the syst
 
 *   **Purpose**: To attach rich data (name, symbol, and URI pointing to the off-chain JSON file) to the on-chain token.
 *   **Pre-conditions**:
-    *   The Mint Account exists.
+    *   The Mint Account from Step 1 exists.
     *   The off-chain JSON metadata file has been uploaded to Arweave and its URI is available.
 *   **Inputs**:
     *   `Payer/Update Authority`: The AIW3 System Wallet.
@@ -932,4 +932,237 @@ pub fn set_authority(
     > Solana Labs. (2024). *Solana Program Library: Token Program*. GitHub. Retrieved August 2, 2025, from https://github.com/solana-labs/solana-program-library/blob/master/token/program/src/instruction.rs.
 
 These code references demonstrate that the entire minting flow is constructed by calling a series of well-defined, open-source, and audited on-chain programs. The "magic" is a result of Solana's composable design, where programs like `spl-token` and `mpl-token-metadata` work together to create complex assets like NFTs.
+
+---
+
+### How NFT Burning Works on Solana: A Deeper Look
+
+Burning an NFT is the process of permanently destroying it. Unlike minting, which is initiated by the AIW3 system, burning is a user-controlled action. The owner of the NFT is the only one who can authorize its destruction. This ensures user autonomy and control over their digital assets. The process involves two main instructions: `burn` and `close_account`.
+
+**Key Actors:**
+*   **User Wallet**: The owner of the NFT. This wallet must sign the transaction to authorize the burn.
+*   **Solana Token Program**: The on-chain program that handles the token's lifecycle, including its destruction.
+
+---
+
+**The Process:**
+
+#### **Step 1: Burn the Token**
+The user initiates the process from their wallet application (e.g., Phantom, Solflare). The wallet constructs and signs a transaction that calls the `burn` instruction on the Solana Token Program.
+
+*   **Purpose**: To destroy the token itself, reducing its supply to zero.
+*   **Pre-conditions**:
+    *   The User's Associated Token Account (ATA) holds exactly 1 token of the NFT mint.
+    *   The User Wallet has a sufficient SOL balance to pay for the transaction fee.
+*   **Inputs**:
+    *   `Signer`: The User Wallet, which owns the ATA.
+    *   `Account to burn from`: The public key of the User's ATA.
+    *   `Mint`: The public key of the NFT's Mint Account.
+    *   `Amount`: 1.
+*   **Action**: The user's wallet calls the `burn` instruction on the Solana Token Program. The program verifies that the transaction is signed by the rightful owner.
+*   **Outputs**:
+    *   A successful transaction confirmation.
+*   **Post-conditions**:
+    *   The balance of the User's ATA is reduced from 1 to **0**.
+    *   The total supply of the Mint Account is reduced from 1 to **0**.
+    *   The token is now considered destroyed. However, the empty ATA still exists on the blockchain.
+
+---
+
+#### **Step 2: Close the Associated Token Account**
+After the token is burned, the Associated Token Account that held it is now empty and serves no purpose. The user can choose to close this account to reclaim the SOL that was locked for its rent.
+
+*   **Purpose**: To remove the empty token account from the blockchain and recover the rent deposit.
+*   **Pre-conditions**:
+    *   The token account's balance is 0.
+    *   The transaction is signed by the owner of the token account (the User Wallet).
+*   **Inputs**:
+    *   `Signer`: The User Wallet.
+    *   `Account to close`: The public key of the empty ATA.
+    *   `Destination for rent`: The public key of the User Wallet, which will receive the reclaimed SOL.
+*   **Action**: The user's wallet calls the `close_account` instruction on the Solana Token Program.
+*   **Outputs**:
+    *   A successful transaction confirmation.
+*   **Post-conditions**:
+    *   The Associated Token Account is permanently removed from the Solana blockchain.
+    *   The SOL rent that was used to create the account is refunded to the User's Wallet.
+    *   The NFT is now completely gone. The Mint Account and Metadata PDA may still exist, but they are effectively orphaned and point to a token that no longer exists.
+
+---
+
+### Source Code Deep Dive: The On-Chain Instructions for Burning
+
+The burning process is handled by the same `spl-token` library that governs minting.
+
+**Source Code: `burn` and `close_account`**
+
+```rust
+// From the spl-token crate: /token/src/instruction.rs
+
+/// Creates a `Burn` instruction.
+pub fn burn(
+    token_program_id: &Pubkey,
+    account_pubkey: &Pubkey,
+    mint_pubkey: &Pubkey,
+    owner_pubkey: &Pubkey,
+    signer_pubkeys: &[&Pubkey],
+    amount: u64,
+) -> Result<Instruction, ProgramError> {
+    // ... implementation to build the instruction ...
+}
+
+/// Creates a `CloseAccount` instruction.
+pub fn close_account(
+    token_program_id: &Pubkey,
+    account_pubkey: &Pubkey,
+    destination_pubkey: &Pubkey,
+    owner_pubkey: &Pubkey,
+    signer_pubkeys: &[&Pubkey],
+) -> Result<Instruction, ProgramError> {
+    // ... implementation to build the instruction ...
+}
+```
+
+*   **Citation**:
+    > Solana Labs. (2024). *Solana Program Library: Token Program*. GitHub. Retrieved August 2, 2025, from https://github.com/solana-labs/solana-program-library/blob/master/token/program/src/instruction.rs.
+
+This demonstrates that burning is a standard, user-initiated operation defined within the core Solana token standard, ensuring a predictable and secure process for all assets on the network.
+
+---
+
+### How NFT Usage and Verification Works: A Deeper Look
+
+This section details the process from the perspective of an ecosystem partner (e.g., a DeFi protocol, a game, or another application) that needs to verify the authenticity of an AIW3 NFT and access its data, such as the user's level. This flow combines on-chain verification with off-chain data retrieval from Arweave/IPFS.
+
+**Key Actors:**
+*   **User Wallet**: The wallet holding the NFT. The user presents their public key to the partner service.
+*   **Partner Application**: The third-party service that needs to read the NFT data.
+*   **Solana Blockchain**: The source of truth for on-chain data (ownership and authenticity).
+*   **Arweave/IPFS**: The decentralized storage network holding the off-chain metadata (level, image, etc.).
+
+---
+
+**The Process:**
+
+#### **Step 1: Find the NFT and its On-Chain Metadata**
+The partner application starts by finding the user's NFT and its associated on-chain metadata account.
+
+*   **Purpose**: To locate the NFT and its verifiable, on-chain data.
+*   **Pre-conditions**:
+    *   The partner application has access to a Solana RPC node.
+    *   The user has provided their public wallet address.
+*   **Inputs**:
+    *   `User Wallet Address`: The public key of the user.
+*   **Action**:
+    1.  The partner application calls a Solana RPC method (e.g., `getTokenAccountsByOwner`) to get all token accounts owned by the user.
+    2.  It filters these accounts to find NFTs (accounts with a balance of 1 and 0 decimals).
+    3.  For each potential NFT, the application gets the **Mint Address**.
+    4.  Using the Mint Address, it deterministically calculates the address of the **Metaplex Metadata PDA**.
+    5.  It fetches the account data for the Metadata PDA.
+*   **Outputs**:
+    *   The decoded on-chain metadata for the NFT.
+*   **Post-conditions**:
+    *   The application has the authoritative on-chain data for the NFT, including the `creators` array and the `uri` field.
+
+---
+
+#### **Step 2: Verify Authenticity**
+This is the most critical step for security. The partner must verify that the NFT was genuinely created by AIW3.
+
+*   **Purpose**: To prevent counterfeit or fraudulent NFTs from being accepted.
+*   **Pre-conditions**:
+    *   The on-chain metadata has been fetched.
+    *   The partner knows the official, published public key of the AIW3 System Wallet.
+*   **Inputs**:
+    *   `On-chain Metadata`: The data fetched in the previous step.
+    *   `AIW3 Creator Address`: The known, trusted public key.
+*   **Action**: The application inspects the `creators` array within the on-chain metadata. It checks two things:
+    1.  Does the array contain the official AIW3 creator address?
+    2.  Is the `verified` flag for that creator set to `true`?
+*   **Outputs**:
+    *   A boolean result: `true` if authentic, `false` if not.
+*   **Post-conditions**:
+    *   The partner application can be certain of the NFT's origin. If verification fails, the process stops here.
+
+---
+
+#### **Step 3: Fetch and Use Off-Chain Metadata**
+Once the NFT is verified as authentic, the partner can safely retrieve and use the rich metadata stored off-chain.
+
+*   **Purpose**: To access the NFT's attributes, such as its "Level" and image.
+*   **Pre-conditions**:
+    *   The NFT has been verified as authentic.
+    *   The application has the `uri` from the on-chain metadata.
+*   **Inputs**:
+    *   `uri`: The URI from the on-chain metadata (e.g., an Arweave link).
+*   **Action**:
+    1.  The application makes an HTTP GET request to the `uri`.
+    2.  It receives the JSON metadata file as a response.
+    3.  It parses the JSON file to access its contents.
+    4.  It reads the `attributes` array to find the object where `trait_type` is "Level" and extracts its `value`.
+    5.  It reads the `image` field to get the URL for the NFT's artwork.
+*   **Outputs**:
+    *   The user's level, the image URL, and any other relevant metadata.
+*   **Post-conditions**:
+    *   The partner application now has all the necessary information to grant the user access, display their status, or perform other business logic based on their AIW3 NFT.
+
+---
+
+### Source Code Deep Dive: The Client-Side SDKs for Using NFTs
+
+Unlike minting and burning, which are defined by on-chain programs, using an NFT is primarily a client-side process of reading and interpreting data. Developers typically use SDKs (Software Development Kits) to simplify these interactions.
+
+**Key Libraries: Metaplex JS SDK and Solana Web3.js**
+
+The Metaplex JS SDK (`@metaplex-foundation/js`) is the standard tool for this. It provides high-level functions that abstract away the complexity of finding, fetching, and parsing NFT data.
+
+**Example Code Snippet (using Metaplex JS SDK):**
+
+```typescript
+// Using the Metaplex JS SDK in a TypeScript/JavaScript application
+
+import { Metaplex, keypairIdentity, walletAdapterIdentity } from "@metaplex-foundation/js";
+import { Connection, PublicKey } from "@solana/web3.js";
+
+// Setup connection and Metaplex instance
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const metaplex = Metaplex.make(connection);
+
+// The known, trusted creator address for AIW3
+const AIW3_CREATOR_ADDRESS = new PublicKey("AIW3_SYSTEM_WALLET_PUBLIC_KEY");
+
+async function verifyAndGetNftLevel(userWallet: PublicKey) {
+    // 1. Find all NFTs owned by the user
+    const userNfts = await metaplex.nfts().findAllByOwner({ owner: userWallet });
+
+    for (const nft of userNfts) {
+        // 2. Verify the creator
+        const creator = nft.creators.find(
+            (c) => c.address.equals(AIW3_CREATOR_ADDRESS) && c.verified
+        );
+
+        if (creator) {
+            // 3. If verified, load the full off-chain metadata
+            const metadata = await metaplex.nfts().load({ metadata: nft });
+            
+            // 4. Access the attributes
+            const levelAttribute = metadata.json?.attributes?.find(
+                (attr) => attr.trait_type === "Level"
+            );
+
+            if (levelAttribute) {
+                console.log(`Found authentic AIW3 NFT: ${nft.name}`);
+                console.log(`User Level: ${levelAttribute.value}`);
+                return levelAttribute.value;
+            }
+        }
+    }
+    return null; // No authentic AIW3 NFT found
+}
+```
+
+*   **Citation**:
+    > Metaplex Foundation. (2024). *Metaplex JavaScript SDK*. GitHub. Retrieved August 2, 2025, from https://github.com/metaplex-foundation/js.
+
+This client-side approach demonstrates how ecosystem partners can securely and reliably interact with AIW3 NFTs by combining on-chain verification with off-chain data retrieval, all made simpler by standard libraries like the Metaplex JS SDK.
 
