@@ -252,19 +252,19 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    A[User provides Wallet Address] --> B[Query Solana: Find Token Accounts]
-    B --> C[Filter: Token Accounts with balance = 1]
-    C --> D[Extract: Mint Account addresses]
-    D --> E[Derive: Metadata PDA from Mint]
-    E --> F[Verify: creators[0] == AIW3 address && verified == true]
-    F --> |Valid| G[Read: URI field from metadata]
-    F --> |Invalid| H[❌ Reject: Not authentic AIW3 NFT]
-    G --> I[Fetch: JSON metadata from Arweave URI]
-    I --> J[Extract: Level from attributes array]
-    I --> K[Extract: Image URI from image field]
-    J --> L[✅ Display: User's NFT level]
-    K --> M[✅ Display: NFT image]
-    
+    A["User provides Wallet Address"] --> B["Query Solana: Find Token Accounts"]
+    B --> C["Filter: Token Accounts with balance = 1"]
+    C --> D["Extract: Mint Account addresses"]
+    D --> E["Derive: Metadata PDA from Mint"]
+    E --> F["Verify: creators[0] == AIW3 address && verified == true"]
+    F --> |Valid| G["Read: URI field from metadata"]
+    F --> |Invalid| H["❌ Reject: Not authentic AIW3 NFT"]
+    G --> I["Fetch: JSON metadata from Arweave URI"]
+    I --> J["Extract: Level from attributes array"]
+    I --> K["Extract: Image URI from image field"]
+    J --> L["✅ Display: User's NFT level"]
+    K --> M["✅ Display: NFT image"]
+
     style A fill:#e1f5fe
     style L fill:#c8e6c9
     style M fill:#c8e6c9
