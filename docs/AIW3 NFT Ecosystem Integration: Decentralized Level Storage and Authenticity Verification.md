@@ -288,9 +288,11 @@ graph LR
     end
     
     USER ---|owns| TOKEN
-    TOKEN ---|linked to| MINT
+    TOKEN ---|is for| MINT
     MINT ---|described by| PDA
-    AIW3 ---|creates| PDA
+    AIW3 ---|1. creates| MINT
+    AIW3 ---|2. creates| PDA
+    AIW3 ---|3. mints to| TOKEN
     PDA ---|points to| JSON
     JSON ---|references| IMG
     PARTNER ---|verifies| PDA
