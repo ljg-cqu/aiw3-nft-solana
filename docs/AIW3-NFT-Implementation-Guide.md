@@ -1266,17 +1266,58 @@ A complete understanding of the NFT lifecycle on Solana requires acknowledging t
 
 ### 💰 Solana Rent (Account State Deposit)
 
-**1. What is Rent?**
-On Solana, "rent" is a one-time SOL deposit required to keep an account (like a Token Account or Mint Account) alive on the blockchain. It is not a recurring fee but rather a **refundable deposit**. If an account is closed, the SOL paid for its rent is returned to a designated wallet.
+**1. What is Rent? (CONFIRMED: Minting NFTs REQUIRES Rent Deposit)**
+On Solana, "rent" is a **mandatory, one-time SOL deposit** required to keep an account (like a Token Account or Mint Account) alive on the blockchain. **Every NFT minting operation absolutely requires this rent payment** - there is no way to create accounts without it.
+
+**Key Facts:**
+*   **NOT a recurring fee** - It's a **refundable deposit** paid once
+*   **NOT an expiring payment** - Once rent-exempt, the account stays alive **forever**
+*   **Fully refundable** - When an account is closed, the SOL paid for rent is returned to a designated wallet
 
 *   **Why it exists**: To prevent the blockchain from being filled with abandoned or unused accounts, which would increase the storage burden on validators.
-*   **Rent-Exempt Balance**: By paying a deposit equivalent to two years' worth of rent, an account becomes "rent-exempt" and the deposit is locked for the life of the account. This is the standard practice for all NFT-related accounts.
+*   **Rent-Exempt Status**: By paying a deposit equivalent to two years' worth of theoretical rent upfront, an account becomes "rent-exempt" **permanently**. The "2 years" is only used to calculate the deposit amount - once paid, **no future payments are ever required**. This is the standard practice for all NFT-related accounts.
 
-**2. How much is the Rent?**
-The rent is calculated based on the size of the data stored in the account. For a standard Associated Token Account (ATA), which is 165 bytes, the rent-exempt balance is approximately **0.00203928 SOL**.
+**2. How much is the Rent? (Verified Calculation)**
+The rent is calculated using the official Solana formula from the `solana-rent` crate. For a standard Associated Token Account (ATA), the calculation is:
 
-*   **Citation**: This figure is commonly seen when funding new accounts via the `spl-token` command-line tool. For example: `spl-token transfer --fund-recipient ... (0.00203928 SOL)`.
-*   **Is it costly?**: The cost in USD depends on the price of SOL. Historically, this has been a very small amount (often a few cents), making it highly cost-effective.
+**Formula:**
+```
+minimum_balance = ((ACCOUNT_STORAGE_OVERHEAD + data_length) × lamports_per_byte_year) × exemption_threshold
+```
+
+**Constants (from Solana source code):**
+- `ACCOUNT_STORAGE_OVERHEAD`: 128 bytes
+- `DEFAULT_LAMPORTS_PER_BYTE_YEAR`: 3,480 lamports (equivalent to $3.65 per megabyte-year at $1/SOL)
+- `DEFAULT_EXEMPTION_THRESHOLD`: 2.0 years
+
+**ATA Calculation:**
+- ATA data length: 165 bytes
+- Total account size: 128 + 165 = 293 bytes
+- Rent: (293 × 3,480) × 2.0 = **2,039,280 lamports = 0.002039280 SOL**
+
+**Official source code confirmation:**
+```rust
+// From https://docs.rs/solana-rent/latest/src/solana_rent/lib.rs.html
+pub fn due(&self, balance: u64, data_len: usize, years_elapsed: f64) -> RentDue {
+    if self.is_exempt(balance, data_len) {
+        RentDue::Exempt  // ← NO RENT DUE EVER once exempt
+    } else {
+        RentDue::Paying(self.due_amount(data_len, years_elapsed))
+    }
+}
+```
+
+**The "2 years" explanation:**
+- `DEFAULT_EXEMPTION_THRESHOLD = 2.0` years is used to **calculate** the deposit amount
+- You pay the equivalent of 2 years of theoretical rent **upfront as a one-time deposit**
+- Once paid, the account is **exempt from rent forever** - no expiration, no renewal needed
+- The deposit is **fully refundable** when the account is closed
+
+*   **Official Sources**: 
+    - Rent mechanism: https://docs.solana.com/implemented-proposals/rent
+    - Rent calculation: https://docs.rs/solana-rent/latest/src/solana_rent/lib.rs.html#93-97
+    - Constants: https://docs.rs/solana-rent/latest/solana_rent/constant.DEFAULT_EXEMPTION_THRESHOLD.html
+*   **Cost in USD**: Varies with SOL price, but historically a few cents, making it highly cost-effective.
 
 **3. The Rent Lifecycle for an AIW3 NFT:**
 *   **Creation (Paid by AIW3 System)**: When the AIW3 system mints an NFT to a user, it creates the user's Associated Token Account (ATA) and pays the ~0.002 SOL rent deposit. This is a one-time operational cost for the AIW3 system.
@@ -1337,10 +1378,20 @@ Based on current market conditions and assuming 10,000,000 users across all NFT 
 #### **1. Solana Rent Costs (Associated Token Accounts)**
 
 ```typescript
-// Cost calculation for ATA rent deposits
-const RENT_PER_ATA = 0.00203928; // SOL per 165-byte ATA
+// Cost calculation for ATA rent deposits using official Solana formula
+const ACCOUNT_STORAGE_OVERHEAD = 128;    // bytes (from solana-rent crate)
+const ATA_DATA_LENGTH = 165;             // bytes (standard ATA size)
+const LAMPORTS_PER_BYTE_YEAR = 3480;     // from DEFAULT_LAMPORTS_PER_BYTE_YEAR
+const EXEMPTION_THRESHOLD = 2.0;         // years (from DEFAULT_EXEMPTION_THRESHOLD)
+
+// Official Solana rent calculation formula:
+// minimum_balance = ((ACCOUNT_STORAGE_OVERHEAD + data_length) × lamports_per_byte_year) × exemption_threshold
+const RENT_PER_ATA_LAMPORTS = ((ACCOUNT_STORAGE_OVERHEAD + ATA_DATA_LENGTH) * LAMPORTS_PER_BYTE_YEAR) * EXEMPTION_THRESHOLD;
+const RENT_PER_ATA_SOL = RENT_PER_ATA_LAMPORTS / 1_000_000_000; // Convert lamports to SOL
+// Result: 2,039,280 lamports = 0.002039280 SOL per ATA
+
 const TOTAL_USERS = 10_000_000;
-const TOTAL_RENT_SOL = RENT_PER_ATA * TOTAL_USERS; // 20,392.8 SOL
+const TOTAL_RENT_SOL = RENT_PER_ATA_SOL * TOTAL_USERS; // 20,392.8 SOL
 
 // USD equivalent at different SOL prices
 const SOL_PRICE_SCENARIOS = {
@@ -1360,6 +1411,7 @@ const rentCostUSD = {
 - **One-time cost**: Paid by AIW3 system during minting
 - **Recoverable**: Users can reclaim rent when burning NFTs
 - **Net cost to AIW3**: Effectively zero if users burn old NFTs during upgrades
+- **Official source**: https://docs.rs/solana-rent/latest/src/solana_rent/lib.rs.html#93-97
 
 #### **2. Transaction Fees**
 
