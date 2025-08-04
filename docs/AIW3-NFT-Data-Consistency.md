@@ -24,7 +24,7 @@ The AIW3 NFT system operates across three critical data layers that must maintai
 2. **IPFS via Pinata** - Decentralized content storage
 3. **Backend Database** - Business logic and user records
 
-For network failure handling and retry strategies, see [AIW3 NFT Network Resilience](./AIW3-NFT-Network-Resilience.md).
+For comprehensive network failure handling and retry strategies, see the [AIW3 NFT Network Resilience](./AIW3-NFT-Network-Resilience.md) document.
 
 ---
 

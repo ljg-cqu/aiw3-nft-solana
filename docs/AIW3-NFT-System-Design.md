@@ -263,6 +263,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 For detailed operational procedures, see:
 - **Security & Key Management**: [AIW3 NFT Security Operations](./AIW3-NFT-Security-Operations.md)
 - **Data Consistency**: [AIW3 NFT Data Consistency](./AIW3-NFT-Data-Consistency.md)
+- **Network Resilience**: [AIW3 NFT Network Resilience](./AIW3-NFT-Network-Resilience.md)
 - **Concurrency Control**: [AIW3 NFT Concurrency Control](./AIW3-NFT-Concurrency-Control.md)
 
 ---
@@ -272,7 +273,8 @@ For detailed operational procedures, see:
 ### Related Documentation
 
 - [AIW3 NFT Security Operations](./AIW3-NFT-Security-Operations.md) - Key management, security protocols, and operational procedures
-- [AIW3 NFT Data Consistency](./AIW3-NFT-Data-Consistency.md) - Multi-layer data verification and network resilience strategies
+- [AIW3 NFT Data Consistency](./AIW3-NFT-Data-Consistency.md) - Multi-layer data verification and consistency management
+- [AIW3 NFT Network Resilience](./AIW3-NFT-Network-Resilience.md) - Network failure handling, retry strategies, and service redundancy
 - [AIW3 NFT Concurrency Control](./AIW3-NFT-Concurrency-Control.md) - Concurrent minting safety and transaction ordering strategies
 
 ### External References
@@ -284,6 +286,6 @@ For detailed operational procedures, see:
 
 ---
 
-*Document Version: 2.1*  
+*Document Version: 1.0*  
 *Last Updated: December 2024*  
 *Author: AIW3 Technical Team*
