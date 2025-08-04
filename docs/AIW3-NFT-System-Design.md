@@ -59,7 +59,6 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 - Partners verify authenticity via on-chain creator field
 - Level queried from off-chain JSON metadata attributes
 - Images retrieved via IPFS via Pinata gateway
-- Optional API for traditional system integration
 
 **Phase 3: Burning (User-Controlled)**
 - User initiates burn transaction
