@@ -92,9 +92,6 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 | Pattern | Description | AIW3 Implementation | Pros | Cons |
 |---------|-------------|---------------------|------|------|
 | **User-Controlled Burning** | NFT owners burn their own NFTs | ✅ **Current Approach** | User autonomy, decentralized | User must initiate and pay |
-| **System-Triggered Burning** | AIW3 burns with user approval | Not adopted | Automated workflows | Complex permissions |
-| **Time-Based Burning** | Auto-burn after expiration | Not adopted | Automatic cleanup | Smart contract complexity |
-| **Conditional Burning** | Event-triggered burning | Not adopted | Advanced automation | High complexity |
 
 #### 🔍 Use Phase Integration Patterns
 
@@ -405,56 +402,17 @@ Wallets like Phantom abstract this complexity, but on-chain, each NFT exists in 
 
 **Key Insight**: ATA closure provides definitive proof of NFT destruction.
 
-### Invalidation Approach Analysis
+### Invalidation Approach: User-Controlled Burning
 
-#### Approach Comparison Matrix
+The recommended and implemented approach is **User-Controlled Burning**. The user executes `burn` and `closeAccount` transactions directly from their wallet. This method provides definitive, on-chain proof of destruction and aligns with Web3 principles of user autonomy.
 
-| Approach | Technical Feasibility | Cost | Implementation | Maintenance | Trust | True Invalidation | Recommendation |
-|----------|:-------------------:|:----:|:-------------:|:-----------:|:-----:|:----------------:|:-------------:|
-| **Public Blackhole** | ✅ High | 💰 Very Low | 🟢 Low | 🟢 Low | ⚠️ Low | ❌ No | Not Recommended |
-| **Custom Blackhole** | ✅ High | 💰 Very Low | 🟡 Moderate | 🟢 Low | 🟡 Medium | ❌ No | Not Recommended |
-| **System Wallet** | ✅ High | 💰 Very Low | 🟡 Moderate | 🔴 High | 🔴 Low | ❌ No | Not Recommended |
-| **Dedicated Wallet** | ✅ High | 💰 Very Low | 🟡 Moderate | 🔴 High | 🟡 Medium | ❌ No | Not Recommended |
-| **User Burns NFT** | ✅ High | 💰 Very Low | 🟡 Moderate | 🟢 Low | ✅ High | ✅ Yes | **⭐ RECOMMENDED** |
-| **System Burns NFT** | ✅ High | 💰 Low | 🔴 High | 🔴 High | 🔴 Low | ⚠️ Partial | Alternative only |
+**Advantages**:
+- ✅ **Unambiguous Proof**: The closure of the Associated Token Account (ATA) is definitive on-chain evidence that the NFT has been destroyed.
+- ✅ **Trustless Verification**: The AIW3 system can programmatically verify the burn by checking that the ATA no longer exists.
+- ✅ **Solana Standards**: This approach correctly follows the SPL Token program's intended lifecycle.
+- ✅ **User Empowerment**: Users maintain full control over their assets and can reclaim the SOL rent from the closed account.
 
-**Legend**: ✅ Excellent ⚠️ Moderate ❌ Poor | 🟢 Low 🟡 Moderate 🔴 High | 💰 Cost indicator | ⭐ Recommended
-
-#### Detailed Approach Analysis
-
-**1. Transfer to Public Blackhole Address**
-- **Implementation**: Transfer to known inaccessible address (e.g., `11111111111111111111111111111111`)
-- **Issue**: NFT still exists on-chain, contributes to supply count, visible in explorers
-- **Business Impact**: Fails core requirement of permanent invalidation
-
-**2. Transfer to Custom Blackhole Address**
-- **Implementation**: Create provably inaccessible address for AIW3 system
-- **Issue**: Same limitations as public blackhole - not true destruction
-- **Business Impact**: External tools still recognize NFT as existing
-
-**3. Transfer to AIW3 System Wallet**
-- **Implementation**: Users transfer NFT to main AIW3 wallet
-- **Issues**: High maintenance overhead, wallet bloat, potential misuse concerns
-- **Business Impact**: Creates custodial responsibility and trust requirements
-
-**4. Transfer to Dedicated Wallet**
-- **Implementation**: Separate wallet for "disabled" NFTs
-- **Issues**: Similar to system wallet but with asset segregation
-- **Business Impact**: Ongoing management complexity without true invalidation
-
-**5. User Burns NFT (RECOMMENDED)**
-- **Implementation**: User executes burn + closeAccount transactions
-- **Advantages**: 
-  - ✅ **Unambiguous Proof**: ATA closure is definitive on-chain evidence
-  - ✅ **Trustless Verification**: System can verify programmatically
-  - ✅ **Solana Standards**: Follows SPL Token lifecycle correctly
-  - ✅ **User Empowerment**: Users control their assets and reclaim rent
-- **Verification Method**: Check if `getAccountInfo(ataAddress)` returns `null`
-
-**6. System Burns NFT**
-- **Implementation**: User transfers to system, system burns
-- **Issues**: Requires user trust, complex custody management
-- **Use Case**: Consider only when user-direct burning isn't feasible
+**Verification Method**: The system confirms the burn by querying the ATA's address. If `getAccountInfo(ataAddress)` returns `null`, the burn is verified.
 
 ### Technical Implementation: Burn Verification
 
