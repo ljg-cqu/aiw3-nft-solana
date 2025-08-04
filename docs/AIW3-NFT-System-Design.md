@@ -46,14 +46,14 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 | Phase | Description | Control | Key Technology |
 |-------|-------------|---------|----------------|
-| **🏗️ MINT** | NFT creation with embedded level data | AIW3 System | Solana Token Program + Metaplex |
-| **🔍 USE** | Verification and data access by partners | Ecosystem Partners | Metadata queries + IPFS |
+| **🏗️ MINT** | NFT creation with embedded level data | AIW3 System Wallet | Solana Token Program + Metaplex |
+| **🔍 USE** | Verification and data access by partners | Ecosystem Partners | Metadata queries + IPFS via Pinata |
 | **🔥 BURN** | NFT destruction for upgrades/exits | User Wallet | User-initiated transactions |
 
 ### Lifecycle Characteristics
 
 **Phase 1: Minting (System-Controlled)**
-- AIW3 system mints NFT directly to user wallet
+- AIW3 System Wallet mints NFT directly to user wallet
 - User becomes immediate owner without transfer
 - Level data stored in off-chain JSON metadata
 - Creator verification data embedded in on-chain metadata
@@ -61,7 +61,7 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 **Phase 2: Usage (Partner-Initiated)**
 - Partners verify authenticity via on-chain creator field
 - Level queried from off-chain JSON metadata attributes
-- Images retrieved via IPFS URIs (Pinata gateway)
+- Images retrieved via IPFS via Pinata gateway
 - Optional API for traditional system integration
 
 **Phase 3: Burning (User-Controlled)**
@@ -80,7 +80,7 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 | Pattern | Description | AIW3 Implementation | Pros | Cons |
 |---------|-------------|---------------------|------|------|
-| **System-Direct Minting** | AIW3 system mints NFTs directly to user wallets | ✅ **Current Approach** | No transfer needed, efficient, lower gas costs | System controls minting authority |
+| **System-Direct Minting** | AIW3 System Wallet mints NFTs directly to user wallets | ✅ **Current Approach** | No transfer needed, efficient, lower gas costs | System controls minting authority |
 
 **Key Insight**: With Solana/Metaplex, NFTs can be minted directly to user wallets without ownership transfer - the user becomes the initial and immediate owner.
 
@@ -114,47 +114,23 @@ Understanding Solana NFTs is crucial for correct implementation. An NFT consists
 3. **NFT Metadata (On-Chain PDA)**: Program Derived Address storing verifiable data
 4. **Rich Content (Off-Chain JSON)**: External JSON file with descriptions, images, attributes
 
-#### Data Flow for Verification
-
-```
-1. User presents Wallet Address
-   ↓
-2. Partner queries Solana for Token Accounts owned by wallet
-   ↓
-3. Filter for tokens with supply = 1 (NFTs) → Get Mint Address
-   ↓
-4. Find On-Chain Metadata PDA associated with Mint
-   ↓
-5. Verify Authenticity: Check creators array for AIW3 public key (verified: true)
-   ↓
-6. Get Rich Data: Read uri field from on-chain metadata
-   ↓
-7. Fetch Off-Chain JSON from uri (IPFS)
-   ↓
-8. Read NFT Level: Parse attributes array for "Level" trait
-   ↓
-9. Retrieve Image: Get image URI from JSON metadata
-```
-
 #### On-Chain Metadata Account Details
 
 Data stored directly on **Solana blockchain** for trust and authenticity verification:
 
 | Field | Type | Source | Required | Description & AIW3 Usage |
 |-------|------|--------|----------|--------------------------|
-| `update_authority` | `Pubkey` | AIW3 | Yes | AIW3 system wallet public key |
+| `update_authority` | `Pubkey` | AIW3 System Wallet | Yes | AIW3 System Wallet public key |
 | `mint` | `Pubkey` | Solana | Yes | NFT's unique identifier |
-| `data.name` | `String` | AIW3 | Yes | NFT name (e.g., "AIW3 Equity NFT #1234") |
-| `data.symbol` | `String` | AIW3 | Yes | Collection symbol (e.g., "AIW3E") |
-| `data.uri` | `String` | AIW3 | Yes | IPFS URI for off-chain JSON |
-| `data.creators` | `Vec<Creator>` | AIW3 | Yes | **Core authenticity verification** |
-| `is_mutable` | `bool` | AIW3 | Yes | Set to `false` for permanence |
+| `data.name` | `String` | AIW3 System Wallet | Yes | NFT name (e.g., "AIW3 Equity NFT #1234") |
+| `data.symbol` | `String` | AIW3 System Wallet | Yes | Collection symbol (e.g., "AIW3E") |
+| `data.uri` | `String` | AIW3 System Wallet | Yes | IPFS via Pinata URI for off-chain JSON |
+| `data.creators` | `Vec<Creator>` | AIW3 System Wallet | Yes | **Core authenticity verification** |
+| `is_mutable` | `bool` | AIW3 System Wallet | Yes | Set to `false` for permanence |
 
 #### Off-Chain JSON Metadata Details
 
-The `uri` from on-chain metadata points to this JSON file on IPFS (via Pinata) where **Level information is stored**:
-
-*Note: IPFS via Pinata chosen to align with existing AIW3 backend system storage architecture.*
+The `uri` from on-chain metadata points to this JSON file on IPFS via Pinata where **Level information is stored**:
 
 ```json
 {
@@ -197,7 +173,7 @@ The `uri` from on-chain metadata points to this JSON file on IPFS (via Pinata) w
 **Storage Chain**: `On-Chain Metadata` → `Off-Chain JSON URI` → `JSON File` → `Image URI` → `Image File`
 
 1. **Upload Image**: Upload to IPFS via Pinata for decentralized storage URI
-2. **Link in JSON**: Place IPFS URI in `image` field of JSON metadata
+2. **Link in JSON**: Place IPFS via Pinata URI in `image` field of JSON metadata
 3. **Link to On-Chain**: JSON file URI stored in `data.uri` field during minting
 
 **Two-Layer Architecture**:
@@ -241,7 +217,7 @@ erDiagram
     MetadataPDA {
         string updateAuthority "AIW3SystemWallet"
         string creators "AIW3 as verified creator"
-        string uri "IPFS URI for JSON"
+        string uri "IPFS via Pinata URI for JSON"
         boolean isMutable "false"
     }
 ```
@@ -254,10 +230,10 @@ flowchart TD
     B --> C["Filter: Token Accounts with balance = 1"]
     C --> D["Extract: Mint Account addresses"]
     D --> E["Derive: Metadata PDA from Mint"]
-    E --> F["Verify: creators[0] == AIW3 && verified == true"]
+    E --> F["Verify: creators[0] == AIW3 System Wallet && verified == true"]
     F --> |Valid| G["Read: URI field from metadata"]
     F --> |Invalid| H["❌ Reject: Not authentic AIW3 NFT"]
-    G --> I["Fetch: JSON metadata from IPFS"]
+    G --> I["Fetch: JSON metadata from IPFS via Pinata"]
     I --> J["Extract: Level from attributes"]
     I --> K["Extract: Image URI from JSON"]
     J --> L["✅ Display: User's NFT level"]
@@ -267,31 +243,6 @@ flowchart TD
     style L fill:#c8e6c9
     style M fill:#c8e6c9
     style H fill:#ffcdd2
-```
-
-### Minting Flow
-
-```mermaid
-flowchart TD
-    subgraph "AIW3 System Actions"
-        A["Initiate Mint for User"]
-        B["Create Mint Account"]
-        C["Create User's ATA"]
-        D["Mint Token to User's ATA"]
-        E["Create Metaplex Metadata PDA"]
-        F["Revoke Authorities (Optional)"]
-    end
-
-    subgraph "User Interaction"
-        G["Provides Public Key"]
-        H["NFT appears in wallet"]
-    end
-
-    G --> A --> B --> C --> D --> E --> F --> H
-
-    style A fill:#fff3e0
-    style G fill:#e3f2fd
-    style H fill:#c8e6c9
 ```
 
 ---
@@ -305,24 +256,7 @@ flowchart TD
 3. **Image/Artwork Storage**: Proper visual asset storage with decentralization
 4. **Ecosystem Integration**: Seamless verification by DeFi protocols and marketplaces
 
-### Image/Artwork Storage Solutions
-
-#### Storage Options Analysis
-
-**Option 1: IPFS via Pinata ⭐ Recommended**
-
-*Chosen to align with existing AIW3 backend system storage architecture.*
-- **Advantages**: Decentralized, content-addressed, proven reliability, cost-effective
-- **Disadvantages**: Requires pinning service for persistence, network-dependent availability
-- **Evaluation**: Excellent decentralization with established ecosystem support
-- **Use Case**: All AIW3 NFT implementations
-
-**Alternative Options (Not Recommended)**:
-- **Traditional Cloud Storage**: Centralized, not aligned with Web3 principles
-- **Multiple Storage Solutions**: Adds unnecessary complexity
-- **Custom IPFS Nodes**: Requires significant infrastructure management
-
-### Level Information Storage Solutions
+### Storage Solutions
 
 #### ⭐ Metadata Attributes (Recommended)
 
@@ -340,26 +274,21 @@ flowchart TD
 - ✅ Cost-effective hybrid approach
 - ✅ Leverages proven Metaplex standard
 
+**Technical Details**:
+- **Storage**: IPFS via Pinata for decentralized, content-addressed storage
+- **Authenticity**: On-chain creator verification via AIW3 System Wallet address
+- **Compatibility**: Standard NFT tools and marketplace support
+
 **Evaluation**:
 - **Trust**: High (on-chain creator verification)
 - **Compatibility**: Excellent (standard NFT tools)
 - **Cost**: Very low (only verification data on-chain)
 
-#### ❌ Smart Contract Verification (Not Recommended)
+#### 🔄 Alternative Approaches (Not Recommended)
 
-**Implementation**: Deploy Solana smart contract for NFT level management.
+**Smart Contract Verification**: Deploy Solana smart contract for NFT level management - adds unnecessary complexity and costs without significant benefits over metadata approach.
 
-**Disadvantages**:
-- High development and maintenance costs
-- Additional transaction fees for queries
-- Unnecessary complexity vs. creator verification
-- No significant trust advantage over metadata approach
-
-#### 🔄 Ecosystem Validation API (Supplementary)
-
-**Implementation**: REST API providing additional validation and convenience.
-
-**Use Case**: Optional integration layer for traditional systems while maintaining on-chain verification as primary method.
+**Traditional Cloud Storage**: Centralized storage - not aligned with Web3 principles and decentralization goals.
 
 ---
 
@@ -405,7 +334,7 @@ The recommended and implemented approach is **User-Controlled Burning**. The use
 
 **Advantages**:
 - ✅ **Unambiguous Proof**: The closure of the Associated Token Account (ATA) is definitive on-chain evidence that the NFT has been destroyed.
-- ✅ **Trustless Verification**: The AIW3 system can programmatically verify the burn by checking that the ATA no longer exists.
+- ✅ **Trustless Verification**: The AIW3 System Wallet can programmatically verify the burn by checking that the ATA no longer exists.
 - ✅ **Solana Standards**: This approach correctly follows the SPL Token program's intended lifecycle.
 - ✅ **User Empowerment**: Users maintain full control over their assets and can reclaim the SOL rent from the closed account.
 
@@ -518,31 +447,31 @@ erDiagram
 
 ### System-Direct Minting Process
 
-Understanding how "AIW3 system mints NFT directly to user's wallet" works through Solana's Associated Token Account (ATA) Program:
+Understanding how "AIW3 System Wallet mints NFT directly to user's wallet" works through Solana's Associated Token Account (ATA) Program:
 
 #### Step 1: Create Mint Account
 
 **Purpose**: Establish unique NFT identifier
 - **Pre-conditions**: AIW3 System Wallet has sufficient SOL for fees/rent
-- **Inputs**: Payer (AIW3), Mint Authority (AIW3), optional Freeze Authority
+- **Inputs**: Payer (AIW3 System Wallet), Mint Authority (AIW3 System Wallet), optional Freeze Authority
 - **Action**: Call Solana Token Program to create and initialize Mint
 - **Outputs**: New Mint Account with unique public key
-- **Post-conditions**: Mint exists with supply=0, decimals=0, AIW3 as authority
+- **Post-conditions**: Mint exists with supply=0, decimals=0, AIW3 System Wallet as authority
 
 #### Step 2: Create User's Associated Token Account (ATA)
 
 **Purpose**: Create dedicated account in user's wallet for NFT
-- **Pre-conditions**: Mint Account exists, User's public key known, AIW3 has SOL for rent
-- **Inputs**: Payer (AIW3), Owner (User Wallet), Mint (from Step 1)
+- **Pre-conditions**: Mint Account exists, User's public key known, AIW3 System Wallet has SOL for rent
+- **Inputs**: Payer (AIW3 System Wallet), Owner (User Wallet), Mint (from Step 1)
 - **Action**: Call ATA Program to create deterministic account address
 - **Outputs**: New ATA owned by User Wallet
-- **Post-conditions**: ATA exists with owner=User, balance=0, rent paid by AIW3
+- **Post-conditions**: ATA exists with owner=User, balance=0, rent paid by AIW3 System Wallet
 
 #### Step 3: Mint NFT to User's ATA
 
 **Purpose**: Create actual token in user's possession
-- **Pre-conditions**: AIW3 is Mint Authority, User's ATA exists
-- **Inputs**: Signer (AIW3), Mint Account, Destination (User's ATA), Amount (1)
+- **Pre-conditions**: AIW3 System Wallet is Mint Authority, User's ATA exists
+- **Inputs**: Signer (AIW3 System Wallet), Mint Account, Destination (User's ATA), Amount (1)
 - **Action**: Call Token Program `mintTo` function
 - **Outputs**: Successful transaction confirmation
 - **Post-conditions**: User's ATA balance = 1, Mint supply = 1, **User owns NFT**
@@ -550,21 +479,70 @@ Understanding how "AIW3 system mints NFT directly to user's wallet" works throug
 #### Step 4: Create Metaplex Metadata
 
 **Purpose**: Attach rich data and authenticity verification
-- **Pre-conditions**: Mint Account exists, off-chain JSON uploaded to IPFS
-- **Inputs**: Payer (AIW3), Mint Address, Metadata (name, symbol, URI, creators)
+- **Pre-conditions**: Mint Account exists, off-chain JSON uploaded to IPFS via Pinata
+- **Inputs**: Payer (AIW3 System Wallet), Mint Address, Metadata (name, symbol, URI, creators)
 - **Action**: Call Metaplex Token Metadata Program for new PDA
 - **Outputs**: New Metadata PDA account
-- **Post-conditions**: Metadata linked to Mint, AIW3 as verified creator
+- **Post-conditions**: Metadata linked to Mint, AIW3 System Wallet as verified creator
 
 #### Step 5: Finalize and Secure (Optional)
 
 **Purpose**: Make NFT and metadata immutable
-- **Pre-conditions**: AIW3 still has Mint Authority and Update Authority
-- **Inputs**: Signer (AIW3), Account to modify, New Authority (null)
+- **Pre-conditions**: AIW3 System Wallet still has Mint Authority and Update Authority
+- **Inputs**: Signer (AIW3 System Wallet), Account to modify, New Authority (null)
 - **Action**: Call `set_authority` instruction to revoke authorities
 - **Post-conditions**: Mint Authority = null, Update Authority = null, permanent NFT
 
 **Key Result**: User becomes immediate owner without any transfer - they are the first and only owner.
+
+### Partner Verification Process
+
+**Data Flow for Authentication**:
+
+```
+1. User presents Wallet Address
+   ↓
+2. Partner queries Solana for Token Accounts owned by wallet
+   ↓
+3. Filter for tokens with supply = 1 (NFTs) → Get Mint Address
+   ↓
+4. Find On-Chain Metadata PDA associated with Mint
+   ↓
+5. Verify Authenticity: Check creators array for AIW3 System Wallet public key (verified: true)
+   ↓
+6. Get Rich Data: Read uri field from on-chain metadata
+   ↓
+7. Fetch Off-Chain JSON from uri (IPFS via Pinata)
+   ↓
+8. Read NFT Level: Parse attributes array for "Level" trait
+   ↓
+9. Retrieve Image: Get image URI from JSON metadata
+```
+
+---
+
+## Testing and Validation
+
+### Testing Framework Overview
+
+The AIW3 NFT system includes comprehensive testing procedures to validate all critical operations:
+
+**Testing Components:**
+- **Burn Verification Testing**: Validate NFT destruction detection
+- **Minting Process Testing**: Verify complete NFT creation workflows  
+- **Integration Testing**: End-to-end system validation
+- **Performance Testing**: Monitor system response times and reliability
+
+**Implementation Reference:**
+- Complete testing procedures: See [Solana NFT Technical Reference](./Solana-NFT-Technical-Reference.md)
+- Test environments: Configuration and setup guides in technical reference
+- Performance monitoring: Production-ready monitoring implementations
+
+**Key Testing Areas:**
+- ✅ Burn verification accuracy (zero false positives/negatives)
+- ✅ Network resilience and error handling
+- ✅ Performance metrics and response times
+- ✅ Integration with wallet adapters and RPC endpoints
 
 ---
 
@@ -579,7 +557,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 **Implementation Strategy**:
 
 1. **Metadata Attributes + Creator Verification**: Use existing Solana/Metaplex standards
-2. **IPFS Storage (Pinata)**: Decentralized storage for images and JSON metadata
+2. **IPFS via Pinata Storage**: Decentralized storage for images and JSON metadata
 3. **Standards Compliance**: Follow Metaplex Token Metadata for ecosystem compatibility
 4. **Optional API Layer**: Supplementary REST API for traditional system integration
 
@@ -594,7 +572,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 **Phase 1 (0-6 months): Core Implementation**
 - Deploy metadata-based verification system
-- Implement IPFS storage via Pinata for decentralization
+- Implement IPFS via Pinata storage for decentralization
 - Launch with Bronze/Silver tiers using system-paid rent
 - Begin ecosystem partner integration
 
@@ -633,7 +611,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 **4. Minting Process**
 - Set `is_mutable: false` after minting for permanence
-- Include AIW3 as first creator with `verified: true`
+- Include AIW3 System Wallet as first creator with `verified: true`
 - Mint directly to user wallet (no transfer required)
 
 ### For Ecosystem Partners Integration
@@ -641,20 +619,20 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 **1. Authenticity Verification Process**
 - Query user's wallet for Token Accounts with balance = 1
 - Derive Metadata PDA from NFT Mint Account address
-- Verify `creators[0].address` matches AIW3 address AND `verified == true`
+- Verify `creators[0].address` matches AIW3 System Wallet address AND `verified == true`
 
 **2. Level Data Access**
 - Read `uri` field from verified on-chain metadata
-- Fetch JSON metadata from IPFS URI
+- Fetch JSON metadata from IPFS via Pinata URI
 - Parse `attributes` array for trait where `trait_type` is "Level"
 
 **3. Image Display**
 - Extract `image` field URI from JSON metadata
-- Display image directly from IPFS decentralized storage
+- Display image directly from IPFS via Pinata decentralized storage
 - Implement fallback handling for network issues
 
 **4. Error Handling & Fallbacks**
-- Implement retry logic for IPFS requests
+- Implement retry logic for IPFS via Pinata requests
 - Cache frequently accessed metadata
 - Provide graceful degradation when off-chain data unavailable
 
@@ -689,31 +667,6 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 ---
 
-## Testing and Validation
-
-### Testing Framework Overview
-
-The AIW3 NFT system includes comprehensive testing procedures to validate all critical operations:
-
-**Testing Components:**
-- **Burn Verification Testing**: Validate NFT destruction detection
-- **Minting Process Testing**: Verify complete NFT creation workflows  
-- **Integration Testing**: End-to-end system validation
-- **Performance Testing**: Monitor system response times and reliability
-
-**Implementation Reference:**
-- Complete testing procedures: See [Solana NFT Technical Reference](./Solana-NFT-Technical-Reference.md)
-- Test environments: Configuration and setup guides in technical reference
-- Performance monitoring: Production-ready monitoring implementations
-
-**Key Testing Areas:**
-- ✅ Burn verification accuracy (zero false positives/negatives)
-- ✅ Network resilience and error handling
-- ✅ Performance metrics and response times
-- ✅ Integration with wallet adapters and RPC endpoints
-
----
-
 ## Appendix
 
 ### Success Metrics
@@ -727,7 +680,7 @@ The AIW3 NFT system includes comprehensive testing procedures to validate all cr
 
 - **Technical Risk**: Comprehensive testing and phased deployment
 - **Integration Risk**: Multiple verification paths (API, contract, hybrid)
-- **Storage Risk**: IPFS decentralization reduces data loss concerns
+- **Storage Risk**: IPFS via Pinata decentralization reduces data loss concerns
 - **Standards Risk**: Metaplex compliance ensures long-term compatibility
 
 ### Related Documentation
