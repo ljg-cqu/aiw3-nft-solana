@@ -51,7 +51,7 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 **Phase 1: Minting (System-Controlled)**
 - AIW3 System Wallet mints NFT to user's Associated Token Account (ATA)
-- User becomes immediate owner without additional transfer
+- User becomes owner upon transaction confirmation without additional transfer
 - Metadata URI points to off-chain JSON containing level data
 - Creator verification data embedded in on-chain metadata
 
@@ -73,7 +73,7 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a URI reference to off-chain JSON metadata that stores the actual level data.
 
-**Note**: The NFT is minted to the user's Associated Token Account (ATA), which is deterministically derived from the user's wallet address and the NFT mint address.
+**Note**: The NFT is minted to the user's Associated Token Account (ATA), which is deterministically derived from the user's wallet address and the NFT mint address. Ownership is established when the minting transaction is confirmed on-chain.
 
 ### On-Chain Metadata Account Details
 
@@ -238,7 +238,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 **Minting Process**
 - Set `is_mutable: false` after minting for permanence
 - Include AIW3 System Wallet as first creator with `verified: true`
-- Mint to user's Associated Token Account (ATA) - no additional transfer required
+- Mint to user's Associated Token Account (ATA) - no separate transfer transaction required
 
 ### For Ecosystem Partners Integration
 
