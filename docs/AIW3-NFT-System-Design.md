@@ -129,7 +129,7 @@ Data stored directly on **Solana blockchain** for trust and authenticity verific
 |-------|------|--------|----------|--------------------------|
 | `update_authority` | `Pubkey` | AIW3 System Wallet | Yes | AIW3 System Wallet public key |
 | `mint` | `Pubkey` | Solana | Yes | NFT's unique identifier |
-| `data.name` | `String` | AIW3 System Wallet | Yes | NFT name (e.g., "AIW3 Equity NFT #1234") |
+| `data.name` | `String` | AIW3 System Wallet | Yes | NFT name (e.g., "Tech Chicken", "Quant Ape") |
 | `data.symbol` | `String` | AIW3 System Wallet | Yes | Collection symbol (e.g., "AIW3E") |
 | `data.uri` | `String` | AIW3 System Wallet | Yes | IPFS via Pinata URI for off-chain JSON |
 | `data.creators` | `Vec<Creator>` | AIW3 System Wallet | Yes | **Core authenticity verification** |
@@ -141,21 +141,21 @@ The `uri` field in the on-chain metadata contains an IPFS via Pinata link to thi
 
 ```json
 {
-  "name": "AIW3 Equity NFT #1234",
+  "name": "On-chain Hunter",
   "symbol": "AIW3E",
-  "description": "Represents user's equity and status within AIW3 ecosystem",
+  "description": "Represents Level 3 equity and status within the AIW3 ecosystem.",
   "image": "https://gateway.pinata.cloud/ipfs/QmImageHashExample123",
   "external_url": "https://aiw3.io",
   "attributes": [
     {
       "trait_type": "Level",
-      "value": "Gold",
-      "display_type": "string"
-    },
-    {
-      "trait_type": "Tier",
       "value": "3",
       "display_type": "number"
+    },
+    {
+      "trait_type": "Name",
+      "value": "On-chain Hunter",
+      "display_type": "string"
     }
   ],
   "properties": {
