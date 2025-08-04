@@ -717,26 +717,6 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 - Cache frequently accessed metadata
 - Provide graceful degradation when off-chain data unavailable
 
-### Technical Implementation Details
-
-**Required Dependencies**:
-- Solana Web3.js or Rust SDK for blockchain interactions
-- Metaplex SDK for metadata operations
-- HTTP client for IPFS requests
-- JSON parsing capabilities
-
-**Key Functions Needed**:
-- `getTokenAccountsByOwner()` - Find user's NFTs
-- `findMetadataPda()` - Derive metadata account address
-- `getAccountInfo()` - Read on-chain metadata
-- `fetch()` - Retrieve off-chain JSON from IPFS
-- `parseAttributes()` - Extract level from metadata traits
-
-**Integration Patterns**:
-- **Direct Integration**: Query blockchain directly for maximum decentralization
-- **API Integration**: Use optional AIW3 validation API for simplified implementation
-- **Hybrid Approach**: Combine direct verification with API convenience
-
 ---
 
 ## Testing and Validation

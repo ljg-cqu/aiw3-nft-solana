@@ -1,4 +1,3 @@
-
 # Solana NFT Technical Reference
 ## Complete Source Code Guide for AIW3 Equity NFT Implementation
 
@@ -322,8 +321,6 @@ pub fn set_authority(
 
 These code references demonstrate that the entire minting flow is constructed by calling a series of well-defined, open-source, and audited on-chain programs. The "magic" is a result of Solana's composable design, where programs like `spl-token` and `mpl-token-metadata` work together to create complex assets like NFTs.
 
-### 🔥 NFT Burning Process
-
 ---
 
 ## 🔥 Burning Operations
@@ -415,13 +412,103 @@ pub fn close_account(
 
 This demonstrates that burning is a standard, user-initiated operation defined within the core Solana token standard, ensuring a predictable and secure process for all assets on the network.
 
-### 🔍 Verification Process for Partners
-
 ---
 
 ## 🔍 NFT Verification & Usage
 
-## 🔍 NFT Verification & Usage
+This section details the process from the perspective of an ecosystem partner (e.g., a DeFi protocol, a game, or another application) that needs to verify the authenticity of an AIW3 NFT and access its data, such as the user's level. This flow combines on-chain verification with off-chain data retrieval from IPFS.
+
+**Key Actors:**
+*   **User Wallet**: The wallet holding the NFT. The user presents their public key to the partner service.
+*   **Partner Application**: The third-party service that needs to read the NFT data.
+*   **Solana Blockchain**: The source of truth for on-chain data (ownership and authenticity).
+*   **IPFS**: The decentralized storage network holding the off-chain metadata (level, image, etc.).
+
+### Technical Prerequisites
+
+**Required Dependencies**:
+- Solana Web3.js or Rust SDK for blockchain interactions
+- Metaplex SDK for metadata operations
+- HTTP client for IPFS requests
+- JSON parsing capabilities
+
+**Key Functions Needed**:
+- `getTokenAccountsByOwner()` - Find user's NFTs
+- `findMetadataPda()` - Derive metadata account address
+- `getAccountInfo()` - Read on-chain metadata
+- `fetch()` - Retrieve off-chain JSON from IPFS
+- `parseAttributes()` - Extract level from metadata traits
+
+**Integration Patterns**:
+- **Direct Integration**: Query blockchain directly for maximum decentralization
+- **API Integration**: Use optional AIW3 validation API for simplified implementation
+- **Hybrid Approach**: Combine direct verification with API convenience
+
+---
+
+#### Step 1: Find the NFT and its On-Chain Metadata
+The partner application starts by finding the user's NFT and its associated on-chain metadata account.
+
+*   **Purpose**: To locate the NFT and its verifiable, on-chain data.
+*   **Pre-conditions**:
+    *   The partner application has access to a Solana RPC node.
+    *   The user has provided their public wallet address.
+*   **Inputs**:
+    *   `User Wallet Address`: The public key of the user.
+*   **Action**:
+    1.  The partner application calls a Solana RPC method (e.g., `getTokenAccountsByOwner`) to get all token accounts owned by the user.
+    2.  It filters these accounts to find NFTs (accounts with a balance of 1 and 0 decimals).
+    3.  For each potential NFT, the application gets the **Mint Address**.
+    4.  Using the Mint Address, it deterministically calculates the address of the **Metaplex Metadata PDA**.
+    5.  It fetches the account data for the Metadata PDA.
+*   **Outputs**:
+    *   The decoded on-chain metadata for the NFT.
+*   **Post-conditions**:
+    *   The application has the authoritative on-chain data for the NFT, including the `creators` array and the `uri` field.
+
+---
+
+#### Step 2: Verify Authenticity
+This is the most critical step for security. The partner must verify that the NFT was genuinely created by AIW3.
+
+*   **Purpose**: To prevent counterfeit or fraudulent NFTs from being accepted.
+*   **Pre-conditions**:
+    *   The on-chain metadata has been fetched.
+    *   The partner knows the official, published public key of the AIW3 System Wallet.
+*   **Inputs**:
+    *   `On-chain Metadata`: The data fetched in the previous step.
+    *   `AIW3 Creator Address`: The known, trusted public key.
+*   **Action**: The application inspects the `creators` array within the on-chain metadata. It checks two things:
+    1.  Does the array contain the official AIW3 creator address?
+    2.  Is the `verified` flag for that creator set to `true`?
+*   **Outputs**:
+    *   A boolean result: `true` if authentic, `false` if not.
+*   **Post-conditions**:
+    *   The partner application can be certain of the NFT's origin. If verification fails, the process stops here.
+
+---
+
+#### Step 3: Fetch and Use Off-Chain Metadata
+Once the NFT is verified as authentic, the partner can safely retrieve and use the rich metadata stored off-chain.
+
+*   **Purpose**: To access the NFT's attributes, such as its "Level" and image.
+*   **Pre-conditions**:
+    *   The NFT has been verified as authentic.
+    *   The application has the `uri` from the on-chain metadata.
+*   **Inputs**:
+    *   `uri`: The URI from the on-chain metadata (e.g., an IPFS link via Pinata).
+*   **Action**:
+    1.  The application makes an HTTP GET request to the `uri`.
+    2.  It receives the JSON metadata file as a response.
+    3.  It parses the JSON file to access its contents.
+    4.  It reads the `attributes` array to find the object where `trait_type` is "Level" and extracts its `value`.
+    5.  It reads the `image` field to get the URL for the NFT's artwork.
+*   **Outputs**:
+    *   The user's level, the image URL, and any other relevant metadata.
+*   **Post-conditions**:
+    *   The partner application now has all the necessary information to grant the user access, display their status, or perform other business logic based on their AIW3 NFT.
+
+---
 
 ### Complete Verification Logic Implementation
 
@@ -791,78 +878,6 @@ class NFTVerificationMonitor {
   }
 }
 ```
-
-This section details the process from the perspective of an ecosystem partner (e.g., a DeFi protocol, a game, or another application) that needs to verify the authenticity of an AIW3 NFT and access its data, such as the user's level. This flow combines on-chain verification with off-chain data retrieval from IPFS.
-
-**Key Actors:**
-*   **User Wallet**: The wallet holding the NFT. The user presents their public key to the partner service.
-*   **Partner Application**: The third-party service that needs to read the NFT data.
-*   **Solana Blockchain**: The source of truth for on-chain data (ownership and authenticity).
-*   **IPFS**: The decentralized storage network holding the off-chain metadata (level, image, etc.).
-
-#### Step 1: Find the NFT and its On-Chain Metadata
-The partner application starts by finding the user's NFT and its associated on-chain metadata account.
-
-*   **Purpose**: To locate the NFT and its verifiable, on-chain data.
-*   **Pre-conditions**:
-    *   The partner application has access to a Solana RPC node.
-    *   The user has provided their public wallet address.
-*   **Inputs**:
-    *   `User Wallet Address`: The public key of the user.
-*   **Action**:
-    1.  The partner application calls a Solana RPC method (e.g., `getTokenAccountsByOwner`) to get all token accounts owned by the user.
-    2.  It filters these accounts to find NFTs (accounts with a balance of 1 and 0 decimals).
-    3.  For each potential NFT, the application gets the **Mint Address**.
-    4.  Using the Mint Address, it deterministically calculates the address of the **Metaplex Metadata PDA**.
-    5.  It fetches the account data for the Metadata PDA.
-*   **Outputs**:
-    *   The decoded on-chain metadata for the NFT.
-*   **Post-conditions**:
-    *   The application has the authoritative on-chain data for the NFT, including the `creators` array and the `uri` field.
-
----
-
-#### Step 2: Verify Authenticity
-This is the most critical step for security. The partner must verify that the NFT was genuinely created by AIW3.
-
-*   **Purpose**: To prevent counterfeit or fraudulent NFTs from being accepted.
-*   **Pre-conditions**:
-    *   The on-chain metadata has been fetched.
-    *   The partner knows the official, published public key of the AIW3 System Wallet.
-*   **Inputs**:
-    *   `On-chain Metadata`: The data fetched in the previous step.
-    *   `AIW3 Creator Address`: The known, trusted public key.
-*   **Action**: The application inspects the `creators` array within the on-chain metadata. It checks two things:
-    1.  Does the array contain the official AIW3 creator address?
-    2.  Is the `verified` flag for that creator set to `true`?
-*   **Outputs**:
-    *   A boolean result: `true` if authentic, `false` if not.
-*   **Post-conditions**:
-    *   The partner application can be certain of the NFT's origin. If verification fails, the process stops here.
-
----
-
-#### Step 3: Fetch and Use Off-Chain Metadata
-Once the NFT is verified as authentic, the partner can safely retrieve and use the rich metadata stored off-chain.
-
-*   **Purpose**: To access the NFT's attributes, such as its "Level" and image.
-*   **Pre-conditions**:
-    *   The NFT has been verified as authentic.
-    *   The application has the `uri` from the on-chain metadata.
-*   **Inputs**:
-    *   `uri`: The URI from the on-chain metadata (e.g., an IPFS link via Pinata).
-*   **Action**:
-    1.  The application makes an HTTP GET request to the `uri`.
-    2.  It receives the JSON metadata file as a response.
-    3.  It parses the JSON file to access its contents.
-    4.  It reads the `attributes` array to find the object where `trait_type` is "Level" and extracts its `value`.
-    5.  It reads the `image` field to get the URL for the NFT's artwork.
-*   **Outputs**:
-    *   The user's level, the image URL, and any other relevant metadata.
-*   **Post-conditions**:
-    *   The partner application now has all the necessary information to grant the user access, display their status, or perform other business logic based on their AIW3 NFT.
-
----
 
 #### Client-Side SDK Implementation
 
