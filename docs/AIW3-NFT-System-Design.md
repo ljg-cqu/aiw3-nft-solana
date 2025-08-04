@@ -114,6 +114,16 @@ Understanding Solana NFTs is crucial for correct implementation. An NFT consists
 3. **NFT Metadata (On-Chain PDA)**: Program Derived Address storing verifiable data
 4. **Rich Content (Off-Chain JSON)**: External JSON file with descriptions, images, attributes
 
+#### Associated Token Account (ATA) Details
+
+Users don't hold NFTs directly in their main wallet address. Instead, for each unique NFT, a separate Associated Token Account (ATA) is created with these properties:
+
+- **Deterministic Address**: Programmatically linked to both user's wallet and NFT's mint address
+- **Token Storage**: The ATA actually holds the single token (the NFT)
+- **Standard Enforcement**: Non-optional part of Solana SPL Token standard
+
+Wallets like Phantom abstract this complexity, but on-chain, each NFT exists in its own separate ATA.
+
 #### On-Chain Metadata Account Details
 
 Data stored directly on **Solana blockchain** for trust and authenticity verification:
@@ -284,11 +294,11 @@ flowchart TD
 - **Compatibility**: Excellent (standard NFT tools)
 - **Cost**: Very low (only verification data on-chain)
 
-#### 🔄 Alternative Approaches (Not Recommended)
+#### Alternative Approaches
 
-**Smart Contract Verification**: Deploy Solana smart contract for NFT level management - adds unnecessary complexity and costs without significant benefits over metadata approach.
+**Smart Contract Verification**: Deploy Solana smart contract for NFT level management - adds complexity without significant benefits.
 
-**Traditional Cloud Storage**: Centralized storage - not aligned with Web3 principles and decentralization goals.
+**Traditional Cloud Storage**: Centralized storage - not aligned with Web3 principles.
 
 ---
 
@@ -302,19 +312,11 @@ When users upgrade from a lower-level NFT to a higher-level one, the system must
 
 **The Solution**: The most secure and reliable approach is **user-controlled burning** with **system verification** through Associated Token Account (ATA) closure confirmation.
 
-### Core Solana NFT Mechanics for Burning
+### Invalidation Approach: User-Controlled Burning
 
-#### Understanding Associated Token Accounts (ATAs)
+The recommended and implemented approach is **User-Controlled Burning**. The user executes `burn` and `closeAccount` transactions directly from their wallet. This method provides definitive, on-chain proof of destruction and aligns with Web3 principles of user autonomy.
 
-Users don't hold NFTs directly in their main wallet address. Instead, for each unique NFT, a separate Associated Token Account (ATA) is created with these properties:
-
-- **Deterministic Address**: Programmatically linked to both user's wallet and NFT's mint address
-- **Token Storage**: The ATA actually holds the single token (the NFT)
-- **Standard Enforcement**: Non-optional part of Solana SPL Token standard
-
-Wallets like Phantom abstract this complexity, but on-chain, each NFT exists in its own separate ATA.
-
-#### NFT Lifecycle: Minting and Burning
+**NFT Lifecycle: Minting and Burning**
 
 **Minting Process**:
 - **Pre-condition**: Unique Mint Account for NFT exists
@@ -327,10 +329,6 @@ Wallets like Phantom abstract this complexity, but on-chain, each NFT exists in 
 - **Post-condition**: NFT destroyed, **ATA closed and removed from blockchain**
 
 **Key Insight**: ATA closure provides definitive proof of NFT destruction.
-
-### Invalidation Approach: User-Controlled Burning
-
-The recommended and implemented approach is **User-Controlled Burning**. The user executes `burn` and `closeAccount` transactions directly from their wallet. This method provides definitive, on-chain proof of destruction and aligns with Web3 principles of user autonomy.
 
 **Advantages**:
 - ✅ **Unambiguous Proof**: The closure of the Associated Token Account (ATA) is definitive on-chain evidence that the NFT has been destroyed.
@@ -578,7 +576,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 **Phase 2 (6-18 months): Enhanced Features**
 - Add smart contract verification for premium features
-- Implement tiered rent responsibility for Gold+ users
+- Implement tiered rent responsibility for Gold users
 - Deploy comprehensive API for traditional integrations
 - Expand partner ecosystem
 
@@ -699,6 +697,6 @@ For comprehensive cost analysis and financial planning:
 
 ---
 
-*Document Version: 2.0*  
-*Last Updated: August 2, 2025*  
+*Document Version: 2.1*  
+*Last Updated: December 2024*  
 *Author: AIW3 Technical Team*
