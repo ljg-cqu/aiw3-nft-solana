@@ -8,13 +8,14 @@
 1. [Executive Summary](#executive-summary)
 2. [NFT Lifecycle Overview](#nft-lifecycle-overview)
 3. [Technical Architecture](#technical-architecture)
-4. [Distributed Data Consistency & Verification](#distributed-data-consistency--verification)
-5. [Implementation Guide](#implementation-guide)
-6. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
-7. [Detailed Process Flows](#detailed-process-flows)
-8. [Recommendations](#recommendations)
-9. [Implementation Requirements](#implementation-requirements)
-10. [Appendix](#appendix)
+4. [System Key Management & Security](#system-key-management--security)
+5. [Distributed Data Consistency & Verification](#distributed-data-consistency--verification)
+6. [Implementation Guide](#implementation-guide)
+7. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
+8. [Detailed Process Flows](#detailed-process-flows)
+9. [Recommendations](#recommendations)
+10. [Implementation Requirements](#implementation-requirements)
+11. [Appendix](#appendix)
 
 ---
 
@@ -129,6 +130,175 @@ The `uri` field in the on-chain metadata contains an IPFS via Pinata link to thi
   }
 }
 ```
+
+---
+
+## System Key Management & Security
+
+### Critical Key Dependencies
+
+The AIW3 NFT system relies on **cryptographic keys** that are essential for system operation:
+
+**Primary System Wallet**
+- **Purpose**: Creator verification, NFT minting authority
+- **Risk Level**: 🔴 **CRITICAL** - Loss breaks entire ecosystem
+- **Usage**: Signs all minting transactions, establishes creator authenticity
+
+### Key Security Threats & Impact
+
+| Threat Scenario | Impact | Recovery Complexity | Prevention Strategy |
+|----------------|--------|-------------------|-------------------|
+| **Private Key Loss** | Complete system shutdown | 🔴 **Impossible** | Multi-location secure backup |
+| **Private Key Theft** | Unauthorized minting, reputation damage | 🟡 **Complex** | Hardware security modules |
+| **Key Corruption** | Transaction failures | 🟢 **Moderate** | Backup restoration |
+| **Access Control Breach** | Operational security risk | 🟡 **Complex** | Role-based access controls |
+
+### Recommended Key Management Architecture
+
+**Tier 1: Production Environment**
+```
+Hardware Security Module (HSM)
+├── Primary System Wallet Private Key
+├── Multi-signature requirement (2-of-3)
+├── Audit logging for all key operations
+└── Geographic redundancy across secure facilities
+```
+
+**Tier 2: Development/Testing Environment**
+```
+Encrypted Key Storage
+├── Separate keypairs for each environment
+├── Limited-privilege test wallets
+├── Automated key rotation for non-production
+└── Isolated from production infrastructure
+```
+
+### Multi-Signature Implementation Strategy
+
+**Recommended Approach: 2-of-3 Multi-Sig Wallet**
+
+**Signers**:
+1. **Primary Operations Key** (Daily minting operations)
+2. **Executive Override Key** (Emergency access, policy changes)
+3. **Compliance/Audit Key** (Financial oversight, regulatory compliance)
+
+**Transaction Requirements**:
+- **Standard Minting**: Primary Operations + Executive Override
+- **Emergency Recovery**: Executive Override + Compliance/Audit
+- **Policy Changes**: All three signatures required
+
+### Key Rotation & Recovery Procedures
+
+**Planned Key Rotation (Annual)**
+```
+1. Generate new keypair using HSM
+   ↓
+2. Update all internal systems with new public key
+   ↓
+3. Coordinate with ecosystem partners for verification updates
+   ↓
+4. Execute transition period with both keys active
+   ↓
+5. Deactivate old key after full ecosystem migration
+   ↓
+6. Secure destruction of old private key material
+```
+
+**Emergency Key Compromise Response**
+```
+1. Immediate key deactivation across all systems
+   ↓
+2. Emergency keypair generation via backup HSM
+   ↓
+3. Broadcast new public key to ecosystem partners
+   ↓
+4. Temporary suspension of minting operations
+   ↓
+5. Forensic analysis of compromise incident
+   ↓
+6. Gradual service restoration with enhanced monitoring
+```
+
+### Operational Security Requirements
+
+**Access Controls**
+- **Principle of Least Privilege**: Minimum necessary key access
+- **Role Separation**: No single person has complete key access
+- **Time-Limited Access**: Temporary permissions with automatic expiration
+- **Audit Trail**: Complete logging of all key-related operations
+
+**Physical Security**
+- **HSM Physical Protection**: Tamper-evident, geographically distributed
+- **Backup Storage**: Multiple secure locations with environmental controls
+- **Access Monitoring**: 24/7 physical security and intrusion detection
+
+**Network Security**
+- **Air-Gapped Key Generation**: Isolated from internet during creation
+- **Encrypted Communication**: All key operations over secure channels
+- **VPN Requirements**: Mandatory for any key-related system access
+
+### Business Continuity Planning
+
+**Disaster Recovery Scenarios**
+
+**Scenario 1: Primary HSM Failure**
+- **Detection**: Automated monitoring alerts within 5 minutes
+- **Response**: Automatic failover to backup HSM
+- **RTO (Recovery Time Objective)**: < 30 minutes
+- **Impact**: Minimal service disruption
+
+**Scenario 2: Complete Key Infrastructure Loss**
+- **Detection**: Total system communication failure
+- **Response**: Emergency key reconstruction from distributed backups
+- **RTO**: < 24 hours
+- **Impact**: Temporary minting suspension
+
+**Scenario 3: Key Compromise Discovery**
+- **Detection**: Unauthorized transaction monitoring
+- **Response**: Immediate key deactivation and emergency rotation
+- **RTO**: < 2 hours for deactivation, < 48 hours for full restoration
+- **Impact**: Service suspension until security restoration
+
+### Monitoring & Alerting
+
+**Real-Time Monitoring**
+- **Key Usage Patterns**: Detect unusual signing activity
+- **Transaction Anomalies**: Unauthorized or unexpected minting
+- **Access Violations**: Failed authentication attempts
+- **System Health**: HSM connectivity and performance
+
+**Alert Triggers**
+- ⚠️ **Warning**: Unusual key access patterns
+- 🔴 **Critical**: Failed key operations or unauthorized access
+- 📊 **Info**: Scheduled maintenance or routine operations
+
+### Compliance & Audit Requirements
+
+**Documentation Requirements**
+- Complete key lifecycle documentation
+- Access control matrices and approval workflows
+- Incident response procedures and contact information
+- Regular security assessment reports
+
+**Audit Trail Maintenance**
+- Immutable logging of all key operations
+- Time-synchronized across all systems
+- Long-term retention (minimum 7 years)
+- Regular audit trail integrity verification
+
+### Integration with NFT Operations
+
+**Minting Process Security**
+- All minting transactions must be signed by authorized keys
+- Real-time verification of signer authenticity
+- Automated rollback for unauthorized transactions
+- Transaction monitoring for compliance with business rules
+
+**Partner Verification Impact**
+- Partners must maintain current AIW3 System Wallet public key
+- Automated notifications for key rotation events
+- Grace period during key transitions
+- Emergency contact procedures for urgent updates
 
 ---
 
@@ -342,6 +512,13 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 **System Wallet Management**
 - Maintain consistent public key for creator verification
 - Secure private key storage and access controls
+
+**Key Management & Security**
+- Implement HSM-based key storage for production environment
+- Establish multi-signature requirements for critical operations
+- Maintain comprehensive audit trails for all key-related activities
+- Design automated key rotation procedures with ecosystem coordination
+- Implement real-time monitoring and alerting for key security events
 
 **Metadata Standards Compliance**
 - Follow Metaplex Token Metadata standard
