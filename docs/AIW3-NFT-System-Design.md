@@ -81,9 +81,6 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 | Pattern | Description | AIW3 Implementation | Pros | Cons |
 |---------|-------------|---------------------|------|------|
 | **System-Direct Minting** | AIW3 system mints NFTs directly to user wallets | ✅ **Current Approach** | No transfer needed, efficient, lower gas costs | System controls minting authority |
-| **User-Initiated Minting** | Users trigger minting themselves | Not adopted | User control, decentralized | Higher friction, user pays costs |
-| **Delegated Minting** | Third-party services mint on behalf | Not adopted | Outsourced complexity | Trust dependency |
-| **Batch Minting** | Multiple NFTs in single transaction | Enhancement option | Cost-efficient for bulk | Complex implementation |
 
 **Key Insight**: With Solana/Metaplex, NFTs can be minted directly to user wallets without ownership transfer - the user becomes the initial and immediate owner.
 
