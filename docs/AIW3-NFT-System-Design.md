@@ -158,10 +158,10 @@ The AIW3 NFT system relies on **cryptographic keys** that are essential for syst
 **Tier 1: Production Environment**
 ```
 Hardware Security Module (HSM)
-├── Primary System Wallet Private Key
-├── Multi-signature requirement (2-of-3)
-├── Audit logging for all key operations
-└── Geographic redundancy across secure facilities
+├── Single System Wallet Private Key (automated access)
+├── Real-time transaction monitoring and anomaly detection
+├── Automated backup and failover mechanisms
+└── Geographic redundancy with hot-standby capabilities
 ```
 
 **Tier 2: Development/Testing Environment**
@@ -173,19 +173,46 @@ Encrypted Key Storage
 └── Isolated from production infrastructure
 ```
 
-### Multi-Signature Implementation Strategy
+### Alternative Security Approaches for Automated Systems
 
-**Recommended Approach: 2-of-3 Multi-Sig Wallet**
+**Multi-Signature Limitations for AIW3**
+- ❌ **Operational Bottleneck**: Requires multiple approvals for each mint
+- ❌ **Automation Conflict**: Incompatible with high-frequency automated minting
+- ❌ **Latency Issues**: Additional confirmation delays impact user experience
+- ❌ **Complexity Overhead**: Coordination requirements hinder system efficiency
 
-**Signers**:
-1. **Primary Operations Key** (Daily minting operations)
-2. **Executive Override Key** (Emergency access, policy changes)
-3. **Compliance/Audit Key** (Financial oversight, regulatory compliance)
+**Recommended Alternative: Single Key with Enhanced Protection**
 
-**Transaction Requirements**:
-- **Standard Minting**: Primary Operations + Executive Override
-- **Emergency Recovery**: Executive Override + Compliance/Audit
-- **Policy Changes**: All three signatures required
+**Primary Approach: Hardware Security Module (HSM) with Single Key**
+- **Hot Wallet Operations**: Single system wallet for automated minting
+- **Enhanced Security**: HSM-protected private key with tamper resistance
+- **Operational Efficiency**: No approval delays for standard minting operations
+- **Automated Monitoring**: Real-time anomaly detection for unauthorized activity
+
+**Transaction Security Model**:
+- **Standard Minting**: Single system wallet signature (automated)
+- **Emergency Operations**: Temporary key deactivation via admin controls
+- **Policy Changes**: Manual intervention with enhanced authentication
+
+### Automated Security Controls for High-Frequency Operations
+
+**Real-Time Monitoring**
+- **Transaction Rate Limiting**: Maximum mints per time period
+- **Anomaly Detection**: Unusual minting patterns or destinations
+- **Automated Circuit Breakers**: Temporary suspension on suspicious activity
+- **Compliance Monitoring**: Automated validation of minting rules
+
+**Emergency Response Automation**
+- **Automatic Key Rotation**: Scheduled or triggered key updates
+- **Hot-Standby Systems**: Immediate failover without manual intervention
+- **Automated Incident Response**: Pre-programmed responses to security events
+- **Real-Time Alerting**: Immediate notification of security incidents
+
+**Operational Safeguards**
+- **Rate Limiting**: Prevent excessive minting velocity
+- **Destination Validation**: Verify minting to legitimate user accounts
+- **Transaction Logging**: Comprehensive audit trail for all operations
+- **Automated Reconciliation**: Continuous verification of system state
 
 ### Key Rotation & Recovery Procedures
 
@@ -242,10 +269,10 @@ Encrypted Key Storage
 **Disaster Recovery Scenarios**
 
 **Scenario 1: Primary HSM Failure**
-- **Detection**: Automated monitoring alerts within 5 minutes
+- **Detection**: Automated monitoring alerts within 30 seconds
 - **Response**: Automatic failover to backup HSM
-- **RTO (Recovery Time Objective)**: < 30 minutes
-- **Impact**: Minimal service disruption
+- **RTO (Recovery Time Objective)**: < 5 minutes
+- **Impact**: Brief interruption in automated minting
 
 **Scenario 2: Complete Key Infrastructure Loss**
 - **Detection**: Total system communication failure
