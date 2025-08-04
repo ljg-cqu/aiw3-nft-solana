@@ -44,9 +44,9 @@ The **Pre-paid Rent Transfer** approach combined with **Premium Feature Revenue*
 |---------------|----------|-----------------|-------------|
 | **Solana Rent (ATA)** | 0.00203928 SOL | 20,392.8 SOL | $408K-$4.08M |
 | **Transaction Fees** | 0.000005 SOL | 50 SOL | $1K-$10K |
-| **IPFS Storage (Pinata)** | $0.001-0.005 | - | $10K-$50K |
+| **IPFS Storage (Pinata)** | $0.0001-0.001 | - | $1K-$10K |
 | **System Operations** | Variable | - | $50K-$200K/year |
-| **TOTAL ESTIMATED** | $0.056-$0.461 | - | **$558K-$4.67M** |
+| **TOTAL ESTIMATED** | $0.046-$0.415 | - | **$470K-$4.15M** |
 
 *Note: Total includes one-time setup costs plus annual operations*
 
@@ -153,17 +153,18 @@ const TOTAL_SIZE_PER_USER_KB = 502;  // Combined size
 // Total storage for 10M users
 const TOTAL_STORAGE_GB = (502 * 10_000_000) / (1024 * 1024); // ~4,768 GB
 
-// IPFS (Pinata) pricing scenarios
+// IPFS (Pinata) pricing scenarios - Based on actual Pinata pricing
 const IPFS_PINATA_COST_PER_GB = {
-    low: 30,      // $30/GB (low network demand)
-    average: 60,  // $60/GB (typical)
-    high: 90      // $90/GB (high demand)
+    starter: 0.15,    // $0.15/GB/month (Pinata Starter plan)
+    growth: 0.10,     // $0.10/GB/month (Pinata Growth plan)
+    business: 0.08    // $0.08/GB/month (Pinata Business plan)
 };
 
+// Annual storage costs (monthly * 12)
 const storageCostUSD = {
-    low: 4768 * 30,      // ~$143,040
-    average: 4768 * 60,  // ~$286,080
-    high: 4768 * 90      // ~$429,120
+    starter: 4768 * 0.15 * 12,    // ~$8,582/year
+    growth: 4768 * 0.10 * 12,     // ~$5,722/year
+    business: 4768 * 0.08 * 12    // ~$4,577/year
 };
 ```
 
@@ -219,9 +220,9 @@ const TIER_STORAGE_MULTIPLIER = {
 **Initial Setup Costs:**
 - Rent deposits: $407,856 (recoverable)
 - Transaction fees: $1,000
-- IPFS storage (Pinata): $28,608
+- IPFS storage (Pinata): $5,722/year
 - Setup & development: $50,000
-- **Total Initial**: $744,936
+- **Total Initial**: $464,578 (+ $5,722/year storage)
 
 **Annual Operating**: $186,000
 
@@ -230,9 +231,9 @@ const TIER_STORAGE_MULTIPLIER = {
 **Initial Setup Costs:**
 - Rent deposits: $1,223,568 (recoverable)
 - Transaction fees: $3,000
-- IPFS storage (Pinata): $28,608
+- IPFS storage (Pinata): $5,722/year
 - Setup & development: $50,000
-- **Total Initial**: $1,562,648
+- **Total Initial**: $1,281,290 (+ $5,722/year storage)
 
 **Annual Operating**: $186,000
 
@@ -241,9 +242,9 @@ const TIER_STORAGE_MULTIPLIER = {
 **Initial Setup Costs:**
 - Rent deposits: $4,078,560 (recoverable)
 - Transaction fees: $10,000
-- IPFS storage (Pinata): $28,608
+- IPFS storage (Pinata): $5,722/year
 - Setup & development: $50,000
-- **Total Initial**: $4,424,640
+- **Total Initial**: $4,143,282 (+ $5,722/year storage)
 
 **Annual Operating**: $186,000
 
