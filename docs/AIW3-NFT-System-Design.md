@@ -79,7 +79,7 @@ The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a 
 ### Transaction Volume Qualification
 
 **Qualification Rules**:
-The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **AIW3 NFT Upgrade Business Logic** document.
+The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **AIW3 NFT Tiers and Policies** document.
 
 **Technical Verification Process**:
 1. Query user's total transaction volume from MySQL database

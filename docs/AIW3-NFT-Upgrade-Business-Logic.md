@@ -1,7 +1,7 @@
 
 
-# AIW3 NFT Upgrade Process
-## Business Logic Requirements & Implementation Guide
+# AIW3 NFT Tiers and Policies
+## Business Rules for NFT Levels, Benefits, and Upgrades
 
 ---
 
@@ -18,7 +18,7 @@
 
 ## 🎯 Overview
 
-This document defines the business logic requirements for AIW3's equity NFT upgrade process. Unlike simple NFT collections, AIW3 equity NFTs control access to real business benefits and rights, requiring sophisticated verification workflows to maintain system integrity.
+This document defines the business rules and policies for AIW3's tiered equity NFT system. It covers level requirements, benefits, and the high-level process for upgrades. Unlike simple NFT collections, AIW3 equity NFTs control access to real business benefits, requiring clear and verifiable policies to maintain system integrity.
 
 **Key Principles:**
 - **Atomic Operations**: Upgrades must be verifiably complete before new benefits activate
