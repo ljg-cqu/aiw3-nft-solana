@@ -205,12 +205,12 @@ erDiagram
     TokenAccount {
         string owner "UserWallet public key"
         string associatedMint "MintAccount public key"
-        int balance "1 (for NFTs)"
+        int balance "1 for NFTs"
     }
     
     MintAccount {
         string mintAuthority "AIW3SystemWallet"
-        int supply "1 (unique)"
+        int supply "1 unique"
         int decimals "0"
     }
     
