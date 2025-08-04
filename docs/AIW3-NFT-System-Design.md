@@ -388,6 +388,74 @@ erDiagram
 
 ---
 
+### Frontend Interaction and User Experience
+
+This section details how the frontend application interacts with the backend services and the Solana blockchain to deliver the user-facing NFT experience.
+
+#### 1. Personal Center - Displaying User NFTs
+
+The Personal Center is the user's primary interface for viewing their NFT collection. The frontend renders this view by orchestrating calls to both the AIW3 backend and the Solana network.
+
+*![Personal Center UI](..//aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/7.%20Personal%20Center.png)*
+
+**Flow:**
+1.  **Frontend Request**: When the user navigates to their Personal Center, the frontend sends a request to the AIW3 backend with the user's authenticated ID.
+2.  **Backend Verification**: The backend retrieves the user's wallet address and queries the Solana blockchain for all NFTs associated with that wallet that have the verified AIW3 creator address.
+3.  **Metadata Fetch**: For each valid NFT found, the backend fetches the off-chain JSON metadata from IPFS.
+4.  **API Response**: The backend aggregates this information (NFT level, image URI, benefits) and sends it back to the frontend.
+5.  **Render View**: The frontend uses this data to display the user's "Unlocked" NFTs and identifies the next "Unlockable" tier based on the user's current level.
+
+#### 2. NFT Synthesis (Upgrade) Flow
+
+"Synthesis" is the user-facing term for the NFT upgrade process, which involves burning an old NFT to mint a new one. The frontend guides the user through this, while the backend manages the complex blockchain interactions.
+
+*![Synthesis UI](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/4.%20Synthesis.png)*
+
+**Flow:**
+1.  **Eligibility Check**: The user clicks the "Synthesize" button. The frontend calls a dedicated backend endpoint to verify if the user meets the transaction volume and badge requirements for the next tier.
+2.  **User Confirmation**: If eligible, the frontend displays a confirmation popup. The user must approve the transaction in their connected wallet (e.g., Phantom or Solflare). This signature authorizes the burning of their current NFT.
+3.  **Backend Process**: The backend initiates the burn transaction, waits for blockchain confirmation, and then proceeds to mint the new, higher-level NFT to the user's wallet.
+4.  **Success Notification**: Once the new NFT is minted, the backend notifies the frontend, which displays a success message to the user.
+
+*![Synthesis Success UI](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/5.%20Lv2%20Synthesis%20Success.png)*
+
+#### 3. Pre-Synthesis Activation
+
+Before a user can initiate the synthesis process, they may need to complete an activation step. This is triggered by a popup that ensures the user is ready and has met preliminary requirements.
+
+*![Activation Popup](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/7.%20Trigger%20Activation%20Popup.png)*
+
+**Flow:**
+1.  The frontend detects that a user is eligible for an upgrade but has not completed a necessary preliminary action (e.g., confirming their wallet).
+2.  A modal popup is displayed, prompting the user to "Activate" their status.
+3.  This interaction is a client-side check that unlocks the "Synthesize" button, acting as a gate before the more resource-intensive backend eligibility check is called.
+
+#### 4. System Notifications and Messaging
+
+The system uses asynchronous messages to keep the user informed of important events, such as receiving a new badge or a successful synthesis.
+
+*![System Messages](..//aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/11.%20System%20Messages.png)*
+
+**Flow:**
+1.  The backend performs an action that requires user notification (e.g., an airdrop is completed).
+2.  A message is stored in a user-specific notification table in the database.
+3.  The frontend periodically polls a notifications endpoint and displays an indicator for unread messages.
+4.  The user can view the full message history in their inbox.
+
+#### 5. Public Profile View
+
+A user's NFTs and badges are visible to others on their Community Mini-Homepage, which serves as their public-facing profile.
+
+*![Other User's View](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/9.%20Other%20Users%20View%20Homepage.png)*
+
+**Flow:**
+1.  A user navigates to another user's profile page.
+2.  The frontend requests the public profile data for the target user from the backend.
+3.  The backend follows the same logic as the Personal Center (querying the blockchain for NFTs and badges) but only returns publicly visible information.
+4.  The frontend renders the public view, showcasing the user's collection.
+
+---
+
 ## Implementation Guide
 
 ### Recommended Approach: Metadata Attributes with IPFS Distribution
