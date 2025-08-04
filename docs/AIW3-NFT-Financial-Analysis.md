@@ -168,9 +168,9 @@ const storageCostUSD = {
 ```
 
 **Considerations:**
-- **One-time cost**: Permanent storage, no recurring fees
-- **Volume discounts**: Potential negotiations for large deployments
-- **Alternative**: IPFS with pinning services (~$5-15/GB annually)
+- **Recurring cost**: IPFS pinning service with monthly/annual fees
+- **Volume discounts**: Pinata offers tiered pricing for large deployments
+- **Cost efficiency**: Significantly lower than permanent storage solutions
 
 ### 4. Tier Distribution Impact
 
