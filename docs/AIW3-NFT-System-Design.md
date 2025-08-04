@@ -10,12 +10,13 @@
 3. [Technical Architecture](#technical-architecture)
 4. [System Key Management & Security](#system-key-management--security)
 5. [Distributed Data Consistency & Verification](#distributed-data-consistency--verification)
-6. [Implementation Guide](#implementation-guide)
-7. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
-8. [Detailed Process Flows](#detailed-process-flows)
-9. [Recommendations](#recommendations)
-10. [Implementation Requirements](#implementation-requirements)
-11. [Appendix](#appendix)
+6. [Network Failure & Retry Strategy](#network-failure--retry-strategy)
+7. [Implementation Guide](#implementation-guide)
+8. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
+9. [Detailed Process Flows](#detailed-process-flows)
+10. [Recommendations](#recommendations)
+11. [Implementation Requirements](#implementation-requirements)
+12. [Appendix](#appendix)
 
 ---
 
@@ -445,6 +446,215 @@ AIW3 NFT minting involves **three distinct data layers** that must remain consis
 
 ---
 
+## Network Failure & Retry Strategy
+
+### Network Failure Scenarios
+
+The AIW3 NFT system operates across multiple network dependencies that can fail independently:
+
+**Primary Network Dependencies**:
+1. **Solana RPC Endpoints** - Blockchain transaction submission and confirmation
+2. **IPFS via Pinata** - Metadata and image upload/retrieval
+3. **Internal Database** - User records and business logic
+4. **Partner Integration APIs** - Third-party verification systems
+
+### Failure Classification & Response Strategy
+
+| Failure Type | Detection Method | Retry Strategy | Escalation Threshold |
+|--------------|------------------|----------------|---------------------|
+| **Transient Network Error** | Connection timeout, 5xx errors | Exponential backoff | 3 attempts |
+| **Rate Limiting** | 429 HTTP status, RPC rate limits | Scheduled retry with delay | 5 attempts |
+| **Service Degradation** | Slow response times | Circuit breaker pattern | 30 seconds response time |
+| **Complete Service Outage** | Connection refused, DNS failure | Failover to backup endpoints | Immediate |
+
+### Solana Network Resilience
+
+**RPC Endpoint Strategy**
+```
+Primary RPC Endpoint (Dedicated Provider)
+├── Backup RPC Endpoint #1 (Alternative provider)
+├── Backup RPC Endpoint #2 (Public endpoint)
+└── Emergency Local Node (Last resort)
+```
+
+**Transaction Retry Logic**
+```
+1. Submit transaction to primary RPC
+   ↓
+2. Wait for confirmation (max 30 seconds)
+   ↓
+3. If timeout/failure → Switch to backup RPC
+   ↓
+4. Re-submit transaction with same blockhash
+   ↓
+5. If repeated failures → Exponential backoff (2s, 4s, 8s)
+   ↓
+6. After 3 total failures → Escalate to manual intervention
+```
+
+**Blockchain-Specific Retry Considerations**
+- **Blockhash Expiry**: Regenerate recent blockhash after 150 slots (~60 seconds)
+- **Transaction Duplication**: Check for existing successful transaction before retry
+- **Network Congestion**: Increase priority fees during high network usage
+- **Confirmation Levels**: Use 'confirmed' for speed, 'finalized' for critical operations
+
+### IPFS via Pinata Resilience
+
+**Upload Failure Handling**
+```
+1. Attempt upload to primary Pinata endpoint
+   ↓
+2. If failure → Retry with exponential backoff (1s, 2s, 4s)
+   ↓
+3. If persistent failure → Check Pinata service status
+   ↓
+4. If Pinata down → Failover to backup IPFS provider
+   ↓
+5. Update internal systems with new IPFS hash
+```
+
+**Retrieval Failure Handling**
+- **Gateway Redundancy**: Multiple IPFS gateways (Pinata, Cloudflare, public)
+- **CDN Integration**: Cache frequently accessed content
+- **Local Backup**: Store critical metadata copies in backend database
+- **Automatic Retry**: Progressive gateway fallback on retrieval failures
+
+### Database Connection Resilience
+
+**Connection Pool Management**
+- **Connection Pooling**: Maintain pool of database connections
+- **Health Monitoring**: Regular connection health checks
+- **Automatic Reconnection**: Transparent reconnection on connection loss
+- **Circuit Breaker**: Temporary suspension during database outages
+
+**Transaction Retry Strategy**
+```
+1. Attempt database operation
+   ↓
+2. If deadlock/timeout → Immediate retry (1 attempt)
+   ↓
+3. If connection error → Exponential backoff (0.5s, 1s, 2s)
+   ↓
+4. If persistent failure → Circuit breaker activation
+   ↓
+5. Queue operations for later processing
+```
+
+### Integrated Retry Orchestration
+
+**Minting Operation Retry Flow**
+```
+1. Pre-Mint Validation Phase
+   ├── IPFS connectivity check (retry: 3x)
+   ├── Database health check (retry: 2x)
+   └── Solana RPC availability (retry: 3x)
+   
+2. Data Upload Phase
+   ├── Image upload to IPFS (retry: 5x with failover)
+   ├── JSON metadata upload (retry: 5x with failover)
+   └── Database record creation (retry: 3x)
+   
+3. Blockchain Minting Phase
+   ├── Transaction submission (retry: 3x across endpoints)
+   ├── Confirmation waiting (timeout: 60s)
+   └── Metadata account verification (retry: 5x)
+   
+4. Post-Mint Verification Phase
+   ├── IPFS accessibility test (retry: 3x across gateways)
+   ├── Partner verification simulation (retry: 2x)
+   └── Database consistency check (retry: 2x)
+```
+
+### Exponential Backoff Implementation
+
+**Base Retry Strategy**
+```javascript
+const retryWithBackoff = async (operation, maxAttempts = 3, baseDelay = 1000) => {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (attempt === maxAttempts) throw error;
+      
+      const delay = baseDelay * Math.pow(2, attempt - 1);
+      const jitter = Math.random() * 0.1 * delay; // Add 10% jitter
+      await sleep(delay + jitter);
+    }
+  }
+};
+```
+
+**Service-Specific Backoff**
+- **Solana RPC**: 2s, 4s, 8s (due to blockchain confirmation times)
+- **IPFS via Pinata**: 1s, 2s, 4s (faster for storage operations)
+- **Database**: 0.5s, 1s, 2s (fastest for internal operations)
+
+### Circuit Breaker Pattern
+
+**Implementation Strategy**
+```
+Circuit States:
+├── CLOSED: Normal operation, monitor failure rate
+├── OPEN: Fail fast, bypass service calls
+└── HALF-OPEN: Test service recovery with limited requests
+```
+
+**Thresholds**
+- **Failure Rate**: 50% failures in 1-minute window
+- **Recovery Test**: Single request every 30 seconds in HALF-OPEN
+- **Success Threshold**: 3 consecutive successes to close circuit
+
+### Error Recovery & Compensation
+
+**Partial Success Scenarios**
+```
+Scenario 1: IPFS uploaded, blockchain failed
+├── Recovery: Retry blockchain with existing IPFS hash
+└── Compensation: Clean up unused IPFS content if mint ultimately fails
+
+Scenario 2: Blockchain succeeded, database failed
+├── Recovery: Retry database operation with idempotency
+└── Compensation: Database reconciliation based on blockchain state
+
+Scenario 3: All operations succeeded, verification failed
+├── Recovery: Re-run verification with different endpoints
+└── Compensation: Manual verification escalation if automated fails
+```
+
+### Monitoring & Alerting
+
+**Real-Time Network Health**
+- **Endpoint Response Times**: Track latency across all services
+- **Success/Failure Rates**: Monitor retry effectiveness
+- **Circuit Breaker Status**: Alert on service degradation
+- **Queue Depths**: Monitor pending retry operations
+
+**Alert Triggers**
+- 🟡 **Warning**: Single service degradation or elevated retry rates
+- 🔴 **Critical**: Multiple service failures or circuit breaker activation
+- 📊 **Info**: Successful failover or service recovery
+
+### Operational Guidelines
+
+**Retry Limits**
+- **Maximum Total Time**: 5 minutes for complete minting operation
+- **Individual Operation Timeout**: 60 seconds for any single network call
+- **Queue Retention**: Hold failed operations for 24 hours before permanent failure
+
+**Manual Intervention Triggers**
+- All automatic retry attempts exhausted
+- Circuit breaker open for > 10 minutes
+- Data consistency verification failures
+- Security-related network anomalies
+
+**Recovery Procedures**
+- **Service Status Dashboard**: Real-time view of all network dependencies
+- **Manual Override Capability**: Force retry or skip operations
+- **Incident Response Playbook**: Standard procedures for different failure scenarios
+- **Escalation Matrix**: Clear ownership for different types of network issues
+
+---
+
 ## Implementation Guide
 
 ### Recommended Approach: Metadata Attributes
@@ -566,6 +776,13 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 - Design compensating transactions for partial failure scenarios
 - Monitor data layer health continuously
 - Maintain detailed audit logs for reconciliation processes
+
+**Network Resilience & Retry Strategy**
+- Implement exponential backoff for all external network calls
+- Design circuit breaker patterns for service degradation scenarios
+- Maintain multiple RPC endpoints with automatic failover
+- Create comprehensive retry orchestration for minting operations
+- Monitor network health and implement automated alerting
 
 ### For Ecosystem Partners Integration
 
