@@ -1,5 +1,5 @@
 # AIW3 NFT Data Consistency
-## Multi-Layer Data Verification and Network Resilience Strategies
+## Multi-Layer Data Verification and Consistency Management
 
 ---
 
@@ -7,16 +7,15 @@
 
 1. [Overview](#overview)
 2. [Distributed Data Consistency & Verification](#distributed-data-consistency--verification)
-3. [Network Failure & Retry Strategy](#network-failure--retry-strategy)
-4. [Implementation Requirements](#implementation-requirements)
-5. [Monitoring & Operations](#monitoring--operations)
-6. [Recovery Procedures](#recovery-procedures)
+3. [Implementation Requirements](#implementation-requirements)
+4. [Monitoring & Operations](#monitoring--operations)
+5. [Recovery Procedures](#recovery-procedures)
 
 ---
 
 ## Overview
 
-This document provides detailed technical guidance for maintaining data consistency across the multi-layer AIW3 NFT system and implementing robust network resilience strategies for production deployment.
+This document provides detailed technical guidance for maintaining data consistency across the multi-layer AIW3 NFT system. It focuses on verification strategies, consistency checks, and reconciliation procedures to ensure data integrity across all system components.
 
 ### Data Layer Architecture
 
@@ -24,6 +23,8 @@ The AIW3 NFT system operates across three critical data layers that must maintai
 1. **Solana Blockchain** - On-chain metadata and authenticity
 2. **IPFS via Pinata** - Decentralized content storage
 3. **Backend Database** - Business logic and user records
+
+For network failure handling and retry strategies, see [AIW3 NFT Network Resilience](./AIW3-NFT-Network-Resilience.md).
 
 ---
 
@@ -73,39 +74,195 @@ AIW3 NFT minting involves **three distinct data layers** that must remain consis
 4. Confirm no orphaned database records
 ```
 
-### Failure Scenarios & Recovery
+### Data Consistency Failure Scenarios
 
-**Scenario 1: IPFS Upload Failure**
-- **Detection**: URI returns 404 or timeout
-- **Impact**: NFT minted but metadata inaccessible
+**Scenario 1: IPFS Upload Failure After Database Success**
+- **Detection**: Database shows success, but IPFS URI returns 404 or timeout
+- **Impact**: NFT record exists but metadata inaccessible to partners
 - **Recovery**: Re-upload to IPFS via Pinata, update URI reference if possible (requires `is_mutable: true` during minting phase)
+- **Prevention**: Verify IPFS accessibility before marking database record as complete
 
-**Scenario 2: Database Inconsistency**
-- **Detection**: Blockchain shows mint but database shows failure
-- **Impact**: Business logic errors, user status misalignment
-- **Recovery**: Database reconciliation based on blockchain state
+**Scenario 2: Database Inconsistency After Blockchain Success**
+- **Detection**: Blockchain shows mint transaction confirmed but database shows failure
+- **Impact**: Business logic errors, user status misalignment, duplicate minting attempts
+- **Recovery**: Database reconciliation based on blockchain state of truth
+- **Prevention**: Implement database transaction retry with blockchain state verification
 
 **Scenario 3: Partial Solana Confirmation**
-- **Detection**: Transaction appears successful but metadata account missing
-- **Impact**: Token exists but no metadata
-- **Recovery**: Complete transaction or re-mint
+- **Detection**: Transaction appears successful but metadata account missing or incomplete
+- **Impact**: Token exists but no metadata, partner verification fails
+- **Recovery**: Complete metadata account creation or initiate re-mint procedure
+- **Prevention**: Verify complete metadata account structure post-transaction
 
-### Implementation Requirements
+**Scenario 4: Cross-Layer State Divergence**
+- **Detection**: Different success/failure states across multiple layers
+- **Impact**: System-wide inconsistency, user confusion, operational complications
+- **Recovery**: Multi-layer reconciliation using blockchain as source of truth
+- **Prevention**: Atomic-style operations with comprehensive rollback procedures
+
+### Consistency Verification Implementation
 
 **Pre-Mint Validation**
-- Verify IPFS via Pinata connectivity and upload capacity
-- Confirm database transaction capability
-- Test Solana RPC endpoint responsiveness
+```javascript
+const validateSystemReadiness = async () => {
+  // Verify IPFS via Pinata connectivity and upload capacity
+  const ipfsHealth = await checkIPFSConnectivity();
+  if (!ipfsHealth.canUpload) throw new Error('IPFS upload unavailable');
+  
+  // Confirm database transaction capability
+  const dbHealth = await checkDatabaseHealth();
+  if (!dbHealth.canWrite) throw new Error('Database writes unavailable');
+  
+  // Test Solana RPC endpoint responsiveness
+  const solanaHealth = await checkSolanaRPCHealth();
+  if (!solanaHealth.responsive) throw new Error('Solana RPC unavailable');
+  
+  return { ipfs: ipfsHealth, database: dbHealth, solana: solanaHealth };
+};
+```
 
-**Atomic-Style Operations**
-- Implement compensating transactions for each layer
-- Maintain detailed operation logs for reconciliation
-- Set appropriate timeouts for each verification step
+**Atomic-Style Operations with Compensation**
+```javascript
+const mintWithConsistencyGuarantees = async (mintRequest) => {
+  const operations = [];
+  let currentState = 'INITIATED';
+  
+  try {
+    // Phase 1: Prepare Data
+    const imageUri = await uploadImageToIPFS(mintRequest.image);
+    operations.push({ type: 'IPFS_UPLOAD', resource: imageUri });
+    
+    const metadata = createMetadata(mintRequest, imageUri);
+    const metadataUri = await uploadMetadataToIPFS(metadata);
+    operations.push({ type: 'IPFS_UPLOAD', resource: metadataUri });
+    
+    currentState = 'IPFS_UPLOADED';
+    
+    // Phase 2: Database Preparation
+    const dbRecord = await createPendingMintRecord(mintRequest, metadataUri);
+    operations.push({ type: 'DATABASE_CREATE', resource: dbRecord.id });
+    
+    currentState = 'DATABASE_PREPARED';
+    
+    // Phase 3: Blockchain Minting
+    const transaction = await submitMintTransaction(mintRequest.userWallet, metadataUri);
+    operations.push({ type: 'BLOCKCHAIN_TRANSACTION', resource: transaction.signature });
+    
+    await waitForTransactionConfirmation(transaction.signature);
+    currentState = 'BLOCKCHAIN_CONFIRMED';
+    
+    // Phase 4: Verification
+    await verifyCompleteConsistency(mintRequest, metadataUri, transaction.signature);
+    currentState = 'VERIFIED';
+    
+    // Phase 5: Finalization
+    await markMintComplete(dbRecord.id);
+    currentState = 'COMPLETED';
+    
+    return {
+      success: true,
+      transactionSignature: transaction.signature,
+      metadataUri,
+      state: currentState
+    };
+    
+  } catch (error) {
+    console.error(`Mint failed at state ${currentState}:`, error);
+    await executeCompensatingTransactions(operations, currentState);
+    throw error;
+  }
+};
+```
 
-**Monitoring & Alerting**
-- Real-time consistency monitoring across all three layers
-- Automated alerts for verification failures
-- Dashboard showing data layer health status
+**Compensating Transaction Implementation**
+```javascript
+const executeCompensatingTransactions = async (operations, failureState) => {
+  console.log(`Executing rollback for failure at state: ${failureState}`);
+  
+  for (const operation of operations.reverse()) {
+    try {
+      switch (operation.type) {
+        case 'IPFS_UPLOAD':
+          await cleanupIPFSContent(operation.resource);
+          break;
+        case 'DATABASE_CREATE':
+          await deleteDatabaseRecord(operation.resource);
+          break;
+        case 'BLOCKCHAIN_TRANSACTION':
+          // Note: Blockchain transactions cannot be rolled back
+          // Must be handled through reconciliation procedures
+          await logBlockchainInconsistency(operation.resource);
+          break;
+      }
+    } catch (cleanupError) {
+      console.error(`Cleanup failed for ${operation.type}:`, cleanupError);
+      // Log for manual intervention
+    }
+  }
+};
+```
+
+### Data Layer Reconciliation
+
+**Blockchain-Database Reconciliation**
+```javascript
+const reconcileBlockchainDatabase = async () => {
+  // Query recent blockchain transactions
+  const recentTransactions = await getRecentMintTransactions();
+  
+  for (const tx of recentTransactions) {
+    const dbRecord = await findDatabaseRecordByTransaction(tx.signature);
+    
+    if (!dbRecord) {
+      // Blockchain success but no database record
+      await createDatabaseRecordFromBlockchain(tx);
+    } else if (dbRecord.status !== 'COMPLETED' && tx.confirmed) {
+      // Database shows failure but blockchain shows success
+      await updateDatabaseRecordFromBlockchain(dbRecord.id, tx);
+    }
+  }
+  
+  // Query database records without blockchain confirmation
+  const pendingRecords = await getPendingDatabaseRecords();
+  
+  for (const record of pendingRecords) {
+    if (record.transactionSignature) {
+      const txStatus = await getTransactionStatus(record.transactionSignature);
+      if (txStatus.confirmed) {
+        await markDatabaseRecordComplete(record.id);
+      } else if (txStatus.failed) {
+        await markDatabaseRecordFailed(record.id);
+      }
+    }
+  }
+};
+```
+
+**IPFS-Database Reconciliation**
+```javascript
+const reconcileIPFSDatabase = async () => {
+  const completedMints = await getCompletedMintRecords();
+  
+  for (const mint of completedMints) {
+    try {
+      // Verify IPFS content accessibility
+      const metadataResponse = await fetch(mint.metadataUri);
+      if (!metadataResponse.ok) {
+        await handleBrokenIPFSReference(mint);
+      }
+      
+      const metadata = await metadataResponse.json();
+      const imageResponse = await fetch(metadata.image);
+      if (!imageResponse.ok) {
+        await handleBrokenImageReference(mint, metadata);
+      }
+    } catch (error) {
+      console.error(`IPFS verification failed for mint ${mint.id}:`, error);
+      await scheduleIPFSRecovery(mint);
+    }
+  }
+};
+```
 
 ### Recommended Minting Flow with Consistency Checks
 
@@ -113,358 +270,289 @@ AIW3 NFT minting involves **three distinct data layers** that must remain consis
 1. Prepare Data Phase
    - Upload image to IPFS via Pinata → Get image URI
    - Create JSON metadata → Upload to IPFS via Pinata → Get metadata URI
-   - Verify both URIs accessible
+   - Verify both URIs accessible from multiple gateways
    
 2. Database Preparation
-   - Create pending mint record in database
+   - Create pending mint record with all IPFS references
    - Lock user account for minting process
+   - Set timeout for automatic cleanup if not completed
    
 3. Blockchain Minting
    - Execute mint transaction with metadata URI
-   - Wait for transaction confirmation
-   - Verify metadata account creation
+   - Wait for transaction confirmation with timeout
+   - Verify metadata account creation and content
    
 4. Consistency Verification
-   - Test complete partner verification flow
-   - Confirm all data layers accessible
-   - Update database record to "completed"
+   - Test complete partner verification flow end-to-end
+   - Confirm all data layers accessible from multiple endpoints
+   - Validate JSON parsing and level extraction
+   - Update database record to "completed" status
    
 5. Error Recovery (if needed)
-   - Rollback database changes
-   - Attempt IPFS re-upload if needed
-   - Re-mint if blockchain operation failed
+   - Execute appropriate compensating transactions
+   - Attempt automated recovery for transient failures
+   - Escalate to manual intervention for persistent issues
+   - Maintain detailed audit trail for debugging
 ```
 
 **Critical Success Factors**:
 - ✅ Never mark mint as "successful" until ALL layers verified
-- ✅ Implement automated reconciliation processes
-- ✅ Maintain audit trail for all verification steps
-- ✅ Design for eventual consistency with conflict resolution
-
----
-
-## Network Failure & Retry Strategy
-
-### Network Failure Scenarios
-
-The AIW3 NFT system operates across multiple network dependencies that can fail independently:
-
-**Primary Network Dependencies**:
-1. **Solana RPC Endpoints** - Blockchain transaction submission and confirmation
-2. **IPFS via Pinata** - Metadata and image upload/retrieval
-3. **Internal Database** - User records and business logic
-4. **Partner Integration APIs** - Third-party verification systems
-
-### Failure Classification & Response Strategy
-
-| Failure Type | Detection Method | Retry Strategy | Escalation Threshold |
-|--------------|------------------|----------------|---------------------|
-| **Transient Network Error** | Connection timeout, 5xx errors | Exponential backoff | 3 attempts |
-| **Rate Limiting** | 429 HTTP status, RPC rate limits | Scheduled retry with delay | 5 attempts |
-| **Service Degradation** | Slow response times | Circuit breaker pattern | 30 seconds response time |
-| **Complete Service Outage** | Connection refused, DNS failure | Failover to backup endpoints | Immediate |
-
-### Solana Network Resilience
-
-**RPC Endpoint Strategy**
-```
-Primary RPC Endpoint (Dedicated Provider)
-├── Backup RPC Endpoint #1 (Alternative provider)
-├── Backup RPC Endpoint #2 (Public endpoint)
-└── Emergency Local Node (Last resort)
-```
-
-**Transaction Retry Logic**
-```
-1. Submit transaction to primary RPC
-   ↓
-2. Wait for confirmation (max 30 seconds)
-   ↓
-3. If timeout/failure → Switch to backup RPC
-   ↓
-4. Re-submit transaction with same blockhash
-   ↓
-5. If repeated failures → Exponential backoff (2s, 4s, 8s)
-   ↓
-6. After 3 total failures → Escalate to manual intervention
-```
-
-**Blockchain-Specific Retry Considerations**
-- **Blockhash Expiry**: Regenerate recent blockhash after 150 slots (~60 seconds)
-- **Transaction Duplication**: Check for existing successful transaction before retry
-- **Network Congestion**: Increase priority fees during high network usage
-- **Confirmation Levels**: Use 'confirmed' for speed, 'finalized' for critical operations
-
-### IPFS via Pinata Resilience
-
-**Upload Failure Handling**
-```
-1. Attempt upload to primary Pinata endpoint
-   ↓
-2. If failure → Retry with exponential backoff (1s, 2s, 4s)
-   ↓
-3. If persistent failure → Check Pinata service status
-   ↓
-4. If Pinata down → Failover to backup IPFS provider
-   ↓
-5. Update internal systems with new IPFS hash
-```
-
-**Retrieval Failure Handling**
-- **Gateway Redundancy**: Multiple IPFS gateways (Pinata, Cloudflare, public)
-- **CDN Integration**: Cache frequently accessed content
-- **Local Backup**: Store critical metadata copies in backend database
-- **Automatic Retry**: Progressive gateway fallback on retrieval failures
-
-### Database Connection Resilience
-
-**Connection Pool Management**
-- **Connection Pooling**: Maintain pool of database connections
-- **Health Monitoring**: Regular connection health checks
-- **Automatic Reconnection**: Transparent reconnection on connection loss
-- **Circuit Breaker**: Temporary suspension during database outages
-
-**Transaction Retry Strategy**
-```
-1. Attempt database operation
-   ↓
-2. If deadlock/timeout → Immediate retry (1 attempt)
-   ↓
-3. If connection error → Exponential backoff (0.5s, 1s, 2s)
-   ↓
-4. If persistent failure → Circuit breaker activation
-   ↓
-5. Queue operations for later processing
-```
-
-### Integrated Retry Orchestration
-
-**Minting Operation Retry Flow**
-```
-1. Pre-Mint Validation Phase
-   ├── IPFS connectivity check (retry: 3x)
-   ├── Database health check (retry: 2x)
-   └── Solana RPC availability (retry: 3x)
-   
-2. Data Upload Phase
-   ├── Image upload to IPFS (retry: 5x with failover)
-   ├── JSON metadata upload (retry: 5x with failover)
-   └── Database record creation (retry: 3x)
-   
-3. Blockchain Minting Phase
-   ├── Transaction submission (retry: 3x across endpoints)
-   ├── Confirmation waiting (timeout: 60s)
-   └── Metadata account verification (retry: 5x)
-   
-4. Post-Mint Verification Phase
-   ├── IPFS accessibility test (retry: 3x across gateways)
-   ├── Partner verification simulation (retry: 2x)
-   └── Database consistency check (retry: 2x)
-```
-
-### Exponential Backoff Implementation
-
-**Base Retry Strategy**
-```javascript
-const retryWithBackoff = async (operation, maxAttempts = 3, baseDelay = 1000) => {
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      return await operation();
-    } catch (error) {
-      if (attempt === maxAttempts) throw error;
-      
-      const delay = baseDelay * Math.pow(2, attempt - 1);
-      const jitter = Math.random() * 0.1 * delay; // Add 10% jitter
-      await sleep(delay + jitter);
-    }
-  }
-};
-```
-
-**Service-Specific Backoff**
-- **Solana RPC**: 2s, 4s, 8s (due to blockchain confirmation times)
-- **IPFS via Pinata**: 1s, 2s, 4s (faster for storage operations)
-- **Database**: 0.5s, 1s, 2s (fastest for internal operations)
-
-### Circuit Breaker Pattern
-
-**Implementation Strategy**
-```
-Circuit States:
-├── CLOSED: Normal operation, monitor failure rate
-├── OPEN: Fail fast, bypass service calls
-└── HALF-OPEN: Test service recovery with limited requests
-```
-
-**Thresholds**
-- **Failure Rate**: 50% failures in 1-minute window
-- **Recovery Test**: Single request every 30 seconds in HALF-OPEN
-- **Success Threshold**: 3 consecutive successes to close circuit
-
-### Error Recovery & Compensation
-
-**Partial Success Scenarios**
-```
-Scenario 1: IPFS uploaded, blockchain failed
-├── Recovery: Retry blockchain with existing IPFS hash
-└── Compensation: Clean up unused IPFS content if mint ultimately fails
-
-Scenario 2: Blockchain succeeded, database failed
-├── Recovery: Retry database operation with idempotency
-└── Compensation: Database reconciliation based on blockchain state
-
-Scenario 3: All operations succeeded, verification failed
-├── Recovery: Re-run verification with different endpoints
-└── Compensation: Manual verification escalation if automated fails
-```
+- ✅ Implement automated reconciliation processes with regular execution
+- ✅ Maintain comprehensive audit trail for all verification steps
+- ✅ Design for eventual consistency with conflict resolution procedures
+- ✅ Provide manual override capabilities for emergency situations
 
 ---
 
 ## Implementation Requirements
 
-### Pre-Deployment Checklist
+### Consistency Monitoring Infrastructure
 
-**Network Infrastructure**
-- [ ] Multiple RPC endpoints configured and tested
-- [ ] IPFS via Pinata account with sufficient storage quota
-- [ ] Database connection pool properly sized
-- [ ] Backup systems operational and verified
+**Real-Time Consistency Checking**
+```javascript
+const monitorDataConsistency = async () => {
+  const checks = [
+    checkBlockchainDatabaseConsistency(),
+    checkIPFSDatabaseConsistency(),
+    checkCrossLayerReferences(),
+    validatePartnerVerificationFlow()
+  ];
+  
+  const results = await Promise.allSettled(checks);
+  
+  for (const [index, result] of results.entries()) {
+    if (result.status === 'rejected') {
+      await alertConsistencyFailure(checks[index].name, result.reason);
+    }
+  }
+};
+```
 
-**Retry Logic Implementation**
-- [ ] Exponential backoff implemented for all external calls
-- [ ] Circuit breaker pattern deployed for critical services
-- [ ] Timeout values appropriately configured
-- [ ] Jitter added to prevent thundering herd
+**Automated Reconciliation Scheduling**
+- **Immediate**: After each minting operation
+- **Frequent**: Every 5 minutes for recent operations
+- **Regular**: Hourly for comprehensive system-wide checks
+- **Deep**: Daily for historical data validation
 
-**Monitoring Infrastructure**
-- [ ] Real-time network health dashboards
-- [ ] Automated alerting for failure scenarios
-- [ ] Comprehensive logging for debugging
-- [ ] Performance metrics collection
+### Database Schema Requirements
+
+**Consistency Tracking Tables**
+```sql
+CREATE TABLE minting_operations (
+  id UUID PRIMARY KEY,
+  user_wallet_address VARCHAR(44) NOT NULL,
+  status ENUM('PENDING', 'IPFS_UPLOADED', 'BLOCKCHAIN_SUBMITTED', 
+              'BLOCKCHAIN_CONFIRMED', 'VERIFIED', 'COMPLETED', 'FAILED') NOT NULL,
+  transaction_signature VARCHAR(88),
+  metadata_uri TEXT,
+  image_uri TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  verified_at TIMESTAMP,
+  failure_reason TEXT,
+  retry_count INT DEFAULT 0
+);
+
+CREATE TABLE consistency_checks (
+  id UUID PRIMARY KEY,
+  operation_id UUID REFERENCES minting_operations(id),
+  check_type ENUM('BLOCKCHAIN', 'IPFS', 'PARTNER_VERIFICATION') NOT NULL,
+  status ENUM('PASSED', 'FAILED', 'PENDING') NOT NULL,
+  details JSON,
+  checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 ### Configuration Management
 
-**Environment Variables**
-- **RPC Endpoints**: Primary and backup URLs with priority ordering
-- **Retry Limits**: Maximum attempts per operation type
-- **Timeout Values**: Service-specific timeout configurations
-- **Circuit Breaker Thresholds**: Failure rates and recovery criteria
-
-**Runtime Configuration**
-- **Dynamic Endpoint Switching**: Ability to change endpoints without restart
-- **Rate Limit Adjustment**: Configurable backoff delays
-- **Emergency Overrides**: Manual circuit breaker control
-- **Maintenance Mode**: Graceful degradation during planned outages
+**Consistency Check Configuration**
+```javascript
+const consistencyConfig = {
+  verification: {
+    immediateCheckTimeout: 30000,     // 30 seconds
+    delayedCheckTimeout: 600000,      // 10 minutes
+    maxRetryAttempts: 3,
+    retryDelayMs: 5000
+  },
+  reconciliation: {
+    frequentInterval: 300000,         // 5 minutes
+    regularInterval: 3600000,         // 1 hour
+    deepCheckInterval: 86400000       // 24 hours
+  },
+  alerting: {
+    consistencyFailureThreshold: 3,   // failures before alert
+    reconciliationFailureThreshold: 1 // immediate alert
+  }
+};
+```
 
 ---
 
 ## Monitoring & Operations
 
-### Real-Time Network Health
+### Data Consistency Metrics
 
-**Endpoint Response Times**
-- Track latency across all services
-- Identify performance degradation trends
-- Alert on unusual response time patterns
-- Maintain historical performance baselines
+**Layer-Specific Metrics**
+```javascript
+const consistencyMetrics = {
+  blockchain: {
+    successfulTransactions: countSuccessfulTransactions(),
+    metadataAccountCreations: countMetadataAccounts(),
+    transactionFailures: countTransactionFailures()
+  },
+  ipfs: {
+    successfulUploads: countSuccessfulUploads(),
+    accessibleContent: countAccessibleContent(),
+    brokenReferences: countBrokenReferences()
+  },
+  database: {
+    completedRecords: countCompletedRecords(),
+    pendingRecords: countPendingRecords(),
+    inconsistentRecords: countInconsistentRecords()
+  },
+  crossLayer: {
+    consistentOperations: countConsistentOperations(),
+    inconsistentOperations: countInconsistentOperations(),
+    reconciliationEvents: countReconciliationEvents()
+  }
+};
+```
 
-**Success/Failure Rates**
-- Monitor retry effectiveness
-- Track circuit breaker activations
-- Analyze failure patterns by service
-- Generate automated health reports
-
-**Queue Depths**
-- Monitor pending retry operations
-- Alert on queue overflow conditions
-- Track processing lag during outages
-- Optimize queue sizing based on patterns
-
-### Alert Triggers
+### Alert Triggers for Data Consistency
 
 **Warning Level (🟡)**
-- Single service degradation or elevated retry rates
-- Response times exceeding baseline by 2x
-- Circuit breaker entering HALF-OPEN state
-- Queue depth exceeding 50% capacity
+- Single layer showing elevated failure rates
+- IPFS content becoming inaccessible
+- Database records in pending state for extended periods
+- Partner verification failures for existing NFTs
 
 **Critical Level (🔴)**
-- Multiple service failures or circuit breaker activation
-- Complete service outage detection
-- Data consistency verification failures
-- Queue overflow or system resource exhaustion
+- Cross-layer consistency failures detected
+- Automated reconciliation procedures failing
+- Large number of orphaned records in any layer
+- Complete breakdown of verification pipeline
 
 **Informational Level (📊)**
-- Successful failover operations
-- Service recovery notifications
-- Routine maintenance completions
-- Performance optimization recommendations
+- Successful reconciliation operations
+- Consistency check completions
+- Performance metrics for verification procedures
+- System health and capacity utilization
 
 ### Dashboard Requirements
 
-**Network Health Overview**
-- Real-time status of all external dependencies
-- Circuit breaker states and failure rates
-- Queue depths and processing statistics
-- Historical performance trends
+**Data Consistency Overview**
+- Real-time status of all three data layers
+- Consistency verification pipeline health
+- Recent reconciliation events and outcomes
+- Historical consistency trends and patterns
 
 **Operation Tracking**
-- Active minting operations with status
-- Retry attempts and success rates
-- Failed operations requiring intervention
-- Data consistency verification results
+- Individual minting operations with current state
+- Verification status across all layers
+- Failed operations requiring manual intervention
+- Performance metrics for consistency checks
+
+**Reconciliation Monitoring**
+- Automated reconciliation job status
+- Identified inconsistencies and resolution progress
+- Manual intervention queue and priorities
+- System capacity and performance trends
 
 ---
 
 ## Recovery Procedures
 
-### Manual Intervention Guidelines
+### Automated Recovery
 
-**Retry Limits Exceeded**
-- Review error logs for root cause analysis
-- Verify external service status and availability
-- Consider manual retry with different parameters
-- Escalate to vendor support if service-specific
+**Transient Failure Recovery**
+```javascript
+const handleTransientFailure = async (operation, layer, error) => {
+  if (operation.retryCount < maxRetries) {
+    await exponentialBackoff(operation.retryCount);
+    operation.retryCount++;
+    return await retryOperation(operation, layer);
+  } else {
+    await escalateToManualIntervention(operation, layer, error);
+  }
+};
+```
 
-**Data Consistency Failures**
-- Execute automated reconciliation procedures
-- Compare blockchain state with database records
-- Identify and resolve data layer mismatches
-- Update monitoring to prevent future occurrences
+**Data Inconsistency Recovery**
+```javascript
+const recoverDataInconsistency = async (inconsistency) => {
+  switch (inconsistency.type) {
+    case 'BLOCKCHAIN_SUCCESS_DATABASE_FAILURE':
+      await reconcileDatabaseFromBlockchain(inconsistency.operation);
+      break;
+    case 'DATABASE_SUCCESS_IPFS_FAILURE':
+      await reuploadIPFSContent(inconsistency.operation);
+      break;
+    case 'PARTIAL_VERIFICATION_FAILURE':
+      await retryVerificationPipeline(inconsistency.operation);
+      break;
+    default:
+      await escalateToManualReview(inconsistency);
+  }
+};
+```
 
-### Emergency Response
+### Manual Intervention Procedures
 
-**Service Status Dashboard**
-- Real-time view of all network dependencies
-- Manual override capabilities for critical operations
-- Emergency contact information for vendors
-- Incident response playbook access
+**Data Inconsistency Resolution**
+1. **Assessment**: Identify scope and impact of inconsistency
+2. **Root Cause Analysis**: Determine underlying cause of failure
+3. **Recovery Planning**: Choose appropriate recovery strategy
+4. **Execution**: Implement recovery with monitoring
+5. **Verification**: Confirm complete consistency restoration
+6. **Documentation**: Record incident and prevention measures
 
-**Manual Override Procedures**
-- Force retry with enhanced monitoring
-- Skip non-critical verification steps
-- Activate emergency failover systems
-- Temporary system configuration changes
+**Emergency Consistency Procedures**
+- **Blockchain State Query**: Verify current on-chain state
+- **IPFS Content Verification**: Test accessibility across gateways
+- **Database Reconciliation**: Update records based on blockchain truth
+- **Partner Notification**: Inform ecosystem of temporary inconsistencies
 
-**Escalation Matrix**
-- **Level 1**: Automated systems and on-call engineer
-- **Level 2**: Network operations team and vendor support
-- **Level 3**: Management escalation and emergency procedures
-- **Level 4**: Business continuity and disaster recovery activation
+### Recovery Tools and Utilities
 
-### Post-Incident Analysis
+**Consistency Verification Tools**
+```javascript
+const verifyOperationConsistency = async (operationId) => {
+  const operation = await getOperationById(operationId);
+  
+  const checks = {
+    blockchain: await verifyBlockchainState(operation),
+    ipfs: await verifyIPFSContent(operation),
+    database: await verifyDatabaseRecord(operation),
+    partnerFlow: await testPartnerVerification(operation)
+  };
+  
+  return {
+    consistent: Object.values(checks).every(check => check.passed),
+    details: checks,
+    recommendedActions: generateRecoveryRecommendations(checks)
+  };
+};
+```
 
-**Incident Documentation**
-- Complete timeline of events and responses
-- Root cause analysis and contributing factors
-- Impact assessment on system and users
-- Lessons learned and improvement recommendations
-
-**System Improvements**
-- Update retry logic based on incident findings
-- Enhance monitoring and alerting capabilities
-- Optimize circuit breaker thresholds
-- Implement additional redundancy where needed
+**Reconciliation Utilities**
+```javascript
+const reconcileOperation = async (operationId) => {
+  const verification = await verifyOperationConsistency(operationId);
+  
+  if (!verification.consistent) {
+    for (const action of verification.recommendedActions) {
+      try {
+        await executeReconciliationAction(action);
+      } catch (error) {
+        console.error(`Reconciliation action failed: ${action.type}`, error);
+        await scheduleManualReview(operationId, action, error);
+      }
+    }
+  }
+  
+  return await verifyOperationConsistency(operationId);
+};
+```
 
 ---
 
