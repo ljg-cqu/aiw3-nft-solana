@@ -51,15 +51,18 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 ### Lifecycle Characteristics
 
 **Phase 1: Minting (System-Controlled)**
+- Images sourced from AIW3 backend `assets/images` directory
+- Images uploaded to IPFS via Pinata for decentralized access
+- JSON metadata created with IPFS image URIs and level data
+- JSON metadata uploaded to IPFS via Pinata
 - AIW3 System Wallet mints NFT to user's Associated Token Account (ATA)
 - User becomes owner upon transaction confirmation without additional transfer
-- Metadata URI points to off-chain JSON containing level data
-- Creator verification data embedded in on-chain metadata
+- Metadata URI points to IPFS-hosted JSON containing level data and image references
 
 **Phase 2: Usage (Partner-Initiated)**
 - Partners verify authenticity via on-chain creator field
-- Level queried from off-chain JSON metadata attributes
-- Images retrieved via IPFS via Pinata gateway
+- Level queried from IPFS-hosted JSON metadata attributes
+- Images retrieved directly from IPFS via Pinata gateway
 
 **Phase 3: Burning (User-Controlled)**
 - User initiates burn transaction
@@ -71,7 +74,23 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 ## Technical Architecture
 
-The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a URI reference to off-chain JSON metadata that stores the actual level data.
+The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a URI reference to off-chain JSON metadata that stores the actual level data and references to IPFS-hosted images.
+
+### Image and Metadata Flow
+
+```
+AIW3 Backend assets/images Directory
+         ↓ (Source Images)
+    Upload to IPFS via Pinata
+         ↓ (Get IPFS Hash)
+    Create JSON Metadata with IPFS Image URI
+         ↓
+    Upload JSON to IPFS via Pinata
+         ↓ (Get Metadata IPFS Hash)
+    Store Metadata URI in On-Chain NFT Metadata
+         ↓
+    Third-Party Access via IPFS Gateways
+```
 
 **Note**: The NFT is minted to the user's Associated Token Account (ATA), which is deterministically derived from the user's wallet address and the NFT mint address. Ownership is established when the minting transaction is confirmed on-chain.
 
@@ -91,14 +110,14 @@ Data stored directly on **Solana blockchain** for trust and authenticity verific
 
 ### Off-Chain JSON Metadata Details
 
-The `uri` field in the on-chain metadata contains an IPFS via Pinata link to this JSON file where the **actual Level data is stored**:
+The `uri` field in the on-chain metadata contains an IPFS via Pinata link to this JSON file where the **actual Level data is stored** and **images are referenced via IPFS**:
 
 ```json
 {
   "name": "AIW3 Equity NFT #1234",
   "symbol": "AIW3E",
   "description": "Represents user's equity and status within AIW3 ecosystem",
-  "image": "https://gateway.pinata.cloud/ipfs/IPFS_IMAGE_HASH",
+  "image": "https://gateway.pinata.cloud/ipfs/QmImageHashExample123",
   "external_url": "https://aiw3.io",
   "attributes": [
     {
@@ -115,7 +134,7 @@ The `uri` field in the on-chain metadata contains an IPFS via Pinata link to thi
   "properties": {
     "files": [
       {
-        "uri": "https://gateway.pinata.cloud/ipfs/IPFS_IMAGE_HASH",
+        "uri": "https://gateway.pinata.cloud/ipfs/QmImageHashExample123",
         "type": "image/png"
       }
     ],
@@ -140,12 +159,30 @@ erDiagram
     AIW3SystemWallet ||--o{ MintAccount : "creates"
     AIW3SystemWallet ||--o{ TokenAccount : "pays for creation"
     AIW3SystemWallet ||--o{ MetadataPDA : "creates"
+    AIW3Backend ||--o{ SourceImages : "stores"
+    SourceImages ||--o{ IPFSImages : "uploaded to"
     UserWallet ||--o{ TokenAccount : "owns"
     TokenAccount ||--|| MintAccount : "is for"
     MintAccount ||--|| MetadataPDA : "is described by"
     MetadataPDA ||--|| JSONMetadata : "points to"
-    JSONMetadata }o--|| IPFSStorage : "references images in"
+    JSONMetadata }o--|| IPFSImages : "references"
+    JSONMetadata }o--|| IPFSStorage : "stored in"
 
+    AIW3Backend {
+        string assetsDirectory "assets/images"
+        string purpose "Source repository for images"
+    }
+    
+    SourceImages {
+        string filePath "Local file system path"
+        string purpose "Original image files"
+    }
+    
+    IPFSImages {
+        string ipfsHash "Content-addressable hash"
+        string gatewayUrl "Public access URL"
+    }
+    
     UserWallet {
         string publicKey "User's public key"
         string purpose "Proves NFT ownership"
@@ -169,6 +206,16 @@ erDiagram
         string uri "IPFS URI for JSON"
         boolean isMutable "false"
     }
+    
+    JSONMetadata {
+        string imageUri "IPFS URI for image"
+        string levelData "Level and tier information"
+    }
+    
+    IPFSStorage {
+        string network "Decentralized storage"
+        string access "Public gateway access"
+    }
 ```
 
 ### Partner Verification Flow
@@ -184,9 +231,9 @@ flowchart TD
     F --> |Invalid| H["❌ Reject: Not authentic AIW3 NFT"]
     G --> I["Fetch: JSON metadata from IPFS via Pinata"]
     I --> J["Extract: Level from attributes"]
-    I --> K["Extract: Image URI from JSON"]
+    I --> K["Extract: Image URI from JSON (IPFS)"]
     J --> L["✅ Display: User's NFT level"]
-    K --> M["✅ Display: NFT image"]
+    K --> M["✅ Display: NFT image from IPFS"]
 
     style A fill:#e1f5fe
     style L fill:#c8e6c9
@@ -200,23 +247,29 @@ flowchart TD
 flowchart TD
     subgraph "AIW3 System Actions"
         A["Initiate Mint for User"]
-        B["Create Mint Account"]
-        C["Create User's ATA"]
-        D["Mint Token to User's ATA"]
-        E["Create Metaplex Metadata PDA"]
-        F["Revoke Authorities (Optional)"]
+        B["Read Image from assets/images"]
+        C["Upload Image to IPFS via Pinata"]
+        D["Create JSON Metadata with IPFS Image URI"]
+        E["Upload JSON to IPFS via Pinata"]
+        F["Create Mint Account"]
+        G["Create User's ATA"]
+        H["Mint Token to User's ATA"]
+        I["Create Metaplex Metadata PDA with IPFS JSON URI"]
+        J["Revoke Authorities (Optional)"]
     end
 
     subgraph "User Interaction"
-        G["Provides Public Key"]
-        H["NFT appears in wallet"]
+        K["Provides Public Key"]
+        L["NFT appears in wallet"]
     end
 
-    G --> A --> B --> C --> D --> E --> F --> H
+    K --> A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> L
 
     style A fill:#fff3e0
-    style G fill:#e3f2fd
-    style H fill:#c8e6c9
+    style K fill:#e3f2fd
+    style L fill:#c8e6c9
+    style C fill:#e8f5e8
+    style E fill:#e8f5e8
 ```
 
 ### System Architecture for Operations
@@ -230,7 +283,14 @@ graph TD
 
     subgraph "AIW3 Services"
         Frontend -->|HTTPS REST API| Backend[🖥️ AIW3 Backend]
+        Backend -->|Read Images| Assets[📁 assets/images]
+        Backend -->|Upload Content| PinataService[📌 Pinata IPFS Service]
         Backend -->|Database Queries| DB[(📦 Database)]
+    end
+
+    subgraph "Decentralized Storage"
+        PinataService -->|Store Content| IPFS[🌐 IPFS Network]
+        IPFS -->|Gateway Access| IPFSGateway[🌍 IPFS Gateways]
     end
 
     subgraph "Solana Network"
@@ -239,10 +299,19 @@ graph TD
         SolanaNode -->|Gossip Protocol| SolanaCluster[🌍 Solana Blockchain]
     end
 
+    subgraph "Third-Party Access"
+        Partners[🤝 Ecosystem Partners] -->|Query NFTs| SolanaCluster
+        Partners -->|Access Images/Metadata| IPFSGateway
+    end
+
     style User fill:#f9f,stroke:#333,stroke-width:2px
     style Frontend fill:#ccf,stroke:#333,stroke-width:2px
     style Backend fill:#cfc,stroke:#333,stroke-width:2px
+    style Assets fill:#ffa,stroke:#333,stroke-width:2px
+    style PinataService fill:#aff,stroke:#333,stroke-width:2px
+    style IPFS fill:#faf,stroke:#333,stroke-width:2px
     style SolanaNode fill:#f96,stroke:#333,stroke-width:2px
+    style Partners fill:#afa,stroke:#333,stroke-width:2px
 ```
 
 ### Data Model Relationships
@@ -259,6 +328,8 @@ erDiagram
         string nftId
         string mintAddress
         string ownerWalletAddress
+        string ipfsImageHash
+        string ipfsMetadataHash
         string status
     }
 
@@ -280,9 +351,9 @@ erDiagram
 
 ## Implementation Guide
 
-### Recommended Approach: Metadata Attributes
+### Recommended Approach: Metadata Attributes with IPFS Distribution
 
-Use Metaplex standard where on-chain metadata contains URI pointing to off-chain JSON with level data, while on-chain metadata provides authenticity verification.
+Use Metaplex standard where on-chain metadata contains URI pointing to IPFS-hosted JSON with level data, while images are sourced from backend `assets/images` directory and distributed via IPFS for decentralized partner access.
 
 **Advantages**:
 - ✅ Decentralized access via standard metadata queries
@@ -290,11 +361,45 @@ Use Metaplex standard where on-chain metadata contains URI pointing to off-chain
 - ✅ Full ecosystem compatibility
 - ✅ Cost-effective hybrid approach
 - ✅ Leverages proven Metaplex standard
+- ✅ Centralized source management with decentralized distribution
 
 **Technical Details**:
-- **Storage**: IPFS via Pinata for decentralized, content-addressed storage
+- **Source Storage**: Backend `assets/images` directory for image management
+- **Distribution**: IPFS via Pinata for decentralized, content-addressed storage
 - **Authenticity**: On-chain creator verification via AIW3 System Wallet address
 - **Compatibility**: Standard NFT tools and marketplace support
+
+### Minting Process Implementation
+
+**Step-by-Step Minting Flow**:
+
+1. **Image Preparation**
+   - Read source image from `assets/images/{level}.png`
+   - Validate image format and size
+   - Upload image to IPFS via Pinata
+   - Obtain IPFS hash for image
+
+2. **Metadata Creation**
+   - Create JSON metadata structure
+   - Include IPFS image URI in `image` field
+   - Add level data to `attributes` array
+   - Include creator information
+
+3. **Metadata Upload**
+   - Upload JSON metadata to IPFS via Pinata
+   - Obtain IPFS hash for metadata
+   - Verify metadata accessibility via gateway
+
+4. **NFT Minting**
+   - Create Solana mint account
+   - Create user's Associated Token Account
+   - Mint single token to user's ATA
+   - Create Metaplex metadata account with IPFS JSON URI
+
+5. **Verification**
+   - Confirm on-chain metadata creation
+   - Verify IPFS content accessibility
+   - Test partner verification flow
 
 ---
 
@@ -333,30 +438,59 @@ The recommended approach is **User-Controlled Burning**. The user executes `burn
    ↓
 6. Get Rich Data: Read uri field from on-chain metadata
    ↓
-7. Fetch Off-Chain JSON from uri (IPFS via Pinata)
+7. Fetch Off-Chain JSON from IPFS URI (via Pinata gateway)
    ↓
 8. Extract Level Data: Parse attributes array in off-chain JSON for "Level" trait
    ↓
-9. Retrieve Image: Get image URI from JSON metadata
+9. Retrieve Image: Get image URI from JSON metadata (IPFS URI)
+   ↓
+10. Display Image: Access image directly from IPFS via gateway
+```
+
+### Image Distribution Flow
+
+**From Source to Third-Party Access**:
+
+```
+Backend assets/images Directory
+         ↓
+    [AIW3 Minting Process]
+         ↓
+    Upload to IPFS via Pinata
+         ↓
+    IPFS Content Hash Generated
+         ↓
+    Include in JSON Metadata
+         ↓
+    [Partner Verification Process]
+         ↓
+    Query JSON from IPFS
+         ↓
+    Extract Image IPFS URI
+         ↓
+    Access Image from IPFS Gateway
 ```
 
 ---
 
 ## Recommendations
 
-### Primary Solution: Hybrid Strategy
+### Primary Solution: Hybrid Strategy with IPFS Distribution
 
-**Recommended Approach**: Creator Address Verification + Metadata Attributes
+**Recommended Approach**: Creator Address Verification + Metadata Attributes + IPFS Content Distribution
 
-This approach prioritizes **simplicity, cost-effectiveness, and standards compliance** while maintaining full decentralization.
+This approach prioritizes **simplicity, cost-effectiveness, and standards compliance** while maintaining full decentralization for third-party access.
 
 **Implementation Strategy**:
 
-1. **Metadata Attributes + Creator Verification**: Use existing Solana/Metaplex standards
-2. **IPFS via Pinata Storage**: Decentralized storage for images and JSON metadata
-3. **Standards Compliance**: Follow Metaplex Token Metadata for ecosystem compatibility
+1. **Source Management**: Maintain images in backend `assets/images` directory
+2. **IPFS Distribution**: Upload images and metadata to IPFS via Pinata for decentralized access
+3. **Metadata Attributes + Creator Verification**: Use existing Solana/Metaplex standards
+4. **Standards Compliance**: Follow Metaplex Token Metadata for ecosystem compatibility
 
 **Advantages**:
+- ✅ **Centralized Source Control**: Easy image management and updates
+- ✅ **Decentralized Distribution**: IPFS ensures partner accessibility
 - ✅ **Minimal Development Complexity**: Leverages existing standards
 - ✅ **Maximum Ecosystem Compatibility**: Works with all NFT tools
 - ✅ **Cost Effective**: Hybrid on-chain/off-chain approach
@@ -369,6 +503,18 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 ### For AIW3 System Implementation
 
+**Source Image Management**
+- Organize images in `assets/images` directory by level/tier
+- Implement image validation and optimization
+- Maintain consistent naming conventions
+- Version control for image updates
+
+**IPFS Integration**
+- Configure Pinata account with sufficient storage quota
+- Implement image upload pipeline to IPFS
+- Verify content accessibility across multiple gateways
+- Monitor IPFS content persistence and availability
+
 **System Wallet Management**
 - Maintain consistent public key for creator verification
 - Secure private key storage and access controls
@@ -377,10 +523,12 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 - Follow Metaplex Token Metadata standard
 - Structure off-chain JSON with required fields
 - Include level as trait: `{"trait_type": "Level", "value": "Gold"}`
+- Reference IPFS URIs for all images
 
 **Storage Implementation**
 - Upload images and JSON metadata to IPFS via Pinata
 - Store metadata URI in on-chain `data.uri` field
+- Ensure content-addressed storage for immutability
 
 **Minting Process**
 - Set `is_mutable: false` after minting for permanence
@@ -404,7 +552,8 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 **Image Display**
 - Extract `image` field URI from JSON metadata
-- Display image directly from IPFS via Pinata decentralized storage
+- Access image directly from IPFS URI (not from AIW3 backend)
+- Implement fallback gateways for reliability
 
 ### Operational Requirements
 
