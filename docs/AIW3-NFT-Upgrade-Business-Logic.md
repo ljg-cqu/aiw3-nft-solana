@@ -159,11 +159,11 @@ async function verifyTransactionVolumeRequirement(
     
     // Define volume thresholds for each NFT level
     const volumeThresholds = {
-        "Bronze": 10000,    // $10,000 USD equivalent
-        "Silver": 50000,    // $50,000 USD equivalent  
-        "Gold": 150000,     // $150,000 USD equivalent
-        "Platinum": 500000, // $500,000 USD equivalent
-        "Diamond": 1000000  // $1,000,000 USD equivalent
+        "Level 1": 100000,    // 100,000 USDT
+        "Level 2": 500000,    // 500,000 USDT
+        "Level 3": 5000000,   // 5,000,000 USDT
+        "Level 4": 10000000,  // 10,000,000 USDT
+        "Level 5": 50000000   // 50,000,000 USDT
     };
     
     // Query AIW3 platform transaction history
@@ -220,31 +220,42 @@ async function verifyNFTBurnCompletion(oldNftMintAddress: PublicKey): Promise<bo
 
 ```typescript
 // Example tiered volume requirements for AIW3 NFT levels
-const VOLUME_THRESHOLDS = {
-    "Bronze": {
-        minVolume: 10000,      // $10K USD equivalent
-        description: "Entry-level equity participation",
-        benefits: ["Basic trading fee discounts", "Community access"]
+const NFT_LEVELS = {
+    "Level 1": {
+        name: "Tech Chicken",
+        minVolume: 100000, // 100,000 USDT
+        upgradeConditions: "Total transaction volume ≥ 100,000 USDT",
+        benefits: ["10% reduction in handling fees", "10 free uses of Aiagent per week"]
     },
-    "Silver": {
-        minVolume: 50000,      // $50K USD equivalent  
-        description: "Enhanced equity benefits",
-        benefits: ["Higher fee discounts", "Priority support", "Exclusive events"]
+    "Level 2": {
+        name: "Quant Ape",
+        minVolume: 500000, // 500,000 USDT
+        upgradeConditions: "Total transaction volume ≥ 500,000 USDT, bind two designated badge-type NFTs",
+        benefits: ["20% reduction in handling fees", "20 free uses of Aiagent per week"]
     },
-    "Gold": {
-        minVolume: 150000,     // $150K USD equivalent
-        description: "Premium equity tier",
-        benefits: ["Maximum fee discounts", "VIP support", "Early access features"]
+    "Level 3": {
+        name: "On-chain Hunter",
+        minVolume: 5000000, // 5,000,000 USDT
+        upgradeConditions: "Total transaction volume ≥ 5,000,000 USDT, bind four designated badge-type NFTs",
+        benefits: ["30% reduction in transaction fees", "30 free uses of Aiagent per week"]
     },
-    "Platinum": {
-        minVolume: 500000,     // $500K USD equivalent
-        description: "Elite equity partnership",
-        benefits: ["Revenue sharing", "Governance voting", "Beta feature access"]
+    "Level 4": {
+        name: "Alpha Alchemist",
+        minVolume: 10000000, // 10,000,000 USDT
+        upgradeConditions: "Total transaction volume ≥ 10,000,000 USDT, binding to six designated badge-type NFTs",
+        benefits: ["40% reduction in transaction fees", "40 free uses of Aiagent per week"]
     },
-    "Diamond": {
-        minVolume: 1000000,    // $1M USD equivalent
-        description: "Ultimate equity ownership",
-        benefits: ["Maximum revenue share", "Advisory board access", "Custom features"]
+    "Level 5": {
+        name: "Quantum Alchemist",
+        minVolume: 50000000, // 50,000,000 USDT
+        upgradeConditions: "Total transaction volume ≥ 50,000,000 USDT, bound to eight designated badge-type NFTs",
+        benefits: ["55% reduction in transaction fees", "50 free uses of Aiagent per week"]
+    },
+    "Trophy Breeder": {
+        name: "Trophy Breeder",
+        minVolume: null, // Not based on volume
+        upgradeConditions: "The top three participants in the trading competition will receive (airdrop)",
+        benefits: ["25% reduction in handling fee"]
     }
 };
 ```

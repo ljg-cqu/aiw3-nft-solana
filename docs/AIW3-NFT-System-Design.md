@@ -78,14 +78,16 @@ The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a 
 
 ### Transaction Volume Qualification
 
-**Level Requirements** (stored in AIW3 MySQL database):
+**Level Requirements**:
 
-| NFT Level | Minimum Transaction Volume | Database Query | Verification Method | Business Logic |
-|-----------|---------------------------|----------------|-------------------|-----------------|
-| **Bronze** | $1,000 - $4,999 | `SELECT SUM(transaction_amount) FROM user_transactions WHERE user_id = ? AND status = 'completed'` | Real-time volume calculation | Entry-level qualification |
-| **Silver** | $5,000 - $19,999 | `SELECT SUM(transaction_amount) FROM user_transactions WHERE user_id = ? AND status = 'completed'` | Real-time volume calculation | Mid-tier qualification |
-| **Gold** | $20,000 - $99,999 | `SELECT SUM(transaction_amount) FROM user_transactions WHERE user_id = ? AND status = 'completed'` | Real-time volume calculation | High-tier qualification |
-| **Platinum** | $100,000+ | `SELECT SUM(transaction_amount) FROM user_transactions WHERE user_id = ? AND status = 'completed'` | Real-time volume calculation | Premium qualification |
+| Level | NFT Name | Upgrade Conditions | Tier Benefits |
+|---|---|---|---|
+| **Level 1** | Tech Chicken | Total transaction volume ≥ 100,000 USDT | 10% reduction in handling fees, 10 free uses of Aiagent per week |
+| **Level 2** | Quant Ape | Total transaction volume ≥ 500,000 USDT, bind two designated badge-type NFTs | 20% reduction in handling fees, 20 free uses of Aiagent per week |
+| **Level 3** | On-chain Hunter | Total transaction volume ≥ 5,000,000 USDT, bind four designated badge-type NFTs | 30% reduction in transaction fees, 30 free uses of Aiagent per week |
+| **Level 4** | Alpha Alchemist | Total transaction volume ≥ 10,000,000 USDT, binding to six designated badge-type NFTs | 40% reduction in transaction fees, 40 free uses of Aiagent per week |
+| **Level 5** | Quantum Alchemist | Total transaction volume ≥ 50,000,000 USDT, bound to eight designated badge-type NFTs | 55% reduction in transaction fees, 50 free uses of Aiagent per week |
+| **-** | Trophy Breeder | The top three participants in the trading competition will receive (airdrop) | 25% reduction in handling fee |
 
 **Volume Verification Process**:
 1. Query user's total transaction volume from MySQL database
