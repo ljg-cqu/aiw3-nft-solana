@@ -240,6 +240,9 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 - Include AIW3 System Wallet as first creator with `verified: true`
 - Mint to user's Associated Token Account (ATA) - no separate transfer transaction required
 
+**Concurrency Safety**
+- See [AIW3 NFT Concurrency Control](./AIW3-NFT-Concurrency-Control.md) for concurrent minting coordination and transaction ordering requirements
+
 ### For Ecosystem Partners Integration
 
 **Authenticity Verification**
@@ -261,6 +264,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 For detailed operational procedures, see:
 - **Security & Key Management**: [AIW3 NFT Security Operations](./AIW3-NFT-Security-Operations.md)
 - **Data Consistency**: [AIW3 NFT Data Consistency](./AIW3-NFT-Data-Consistency.md)
+- **Concurrency Control**: [AIW3 NFT Concurrency Control](./AIW3-NFT-Concurrency-Control.md)
 
 ---
 
@@ -270,6 +274,7 @@ For detailed operational procedures, see:
 
 - [AIW3 NFT Security Operations](./AIW3-NFT-Security-Operations.md) - Key management, security protocols, and operational procedures
 - [AIW3 NFT Data Consistency](./AIW3-NFT-Data-Consistency.md) - Multi-layer data verification and network resilience strategies
+- [AIW3 NFT Concurrency Control](./AIW3-NFT-Concurrency-Control.md) - Concurrent minting safety and transaction ordering strategies
 
 ### External References
 
