@@ -47,7 +47,7 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 | Phase | Description | Control | Key Technology |
 |-------|-------------|---------|----------------|
 | **🏗️ MINT** | NFT creation with embedded level data | AIW3 System | Solana Token Program + Metaplex |
-| **🔍 USE** | Verification and data access by partners | Ecosystem Partners | Metadata queries + Arweave |
+| **🔍 USE** | Verification and data access by partners | Ecosystem Partners | Metadata queries + IPFS |
 | **🔥 BURN** | NFT destruction for upgrades/exits | User Wallet | User-initiated transactions |
 
 ### Lifecycle Characteristics
@@ -61,7 +61,7 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 **Phase 2: Usage (Partner-Initiated)**
 - Partners verify authenticity via on-chain creator field
 - Level queried from off-chain JSON metadata attributes
-- Images retrieved via Arweave URIs
+- Images retrieved via IPFS URIs (Pinata gateway)
 - Optional API for traditional system integration
 
 **Phase 3: Burning (User-Controlled)**
@@ -135,7 +135,7 @@ Understanding Solana NFTs is crucial for correct implementation. An NFT consists
    ↓
 6. Get Rich Data: Read uri field from on-chain metadata
    ↓
-7. Fetch Off-Chain JSON from uri (Arweave)
+7. Fetch Off-Chain JSON from uri (IPFS)
    ↓
 8. Read NFT Level: Parse attributes array for "Level" trait
    ↓
@@ -152,20 +152,22 @@ Data stored directly on **Solana blockchain** for trust and authenticity verific
 | `mint` | `Pubkey` | Solana | Yes | NFT's unique identifier |
 | `data.name` | `String` | AIW3 | Yes | NFT name (e.g., "AIW3 Equity NFT #1234") |
 | `data.symbol` | `String` | AIW3 | Yes | Collection symbol (e.g., "AIW3E") |
-| `data.uri` | `String` | AIW3 | Yes | Arweave URI for off-chain JSON |
+| `data.uri` | `String` | AIW3 | Yes | IPFS URI for off-chain JSON |
 | `data.creators` | `Vec<Creator>` | AIW3 | Yes | **Core authenticity verification** |
 | `is_mutable` | `bool` | AIW3 | Yes | Set to `false` for permanence |
 
 #### Off-Chain JSON Metadata Details
 
-The `uri` from on-chain metadata points to this JSON file on Arweave/IPFS where **Level information is stored**:
+The `uri` from on-chain metadata points to this JSON file on IPFS (via Pinata) where **Level information is stored**:
+
+*Note: IPFS via Pinata chosen to align with existing AIW3 backend system storage architecture.*
 
 ```json
 {
   "name": "AIW3 Equity NFT #1234",
   "symbol": "AIW3E",
   "description": "Represents user's equity and status within AIW3 ecosystem",
-  "image": "https://arweave.net/ARWEAVE_IMAGE_HASH",
+  "image": "https://gateway.pinata.cloud/ipfs/IPFS_IMAGE_HASH",
   "external_url": "https://aiw3.io",
   "attributes": [
     {
@@ -182,7 +184,7 @@ The `uri` from on-chain metadata points to this JSON file on Arweave/IPFS where 
   "properties": {
     "files": [
       {
-        "uri": "https://arweave.net/ARWEAVE_IMAGE_HASH",
+        "uri": "https://gateway.pinata.cloud/ipfs/IPFS_IMAGE_HASH",
         "type": "image/png"
       }
     ],
@@ -200,13 +202,13 @@ The `uri` from on-chain metadata points to this JSON file on Arweave/IPFS where 
 
 **Storage Chain**: `On-Chain Metadata` → `Off-Chain JSON URI` → `JSON File` → `Image URI` → `Image File`
 
-1. **Upload Image**: Upload to Arweave for permanent storage URI
-2. **Link in JSON**: Place Arweave URI in `image` field of JSON metadata
+1. **Upload Image**: Upload to IPFS via Pinata for decentralized storage URI
+2. **Link in JSON**: Place IPFS URI in `image` field of JSON metadata
 3. **Link to On-Chain**: JSON file URI stored in `data.uri` field during minting
 
 **Two-Layer Architecture**:
 - **On-Chain (Solana)**: Creator verification, ownership proof, URI pointer
-- **Off-Chain (Arweave/IPFS)**: Level attributes, images, rich metadata
+- **Off-Chain (IPFS via Pinata)**: Level attributes, images, rich metadata
 
 ---
 
@@ -223,7 +225,7 @@ erDiagram
     TokenAccount ||--|| MintAccount : "is for"
     MintAccount ||--|| MetadataPDA : "is described by"
     MetadataPDA ||--|| JSONMetadata : "points to"
-    JSONMetadata }o--|| ArweaveStorage : "references images in"
+    JSONMetadata }o--|| IPFSStorage : "references images in"
 
     UserWallet {
         string publicKey "User's public key"
@@ -245,7 +247,7 @@ erDiagram
     MetadataPDA {
         string updateAuthority "AIW3SystemWallet"
         string creators "AIW3 as verified creator"
-        string uri "Arweave URI for JSON"
+        string uri "IPFS URI for JSON"
         boolean isMutable "false"
     }
 ```
@@ -261,7 +263,7 @@ flowchart TD
     E --> F["Verify: creators[0] == AIW3 && verified == true"]
     F --> |Valid| G["Read: URI field from metadata"]
     F --> |Invalid| H["❌ Reject: Not authentic AIW3 NFT"]
-    G --> I["Fetch: JSON metadata from Arweave"]
+    G --> I["Fetch: JSON metadata from IPFS"]
     I --> J["Extract: Level from attributes"]
     I --> K["Extract: Image URI from JSON"]
     J --> L["✅ Display: User's NFT level"]
@@ -313,7 +315,9 @@ flowchart TD
 
 #### Storage Options Analysis
 
-**Option 1: Arweave Permanent Storage ⭐ Recommended**
+**Option 1: IPFS via Pinata ⭐ Recommended**
+
+*Chosen to align with existing AIW3 backend system storage architecture.*
 - **Advantages**: Truly permanent (200+ years), one-time payment, cryptographically verifiable
 - **Disadvantages**: Higher upfront cost (~$5-20 per MB)
 - **Evaluation**: Excellent decentralization and permanence
@@ -326,7 +330,7 @@ flowchart TD
 - **Use Case**: Cost-sensitive implementations
 
 **Option 3: Hybrid Approach**
-- **Description**: IPFS for immediate availability, migrate to Arweave for permanence
+- **Description**: IPFS via Pinata for decentralized storage with proven reliability
 - **Advantages**: Best of both worlds, cost optimization
 - **Disadvantages**: Complex implementation, migration logic required
 
@@ -611,7 +615,7 @@ Understanding how "AIW3 system mints NFT directly to user's wallet" works throug
 #### Step 4: Create Metaplex Metadata
 
 **Purpose**: Attach rich data and authenticity verification
-- **Pre-conditions**: Mint Account exists, off-chain JSON uploaded to Arweave
+- **Pre-conditions**: Mint Account exists, off-chain JSON uploaded to IPFS
 - **Inputs**: Payer (AIW3), Mint Address, Metadata (name, symbol, URI, creators)
 - **Action**: Call Metaplex Token Metadata Program for new PDA
 - **Outputs**: New Metadata PDA account
@@ -640,7 +644,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 **Implementation Strategy**:
 
 1. **Metadata Attributes + Creator Verification**: Use existing Solana/Metaplex standards
-2. **Arweave Storage**: Permanent storage for images and JSON metadata
+2. **IPFS Storage (Pinata)**: Decentralized storage for images and JSON metadata
 3. **Standards Compliance**: Follow Metaplex Token Metadata for ecosystem compatibility
 4. **Optional API Layer**: Supplementary REST API for traditional system integration
 
@@ -655,7 +659,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 **Phase 1 (0-6 months): Core Implementation**
 - Deploy metadata-based verification system
-- Implement Arweave storage for permanence
+- Implement IPFS storage via Pinata for decentralization
 - Launch with Bronze/Silver tiers using system-paid rent
 - Begin ecosystem partner integration
 
@@ -688,8 +692,8 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 - Include level as trait: `{"trait_type": "Level", "value": "Gold"}`
 
 **3. Storage Implementation**
-- Upload images to Arweave before minting for permanent URIs
-- Upload JSON metadata to Arweave for metadata URIs
+- Upload images to IPFS via Pinata before minting for decentralized URIs
+- Upload JSON metadata to IPFS via Pinata for metadata URIs
 - Store metadata URI in on-chain `data.uri` field
 
 **4. Minting Process**
@@ -706,16 +710,16 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 **2. Level Data Access**
 - Read `uri` field from verified on-chain metadata
-- Fetch JSON metadata from Arweave URI
+- Fetch JSON metadata from IPFS URI
 - Parse `attributes` array for trait where `trait_type` is "Level"
 
 **3. Image Display**
 - Extract `image` field URI from JSON metadata
-- Display image directly from Arweave permanent storage
+- Display image directly from IPFS decentralized storage
 - Implement fallback handling for network issues
 
 **4. Error Handling & Fallbacks**
-- Implement retry logic for Arweave requests
+- Implement retry logic for IPFS requests
 - Cache frequently accessed metadata
 - Provide graceful degradation when off-chain data unavailable
 
@@ -724,14 +728,14 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 **Required Dependencies**:
 - Solana Web3.js or Rust SDK for blockchain interactions
 - Metaplex SDK for metadata operations
-- HTTP client for Arweave requests
+- HTTP client for IPFS requests
 - JSON parsing capabilities
 
 **Key Functions Needed**:
 - `getTokenAccountsByOwner()` - Find user's NFTs
 - `findMetadataPda()` - Derive metadata account address
 - `getAccountInfo()` - Read on-chain metadata
-- `fetch()` - Retrieve off-chain JSON from Arweave
+- `fetch()` - Retrieve off-chain JSON from IPFS
 - `parseAttributes()` - Extract level from metadata traits
 
 **Integration Patterns**:
@@ -782,7 +786,7 @@ The AIW3 NFT system includes comprehensive testing procedures to validate all cr
 
 **System Requirements**:
 - Solana RPC access (public or private endpoints)
-- Arweave/IPFS for metadata storage
+- IPFS via Pinata for metadata storage
 - Backend infrastructure for business logic
 - Frontend wallet adapter integration
 
@@ -816,7 +820,7 @@ The AIW3 NFT system includes comprehensive testing procedures to validate all cr
 
 - **Technical Risk**: Comprehensive testing and phased deployment
 - **Integration Risk**: Multiple verification paths (API, contract, hybrid)
-- **Storage Risk**: Arweave permanence eliminates data loss concerns
+- **Storage Risk**: IPFS decentralization reduces data loss concerns
 - **Standards Risk**: Metaplex compliance ensures long-term compatibility
 
 ### Related Documentation
@@ -830,7 +834,7 @@ For comprehensive cost analysis and financial planning:
 
 - [Solana Token Program Documentation](https://docs.solana.com/developing/runtime-facilities/programs#token-program)
 - [Metaplex Token Metadata Standard](https://docs.metaplex.com/programs/token-metadata/)
-- [Arweave Permanent Storage](https://arweave.org)
+- [Pinata IPFS Service](https://pinata.cloud)
 - [Associated Token Account Program](https://spl.solana.com/associated-token-account)
 
 ---

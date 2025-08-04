@@ -46,7 +46,9 @@ The fundamental program on Solana for creating and managing tokens (both fungibl
 #### Metaplex Token Metadata Program  
 An on-chain program that allows you to attach additional properties (like name, symbol, description, and a link to off-chain artwork) to your token mint.
 
-#### Off-chain Storage (Arweave/IPFS)
+#### Off-chain Storage (IPFS via Pinata)
+
+*Note: IPFS via Pinata chosen to align with existing AIW3 backend system storage architecture.*
 NFTs typically store their actual artwork and rich metadata (JSON files) off-chain on decentralized storage solutions. The on-chain metadata then points to this off-chain URI.
 
 #### Umi SDK
@@ -99,7 +101,7 @@ umi.use(mplTokenMetadata()).use(irysUploader());
   "name": "My Awesome NFT",
   "symbol": "MAN",
   "description": "A brief description of the NFT",
-  "image": "https://arweave.net/your-image-uri",
+  "image": "https://gateway.pinata.cloud/ipfs/your-image-hash",
   "seller_fee_basis_points": 500,
   "attributes": [
     { "trait_type": "Background", "value": "Blue" },
@@ -107,7 +109,7 @@ umi.use(mplTokenMetadata()).use(irysUploader());
   ],
   "properties": {
     "files": [{ 
-      "uri": "https://arweave.net/your-image-uri", 
+      "uri": "https://gateway.pinata.cloud/ipfs/your-image-hash", 
       "type": "image/png" 
     }],
     "creators": [
@@ -127,9 +129,9 @@ umi.use(mplTokenMetadata()).use(irysUploader());
 
 #### Step 4: Asset Upload to Decentralized Storage
 
-1. **Upload image file to Arweave** → Get image URI
+1. **Upload image file to IPFS via Pinata** → Get image URI
 2. **Update metadata JSON** with image URI  
-3. **Upload metadata JSON to Arweave** → Get metadata URI
+3. **Upload metadata JSON to IPFS via Pinata** → Get metadata URI
 
 #### Step 5: NFT Creation with Metaplex Umi
 
@@ -146,7 +148,7 @@ const { signature } = await createNft(umi, {
     mint,
     name: "AIW3 Level 1 NFT",
     symbol: "AIW3L1", 
-    uri: "https://arweave.net/your-metadata-uri", // From Step 4
+    uri: "https://gateway.pinata.cloud/ipfs/your-metadata-hash", // From Step 4
     sellerFeeBasisPoints: percentAmount(5, 2), // 5% royalties
     isMutable: true, // Set to false for immutable NFTs
     creators: [
@@ -198,7 +200,7 @@ console.log("Minting authority disabled for the NFT.");
 
 - **Transaction Fees**: Every transaction costs a small amount of SOL
 - **Rent Exemption**: Account rent for token accounts and metadata accounts
-- **Storage Costs**: Arweave storage fees for images and metadata
+- **Storage Costs**: IPFS storage fees for images and metadata (via Pinata)
 
 ### 🏗️ On-Chain Instructions Deep Dive
 
@@ -790,13 +792,13 @@ class NFTVerificationMonitor {
 }
 ```
 
-This section details the process from the perspective of an ecosystem partner (e.g., a DeFi protocol, a game, or another application) that needs to verify the authenticity of an AIW3 NFT and access its data, such as the user's level. This flow combines on-chain verification with off-chain data retrieval from Arweave/IPFS.
+This section details the process from the perspective of an ecosystem partner (e.g., a DeFi protocol, a game, or another application) that needs to verify the authenticity of an AIW3 NFT and access its data, such as the user's level. This flow combines on-chain verification with off-chain data retrieval from IPFS.
 
 **Key Actors:**
 *   **User Wallet**: The wallet holding the NFT. The user presents their public key to the partner service.
 *   **Partner Application**: The third-party service that needs to read the NFT data.
 *   **Solana Blockchain**: The source of truth for on-chain data (ownership and authenticity).
-*   **Arweave/IPFS**: The decentralized storage network holding the off-chain metadata (level, image, etc.).
+*   **IPFS**: The decentralized storage network holding the off-chain metadata (level, image, etc.).
 
 #### Step 1: Find the NFT and its On-Chain Metadata
 The partner application starts by finding the user's NFT and its associated on-chain metadata account.
@@ -848,7 +850,7 @@ Once the NFT is verified as authentic, the partner can safely retrieve and use t
     *   The NFT has been verified as authentic.
     *   The application has the `uri` from the on-chain metadata.
 *   **Inputs**:
-    *   `uri`: The URI from the on-chain metadata (e.g., an Arweave link).
+    *   `uri`: The URI from the on-chain metadata (e.g., an IPFS link via Pinata).
 *   **Action**:
     1.  The application makes an HTTP GET request to the `uri`.
     2.  It receives the JSON metadata file as a response.

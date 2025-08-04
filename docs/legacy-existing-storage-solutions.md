@@ -165,7 +165,7 @@ File Storage: OBS (Centralized) + IPFS/Pinata (Decentralized)
 #### Consider Alternatives
 - **MySQL → PostgreSQL + Blockchain indexing**: Better Web3 integration
 - **Elasticsearch → The Graph Protocol**: Decentralized indexing
-- **Huawei OBS → Arweave**: Permanent, decentralized storage
+- **Huawei OBS → Continue with IPFS via Pinata**: Maintain decentralized storage consistency
 
 #### New Additions
 - **Solana RPC nodes**: Direct blockchain data access

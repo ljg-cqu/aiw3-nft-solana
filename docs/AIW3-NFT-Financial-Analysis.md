@@ -44,7 +44,7 @@ The **Pre-paid Rent Transfer** approach combined with **Premium Feature Revenue*
 |---------------|----------|-----------------|-------------|
 | **Solana Rent (ATA)** | 0.00203928 SOL | 20,392.8 SOL | $408K-$4.08M |
 | **Transaction Fees** | 0.000005 SOL | 50 SOL | $1K-$10K |
-| **Arweave Storage** | $0.015-0.045 | - | $150K-$450K |
+| **IPFS Storage (Pinata)** | $0.001-0.005 | - | $10K-$50K |
 | **System Operations** | Variable | - | $50K-$200K/year |
 | **TOTAL ESTIMATED** | $0.056-$0.461 | - | **$558K-$4.67M** |
 
@@ -140,7 +140,9 @@ const txFeeCostUSD = {
 - **User responsibility**: Burns/upgrades paid by users
 - **Scaling efficiency**: Linear scaling with negligible impact
 
-### 3. Arweave Storage Costs
+### 3. IPFS Storage Costs (Pinata)
+
+*Note: IPFS via Pinata chosen to align with existing AIW3 backend system storage architecture.*
 
 ```typescript
 // Storage requirements per user
@@ -151,8 +153,8 @@ const TOTAL_SIZE_PER_USER_KB = 502;  // Combined size
 // Total storage for 10M users
 const TOTAL_STORAGE_GB = (502 * 10_000_000) / (1024 * 1024); // ~4,768 GB
 
-// Arweave pricing scenarios
-const ARWEAVE_COST_PER_GB = {
+// IPFS (Pinata) pricing scenarios
+const IPFS_PINATA_COST_PER_GB = {
     low: 30,      // $30/GB (low network demand)
     average: 60,  // $60/GB (typical)
     high: 90      // $90/GB (high demand)
@@ -217,7 +219,7 @@ const TIER_STORAGE_MULTIPLIER = {
 **Initial Setup Costs:**
 - Rent deposits: $407,856 (recoverable)
 - Transaction fees: $1,000
-- Arweave storage: $286,080
+- IPFS storage (Pinata): $28,608
 - Setup & development: $50,000
 - **Total Initial**: $744,936
 
@@ -228,7 +230,7 @@ const TIER_STORAGE_MULTIPLIER = {
 **Initial Setup Costs:**
 - Rent deposits: $1,223,568 (recoverable)
 - Transaction fees: $3,000
-- Arweave storage: $286,080
+- IPFS storage (Pinata): $28,608
 - Setup & development: $50,000
 - **Total Initial**: $1,562,648
 
@@ -239,7 +241,7 @@ const TIER_STORAGE_MULTIPLIER = {
 **Initial Setup Costs:**
 - Rent deposits: $4,078,560 (recoverable)
 - Transaction fees: $10,000
-- Arweave storage: $286,080
+- IPFS storage (Pinata): $28,608
 - Setup & development: $50,000
 - **Total Initial**: $4,424,640
 
@@ -460,7 +462,7 @@ For detailed technical implementation guides, see:
 
 - [Solana Rent Documentation](https://docs.solana.com/implemented-proposals/rent)
 - [Solana Rent Calculation Source](https://docs.rs/solana-rent/latest/src/solana_rent/lib.rs.html)
-- [Arweave Pricing Information](https://arweave.org)
+- [Pinata IPFS Pricing Information](https://pinata.cloud/pricing)
 - [IPFS Pinning Services Comparison](https://docs.ipfs.io/concepts/persistence/)
 
 ---
