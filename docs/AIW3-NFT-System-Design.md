@@ -43,7 +43,7 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 | Phase | Description | Control | Key Technology |
 |-------|-------------|---------|----------------|
-| **🏗️ MINT** | NFT creation with embedded level data | AIW3 System Wallet | Solana Token Program + Metaplex |
+| **🏗️ MINT** | NFT creation with metadata URI linking to level data | AIW3 System Wallet | Solana Token Program + Metaplex |
 | **🔍 USE** | Verification and data access by partners | Ecosystem Partners | Metadata queries + IPFS via Pinata |
 | **🔥 BURN** | NFT destruction for upgrades/exits | User Wallet | User-initiated transactions |
 
@@ -52,7 +52,7 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 **Phase 1: Minting (System-Controlled)**
 - AIW3 System Wallet mints NFT directly to user wallet
 - User becomes immediate owner without transfer
-- Level data stored in off-chain JSON metadata
+- Metadata URI points to off-chain JSON containing level data
 - Creator verification data embedded in on-chain metadata
 
 **Phase 2: Usage (Partner-Initiated)**
@@ -71,6 +71,8 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 ## Technical Architecture
 
+The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a URI reference to off-chain JSON metadata that stores the actual level data.
+
 ### On-Chain Metadata Account Details
 
 Data stored directly on **Solana blockchain** for trust and authenticity verification:
@@ -87,7 +89,7 @@ Data stored directly on **Solana blockchain** for trust and authenticity verific
 
 ### Off-Chain JSON Metadata Details
 
-The `uri` from on-chain metadata points to this JSON file on IPFS via Pinata where **Level information is stored**:
+The `uri` field in the on-chain metadata contains an IPFS via Pinata link to this JSON file where the **actual Level data is stored**:
 
 ```json
 {
@@ -131,7 +133,7 @@ The `uri` from on-chain metadata points to this JSON file on IPFS via Pinata whe
 
 ### Recommended Approach: Metadata Attributes
 
-Use Metaplex standard with off-chain JSON metadata for level data, on-chain metadata for authenticity verification.
+Use Metaplex standard where on-chain metadata contains URI pointing to off-chain JSON with level data, while on-chain metadata provides authenticity verification.
 
 **Advantages**:
 - ✅ Decentralized access via standard metadata queries
@@ -184,7 +186,7 @@ The recommended approach is **User-Controlled Burning**. The user executes `burn
    ↓
 7. Fetch Off-Chain JSON from uri (IPFS via Pinata)
    ↓
-8. Read NFT Level: Parse attributes array for "Level" trait
+8. Extract Level Data: Parse attributes array in off-chain JSON for "Level" trait
    ↓
 9. Retrieve Image: Get image URI from JSON metadata
 ```
