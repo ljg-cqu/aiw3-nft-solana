@@ -194,6 +194,88 @@ flowchart TD
     style H fill:#ffcdd2
 ```
 
+### Complete Minting Process Flow
+
+```mermaid
+flowchart TD
+    subgraph "AIW3 System Actions"
+        A["Initiate Mint for User"]
+        B["Create Mint Account"]
+        C["Create User's ATA"]
+        D["Mint Token to User's ATA"]
+        E["Create Metaplex Metadata PDA"]
+        F["Revoke Authorities (Optional)"]
+    end
+
+    subgraph "User Interaction"
+        G["Provides Public Key"]
+        H["NFT appears in wallet"]
+    end
+
+    G --> A --> B --> C --> D --> E --> F --> H
+
+    style A fill:#fff3e0
+    style G fill:#e3f2fd
+    style H fill:#c8e6c9
+```
+
+### System Architecture for Operations
+
+```mermaid
+graph TD
+    subgraph "User Environment"
+        User[👤 User] -->|Browser Interaction| Frontend[🌐 AIW3 Frontend]
+        Frontend -->|Wallet Adapter| Wallet[🔒 Phantom/Solflare]
+    end
+
+    subgraph "AIW3 Services"
+        Frontend -->|HTTPS REST API| Backend[🖥️ AIW3 Backend]
+        Backend -->|Database Queries| DB[(📦 Database)]
+    end
+
+    subgraph "Solana Network"
+        Wallet -->|RPC/WebSocket| SolanaNode[⚡️ Solana RPC Node]
+        Backend -->|RPC/WebSocket| SolanaNode
+        SolanaNode -->|Gossip Protocol| SolanaCluster[🌍 Solana Blockchain]
+    end
+
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+    style Frontend fill:#ccf,stroke:#333,stroke-width:2px
+    style Backend fill:#cfc,stroke:#333,stroke-width:2px
+    style SolanaNode fill:#f96,stroke:#333,stroke-width:2px
+```
+
+### Data Model Relationships
+
+```mermaid
+erDiagram
+    USER {
+        string userId
+        string walletAddress
+        datetime createdAt
+    }
+
+    NFT {
+        string nftId
+        string mintAddress
+        string ownerWalletAddress
+        string status
+    }
+
+    UPGRADE_REQUEST {
+        string requestId
+        string userId
+        string originalNftId
+        string newNftId
+        string status
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    USER ||--o{ UPGRADE_REQUEST : initiates
+    UPGRADE_REQUEST }|--|| NFT : for
+```
+
 ---
 
 ## Implementation Guide
