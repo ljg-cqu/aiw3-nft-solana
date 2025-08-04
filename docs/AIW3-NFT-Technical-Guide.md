@@ -318,21 +318,15 @@ flowchart TD
 **Option 1: IPFS via Pinata ⭐ Recommended**
 
 *Chosen to align with existing AIW3 backend system storage architecture.*
-- **Advantages**: Truly permanent (200+ years), one-time payment, cryptographically verifiable
-- **Disadvantages**: Higher upfront cost (~$5-20 per MB)
-- **Evaluation**: Excellent decentralization and permanence
-- **Use Case**: High-value, permanent NFTs like AIW3 equity tokens
+- **Advantages**: Decentralized, content-addressed, proven reliability, cost-effective
+- **Disadvantages**: Requires pinning service for persistence, network-dependent availability
+- **Evaluation**: Excellent decentralization with established ecosystem support
+- **Use Case**: All AIW3 NFT implementations
 
-**Option 2: IPFS with Pinning Services**
-- **Advantages**: Lower initial costs, flexible deployment, good ecosystem support
-- **Disadvantages**: Requires ongoing pinning costs, availability dependency
-- **Evaluation**: Good decentralization, moderate permanence
-- **Use Case**: Cost-sensitive implementations
-
-**Option 3: Hybrid Approach**
-- **Description**: IPFS via Pinata for decentralized storage with proven reliability
-- **Advantages**: Best of both worlds, cost optimization
-- **Disadvantages**: Complex implementation, migration logic required
+**Alternative Options (Not Recommended)**:
+- **Traditional Cloud Storage**: Centralized, not aligned with Web3 principles
+- **Multiple Storage Solutions**: Adds unnecessary complexity
+- **Custom IPFS Nodes**: Requires significant infrastructure management
 
 ### Level Information Storage Solutions
 
