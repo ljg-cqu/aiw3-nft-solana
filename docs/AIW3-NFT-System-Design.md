@@ -8,12 +8,13 @@
 1. [Executive Summary](#executive-summary)
 2. [NFT Lifecycle Overview](#nft-lifecycle-overview)
 3. [Technical Architecture](#technical-architecture)
-4. [Implementation Guide](#implementation-guide)
-5. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
-6. [Detailed Process Flows](#detailed-process-flows)
-7. [Recommendations](#recommendations)
-8. [Implementation Requirements](#implementation-requirements)
-9. [Appendix](#appendix)
+4. [Distributed Data Consistency & Verification](#distributed-data-consistency--verification)
+5. [Implementation Guide](#implementation-guide)
+6. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
+7. [Detailed Process Flows](#detailed-process-flows)
+8. [Recommendations](#recommendations)
+9. [Implementation Requirements](#implementation-requirements)
+10. [Appendix](#appendix)
 
 ---
 
@@ -131,6 +132,122 @@ The `uri` field in the on-chain metadata contains an IPFS via Pinata link to thi
 
 ---
 
+## Distributed Data Consistency & Verification
+
+### The Multi-Layer Data Challenge
+
+AIW3 NFT minting involves **three distinct data layers** that must remain consistent:
+
+1. **On-Chain Data** (Solana blockchain) - Metadata account with URI reference
+2. **Off-Chain Storage** (IPFS via Pinata) - JSON metadata and images  
+3. **Backend Database** (AIW3 systems) - User records, minting status, business logic
+
+### Critical Consistency Requirements
+
+**Data Persistence Verification Points**:
+
+| Layer | Verification Method | Failure Impact | Recovery Strategy |
+|-------|-------------------|----------------|-------------------|
+| **Solana Blockchain** | Query metadata account existence | NFT unusable | Re-mint with same data |
+| **IPFS via Pinata** | HTTP GET request to URI | Broken metadata display | Re-upload and update URI |
+| **Backend Database** | Database query validation | Business logic failures | Database reconciliation |
+
+### Post-Mint Verification Protocol
+
+**Phase 1: Immediate Verification (< 30 seconds)**
+```
+1. Confirm Solana transaction finalization
+   ↓
+2. Verify metadata account creation via RPC call
+   ↓
+3. Validate IPFS via Pinata URI accessibility
+   ↓
+4. Test JSON metadata parsing and level extraction
+   ↓
+5. Confirm database record consistency
+```
+
+**Phase 2: Delayed Verification (5-10 minutes)**
+```
+1. Re-verify IPFS via Pinata propagation across gateways
+   ↓
+2. Test partner verification flow end-to-end
+   ↓
+3. Validate image accessibility from multiple endpoints
+   ↓
+4. Confirm no orphaned database records
+```
+
+### Failure Scenarios & Recovery
+
+**Scenario 1: IPFS Upload Failure**
+- **Detection**: URI returns 404 or timeout
+- **Impact**: NFT minted but metadata inaccessible
+- **Recovery**: Re-upload to IPFS via Pinata, update URI reference if possible (requires `is_mutable: true` during minting phase)
+
+**Scenario 2: Database Inconsistency**
+- **Detection**: Blockchain shows mint but database shows failure
+- **Impact**: Business logic errors, user status misalignment
+- **Recovery**: Database reconciliation based on blockchain state
+
+**Scenario 3: Partial Solana Confirmation**
+- **Detection**: Transaction appears successful but metadata account missing
+- **Impact**: Token exists but no metadata
+- **Recovery**: Complete transaction or re-mint
+
+### Implementation Requirements
+
+**Pre-Mint Validation**
+- Verify IPFS via Pinata connectivity and upload capacity
+- Confirm database transaction capability
+- Test Solana RPC endpoint responsiveness
+
+**Atomic-Style Operations**
+- Implement compensating transactions for each layer
+- Maintain detailed operation logs for reconciliation
+- Set appropriate timeouts for each verification step
+
+**Monitoring & Alerting**
+- Real-time consistency monitoring across all three layers
+- Automated alerts for verification failures
+- Dashboard showing data layer health status
+
+### Recommended Minting Flow with Consistency Checks
+
+```
+1. Prepare Data Phase
+   - Upload image to IPFS via Pinata → Get image URI
+   - Create JSON metadata → Upload to IPFS via Pinata → Get metadata URI
+   - Verify both URIs accessible
+   
+2. Database Preparation
+   - Create pending mint record in database
+   - Lock user account for minting process
+   
+3. Blockchain Minting
+   - Execute mint transaction with metadata URI
+   - Wait for transaction confirmation
+   - Verify metadata account creation
+   
+4. Consistency Verification
+   - Test complete partner verification flow
+   - Confirm all data layers accessible
+   - Update database record to "completed"
+   
+5. Error Recovery (if needed)
+   - Rollback database changes
+   - Attempt IPFS re-upload if needed
+   - Re-mint if blockchain operation failed
+```
+
+**Critical Success Factors**:
+- ✅ Never mark mint as "successful" until ALL layers verified
+- ✅ Implement automated reconciliation processes
+- ✅ Maintain audit trail for all verification steps
+- ✅ Design for eventual consistency with conflict resolution
+
+---
+
 ## Implementation Guide
 
 ### Recommended Approach: Metadata Attributes
@@ -239,6 +356,12 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 - Set `is_mutable: false` after minting for permanence
 - Include AIW3 System Wallet as first creator with `verified: true`
 - Mint to user's Associated Token Account (ATA) - no separate transfer transaction required
+
+**Distributed Data Consistency**
+- Implement multi-layer verification protocol before confirming mint success
+- Design compensating transactions for partial failure scenarios
+- Monitor data layer health continuously
+- Maintain detailed audit logs for reconciliation processes
 
 ### For Ecosystem Partners Integration
 
