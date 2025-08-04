@@ -95,8 +95,6 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 | Pattern | Description | Status | Ecosystem Benefit |
 |---------|-------------|--------|-------------------|
 | **Metadata-Based Verification** | Partners read level from NFT metadata | ✅ **Recommended** | Standard, widely supported |
-| **Smart Contract Registry** | On-chain registry for verification | 📋 **Planned** | Trustless verification |
-| **API Gateway** | Centralized API for integration | 🔄 **Optional** | Easy traditional integration |
 | **Direct Blockchain Queries** | Partners query blockchain directly | ✅ **Always Available** | No intermediaries |
 
 ---
@@ -295,8 +293,6 @@ flowchart TD
 - **Cost**: Very low (only verification data on-chain)
 
 #### Alternative Approaches
-
-**Smart Contract Verification**: Deploy Solana smart contract for NFT level management - adds complexity without significant benefits.
 
 **Traditional Cloud Storage**: Centralized storage - not aligned with Web3 principles.
 
@@ -557,7 +553,6 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 1. **Metadata Attributes + Creator Verification**: Use existing Solana/Metaplex standards
 2. **IPFS via Pinata Storage**: Decentralized storage for images and JSON metadata
 3. **Standards Compliance**: Follow Metaplex Token Metadata for ecosystem compatibility
-4. **Optional API Layer**: Supplementary REST API for traditional system integration
 
 **Advantages**:
 - ✅ **Minimal Development Complexity**: Leverages existing standards
@@ -575,15 +570,11 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 - Begin ecosystem partner integration
 
 **Phase 2 (6-18 months): Enhanced Features**
-- Add smart contract verification for premium features
 - Implement tiered rent responsibility for Gold users
-- Deploy comprehensive API for traditional integrations
 - Expand partner ecosystem
 
 **Phase 3 (18+ months): Full Ecosystem**
-- Complete smart contract verification deployment
-- Optimize user-paid models for premium tiers
-- Mature API ecosystem with multiple verification paths
+- Optimize system efficiency and partner integrations
 - Scale to millions of users
 
 ---
@@ -630,9 +621,10 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 - Implement fallback handling for network issues
 
 **4. Error Handling & Fallbacks**
-- Implement retry logic for IPFS via Pinata requests
-- Cache frequently accessed metadata
-- Provide graceful degradation when off-chain data unavailable
+- Implement retry logic for IPFS via Pinata requests with exponential backoff
+- Cache frequently accessed metadata for improved performance
+- Provide graceful degradation when off-chain data is temporarily unavailable
+- Log failed requests for monitoring and debugging purposes
 
 ### Technical Prerequisites
 
@@ -656,7 +648,6 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 ### Deployment Checklist
 
-- ✅ Smart contract deployment (if using custom logic)
 - ✅ Metadata storage infrastructure setup
 - ✅ RPC endpoint configuration and monitoring
 - ✅ Wallet adapter integration testing
@@ -669,7 +660,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 
 ### Success Metrics
 
-- **Integration**: Partner integration time < 1 week for API, < 2 weeks for direct verification
+- **Integration**: Partner integration time < 1 week for direct verification
 - **Reliability**: 99.9% uptime for verification services
 - **Authenticity**: Zero counterfeit NFTs accepted by ecosystem partners
 - **Compatibility**: 100% compatibility with major Solana NFT tools and wallets
@@ -677,7 +668,7 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 ### Risk Mitigation
 
 - **Technical Risk**: Comprehensive testing and phased deployment
-- **Integration Risk**: Multiple verification paths (API, contract, hybrid)
+- **Integration Risk**: Standardized metadata verification ensures reliable partner integration
 - **Storage Risk**: IPFS via Pinata decentralization reduces data loss concerns
 - **Standards Risk**: Metaplex compliance ensures long-term compatibility
 
