@@ -8,12 +8,13 @@
 1. [Executive Summary](#executive-summary)
 2. [NFT Lifecycle Overview](#nft-lifecycle-overview)
 3. [Technical Architecture](#technical-architecture)
-4. [Implementation Guide](#implementation-guide)
-5. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
-6. [Detailed Process Flows](#detailed-process-flows)
-7. [Recommendations](#recommendations)
-8. [Implementation Requirements](#implementation-requirements)
-9. [Appendix](#appendix)
+4. [Visual Architecture](#visual-architecture)
+5. [Implementation Guide](#implementation-guide)
+6. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
+7. [Detailed Process Flows](#detailed-process-flows)
+8. [Recommendations](#recommendations)
+9. [Implementation Requirements](#implementation-requirements)
+10. [Appendix](#appendix)
 
 ---
 
@@ -126,6 +127,71 @@ The `uri` field in the on-chain metadata contains an IPFS via Pinata link to thi
     ]
   }
 }
+```
+
+---
+
+## Visual Architecture
+
+### NFT Ecosystem Entity Relationship
+
+```mermaid
+erDiagram
+    AIW3SystemWallet ||--o{ MintAccount : "creates"
+    AIW3SystemWallet ||--o{ TokenAccount : "pays for creation"
+    AIW3SystemWallet ||--o{ MetadataPDA : "creates"
+    UserWallet ||--o{ TokenAccount : "owns"
+    TokenAccount ||--|| MintAccount : "is for"
+    MintAccount ||--|| MetadataPDA : "is described by"
+    MetadataPDA ||--|| JSONMetadata : "points to"
+    JSONMetadata }o--|| IPFSStorage : "references images in"
+
+    UserWallet {
+        string publicKey "User's public key"
+        string purpose "Proves NFT ownership"
+    }
+    
+    TokenAccount {
+        string owner "UserWallet public key"
+        string associatedMint "MintAccount public key"
+        int balance "1 (for NFTs)"
+    }
+    
+    MintAccount {
+        string mintAuthority "AIW3SystemWallet"
+        int supply "1 (unique)"
+        int decimals "0"
+    }
+    
+    MetadataPDA {
+        string updateAuthority "AIW3SystemWallet"
+        string creators "AIW3 as verified creator"
+        string uri "IPFS URI for JSON"
+        boolean isMutable "false"
+    }
+```
+
+### Partner Verification Flow
+
+```mermaid
+flowchart TD
+    A["User provides Wallet Address"] --> B["Query Solana: Find Token Accounts"]
+    B --> C["Filter: Token Accounts with balance = 1"]
+    C --> D["Extract: Mint Account addresses"]
+    D --> E["Derive: Metadata PDA from Mint"]
+    E --> F["Verify: creators[0] == AIW3 && verified == true"]
+    F --> |Valid| G["Read: URI field from metadata"]
+    F --> |Invalid| H["❌ Reject: Not authentic AIW3 NFT"]
+    G --> I["Fetch: JSON metadata from IPFS via Pinata"]
+    I --> J["Extract: Level from attributes"]
+    I --> K["Extract: Image URI from JSON"]
+    J --> L["✅ Display: User's NFT level"]
+    K --> M["✅ Display: NFT image"]
+
+    style A fill:#e1f5fe
+    style L fill:#c8e6c9
+    style M fill:#c8e6c9
+    style H fill:#ffcdd2
 ```
 
 ---
