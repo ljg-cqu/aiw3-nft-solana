@@ -1,4 +1,4 @@
-# AIW3 NFT Financial Analysis
+# AIW3 NFT On-Chain and Decentralized Storage Financial Analysis
 ## Comprehensive Cost Strategy for Solana-Based Equity NFTs at Scale
 
 ---
