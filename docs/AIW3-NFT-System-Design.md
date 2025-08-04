@@ -76,6 +76,31 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a URI reference to off-chain JSON metadata that stores the actual level data and references to IPFS-hosted images.
 
+### Transaction Volume Qualification
+
+**Level Requirements** (stored in AIW3 MySQL database):
+
+| NFT Level | Minimum Transaction Volume | Database Query | Verification Method | Business Logic |
+|-----------|---------------------------|----------------|-------------------|-----------------|
+| **Bronze** | $1,000 - $4,999 | `SELECT SUM(transaction_amount) FROM user_transactions WHERE user_id = ? AND status = 'completed'` | Real-time volume calculation | Entry-level qualification |
+| **Silver** | $5,000 - $19,999 | `SELECT SUM(transaction_amount) FROM user_transactions WHERE user_id = ? AND status = 'completed'` | Real-time volume calculation | Mid-tier qualification |
+| **Gold** | $20,000 - $99,999 | `SELECT SUM(transaction_amount) FROM user_transactions WHERE user_id = ? AND status = 'completed'` | Real-time volume calculation | High-tier qualification |
+| **Platinum** | $100,000+ | `SELECT SUM(transaction_amount) FROM user_transactions WHERE user_id = ? AND status = 'completed'` | Real-time volume calculation | Premium qualification |
+
+**Volume Verification Process**:
+1. Query user's total transaction volume from MySQL database
+2. Determine highest qualified NFT level based on volume thresholds
+3. Verify user doesn't already possess NFT of that level or higher
+4. Check for any pending minting operations for the user
+5. Authorize minting for qualified level only
+
+**Qualification Business Rules**:
+- Users can only mint NFTs for levels they have transaction volume to support
+- Users cannot mint multiple NFTs of the same level
+- Users cannot mint lower-level NFTs if they already possess higher-level ones
+- Transaction volume is calculated from all completed transactions in the system
+- Real-time volume calculation ensures current qualification status
+
 ### Image and Metadata Flow
 
 ```
@@ -247,29 +272,35 @@ flowchart TD
 flowchart TD
     subgraph "AIW3 System Actions"
         A["Initiate Mint for User"]
-        B["Read Image from assets/images"]
-        C["Upload Image to IPFS via Pinata"]
-        D["Create JSON Metadata with IPFS Image URI"]
-        E["Upload JSON to IPFS via Pinata"]
-        F["Create Mint Account"]
-        G["Create User's ATA"]
-        H["Mint Token to User's ATA"]
-        I["Create Metaplex Metadata PDA with IPFS JSON URI"]
-        J["Revoke Authorities (Optional)"]
+        B["Query Transaction Volume from MySQL Database"]
+        C["Verify Level Qualification Based on Volume"]
+        D["Check No Existing NFT of Same Level"]
+        E["Read Image from assets/images"]
+        F["Upload Image to IPFS via Pinata"]
+        G["Create JSON Metadata with IPFS Image URI"]
+        H["Upload JSON to IPFS via Pinata"]
+        I["Create Mint Account"]
+        J["Create User's ATA"]
+        K["Mint Token to User's ATA"]
+        L["Create Metaplex Metadata PDA with IPFS JSON URI"]
+        M["Revoke Authorities (Optional)"]
     end
 
     subgraph "User Interaction"
-        K["Provides Public Key"]
-        L["NFT appears in wallet"]
+        N["Provides Public Key and Requests Level"]
+        O["NFT appears in wallet"]
     end
 
-    K --> A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> L
+    N --> A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K --> L --> M --> O
 
     style A fill:#fff3e0
-    style K fill:#e3f2fd
-    style L fill:#c8e6c9
-    style C fill:#e8f5e8
-    style E fill:#e8f5e8
+    style B fill:#e3f2fd
+    style C fill:#e3f2fd
+    style D fill:#fce4ec
+    style N fill:#e3f2fd
+    style O fill:#c8e6c9
+    style F fill:#e8f5e8
+    style H fill:#e8f5e8
 ```
 
 ### System Architecture for Operations
@@ -285,7 +316,8 @@ graph TD
         Frontend -->|HTTPS REST API| Backend[🖥️ AIW3 Backend]
         Backend -->|Read Images| Assets[📁 assets/images]
         Backend -->|Upload Content| PinataService[📌 Pinata IPFS Service]
-        Backend -->|Database Queries| DB[(📦 Database)]
+        Backend -->|Database Queries| DB[(📦 Backend Database)]
+        Backend -->|Transaction Volume Queries| TxDB[(💾 MySQL Transaction Database)]
     end
 
     subgraph "Decentralized Storage"
@@ -309,6 +341,7 @@ graph TD
     style Backend fill:#cfc,stroke:#333,stroke-width:2px
     style Assets fill:#ffa,stroke:#333,stroke-width:2px
     style PinataService fill:#aff,stroke:#333,stroke-width:2px
+    style TxDB fill:#faf,stroke:#333,stroke-width:2px
     style IPFS fill:#faf,stroke:#333,stroke-width:2px
     style SolanaNode fill:#f96,stroke:#333,stroke-width:2px
     style Partners fill:#afa,stroke:#333,stroke-width:2px
@@ -323,14 +356,24 @@ erDiagram
         string walletAddress
         datetime createdAt
     }
+    
+    USER_TRANSACTIONS {
+        string transactionId
+        string userId
+        decimal transactionAmount
+        string status
+        datetime createdAt
+    }
 
     NFT {
         string nftId
         string mintAddress
         string ownerWalletAddress
+        string level
         string ipfsImageHash
         string ipfsMetadataHash
         string status
+        decimal qualifyingVolume
     }
 
     UPGRADE_REQUEST {
@@ -343,8 +386,10 @@ erDiagram
         datetime updatedAt
     }
 
-    USER ||--o{ UPGRADE_REQUEST : initiates
-    UPGRADE_REQUEST }|--|| NFT : for
+    USER ||--o{ USER_TRANSACTIONS : "has"
+    USER ||--o{ UPGRADE_REQUEST : "initiates"
+    USER ||--o{ NFT : "owns"
+    UPGRADE_REQUEST }|--|| NFT : "for"
 ```
 
 ---
@@ -373,30 +418,36 @@ Use Metaplex standard where on-chain metadata contains URI pointing to IPFS-host
 
 **Step-by-Step Minting Flow**:
 
-1. **Image Preparation**
+1. **Transaction Volume Verification**
+   - Query user's total transaction volume from MySQL database
+   - Determine highest qualified NFT level based on volume thresholds
+   - Verify user doesn't already possess NFT of that level or higher
+   - Check for any pending minting operations for the user
+
+2. **Image Preparation**
    - Read source image from `assets/images/{level}.png`
    - Validate image format and size
    - Upload image to IPFS via Pinata
    - Obtain IPFS hash for image
 
-2. **Metadata Creation**
+3. **Metadata Creation**
    - Create JSON metadata structure
    - Include IPFS image URI in `image` field
    - Add level data to `attributes` array
    - Include creator information
 
-3. **Metadata Upload**
+4. **Metadata Upload**
    - Upload JSON metadata to IPFS via Pinata
    - Obtain IPFS hash for metadata
    - Verify metadata accessibility via gateway
 
-4. **NFT Minting**
+5. **NFT Minting**
    - Create Solana mint account
    - Create user's Associated Token Account
    - Mint single token to user's ATA
    - Create Metaplex metadata account with IPFS JSON URI
 
-5. **Verification**
+6. **Verification**
    - Confirm on-chain metadata creation
    - Verify IPFS content accessibility
    - Test partner verification flow
@@ -445,7 +496,39 @@ The recommended approach is **User-Controlled Burning**. The user executes `burn
 9. Retrieve Image: Get image URI from JSON metadata (IPFS URI)
    ↓
 10. Display Image: Access image directly from IPFS via gateway
+   ↓
+11. Business Context: Level represents user's transaction volume tier at time of minting
 ```
+
+### Volume Qualification Verification Process
+
+**Pre-Minting Volume Check Flow**:
+
+```
+1. User requests NFT minting for specific level
+   ↓
+2. System queries MySQL: SELECT SUM(transaction_amount) FROM user_transactions WHERE user_id = ? AND status = 'completed'
+   ↓
+3. Calculate qualified level based on volume thresholds
+   ↓
+4. Compare requested level with qualified level
+   ↓
+5. Check existing NFT ownership: Query blockchain for user's current NFTs
+   ↓
+6. Verify no duplicate level minting
+   ↓
+7. Authorize or deny minting request based on qualification
+   ↓
+8. If approved: Proceed to image preparation and IPFS upload
+   ↓
+9. If denied: Return qualification error with current volume status
+```
+
+**Volume Verification Error Scenarios**:
+- **Insufficient Volume**: User requests level above their transaction volume
+- **Duplicate Level**: User already owns NFT of requested level
+- **Database Error**: Unable to calculate transaction volume
+- **Pending Operation**: User has existing minting operation in progress
 
 ### Image Distribution Flow
 
@@ -502,6 +585,12 @@ This approach prioritizes **simplicity, cost-effectiveness, and standards compli
 ## Implementation Requirements
 
 ### For AIW3 System Implementation
+
+**Transaction Volume Integration**
+- Implement real-time volume calculation from MySQL database
+- Create qualification checking logic before minting
+- Add duplicate NFT prevention for same-level minting
+- Integrate volume-based business logic into minting workflow
 
 **Source Image Management**
 - Organize images in `assets/images` directory by level/tier
