@@ -34,56 +34,7 @@ The **Pre-paid Rent Transfer** approach combined with **Premium Feature Revenue*
 
 ---
 
-## Quantitative Cost Analysis
-
-### Cost Breakdown Summary
-
-**10,000,000 users across all NFT tiers:**
-
-| Cost Category | Per User | 10M Users Total | Price Range |
-|---------------|----------|-----------------|-------------|
-| **Solana Rent (ATA)** | 0.00203928 SOL | 20,392.8 SOL | $408K-$4.08M |
-| **Transaction Fees** | 0.000005 SOL | 50 SOL | $1K-$10K |
-| **IPFS Storage (Pinata)** | $0.0001-0.001 | - | $1K-$10K |
-| **System Operations** | Variable | - | $50K-$200K/year |
-| **TOTAL ESTIMATED** | $0.046-$0.415 | - | **$470K-$4.15M** |
-
-*Note: Total includes one-time setup costs plus annual operations*
-
----
-
-## Detailed Cost Components
-
-### Cost Optimization Through Architecture Patterns
-
-#### Pattern-Based Cost Analysis
-
-Different implementation patterns have varying cost implications at scale:
-
-| Pattern | Mint Cost | Burn Cost | Storage Cost | Total 10M Users |
-|---------|-----------|-----------|--------------|-----------------|
-| **System-Direct Minting** | 0.002044 SOL | User pays | $150K-450K | $558K-4.67M |
-| **User-Initiated Minting** | User pays | User pays | $150K-450K | $150K-450K |
-| **Batch Minting** | 0.001800 SOL | User pays | $150K-450K | $510K-4.20M |
-| **Delegated Minting** | Variable | User pays | $150K-450K | $200K-500K |
-
-**Economic Impact Analysis:**
-
-- **System-Direct**: Higher initial investment, better user experience, predictable costs
-- **User-Initiated**: Lower system costs, higher user friction, variable adoption rates  
-- **Batch Processing**: 12% cost reduction for bulk operations, implementation complexity
-- **Hybrid Approach**: Optimal balance for scaled deployment
-
-#### Resource Allocation Recommendations
-
-**For Different Deployment Scales:**
-
-| Scale | Recommended Pattern | Capital Required | Monthly Operations |
-|-------|-------------------|------------------|-------------------|
-| **0-100K users** | System-Direct | $20K-400K | $5K-15K |
-| **100K-1M users** | Hybrid + Batch | $100K-2M | $25K-75K |
-| **1M-10M users** | Pre-paid Transfer | $150K-500K | $50K-200K |
-| **10M+ users** | Enterprise Hybrid | $200K-1M | $100K-500K |
+## Detailed On-Chain and Storage Cost Components
 
 ### 1. Solana Rent Costs (Associated Token Accounts)
 
@@ -222,7 +173,7 @@ const TIER_STORAGE_MULTIPLIER = {
 - Transaction fees: $1,000
 - IPFS storage (Pinata): $5,722/year
 - Setup & development: $50,000
-- **Total Initial**: $464,578 (+ $5,722/year storage)
+- **Total Initial**: $458,856 (Recurring: +$5,722/year)
 
 **Annual Operating**: $186,000
 
@@ -233,7 +184,7 @@ const TIER_STORAGE_MULTIPLIER = {
 - Transaction fees: $3,000
 - IPFS storage (Pinata): $5,722/year
 - Setup & development: $50,000
-- **Total Initial**: $1,281,290 (+ $5,722/year storage)
+- **Total Initial**: $1,275,568 (Recurring: +$5,722/year)
 
 **Annual Operating**: $186,000
 
@@ -244,7 +195,7 @@ const TIER_STORAGE_MULTIPLIER = {
 - Transaction fees: $10,000
 - IPFS storage (Pinata): $5,722/year
 - Setup & development: $50,000
-- **Total Initial**: $4,143,282 (+ $5,722/year storage)
+- **Total Initial**: $4,138,560 (Recurring: +$5,722/year)
 
 **Annual Operating**: $186,000
 
@@ -264,13 +215,7 @@ const TIER_STORAGE_MULTIPLIER = {
 
 ### Recommended Strategy: Pre-paid Rent Transfer
 
-**Implementation Overview:**
-1. **User initiates** NFT mint/upgrade request
-2. **System calculates** exact rent cost (0.002039280 SOL)
-3. **User transfers** rent amount to AIW3 dedicated wallet
-4. **System verifies** transfer completion and amount
-5. **System proceeds** with NFT minting using transferred funds
-6. **User receives** NFT with verified authenticity
+This strategy is recommended for its balance of low capital risk for AIW3 and a clear, one-time cost for users. It eliminates the need for AIW3 to front millions in recoverable rent deposits. The detailed implementation is outlined in the 'Implementation Strategies' section.
 
 **Advantages:**
 - ✅ **Zero capital lock-up** for AIW3
@@ -378,22 +323,22 @@ const PREPAID_STRATEGY_PROJECTIONS = {
 ### Break-Even Analysis
 
 **Conservative Scenario (SOL @ $20):**
-- Initial setup cost: $744,936
+- Initial setup cost: $458,856
 - Annual operations: $186,000
 - Premium revenue: $255M annually
-- **Break-even**: 2-3 months
+- **Break-even**: < 1 month
 
 **Moderate Scenario (SOL @ $60):**
-- Initial setup cost: $1,562,648
+- Initial setup cost: $1,275,568
 - Annual operations: $186,000
 - Premium revenue: $255M annually
-- **Break-even**: 4-6 months
+- **Break-even**: < 1 month
 
 **Optimistic Scenario (SOL @ $200):**
-- Initial setup cost: $4,424,640
+- Initial setup cost: $4,138,560
 - Annual operations: $186,000
 - Premium revenue: $255M annually
-- **Break-even**: 12-18 months
+- **Break-even**: < 1 month
 
 ---
 
@@ -455,7 +400,7 @@ The financial projections show exceptional ROI potential with minimal downside r
 ### Technical Implementation Details
 
 For detailed technical implementation guides, see:
-- [AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)
+- [AIW3 NFT Technical Guide](./AIW3-NFT-Technical-Guide.md)
 - [Solana NFT Technical Reference](./Solana-NFT-Technical-Reference.md)
 - [AIW3 NFT Upgrade Business Logic](./AIW3-NFT-Upgrade-Business-Logic.md)
 
