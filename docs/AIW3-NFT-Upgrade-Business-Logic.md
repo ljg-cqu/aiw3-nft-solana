@@ -7,12 +7,11 @@
 
 ## 📋 Table of Contents
 
-1. [Overview](#overview)
-2. [Upgrade Challenge & Requirements](#upgrade-challenge--requirements)
-3. [System Verification Workflow](#system-verification-workflow)
-4. [Implementation Options](#implementation-options)
-5. [Volume Thresholds & Benefits](#volume-thresholds--benefits)
-6. [Business Considerations](#business-considerations)
+1. [Overview](#-overview)
+2. [Upgrade Challenge & Requirements](#-upgrade-challenge--requirements)
+3. [System Verification Workflow](#-system-verification-workflow)
+4. [NFT Levels, Benefits, and Upgrade Logic](#-nft-levels-benefits-and-upgrade-logic)
+5. [Business Considerations](#-business-considerations)
 
 ---
 
@@ -65,9 +64,6 @@ From a business perspective, the user journey for an upgrade is as follows:
 
 ---
 
-
----
-
 ## 🏆 NFT Levels, Benefits, and Upgrade Logic
 
 This section defines the official business rules for each NFT level, including the conditions required to attain them and the benefits they confer.
@@ -93,7 +89,7 @@ This section defines the official business rules for each NFT level, including t
 - **Revenue Protection**: Volume thresholds ensure higher-tier benefits are earned, not gamed
 - **Scalability**: Enables confident expansion of the equity NFT program with clear qualification criteria
 
-### Implementation Considerations
+### Policy Decisions for Implementation
 - **Volume Calculation Period**: Define whether thresholds are based on all-time, rolling 12-month, or other time periods
 - **Volume Types**: Specify which transactions count (trading, staking, lending, etc.)
 - **Currency Conversion**: Establish how to handle multi-asset volumes and price conversions
