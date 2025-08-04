@@ -29,8 +29,6 @@ This document defines the business rules and policies for AIW3's tiered equity N
 
 ## 🔄 Upgrade Challenge & Requirements
 
-### 🎯 The Equity NFT Upgrade Challenge
-
 AIW3 equity NFTs represent tiered access rights and benefits. When users upgrade from a lower-level NFT to a higher-level one, the system must ensure:
 
 1. **Old NFT Rights Are Revoked**: The burned NFT should immediately stop providing benefits
