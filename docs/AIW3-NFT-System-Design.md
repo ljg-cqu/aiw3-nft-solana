@@ -78,18 +78,10 @@ The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a 
 
 ### Transaction Volume Qualification
 
-**Level Requirements**:
+**Qualification Rules**:
+The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **AIW3 NFT Upgrade Business Logic** document.
 
-| Level | NFT Name | Upgrade Conditions | Tier Benefits |
-|---|---|---|---|
-| **Level 1** | Tech Chicken | Total transaction volume ≥ 100,000 USDT | 10% reduction in handling fees, 10 free uses of Aiagent per week |
-| **Level 2** | Quant Ape | Total transaction volume ≥ 500,000 USDT, bind two designated badge-type NFTs | 20% reduction in handling fees, 20 free uses of Aiagent per week |
-| **Level 3** | On-chain Hunter | Total transaction volume ≥ 5,000,000 USDT, bind four designated badge-type NFTs | 30% reduction in transaction fees, 30 free uses of Aiagent per week |
-| **Level 4** | Alpha Alchemist | Total transaction volume ≥ 10,000,000 USDT, binding to six designated badge-type NFTs | 40% reduction in transaction fees, 40 free uses of Aiagent per week |
-| **Level 5** | Quantum Alchemist | Total transaction volume ≥ 50,000,000 USDT, bound to eight designated badge-type NFTs | 55% reduction in transaction fees, 50 free uses of Aiagent per week |
-| **-** | Trophy Breeder | The top three participants in the trading competition will receive (airdrop) | 25% reduction in handling fee |
-
-**Volume Verification Process**:
+**Technical Verification Process**:
 1. Query user's total transaction volume from MySQL database
 2. Determine highest qualified NFT level based on volume thresholds
 3. Verify user doesn't already possess NFT of that level or higher
@@ -456,10 +448,11 @@ Use Metaplex standard where on-chain metadata contains URI pointing to IPFS-host
 
 ---
 
-## NFT Upgrade and Burn Strategy
+## NFT Upgrade and Burn Process
 
-### Invalidation Approach: User-Controlled Burning
+The upgrade process is a critical system function that combines on-chain (Solana) and off-chain (AIW3 Backend) operations. It is designed to be atomic and verifiable, ensuring system integrity.
 
+### Invalidation Strategy: User-Controlled Burning
 The recommended approach is **User-Controlled Burning**. The user executes `burn` and `closeAccount` transactions directly from their wallet. This method provides definitive, on-chain proof of destruction and aligns with Web3 principles of user autonomy.
 
 **Advantages**:
@@ -469,6 +462,91 @@ The recommended approach is **User-Controlled Burning**. The user executes `burn
 - ✅ **User Empowerment**: Users maintain full control over their assets and can reclaim the SOL rent from the closed account.
 
 **Verification Method**: The system confirms the burn by querying the ATA's address. If `getAccountInfo(ataAddress)` returns `null`, the burn is verified.
+
+### Upgrade Sequence Workflow
+
+The following diagram illustrates the technical sequence of events during an NFT upgrade.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend as AIW3 Frontend
+    participant Wallet as Phantom/Solflare
+    participant Backend as AIW3 Backend
+    participant Solana as Solana Blockchain
+
+    %% Step 1: Eligibility Check
+    User->>Frontend: Click "Check Eligibility"
+    Frontend->>Backend: GET /api/eligibility-check
+    Backend->>Backend: Verify transaction volume & badges for user
+    Backend-->>Frontend: {"eligible": true, "targetLevel": "Level 2"}
+    Frontend->>User: Display "You are eligible to upgrade!"
+
+    %% Step 2: Burn Initiation
+    User->>Frontend: Click "Burn to Upgrade"
+    Frontend->>Wallet: Request signature for burn transaction
+    User->>Wallet: Approve Transaction
+    Wallet->>Solana: Submit burn & close ATA transaction
+    Solana-->>Wallet: Transaction Confirmed
+    Wallet-->>Frontend: Burn transaction successful
+
+    %% Step 3: Burn Verification
+    Frontend->>Backend: POST /api/request-upgrade {burnTx: "..."}
+    Backend->>Solana: getAccountInfo(user_L1_NFT_ata_address)
+    Solana-->>Backend: null (Confirms ATA is closed)
+    note right of Backend: ✅ On-chain verification success!
+
+    %% Step 4: New NFT Minting
+    Backend->>Solana: Mint Level 2 NFT to new ATA for User
+    Solana-->>Backend: Mint Successful
+    Backend-->>Frontend: {"upgradeStatus": "complete"}
+    Frontend->>User: Display "Upgrade Complete! You now have Level 2 NFT."
+```
+
+### Upgrade Implementation Pseudo-Code
+
+**Transaction Volume Verification (Backend)**
+```typescript
+// Pseudo-code for AIW3 platform transaction volume verification
+async function verifyTransactionVolumeRequirement(
+    userWallet: PublicKey, 
+    targetLevel: string
+): Promise<{ qualified: boolean; currentVolume: number; requiredVolume: number }> {
+    
+    // Volume thresholds are sourced from business logic configuration
+    const volumeThresholds = getVolumeThresholds();
+    
+    // Query AIW3 platform transaction history
+    const userTransactionHistory = await getAIW3TransactionHistory(userWallet);
+    const totalVolume = calculateTotalVolume(userTransactionHistory);
+    const requiredVolume = volumeThresholds[targetLevel];
+    
+    return {
+        qualified: totalVolume >= requiredVolume,
+        currentVolume: totalVolume,
+        requiredVolume: requiredVolume
+    };
+}
+```
+
+**Burn Verification (Backend)**
+```typescript
+// Pseudo-code for AIW3 system verification
+async function verifyNFTBurnCompletion(oldNftMintAddress: PublicKey, userWallet: PublicKey): Promise<boolean> {
+    // Check if the user's ATA for this mint still exists
+    const ata = await getAssociatedTokenAddress(oldNftMintAddress, userWallet);
+    const accountInfo = await connection.getAccountInfo(ata);
+    
+    return accountInfo === null; // Account closed = burn complete
+}
+```
+
+### Implementation Design Choices
+
+| Verification Type | Approach | Description | Rationale |
+|:---|:---|:---|:---|
+| **Transaction Volume** | **Platform Database Query** | Query AIW3 internal database for user transaction history. | Provides real-time, comprehensive data. While centralized, it is the authoritative source for platform-specific activity. |
+| **NFT Burn Status** | **Polling after User Signal** | User's frontend signals the backend after submitting the burn transaction. Backend then polls the ATA address until `getAccountInfo` returns `null`. | Balances implementation simplicity with near real-time verification without requiring a complex chain-monitoring service. |
 
 ---
 
