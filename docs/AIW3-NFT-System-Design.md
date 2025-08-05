@@ -75,7 +75,200 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 ## Core Technical Architecture
 
+### Multi-System Integration Overview
+
+The AIW3 NFT system integrates with the complete `lastmemefi-api` infrastructure stack, coordinating between blockchain, database, cache, message queue, and storage systems:
+
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        UI["Personal Center UI"]
+        WS["WebSocket Client"]
+    end
+    
+    subgraph "API Gateway Layer"
+        API["Sails.js API Server"]
+        AUTH["JWT Middleware"]
+        CORS["CORS Handler"]
+    end
+    
+    subgraph "Service Layer"
+        NFT["NFTService"]
+        WEB3["Web3Service"]
+        USER["UserService"]
+        REDIS["RedisService"]
+        KAFKA["KafkaService"]
+        ACCESS["AccessTokenService"]
+    end
+    
+    subgraph "Data Layer"
+        MYSQL[("MySQL Database")]
+        REDIS_DB[("Redis Cache")]
+        KAFKA_Q[("Kafka Queue")]
+    end
+    
+    subgraph "External Systems"
+        SOLANA["Solana Blockchain"]
+        IPFS["IPFS via Pinata"]
+        ELASTIC["Elasticsearch"]
+    end
+    
+    %% Frontend to API
+    UI --> API
+    WS --> API
+    
+    %% API Layer Flow
+    API --> AUTH
+    AUTH --> NFT
+    
+    %% Service Interactions
+    NFT --> WEB3
+    NFT --> USER
+    NFT --> REDIS
+    NFT --> KAFKA
+    NFT --> ACCESS
+    
+    %% Data Layer Connections
+    USER --> MYSQL
+    REDIS --> REDIS_DB
+    KAFKA --> KAFKA_Q
+    
+    %% External System Connections
+    WEB3 --> SOLANA
+    NFT --> IPFS
+    NFT --> ELASTIC
+    
+    %% WebSocket Events
+    KAFKA --> WS
+```
+
+### System Component Responsibilities
+
+| Component | NFT-Related Responsibilities | Data Flow |
+|-----------|----------------------------|----------|
+| **NFTService** | Orchestrates all NFT business logic, qualification checks, minting/burning coordination | Reads from MySQL, writes to Kafka, calls Web3Service |
+| **Web3Service** | Solana blockchain interactions, mint/burn operations, balance queries | Communicates with Solana RPC, returns transaction signatures |
+| **UserService** | User data management, trading volume tracking, wallet address validation | CRUD operations on MySQL User table |
+| **RedisService** | Caches NFT qualification status, pending operations, rate limiting | Read/write to Redis with TTL for performance |
+| **KafkaService** | Publishes NFT events, processes async operations, handles retries | Produces/consumes messages for real-time updates |
+| **AccessTokenService** | JWT validation for NFT endpoints, wallet-based authentication | Validates tokens, manages user sessions |
+
 The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a URI reference to off-chain JSON metadata that stores the actual level data and references to IPFS-hosted images.
+
+### NFT Operation Data Flows
+
+#### 1. NFT Claiming Flow
+```mermaid
+sequenceDiagram
+    participant UI as Personal Center UI
+    participant API as Sails.js API
+    participant NFT as NFTService
+    participant REDIS as RedisService
+    participant MYSQL as MySQL DB
+    participant WEB3 as Web3Service
+    participant SOLANA as Solana Blockchain
+    participant IPFS as IPFS/Pinata
+    participant KAFKA as KafkaService
+    participant WS as WebSocket
+    
+    UI->>API: POST /api/nft/claim
+    API->>NFT: claimNFT(userId, level)
+    
+    %% Check qualification from cache first
+    NFT->>REDIS: get("nft_qual:" + userId)
+    REDIS-->>NFT: cached qualification data
+    
+    %% If not cached, query database
+    alt Cache Miss
+        NFT->>MYSQL: SELECT total_trading_volume FROM users WHERE id = ?
+        MYSQL-->>NFT: user trading volume
+        NFT->>REDIS: setex("nft_qual:" + userId, 300, qualData)
+    end
+    
+    %% Check existing NFTs
+    NFT->>MYSQL: SELECT * FROM user_nfts WHERE user_id = ? AND status = 'active'
+    MYSQL-->>NFT: existing NFTs
+    
+    %% Upload metadata to IPFS
+    NFT->>IPFS: uploadMetadata(nftData)
+    IPFS-->>NFT: metadata IPFS hash
+    
+    %% Mint NFT on Solana
+    NFT->>WEB3: mintNFT(userWallet, metadataUri)
+    WEB3->>SOLANA: mintTo() transaction
+    SOLANA-->>WEB3: transaction signature
+    WEB3-->>NFT: mint result
+    
+    %% Store in database
+    NFT->>MYSQL: INSERT INTO user_nfts (...)
+    MYSQL-->>NFT: NFT record created
+    
+    %% Publish event
+    NFT->>KAFKA: publish("nft.claimed", eventData)
+    KAFKA->>WS: broadcast to user
+    WS-->>UI: real-time update
+    
+    NFT-->>API: success response
+    API-->>UI: NFT claimed successfully
+```
+
+#### 2. NFT Upgrade Flow
+```mermaid
+sequenceDiagram
+    participant UI as Personal Center UI
+    participant API as Sails.js API
+    participant NFT as NFTService
+    participant REDIS as RedisService
+    participant MYSQL as MySQL DB
+    participant WEB3 as Web3Service
+    participant SOLANA as Solana Blockchain
+    participant IPFS as IPFS/Pinata
+    participant KAFKA as KafkaService
+    
+    UI->>API: POST /api/nft/upgrade
+    API->>NFT: upgradeNFT(userId, fromLevel, toLevel)
+    
+    %% Verify upgrade eligibility
+    NFT->>REDIS: get("upgrade_lock:" + userId)
+    REDIS-->>NFT: check for pending upgrades
+    
+    NFT->>MYSQL: SELECT badges_collected, required_volume FROM user_nft_qualifications
+    MYSQL-->>NFT: qualification status
+    
+    %% Set upgrade lock
+    NFT->>REDIS: setex("upgrade_lock:" + userId, 600, "processing")
+    
+    %% Create upgrade request record
+    NFT->>MYSQL: INSERT INTO nft_upgrade_requests (...)
+    MYSQL-->>NFT: upgrade request ID
+    
+    %% Burn old NFT
+    NFT->>WEB3: burnNFT(oldMintAddress)
+    WEB3->>SOLANA: burn() transaction
+    SOLANA-->>WEB3: burn transaction signature
+    
+    %% Upload new metadata
+    NFT->>IPFS: uploadMetadata(newNftData)
+    IPFS-->>NFT: new metadata IPFS hash
+    
+    %% Mint new NFT
+    NFT->>WEB3: mintNFT(userWallet, newMetadataUri)
+    WEB3->>SOLANA: mintTo() transaction
+    SOLANA-->>WEB3: mint transaction signature
+    
+    %% Update database records
+    NFT->>MYSQL: UPDATE user_nfts SET status='burned' WHERE mint_address=?
+    NFT->>MYSQL: INSERT INTO user_nfts (new NFT record)
+    NFT->>MYSQL: UPDATE nft_upgrade_requests SET status='completed'
+    
+    %% Clear cache and publish event
+    NFT->>REDIS: del("upgrade_lock:" + userId)
+    NFT->>REDIS: del("nft_qual:" + userId)
+    NFT->>KAFKA: publish("nft.upgraded", upgradeData)
+    
+    NFT-->>API: upgrade success
+    API-->>UI: NFT upgraded successfully
+```
 
 ### Transaction Volume Qualification
 
@@ -83,11 +276,12 @@ The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a 
 The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **[AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)** document.
 
 **Technical Verification Process**:
-1. Query user's total transaction volume from MySQL database
-2. Determine highest qualified NFT level based on volume thresholds
-3. Verify user doesn't already possess NFT of that level or higher
-4. Check for any pending minting operations for the user
-5. Authorize minting for qualified level only
+1. **Redis Cache Check**: Query cached qualification data (`nft_qual:{userId}`) with 5-minute TTL
+2. **Database Query**: If cache miss, query `total_trading_volume` from MySQL `users` table
+3. **NFT Ownership Check**: Query existing NFTs from `user_nfts` table to prevent duplicates
+4. **Badge Verification**: Check badge requirements from `user_nft_qualifications` table
+5. **Concurrency Control**: Use Redis locks to prevent duplicate operations
+6. **Authorization**: Authorize minting only for qualified level with proper validation
 
 ### Image and Metadata Flow
 
