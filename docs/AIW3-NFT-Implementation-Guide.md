@@ -159,23 +159,37 @@ sequenceDiagram
     participant User
     participant Frontend
     participant Backend
-    participant SolanaProgram
+    participant MySQL
+    participant Redis
+    participant Web3Service
+    participant SolanaRPC
+    participant Kafka
 
     User->>Frontend: Clicks "Upgrade NFT"
-    Frontend->>Backend: POST /api/nft/initiate-upgrade
-    Backend->>Backend: Verify user meets off-chain requirements (e.g., trading volume)
+    Frontend->>Backend: POST /api/nft/upgrade
+    Backend->>MySQL: Query user trading volume and badges
+    Backend->>Redis: Check cached NFT status
+    Backend->>Backend: Verify qualification requirements
+    
     alt Requirements Met
-        Backend->>Frontend: Return signed "Burn" transaction
+        Backend->>MySQL: Create NFTUpgradeRequest record
+        Backend->>Web3Service: Prepare burn transaction
+        Backend->>Frontend: Return transaction for user approval
         Frontend->>User: Prompt to approve Burn transaction
-        User->>SolanaProgram: Approves and sends transaction
-        SolanaProgram->>SolanaProgram: Burns the old NFT
-        Note over Backend,SolanaProgram: Backend monitors for Burn confirmation
-        Backend->>SolanaProgram: Calls mint_new_nft(level)
-        SolanaProgram->>SolanaProgram: Mints the new, higher-level NFT to user's wallet
-        SolanaProgram-->>User: New NFT appears in wallet
+        User->>SolanaRPC: Signs and submits burn transaction
+        SolanaRPC-->>Backend: Transaction confirmation via monitoring
+        Backend->>MySQL: Update upgrade status to 'burn_confirmed'
+        Backend->>Web3Service: Prepare mint transaction
+        Web3Service->>SolanaRPC: Submit mint transaction
+        SolanaRPC-->>Backend: Mint confirmation
+        Backend->>MySQL: Update user NFT level and status
+        Backend->>Redis: Invalidate cached NFT data
+        Backend->>Kafka: Publish upgrade success event
+        Backend->>Frontend: WebSocket: nft:upgrade_complete
+        Frontend-->>User: Display success and new NFT
     else Requirements Not Met
-        Backend-->>Frontend: Return error message
-        Frontend-->>User: Display "You are not eligible for an upgrade"
+        Backend-->>Frontend: Return detailed error response
+        Frontend-->>User: Display specific requirements needed
     end
 ```
 
@@ -199,19 +213,26 @@ This section provides detailed, step-by-step flows for the key processes in the 
 
 ```mermaid
 flowchart TD
-    A[User connects wallet to AIW3 for the first time] --> B{Backend: Is this a new user?}
-    B -->|Yes| C[Create new user record in database]
-    B -->|No| D[Load existing user data]
-    C --> E[Mark Lv.1 NFT as Unlockable for the user]
-    D --> F[Frontend: Display Claim Your Lv.1 NFT button]
+    A[User connects wallet to AIW3 for the first time] --> B[Wallet signature verification via existing SolanaChainAuth]
+    B --> C{Check user in MySQL database}
+    C -->|New User| D[Create User record with wallet_address]
+    C -->|Existing User| E[Load user data and trading history]
+    D --> F[Check if user qualifies for Lv.1 NFT]
     E --> F
-    F --> G[User clicks Claim]
-    G --> H[Backend: Prepare standard SPL Token mint transaction]
-    H --> I[Frontend: Prompt user to approve transaction in wallet]
-    I --> J[User approves]
-    J --> K[Transaction sent to SPL Token Program]
-    K --> L[SPL Token Program mints Lv.1 NFT to user wallet]
-    L --> M[Frontend: Display success message and show new NFT]
+    F --> G{Meets 100k USDT volume requirement?}
+    G -->|Yes| H[Mark Lv.1 NFT as unlockable in UserNFTQualification table]
+    G -->|No| I[Display volume requirement progress]
+    H --> J[Frontend: Display Claim Your Lv.1 NFT button]
+    J --> K[User clicks Claim]
+    K --> L[Backend: Upload image to IPFS via Pinata]
+    L --> M[Backend: Create and upload metadata JSON to IPFS]
+    M --> N[Web3Service: Prepare mint transaction with metadata URI]
+    N --> O[Frontend: Prompt user to approve transaction]
+    O --> P[User approves via wallet]
+    P --> Q[SPL Token Program mints NFT to user's ATA]
+    Q --> R[Backend: Create UserNFT record in MySQL]
+    R --> S[Backend: Publish nft:claimed event to Kafka]
+    S --> T[Frontend: WebSocket notification and NFT display]
 ```
 
 ### 2. NFT Synthesis (Upgrade) Flow
@@ -220,24 +241,39 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    subgraph OffChain ["Off-Chain Verification"]
-        A[User with Lv.1 NFT navigates to Synthesis page] --> B{Backend: Check eligibility for Lv.2}
-        B -->|Trading volume sufficient?| C{User has required Badge NFTs?}
-        B -->|No| D[Frontend: Display More trading volume needed]
-        C -->|No| E[Frontend: Display You need to acquire more Badge NFTs]
+    subgraph LegacyIntegration ["Integration with lastmemefi-api"]
+        A[User with Lv.1 NFT navigates to Synthesis page] --> B[Frontend: GET /api/nft/status]
+        B --> C[Backend: Query MySQL for user trading volume]
+        C --> D[Backend: Query NFTBadge table for bound badges]
+        D --> E{Check Lv.2 requirements: 500k USDT + 2 badges}
+        E -->|Volume insufficient| F[Display current volume vs required 500k USDT]
+        E -->|Missing badges| G[Display badge collection status and requirements]
     end
 
-    subgraph OnChain ["On-Chain Execution"]
-        C -->|Yes| F[Frontend: Display You are eligible! Click to upgrade]
-        F --> G[User clicks Upgrade]
-        G --> H[Backend: Prepare burn transaction for Lv.1 NFT]
-        H --> I[Frontend: Prompt user to approve Burn]
-        I --> J[User approves; Lv.1 NFT is burned]
-        J --> K{Backend: Monitor blockchain for burn confirmation}
-        K -->|Confirmed| L[Backend: Prepare mint transaction for Lv.2 NFT]
-        L --> M[Frontend: Prompt user to approve Mint]
-        M --> N[User approves; Lv.2 NFT is minted]
-        N --> O[Frontend: Show success animation and new Lv.2 NFT]
+    subgraph BusinessLogic ["Business Rules Validation"]
+        E -->|All requirements met| H[Display upgrade eligibility confirmation]
+        H --> I[User clicks Upgrade button]
+        I --> J[Backend: Create NFTUpgradeRequest record]
+        J --> K[Backend: Verify no pending upgrades exist]
+    end
+
+    subgraph BlockchainExecution ["Solana Blockchain Operations"]
+        K --> L[Web3Service: Prepare burn transaction]
+        L --> M[Frontend: Request user approval for burn]
+        M --> N[User signs burn transaction]
+        N --> O[Solana RPC: Execute burn via SPL Token Program]
+        O --> P[Backend monitoring service confirms burn]
+        P --> Q[Backend: Update NFTUpgradeRequest to burn_confirmed]
+        Q --> R[Web3Service: Create new Lv.2 metadata and upload to IPFS]
+        R --> S[Web3Service: Prepare mint transaction]
+        S --> T[Frontend: Request user approval for mint]
+        T --> U[User signs mint transaction]
+        U --> V[Solana RPC: Mint new NFT to user's wallet]
+        V --> W[Backend: Update User.current_nft_level to 2]
+        W --> X[Backend: Create new UserNFT record]
+        X --> Y[Redis: Invalidate cached user NFT status]
+        Y --> Z[Kafka: Publish nft:upgraded event]
+        Z --> AA[WebSocket: Notify frontend of completion]
     end
 ```
 
@@ -247,14 +283,46 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[User connects wallet to Partner dApp] --> B[Partner Backend: Get user wallet address]
-    B --> C[Query all token accounts owned by the address]
-    C --> D{Filter for tokens where mint is part of AIW3 Collection}
-    D --> E{For each AIW3 NFT, read on-chain metadata}
-    E --> F[Verify creator is the official AIW3 address]
-    F --> G[Read level attribute from metadata]
-    G --> H[Identify the highest level NFT owned by the user]
-    H --> I[Grant user access based on their verified level]
+    subgraph PartnerDApp ["External Partner Integration"]
+        A[User connects wallet to Partner dApp] --> B[Partner: Get user's wallet public key]
+        B --> C[Partner: Query Solana RPC for all token accounts]
+        C --> D[Filter token accounts by AIW3 collection criteria]
+    end
+
+    subgraph OnChainVerification ["Blockchain Verification Process"]
+        D --> E{For each potential AIW3 NFT token account}
+        E --> F[Read on-chain Metaplex metadata PDA]
+        F --> G[Verify creators field contains AIW3 system wallet]
+        G --> H{Is creator verified?}
+        H -->|No| I[Skip this token - not authentic AIW3 NFT]
+        H -->|Yes| J[Fetch metadata JSON from IPFS URI]
+    end
+
+    subgraph MetadataProcessing ["NFT Level Extraction"]
+        J --> K[Parse JSON metadata attributes array]
+        K --> L[Find attribute with trait_type: Level]
+        L --> M[Extract level value 1-6]
+        M --> N[Store NFT level and mint address]
+    end
+
+    subgraph AccessControl ["Partner Access Decision"]
+        N --> O[Compare all found NFT levels]
+        O --> P[Identify highest level NFT owned]
+        P --> Q{Apply partner's access rules}
+        Q --> R[Grant tier-appropriate access/benefits]
+        R --> S[Log verification event for audit]
+    end
+
+    subgraph ErrorHandling ["Verification Edge Cases"]
+        I --> T[Continue checking other tokens]
+        T --> U{Any valid NFTs found?}
+        U -->|No| V[User has no AIW3 NFTs - deny access]
+        U -->|Yes| O
+        
+        J --> W{IPFS metadata accessible?}
+        W -->|No| X[Use backup IPFS gateway or cache]
+        W -->|Yes| K
+    end
 ```
 
 ---

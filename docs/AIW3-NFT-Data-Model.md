@@ -566,44 +566,93 @@ This diagram illustrates the relationships between the different data entities i
 ```mermaid
 erDiagram
     USER {
-        string userId
-        string walletAddress
+        int id PK
+        string wallet_address UK
+        string accessToken
+        string referralCode UK
+        int current_nft_level
+        string current_nft_mint
+        datetime last_nft_upgrade
+        decimal total_trading_volume
+        datetime last_volume_update
         datetime createdAt
+        datetime updatedAt
     }
     
-    USER_TRANSACTIONS {
-        string transactionId
-        string userId
-        decimal transactionAmount
+    USERNFT {
+        int id PK
+        int user_id FK
+        string nft_mint_address UK
+        int nft_level
+        string nft_name
+        string metadata_uri
+        string image_uri
         string status
-        datetime createdAt
-    }
-
-    NFT {
-        string nftId
-        string mintAddress
-        string ownerWalletAddress
-        string level
-        string ipfsImageHash
-        string ipfsMetadataHash
-        string status
-        decimal qualifyingVolume
-    }
-
-    UPGRADE_REQUEST {
-        string requestId
-        string userId
-        string originalNftId
-        string newNftId
-        string status
+        datetime claimed_at
+        datetime last_upgraded_at
+        datetime burned_at
         datetime createdAt
         datetime updatedAt
     }
 
-    USER ||--o{ USER_TRANSACTIONS : has
-    USER ||--o{ UPGRADE_REQUEST : initiates
-    USER ||--o{ NFT : owns
-    UPGRADE_REQUEST }|--|| NFT : for
+    USERNFTQUALIFICATION {
+        int id PK
+        int user_id FK
+        int target_level
+        decimal current_volume
+        decimal required_volume
+        int badges_collected
+        int badges_required
+        boolean is_qualified
+        datetime last_checked_at
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    NFTBADGE {
+        int id PK
+        int user_id FK
+        string badge_type
+        string badge_name
+        string mint_address UK
+        string metadata_uri
+        boolean is_bound
+        datetime earned_at
+        datetime bound_at
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    NFTUPGRADEREQUEST {
+        int id PK
+        int user_id FK
+        int from_level
+        int to_level
+        string old_nft_mint
+        string new_nft_mint
+        string burn_transaction
+        string mint_transaction
+        string status
+        string error_message
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    TRADES {
+        int id PK
+        string wallet_address
+        decimal total_price
+        string trade_type
+        datetime createdAt
+    }
+
+    USER ||--o{ USERNFT : owns
+    USER ||--o{ USERNFTQUALIFICATION : has_qualification_for
+    USER ||--o{ NFTBADGE : earned
+    USER ||--o{ NFTUPGRADEREQUEST : initiated
+    USER ||--o{ TRADES : executed
+    USERNFT ||--o{ NFTUPGRADEREQUEST : involved_in
+    USERNFTQUALIFICATION }o--|| NFTBADGE : requires_badges
 ```
 
 ---
