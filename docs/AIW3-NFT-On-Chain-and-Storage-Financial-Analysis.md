@@ -396,7 +396,7 @@ The financial projections show exceptional ROI potential with minimal downside r
 For detailed technical implementation guides, see:
 - [AIW3 NFT System Design](./AIW3-NFT-System-Design.md)
 - [AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)
-- [AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)
+- [AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)
 
 ### External References
 

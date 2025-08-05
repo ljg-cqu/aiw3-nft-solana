@@ -285,7 +285,7 @@ sequenceDiagram
 ### Transaction Volume Qualification
 
 **Qualification Rules**:
-The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **[AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)** document.
+The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)** document.
 
 **Technical Verification Process**:
 1. **Redis Cache Check**: Query cached qualification data (`nft_qual:{userId}`) with 5-minute TTL
@@ -486,7 +486,7 @@ graph TD
 For more detailed information, please refer to the following documents:
 
 ### Core Documentation
-- **[AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)**: Contains the business rules, tier requirements, and user policies for the NFT system.
+- **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**: Contains the business rules, tier requirements, and user policies for the NFT system.
 - **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: Provides a step-by-step guide for developers, including process flows and code-level details.
 - **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: Details the on-chain and off-chain data structures, including table schemas and metadata specifications.
 - **[AIW3 NFT Appendix](./AIW3-NFT-Appendix.md)**: Contains a glossary of terms and a list of external references.

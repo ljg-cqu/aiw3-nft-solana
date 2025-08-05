@@ -387,7 +387,7 @@ For comprehensive information about the AIW3 NFT system, please refer to these r
 
 ### Core Documentation
 - **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: High-level technical architecture and lifecycle management overview
-- **[AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)**: Business rules, tier requirements, and user policies for the NFT system
+- **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**: Business rules, tier requirements, and user policies for the NFT system
 - **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: On-chain and off-chain data structures, schemas, and metadata specifications
 - **[AIW3 NFT Appendix](./AIW3-NFT-Appendix.md)**: Glossary of terms and external references
 

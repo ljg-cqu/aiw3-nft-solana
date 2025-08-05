@@ -35,7 +35,7 @@ The AIW3 NFT System is a comprehensive Solana-based equity NFT implementation **
 This project's documentation is organized into focused, modular documents optimized for integration with the existing AIW3 backend system:
 
 ### Core Documentation
-- **[AIW3 NFT Tiers and Policies](./docs/AIW3-NFT-Tiers-and-Policies.md)**: Business rules, tier requirements, and user policies integrated with lastmemefi-api user system
+- **[AIW3 NFT Tiers and Rules](./docs/AIW3-NFT-Tiers-and-Rules.md)**: Business rules, tier requirements, and user policies integrated with lastmemefi-api user system
 - **[AIW3 NFT System Design](./docs/AIW3-NFT-System-Design.md)**: High-level technical architecture leveraging existing lastmemefi-api infrastructure
 - **[AIW3 NFT Implementation Guide](./docs/AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide using lastmemefi-api patterns and services
 - **[AIW3 NFT Data Model](./docs/AIW3-NFT-Data-Model.md)**: Database schemas extending existing User model and API response formats
@@ -53,7 +53,7 @@ This project's documentation is organized into focused, modular documents optimi
 
 ## Business Process and Rules
 
-The comprehensive business process and rules for this NFT project are detailed in the [AIW3 NFT Tiers and Policies](./docs/AIW3-NFT-Tiers-and-Policies.md) document.
+The comprehensive business process and rules for this NFT project are detailed in the [AIW3 NFT Tiers and Rules](./docs/AIW3-NFT-Tiers-and-Rules.md) document.
 
 ## Project Roadmap, Scope, and Timeline
 
