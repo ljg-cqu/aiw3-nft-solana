@@ -11,6 +11,10 @@ This document serves as a centralized reference for terminology definitions and 
 
 ---
 
+## Terminologies and Flow References
+
+Each term in this appendix is cross-referenced with the respective NFT workflows as detailed in the **AIW3 NFT Business Flows and Processes** document to ensure clarity and comprehensive understanding.
+
 ## Terminologies
 
 This section defines the core concepts used throughout the AIW3 NFT documentation.

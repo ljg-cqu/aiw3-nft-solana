@@ -1,5 +1,7 @@
 # AIW3 NFT Integration Issues/PRs Breakdown
 
+**Implementation Note**: All integration issues and PRs are designed to support the complete NFT business flows documented in **AIW3 NFT Business Flows and Processes**, ensuring alignment with all 41 prototype designs.
+
 ## Overview
 
 This document provides a detailed breakdown of issues and pull requests for integrating the AIW3 NFT system with the existing `lastmemefi-api` backend. Each issue is designed to be small, controllable, and testable with appropriate granularity for team collaboration.

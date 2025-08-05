@@ -1,4 +1,6 @@
 # AIW3 NFT Concurrency Control
+
+**Concurrency Context**: This document addresses concurrency control for all NFT business flows documented in **AIW3 NFT Business Flows and Processes**, ensuring thread-safe operations across all user interactions.
 ## Transaction Ordering & Safe Concurrent Minting for Solana-Based Equity NFTs
 
 ---

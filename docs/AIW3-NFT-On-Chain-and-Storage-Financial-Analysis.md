@@ -1,4 +1,6 @@
-# AIW3 NFT On-Chain and Decentralized Storage Financial Analysis
+# AIW3 NFT On-Chain and Storage Financial Analysis
+
+**Financial Analysis Scope**: This document provides cost analysis for all NFT business flows documented in **AIW3 NFT Business Flows and Processes**, covering all prototype-defined operations and their associated costs.
 ## Comprehensive Cost Strategy for Solana-Based Equity NFTs at Scale
 
 ---

@@ -1,4 +1,6 @@
 # AIW3 NFT Security Operations
+
+**Security Context**: This document covers security considerations for all NFT business flows and processes as detailed in **AIW3 NFT Business Flows and Processes**, ensuring comprehensive protection across all user interactions.
 ## Key Management, Security Protocols, and Operational Procedures
 
 ---

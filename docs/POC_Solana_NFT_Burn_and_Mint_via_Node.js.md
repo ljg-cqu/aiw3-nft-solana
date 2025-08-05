@@ -1,4 +1,6 @@
-# Proof of Concept: Solana NFT Burn and Mint via Node.js
+# POC: Solana NFT Burn and Mint via Node.js
+
+**POC Scope**: This proof of concept validates the technical feasibility of core NFT operations documented in **AIW3 NFT Business Flows and Processes**, specifically focusing on the burn-and-mint synthesis process.
 
 ## 1. Introduction
 

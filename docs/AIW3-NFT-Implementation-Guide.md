@@ -101,6 +101,12 @@ The backend is the intermediary between the user-facing frontend and the standar
 
 ---
 
+## Comprehensive NFT Business Flows
+
+### Overview
+
+This section is dedicated to ensuring every NFT-related business flow and process is thoroughly documented. It references the in-depth breakdown in the newly created **AIW3 NFT Business Flows and Processes** document, focusing purely on actionable components and major tasks relating to NFT management.
+
 ## Frontend Application
 
 The frontend is the user's primary interface for interacting with the AIW3 NFT system.
