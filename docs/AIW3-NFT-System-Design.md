@@ -134,14 +134,19 @@ graph TD
     subgraph "User Environment"
         User[👤 User] -->|Browser Interaction| Frontend[🌐 AIW3 Frontend]
         Frontend -->|Wallet Adapter| Wallet[🔒 Phantom/Solflare]
+        Frontend <-->|WebSocket Events| Backend
     end
 
-    subgraph "AIW3 Services"
+    subgraph "AIW3 Services (lastmemefi-api Integration)"
         Frontend -->|HTTPS REST API| Backend[⚙️ AIW3 Backend]
+        Backend -->|NFT Service| NFTService[🎯 NFTService]
+        Backend -->|User Service| UserService[👥 UserService]
+        Backend -->|Web3 Service| Web3Service[⛓️ Web3Service]
+        Backend <-->|Caching| Redis[(🔴 Redis Cache)]
+        Backend -->|Event Publishing| Kafka[📨 Kafka Queue]
         Backend -->|Read Images| Assets[📁 assets/images]
         Backend -->|Upload Content| PinataService[📌 Pinata IPFS Service]
-        Backend -->|Database Queries| DB[(📦 Backend Database)]
-        Backend -->|Transaction Volume Queries| TxDB[(💾 MySQL Transaction Database)]
+        Backend -->|Database Queries| MySQL[(💾 MySQL Database)]
     end
 
     subgraph "Decentralized Storage"
@@ -151,7 +156,7 @@ graph TD
 
     subgraph "Solana Network"
         Wallet -->|RPC/WebSocket| SolanaNode[⚡️ Solana RPC Node]
-        Backend -->|RPC/WebSocket| SolanaNode
+        Web3Service -->|RPC/WebSocket| SolanaNode
         SolanaNode -->|Gossip Protocol| SolanaCluster[🌍 Solana Blockchain]
     end
 
@@ -163,9 +168,14 @@ graph TD
     style User fill:#f9f,stroke:#333,stroke-width:2px
     style Frontend fill:#ccf,stroke:#333,stroke-width:2px
     style Backend fill:#cfc,stroke:#333,stroke-width:2px
+    style NFTService fill:#9cf,stroke:#333,stroke-width:2px
+    style UserService fill:#9cf,stroke:#333,stroke-width:2px
+    style Web3Service fill:#9cf,stroke:#333,stroke-width:2px
+    style Redis fill:#ff9,stroke:#333,stroke-width:2px
+    style Kafka fill:#f9c,stroke:#333,stroke-width:2px
     style Assets fill:#ffa,stroke:#333,stroke-width:2px
     style PinataService fill:#aff,stroke:#333,stroke-width:2px
-    style TxDB fill:#faf,stroke:#333,stroke-width:2px
+    style MySQL fill:#faf,stroke:#333,stroke-width:2px
     style IPFS fill:#faf,stroke:#333,stroke-width:2px
     style SolanaNode fill:#f96,stroke:#333,stroke-width:2px
     style Partners fill:#afa,stroke:#333,stroke-width:2px
