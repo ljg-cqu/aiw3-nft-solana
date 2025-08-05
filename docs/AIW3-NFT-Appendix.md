@@ -1,5 +1,7 @@
 # AIW3 NFT Appendix
 
+This document serves as a centralized reference for terminology definitions and external resources used throughout the AIW3 NFT documentation. It provides consistent definitions of key concepts and links to relevant external documentation and standards.
+
 ---
 
 ## Table of Contents

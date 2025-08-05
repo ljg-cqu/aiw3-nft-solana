@@ -1,5 +1,7 @@
 # AIW3 NFT Data Model
 
+This document provides comprehensive specifications for the data structures used in the AIW3 NFT system, covering both on-chain and off-chain data models. It serves as a technical reference for developers implementing the system and partners integrating with the AIW3 NFT ecosystem.
+
 ---
 
 ## Table of Contents
@@ -137,3 +139,14 @@ The AIW3 system interacts with the Solana blockchain in two ways: by calling cus
 | **Binding a Badge NFT**         | `bind_badge(badge_mint)`        | **Custom Smart Contract**       | A user calls this to "lock" a specific Badge NFT to their account, making it eligible to be counted toward an `unlock_tier` requirement. This prevents a single Badge NFT from being used for multiple simultaneous upgrades. |
 | **Selling/Transferring an NFT** | `transfer(...)`                 | **Standard SPL Token Program**  | This is a standard token transfer. The AIW3 system does not need a custom function for this. Users can freely trade their NFTs on any marketplace that supports Solana NFTs. |
 | **Burning an NFT**              | `burn(...)`                     | **Standard SPL Token Program**  | This is a standard token burn. It is used in the **Synthesis** process to destroy the lower-level NFT before the higher-level one is minted. |
+
+---
+
+## Related Documents
+
+For comprehensive information about the AIW3 NFT system, please refer to these related documents:
+
+- **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: High-level technical architecture and lifecycle management overview
+- **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide with process flows and code-level details
+- **[AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)**: Business rules, tier requirements, and user policies for the NFT system
+- **[AIW3 NFT Appendix](./AIW3-NFT-Appendix.md)**: Glossary of terms and external references
