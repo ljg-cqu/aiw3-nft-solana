@@ -101,6 +101,35 @@ The backend is the intermediary between the user-facing frontend and the standar
 
 ---
 
+## Frontend Application Development
+
+This section outlines the structure and key components of the user-facing application, with the **Personal Center** as its core feature. The design should align with the user experience flows detailed in the `aiw3-prototypes`.
+
+### 1. **The Personal Center: A Central Hub**
+
+The Personal Center is the primary interface for users to manage their NFTs, track progress, and interact with the AIW3 community. It provides a consolidated view of a user's status and achievements.
+
+**Key Features:**
+- **NFT Status Display:** Clearly visualizes the user's currently held NFT, its tier, and associated benefits. It must handle two primary states based on the prototypes:
+  - **Unlocked:** Displays the NFT the user owns, along with options for synthesis.
+  - **Unlockable:** Shows the next available NFT tier and the requirements to obtain it.
+- **Synthesis (Upgrade) Interface:** A dedicated module where users can initiate the burn-and-mint upgrade process. The UI must clearly communicate the requirements and outcomes, as seen in `4. Synthesis.png` and `5. VIP2 Synthesis Success.png`.
+- **Badge-Type NFT Display:** A section to display collected badges (`6. Micro Badge.png`), which are prerequisites for certain NFT tier upgrades.
+- **Community Hub Integration:** Features a link to the user's public-facing "Mini Homepage" (`9. Community-Mini Homepage.png`) to foster social interaction and display achievements to others.
+
+### 2. **Wallet Integration**
+- **Action:** Integrate a wallet adapter library (e.g., `@solana/wallet-adapter`).
+  - **Supported Wallets:** Add support for popular wallets like Phantom, Solflare, and Backpack.
+- **Rationale:** A robust wallet adapter is crucial for secure and seamless user interaction with the Solana blockchain.
+
+### 3. **API Integration**
+- **Action:** Connect the frontend components to the backend API endpoints.
+  - **Data Fetching:** Use `GET /api/nft/status` to populate the Personal Center with the user's NFT data, progress, and eligibility.
+  - **Transaction Submission:** When a user initiates an upgrade, call the `POST` endpoint to have the backend construct and submit the on-chain transaction.
+- **Rationale:** API integration links the user interface to the underlying business logic, creating a fully functional application.
+
+---
+
 ## Comprehensive NFT Business Flows
 
 ### Overview

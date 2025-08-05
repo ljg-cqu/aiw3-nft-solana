@@ -321,6 +321,8 @@ module.exports = {
 
 ### Extended User Model
 
+**Note**: The NFT qualification logic will use the existing `total_trading_volume` field from the `user` table. The extensions below are for tracking NFT-specific state and relationships.
+
 #### User Model Extensions (api/models/User.js)
 
 ```javascript

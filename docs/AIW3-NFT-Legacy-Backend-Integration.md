@@ -8,16 +8,25 @@ This document provides an analysis of the AIW3 NFT system integration and strate
 
 ### Existing AIW3 Backend Infrastructure
 
-**Components**:
+The `lastmemefi-api` provides a robust set of services and components that will be leveraged for the NFT integration.
+
+**Core Components**:
 
 - **Framework**: Sails.js (Node.js MVC framework)
-- **Database**: MySQL using Waterline ORM
-- **Cache Layer**: Redis for caching and session management
-- **Message Queue**: Kafka for asynchronous processes
-- **Storage**: Pinata SDK integrated with IPFS
-- **Blockchain**: Integrated Solana Web3.js
-- **Monitoring**: Elasticsearch available for logging
-- **Authentication**: JWT with wallet signature verification
+- **Database**: MySQL with Waterline ORM
+- **Cache**: Redis (`ioredis`) managed via `RedisService` for session data and caching.
+- **Message Queue**: Kafka (`KafkaService`) for asynchronous event processing.
+- **Storage**: IPFS via the Pinata SDK, with API keys already configured.
+- **Blockchain**: Solana (`@solana/web3.js`) managed via `Web3Service`.
+- **Monitoring**: Elasticsearch for application logging and analytics.
+
+**Key Existing Services to Leverage**:
+
+- **`Web3Service`**: Manages Solana RPC connections and basic on-chain queries (e.g., SOL balance). This will be extended for NFT operations.
+- **`UserService`**: Handles user data management, including wallet addresses and profile information.
+- **`RedisService`**: Provides utility functions for interacting with the Redis cache.
+- **`KafkaService`**: Manages producing and consuming messages from Kafka topics.
+- **`AccessTokenService`**: Manages JWT generation and verification for API authentication.
 
 ### Required Modifications
 
@@ -40,14 +49,18 @@ const Web3Service = {
 
 #### 2. User Model Structure
 
+The existing `User` model in `lastmemefi-api` already contains fields that are essential for the NFT system's business logic.
+
 ```javascript
-// Existing User model attributes relevant to NFT integration
+// api/models/User.js - Existing attributes to leverage
 {
-    wallet_address: { type: 'string', unique: true }, // Primary blockchain identifier
-    accessToken: { type: 'string' }, // JWT authentication
-    referralCode: { type: 'string', unique: true }, // Built-in referral system
-    // Trading volume tracking (critical for NFT tier qualification)
-    // User points/rewards system (can be leveraged for NFT benefits)
+    wallet_address: { type: 'string', unique: true }, // Primary key for all blockchain interactions
+    accessToken: { type: 'string' }, // Existing JWT managed by AccessTokenService
+    referralCode: { type: 'string', unique: true },
+
+    // IMPORTANT: These fields are critical for NFT tier qualification
+    total_trading_volume: { type: 'number' }, // Use this for level qualification
+    points: { type: 'number' } // Can be used for badge or benefit systems
 }
 ```
 
@@ -55,12 +68,14 @@ const Web3Service = {
 
 #### 3. Authentication Patterns
 
+The existing `SolanaChainAuthController` provides the foundation for secure, wallet-based authentication.
+
 ```javascript
-// Existing SolanaChainAuthController patterns
+// config/routes.js - Existing route for wallet verification
 'POST /api/solanachainauth/verify': 'SolanaChainAuthController.phantomSignInOrSignUp'
 ```
 
-**Leverage Point**: Reuse existing wallet authentication for NFT operations.
+**Leverage Point**: This nonce-based signature verification flow must be used to secure all NFT-related endpoints. The existing `AccessTokenService` will continue to manage the JWTs issued upon successful wallet verification.
 
 ## Integration Strategy
 
@@ -133,7 +148,9 @@ module.exports = {
 };
 ```
 
-#### New NFTService
+#### New NFTService (Orchestrator)
+
+The `NFTService` will act as an orchestrator, coordinating operations between existing services to execute NFT-related business logic.
 
 ```javascript
 // api/services/NFTService.js
