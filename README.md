@@ -1,8 +1,18 @@
 # aiw3-nft-solana
 
+## Documentation Overview
+
+This project's documentation is organized into focused, modular documents for improved clarity and maintainability:
+
+- **[AIW3 NFT Tiers and Policies](./docs/AIW3-NFT-Tiers-and-Policies.md)**: Business rules, tier requirements, and user policies for the NFT system
+- **[AIW3 NFT System Design](./docs/AIW3-NFT-System-Design.md)**: High-level technical architecture and lifecycle management overview
+- **[AIW3 NFT Implementation Guide](./docs/AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide with process flows and code-level details
+- **[AIW3 NFT Data Model](./docs/AIW3-NFT-Data-Model.md)**: On-chain and off-chain data structures, schemas, and metadata specifications
+- **[AIW3 NFT Appendix](./docs/AIW3-NFT-Appendix.md)**: Glossary of terms and external references
+
 ## Business Process and Rules
 
-The business process and rules for this NFT project are detailed in the [AIW3 NFT Tiers and Policies](./docs/AIW3-NFT-Tiers-and-Policies.md) document.
+The comprehensive business process and rules for this NFT project are detailed in the [AIW3 NFT Tiers and Policies](./docs/AIW3-NFT-Tiers-and-Policies.md) document.
 
 ## Project Roadmap, Scope, and Timeline
 
@@ -22,3 +32,7 @@ This project will be developed in three main phases, focusing on building the co
 | 2     | Staging Deployment (Testnet)        | - The system is deployed to the Solana Testnet.<br>- A small group of internal users (e.g., company employees) are invited to test the system and provide feedback.                                                                                                      | Week 7             |
 | 3     | Mainnet Beta Launch (Limited Users) | - The on-chain program is deployed to the Solana Mainnet.<br>- A select group of real users are invited to participate in a closed beta.<br>- The system is monitored for bugs and performance issues.                                                                        | Week 8             |
 | 4     | Official Public Launch              | - Announce the official launch of the Equity NFT system to all users.<br>- Enable all features for the public.<br>- The development team provides heightened monitoring and support during the initial launch period.                                                                                 | Launch Day         |
+
+## Technical Architecture
+
+For detailed technical information, please refer to the [AIW3 NFT System Design](./docs/AIW3-NFT-System-Design.md) document, which provides a high-level overview of the system architecture and links to more detailed implementation guides.

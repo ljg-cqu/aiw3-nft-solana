@@ -371,9 +371,9 @@ The financial projections show exceptional ROI potential with minimal downside r
 ### Technical Implementation Details
 
 For detailed technical implementation guides, see:
-- [AIW3 NFT Technical Guide](./AIW3-NFT-Technical-Guide.md)
-- [Solana NFT Technical Reference](./Solana-NFT-Technical-Reference.md)
-- [AIW3 NFT Upgrade Business Logic](./AIW3-NFT-Upgrade-Business-Logic.md)
+- [AIW3 NFT System Design](./AIW3-NFT-System-Design.md)
+- [AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)
+- [AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)
 
 ### External References
 
