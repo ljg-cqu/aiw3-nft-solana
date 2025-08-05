@@ -170,7 +170,7 @@ sequenceDiagram
         User->>SolanaProgram: Approves and sends transaction
         SolanaProgram->>SolanaProgram: Burns the old NFT
         Note over Backend,SolanaProgram: Backend monitors for Burn confirmation
-        Backend->>SolanaProgram: Calls `mint_new_nft(level)`
+        Backend->>SolanaProgram: Calls mint_new_nft(level)
         SolanaProgram->>SolanaProgram: Mints the new, higher-level NFT to user's wallet
         SolanaProgram-->>User: New NFT appears in wallet
     else Requirements Not Met
@@ -202,15 +202,15 @@ flowchart TD
     A[User connects wallet to AIW3 for the first time] --> B{Backend: Is this a new user?}
     B -->|Yes| C[Create new user record in database]
     B -->|No| D[Load existing user data]
-    C --> E[Mark Lv.1 NFT as "Unlockable" for the user]
-    D --> F{Frontend: Display "Claim Your Lv.1 NFT" button}
+    C --> E[Mark Lv.1 NFT as Unlockable for the user]
+    D --> F[Frontend: Display Claim Your Lv.1 NFT button]
     E --> F
-    F --> G[User clicks "Claim"]
+    F --> G[User clicks Claim]
     G --> H[Backend: Prepare standard SPL Token mint transaction]
     H --> I[Frontend: Prompt user to approve transaction in wallet]
     I --> J[User approves]
     J --> K[Transaction sent to SPL Token Program]
-    K --> L[SPL Token Program mints Lv.1 NFT to user's wallet]
+    K --> L[SPL Token Program mints Lv.1 NFT to user wallet]
     L --> M[Frontend: Display success message and show new NFT]
 ```
 
@@ -220,21 +220,21 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    subgraph "Off-Chain Verification"
+    subgraph OffChain ["Off-Chain Verification"]
         A[User with Lv.1 NFT navigates to Synthesis page] --> B{Backend: Check eligibility for Lv.2}
         B -->|Trading volume sufficient?| C{User has required Badge NFTs?}
-        B -->|No| D[Frontend: Display "More trading volume needed"]
-        C -->|No| E[Frontend: Display "You need to acquire more Badge NFTs"]
+        B -->|No| D[Frontend: Display More trading volume needed]
+        C -->|No| E[Frontend: Display You need to acquire more Badge NFTs]
     end
 
-    subgraph "On-Chain Execution"
-        C -->|Yes| F[Frontend: Display "You are eligible! Click to upgrade"]
-        F --> G[User clicks "Upgrade"]
-        G --> H[Backend: Prepare `burn` transaction for Lv.1 NFT]
+    subgraph OnChain ["On-Chain Execution"]
+        C -->|Yes| F[Frontend: Display You are eligible! Click to upgrade]
+        F --> G[User clicks Upgrade]
+        G --> H[Backend: Prepare burn transaction for Lv.1 NFT]
         H --> I[Frontend: Prompt user to approve Burn]
         I --> J[User approves; Lv.1 NFT is burned]
         J --> K{Backend: Monitor blockchain for burn confirmation}
-        K -->|Confirmed| L[Backend: Prepare `mint` transaction for Lv.2 NFT]
+        K -->|Confirmed| L[Backend: Prepare mint transaction for Lv.2 NFT]
         L --> M[Frontend: Prompt user to approve Mint]
         M --> N[User approves; Lv.2 NFT is minted]
         N --> O[Frontend: Show success animation and new Lv.2 NFT]
@@ -247,12 +247,12 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[User connects wallet to Partner dApp] --> B[Partner Backend: Get user's wallet address]
+    A[User connects wallet to Partner dApp] --> B[Partner Backend: Get user wallet address]
     B --> C[Query all token accounts owned by the address]
-    C --> D{Filter for tokens where `mint` is part of AIW3 Collection}
+    C --> D{Filter for tokens where mint is part of AIW3 Collection}
     D --> E{For each AIW3 NFT, read on-chain metadata}
-    E --> F[Verify `creator` is the official AIW3 address]
-    F --> G[Read `level` attribute from metadata]
+    E --> F[Verify creator is the official AIW3 address]
+    F --> G[Read level attribute from metadata]
     G --> H[Identify the highest level NFT owned by the user]
     H --> I[Grant user access based on their verified level]
 ```

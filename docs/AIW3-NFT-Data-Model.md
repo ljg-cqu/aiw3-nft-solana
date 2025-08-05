@@ -600,10 +600,10 @@ erDiagram
         datetime updatedAt
     }
 
-    USER ||--o{ USER_TRANSACTIONS : "has"
-    USER ||--o{ UPGRADE_REQUEST : "initiates"
-    USER ||--o{ NFT : "owns"
-    UPGRADE_REQUEST }|--|| NFT : "for"
+    USER ||--o{ USER_TRANSACTIONS : has
+    USER ||--o{ UPGRADE_REQUEST : initiates
+    USER ||--o{ NFT : owns
+    UPGRADE_REQUEST }|--|| NFT : for
 ```
 
 ---
