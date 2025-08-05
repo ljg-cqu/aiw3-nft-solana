@@ -43,7 +43,7 @@ Qualification for each NFT tier is based on a user's total trading volume, calcu
 | 3     | On-chain Hunter       | ≥ 1,000,000                    | ![[NFT_Level_3.png]](../assets/images/NFT_Level_3.png) |
 | 4     | Alpha Alchemist       | ≥ 5,000,000                    | ![[NFT_Level_4.png]](../assets/images/NFT_Level_4.png) |
 | 5     | Quantum Alchemist     | ≥ 10,000,000                   | ![[NFT_Level_5.png]](../assets/images/NFT_Level_5.png) |
-| Special | Trophy Breeder (Special) | By community contribution      | ![[NFT_Level_6.png]](../assets/images/NFT_Level_6.png) |
+| Special | Trophy Breeder (Special) | By community contribution      | ![[NFT_Special.png]](../assets/images/NFT_Special.png) |
 
 ---
 
