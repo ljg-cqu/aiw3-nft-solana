@@ -528,7 +528,7 @@ Data stored directly on **Solana blockchain** for trust and authenticity verific
 
 ## Off-Chain Data
 
-This section describes the data stored off-chain to provide flexibility and richer content.
+This section describes the data stored off-chain. **All NFT-related assets (images, videos, and metadata JSON files) must be stored exclusively on IPFS via the Pinata pinning service.** This is a strict project policy to ensure data immutability, decentralization, and long-term availability. No other storage solutions are permitted for NFT assets.
 
 ### Off-Chain JSON Metadata Details
 
