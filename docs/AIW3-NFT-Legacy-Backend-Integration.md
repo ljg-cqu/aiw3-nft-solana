@@ -24,7 +24,7 @@ The `lastmemefi-api` provides a robust set of services and components that will 
 
 - **`Web3Service`**: Manages Solana RPC connections and basic on-chain queries (e.g., SOL balance). This will be extended for NFT operations.
 - **`UserService`**: Handles user data management, including wallet addresses and profile information.
-- **`RedisService`**: Provides comprehensive Redis caching functionality using `ioredis` client with connection management, TTL support, and advanced operations like `setCache()`, `getCache()`, `setex()`, `sadd()`, and distributed locking capabilities.
+- **`RedisService`**: Provides comprehensive Redis caching functionality using `ioredis` client with connection management, TTL support, and advanced operations like `setCache()`, `getCache()`, `delCache()`, `sadd()`, and distributed locking capabilities.
 - **`KafkaService`**: Manages Kafka messaging using `kafkajs` library with producer/consumer instances, supports `sendMessage()` for publishing events and `receiveMessage()` for consuming, configured with broker `172.23.1.63:29092`, clientId `my-nodejs-app`, and groupId `test-group`.
 - **`AccessTokenService`**: Manages JWT generation and verification for API authentication.
 

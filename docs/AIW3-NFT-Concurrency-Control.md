@@ -248,7 +248,7 @@ def acquire_system_wallet_lock(timeout=30):
     lock_value = f"{worker_id}:{timestamp}"
     
     # Atomic set-if-not-exists with expiration
-    if redis.set(lock_key, lock_value, nx=True, ex=timeout):
+    if RedisService.setCache(lock_key, lock_value, timeout, {lockMode: true}):
         return lock_value
     return None
 

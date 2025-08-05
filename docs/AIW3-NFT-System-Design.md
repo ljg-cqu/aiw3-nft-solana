@@ -11,8 +11,8 @@ This document provides technical specifications for integrating AIW3's Equity NF
 2. [Integration with lastmemefi-api Backend](#integration-with-lastmemefi-api)
 3. [NFT Lifecycle Overview](#nft-lifecycle-overview)
 4. [Core Technical Architecture](#core-technical-architecture)
-4. [Visual Architecture](#visual-architecture)
-5. [Related Documents](#related-documents)
+5. [Visual Architecture](#visual-architecture)
+6. [Related Documents](#related-documents)
 
 ---
 
