@@ -186,11 +186,11 @@ flowchart TD
     D --> F{Frontend: Display "Claim Your Lv.1 NFT" button}
     E --> F
     F --> G[User clicks "Claim"]
-    G --> H[Backend: Construct and sign `claim_nft(level=1)` transaction]
+    G --> H[Backend: Prepare standard SPL Token mint transaction]
     H --> I[Frontend: Prompt user to approve transaction in wallet]
     I --> J[User approves]
-    J --> K[Transaction sent to Solana program]
-    K --> L[Program mints Lv.1 NFT to user's wallet]
+    J --> K[Transaction sent to SPL Token Program]
+    K --> L[SPL Token Program mints Lv.1 NFT to user's wallet]
     L --> M[Frontend: Display success message and show new NFT]
 ```
 
