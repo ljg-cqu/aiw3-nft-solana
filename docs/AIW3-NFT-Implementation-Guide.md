@@ -1,7 +1,7 @@
 
 # AIW3 NFT Implementation Guide
 
-This document provides step-by-step implementation instructions for developers building the AIW3 NFT system. It covers on-chain program development, backend services, frontend application, and detailed process flows with code examples and best practices.
+This document provides step-by-step implementation instructions for developers building the AIW3 NFT system. It covers standard Solana program integration, backend services, frontend application, and detailed process flows with code examples and best practices.
 
 ---
 
@@ -51,7 +51,7 @@ The AIW3 NFT system uses **only standard Solana programs** without requiring any
 
 ## Backend Services
 
-The backend is the intermediary between the user-facing frontend and the on-chain program.
+The backend is the intermediary between the user-facing frontend and the standard Solana programs.
 
 ### 1. **Standard Program Integration**
 - **Action:** Integrate with existing Solana programs using standard libraries and SDKs.
@@ -63,14 +63,15 @@ The backend is the intermediary between the user-facing frontend and the on-chai
 ### 2. **API Endpoint Creation**
 - **Action:** Develop a REST API with endpoints for the frontend.
   - `GET /api/user/nft-status`: Returns the user's current NFT level and progress toward the next tier.
-  - `POST /api/nft/unlock-tier`: Initiates the on-chain `unlock_tier` instruction after verifying off-chain requirements.
-- **Rationale:** The API provides a secure and controlled interface for the frontend to interact with backend services and, indirectly, the blockchain.
+  - `POST /api/nft/upgrade-tier`: Initiates the burn-and-mint upgrade process using standard SPL Token operations after verifying off-chain requirements.
+- **Rationale:** The API provides a secure and controlled interface for the frontend to interact with backend services and standard Solana programs.
 
 ### 3. **Solana Integration**
 - **Action:** Use the `@solana/web3.js` library to communicate with the Solana network.
   - **RPC Communication:** Connect to a Solana RPC node to read on-chain data and submit transactions.
-  - **Instruction Building:** Construct and serialize the `unlock_tier` and `bind_badge` instructions to be sent to the on-chain program.
-- **Rationale:** Direct blockchain integration allows the backend to verify on-chain state and execute transactions on behalf of the user.
+  - **Standard Operations:** Use SPL Token Program instructions for minting, burning, and transferring NFTs.
+  - **Metadata Management:** Use Metaplex Token Metadata Program for NFT metadata operations.
+- **Rationale:** Direct integration with standard Solana programs allows the backend to verify on-chain state and execute transactions without custom smart contract complexity.
 
 ### 4. **Monitoring Service**
 - **Action:** Develop a background service to monitor the blockchain for relevant events.
@@ -128,7 +129,7 @@ The most secure and straightforward approach is to require the user to **burn** 
 
 An alternative would be to have a mutable NFT whose metadata is updated by the system. This is **not recommended** for the following reasons:
 - **Breaks Immutability:** It violates the core principle that NFTs should be immutable records.
-- **Complex and Error-Prone:** Requires a custom smart contract with authority to modify NFT metadata, which is more complex and introduces potential security risks.
+- **Complex and Error-Prone:** Would require custom smart contract development with authority to modify NFT metadata, which is more complex and introduces potential security risks. Our approach avoids this entirely by using standard programs.
 - **Poor Ecosystem Compatibility:** Many wallets and marketplaces are not designed to handle NFTs whose metadata changes, which could lead to display issues or user confusion.
 
 ### Burn-and-Mint Workflow

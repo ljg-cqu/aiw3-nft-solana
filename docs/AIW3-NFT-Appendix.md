@@ -47,7 +47,7 @@ This section defines the core concepts used throughout the AIW3 NFT documentatio
 ## External References
 
 - [Solana Documentation](https://docs.solana.com/)
-- [Anchor Framework](https://www.anchor-lang.com/)
+- [SPL Token Program](https://spl.solana.com/token)
 - [Metaplex Token Metadata Standard](https://docs.metaplex.com/programs/token-metadata/)
 - [Pinata IPFS Service](https://pinata.cloud)
 - [Associated Token Account Program](https://spl.solana.com/associated-token-account)
