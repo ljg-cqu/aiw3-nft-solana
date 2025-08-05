@@ -1,17 +1,17 @@
 
 # AIW3 NFT Implementation Guide
 
-This document provides step-by-step implementation instructions for developers building the AIW3 NFT system. It covers standard Solana program integration, backend services, frontend application, and detailed process flows with code examples and best practices.
+This document provides comprehensive implementation guidelines for the AIW3 NFT system, emphasizing integration with the lastmemefi-api backend. It outlines standard program integration, backend service utilization, frontend application development, and process flows.
 
 ---
 
 ## Table of Contents
 
 1. [Standard Solana Programs Integration](#standard-solana-programs-integration)
-2. [Backend Services](#backend-services)
-3. [Frontend Application](#frontend-application)
+2. [Backend Services Integration](#backend-services-integration)
+3. [Frontend Application Development](#frontend-application-development)
 4. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
-5. [Detailed Process Flows](#detailed-process-flows)
+5. [Integration Process Flows](#integration-process-flows)
 
 ---
 

@@ -1,15 +1,495 @@
 # AIW3 NFT Data Model
 
-This document provides comprehensive specifications for the data structures used in the AIW3 NFT system, covering both on-chain and off-chain data models. It serves as a technical reference for developers implementing the system and partners integrating with the AIW3 NFT ecosystem.
+This document provides comprehensive specifications for data structures in the AIW3 NFT system, designed for seamless integration with the existing lastmemefi-api backend. It covers database extensions, API response formats, and data relationships optimized for the Sails.js/MySQL infrastructure.
 
 ---
 
 ## Table of Contents
 
-1. [On-Chain Data](#on-chain-data)
-2. [Off-Chain Data](#off-chain-data)
-3. [Data Model Relationships](#data-model-relationships)
-4. [On-Chain Interaction Mapping](#on-chain-interaction-mapping)
+1. [Database Schema Extensions](#database-schema-extensions)
+2. [API Response Data Formats](#api-response-data-formats)
+3. [On-Chain Data Structures](#on-chain-data-structures)
+4. [Off-Chain Data Storage](#off-chain-data-storage)
+5. [Data Model Relationships](#data-model-relationships)
+6. [WebSocket Event Formats](#websocket-event-formats)
+
+---
+
+## Database Schema Extensions
+
+This section defines the new database models and extensions to existing models required for NFT integration with lastmemefi-api.
+
+### New Models
+
+#### UserNFT Model (api/models/UserNFT.js)
+
+```javascript
+module.exports = {
+  attributes: {
+    // Primary key
+    id: { type: 'number', autoIncrement: true },
+    
+    // User relationship
+    user_id: { 
+      model: 'user',
+      required: true,
+      description: 'Reference to the User who owns this NFT'
+    },
+    
+    // NFT identification
+    nft_mint_address: { 
+      type: 'string', 
+      required: true,
+      unique: true,
+      maxLength: 44,
+      description: 'Solana mint address of the NFT'
+    },
+    
+    nft_level: { 
+      type: 'number', 
+      required: true,
+      min: 1,
+      max: 6,
+      description: 'NFT tier level (1-5 regular, 6 special)'
+    },
+    
+    nft_name: { 
+      type: 'string',
+      required: true,
+      maxLength: 100,
+      description: 'Human-readable NFT name (Tech Chicken, Quant Ape, etc.)'
+    },
+    
+    // Metadata
+    metadata_uri: { 
+      type: 'string',
+      maxLength: 500,
+      description: 'IPFS URI for NFT metadata JSON'
+    },
+    
+    image_uri: {
+      type: 'string',
+      maxLength: 500,
+      description: 'IPFS URI for NFT image'
+    },
+    
+    // Status tracking
+    status: {
+      type: 'string',
+      isIn: ['active', 'inactive', 'burned'],
+      defaultsTo: 'active',
+      description: 'Current status of the NFT'
+    },
+    
+    // Timestamps
+    claimed_at: { 
+      type: 'ref', 
+      columnType: 'datetime',
+      description: 'When the NFT was first claimed'
+    },
+    
+    last_upgraded_at: { 
+      type: 'ref', 
+      columnType: 'datetime',
+      description: 'When the NFT was last upgraded'
+    },
+    
+    burned_at: {
+      type: 'ref',
+      columnType: 'datetime',
+      allowNull: true,
+      description: 'When the NFT was burned (for upgrades)'
+    },
+    
+    // Waterline standard timestamps
+    createdAt: { type: 'ref', columnType: 'datetime' },
+    updatedAt: { type: 'ref', columnType: 'datetime' }
+  }
+};
+```
+
+#### UserNFTQualification Model (api/models/UserNFTQualification.js)
+
+```javascript
+module.exports = {
+  attributes: {
+    id: { type: 'number', autoIncrement: true },
+    
+    user_id: { 
+      model: 'user',
+      required: true
+    },
+    
+    target_level: { 
+      type: 'number', 
+      required: true,
+      min: 1,
+      max: 6
+    },
+    
+    // Volume tracking
+    current_volume: { 
+      type: 'number', 
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'User current trading volume in USDT'
+    },
+    
+    required_volume: { 
+      type: 'number', 
+      columnType: 'DECIMAL(30,10)',
+      required: true,
+      description: 'Required volume for target level'
+    },
+    
+    // Badge tracking
+    badges_collected: { 
+      type: 'number', 
+      defaultsTo: 0,
+      description: 'Number of badges user has collected'
+    },
+    
+    badges_required: { 
+      type: 'number',
+      defaultsTo: 0,
+      description: 'Number of badges required for target level'
+    },
+    
+    // Qualification status
+    is_qualified: { 
+      type: 'boolean', 
+      defaultsTo: false,
+      description: 'Whether user meets all requirements'
+    },
+    
+    last_checked_at: { 
+      type: 'ref', 
+      columnType: 'datetime',
+      description: 'When qualification was last calculated'
+    },
+    
+    // Standard timestamps
+    createdAt: { type: 'ref', columnType: 'datetime' },
+    updatedAt: { type: 'ref', columnType: 'datetime' }
+  }
+};
+```
+
+#### NFTBadge Model (api/models/NFTBadge.js)
+
+```javascript
+module.exports = {
+  attributes: {
+    id: { type: 'number', autoIncrement: true },
+    
+    user_id: { 
+      model: 'user',
+      required: true
+    },
+    
+    badge_type: {
+      type: 'string',
+      required: true,
+      isIn: ['micro_badge', 'achievement_badge', 'event_badge', 'special_badge'],
+      description: 'Type of badge'
+    },
+    
+    badge_name: {
+      type: 'string',
+      required: true,
+      maxLength: 100,
+      description: 'Human-readable badge name'
+    },
+    
+    mint_address: {
+      type: 'string',
+      required: true,
+      unique: true,
+      maxLength: 44,
+      description: 'Solana mint address of the badge NFT'
+    },
+    
+    metadata_uri: {
+      type: 'string',
+      maxLength: 500,
+      description: 'IPFS URI for badge metadata'
+    },
+    
+    is_bound: {
+      type: 'boolean',
+      defaultsTo: false,
+      description: 'Whether badge is bound for NFT qualification'
+    },
+    
+    earned_at: {
+      type: 'ref',
+      columnType: 'datetime',
+      description: 'When the badge was earned'
+    },
+    
+    bound_at: {
+      type: 'ref',
+      columnType: 'datetime',
+      allowNull: true,
+      description: 'When the badge was bound'
+    },
+    
+    // Standard timestamps
+    createdAt: { type: 'ref', columnType: 'datetime' },
+    updatedAt: { type: 'ref', columnType: 'datetime' }
+  }
+};
+```
+
+#### NFTUpgradeRequest Model (api/models/NFTUpgradeRequest.js)
+
+```javascript
+module.exports = {
+  attributes: {
+    id: { type: 'number', autoIncrement: true },
+    
+    user_id: {
+      model: 'user',
+      required: true
+    },
+    
+    from_level: {
+      type: 'number',
+      required: true,
+      min: 1,
+      max: 5
+    },
+    
+    to_level: {
+      type: 'number',
+      required: true,
+      min: 2,
+      max: 6
+    },
+    
+    old_nft_mint: {
+      type: 'string',
+      required: true,
+      maxLength: 44,
+      description: 'Mint address of NFT being burned'
+    },
+    
+    new_nft_mint: {
+      type: 'string',
+      allowNull: true,
+      maxLength: 44,
+      description: 'Mint address of new NFT (when created)'
+    },
+    
+    // Transaction tracking
+    burn_transaction: {
+      type: 'string',
+      allowNull: true,
+      maxLength: 88,
+      description: 'Solana transaction signature for burn'
+    },
+    
+    mint_transaction: {
+      type: 'string',
+      allowNull: true,
+      maxLength: 88,
+      description: 'Solana transaction signature for mint'
+    },
+    
+    status: {
+      type: 'string',
+      isIn: ['pending', 'burn_confirmed', 'mint_confirmed', 'completed', 'failed'],
+      defaultsTo: 'pending',
+      description: 'Current status of upgrade process'
+    },
+    
+    error_message: {
+      type: 'string',
+      allowNull: true,
+      maxLength: 500,
+      description: 'Error message if upgrade failed'
+    },
+    
+    // Standard timestamps
+    createdAt: { type: 'ref', columnType: 'datetime' },
+    updatedAt: { type: 'ref', columnType: 'datetime' }
+  }
+};
+```
+
+### Extended User Model
+
+#### User Model Extensions (api/models/User.js)
+
+```javascript
+// Add these attributes to existing User model
+{
+  // NFT-related fields
+  current_nft_level: {
+    type: 'number',
+    allowNull: true,
+    min: 0,
+    max: 6,
+    defaultsTo: 0,
+    description: 'Current NFT level (0 = no NFT)'
+  },
+  
+  current_nft_mint: {
+    type: 'string',
+    allowNull: true,
+    maxLength: 44,
+    description: 'Mint address of current active NFT'
+  },
+  
+  last_nft_upgrade: {
+    type: 'ref',
+    columnType: 'datetime',
+    allowNull: true,
+    description: 'When user last upgraded their NFT'
+  },
+  
+  total_trading_volume: {
+    type: 'number',
+    columnType: 'DECIMAL(30,10)',
+    defaultsTo: 0,
+    description: 'Cached total trading volume for NFT qualification'
+  },
+  
+  last_volume_update: {
+    type: 'ref',
+    columnType: 'datetime',
+    allowNull: true,
+    description: 'When trading volume was last calculated'
+  },
+  
+  // Relationships
+  nfts: {
+    collection: 'usernft',
+    via: 'user_id'
+  },
+  
+  badges: {
+    collection: 'nftbadge',
+    via: 'user_id'
+  },
+  
+  qualifications: {
+    collection: 'usernftqualification',
+    via: 'user_id'
+  },
+  
+  upgradeRequests: {
+    collection: 'nftupgraderequest',
+    via: 'user_id'
+  }
+}
+```
+
+### Database Migration Scripts
+
+#### Migration 1: Create NFT Tables
+
+```sql
+-- Create UserNFT table
+CREATE TABLE usernft (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  nft_mint_address VARCHAR(44) NOT NULL UNIQUE,
+  nft_level TINYINT NOT NULL CHECK (nft_level BETWEEN 1 AND 6),
+  nft_name VARCHAR(100) NOT NULL,
+  metadata_uri VARCHAR(500),
+  image_uri VARCHAR(500),
+  status ENUM('active', 'inactive', 'burned') DEFAULT 'active',
+  claimed_at DATETIME,
+  last_upgraded_at DATETIME,
+  burned_at DATETIME NULL,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  
+  FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+  INDEX idx_user_id (user_id),
+  INDEX idx_nft_level (nft_level),
+  INDEX idx_status (status)
+);
+
+-- Create UserNFTQualification table
+CREATE TABLE usernftqualification (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  target_level TINYINT NOT NULL CHECK (target_level BETWEEN 1 AND 6),
+  current_volume DECIMAL(30,10) DEFAULT 0,
+  required_volume DECIMAL(30,10) NOT NULL,
+  badges_collected INT DEFAULT 0,
+  badges_required INT DEFAULT 0,
+  is_qualified BOOLEAN DEFAULT FALSE,
+  last_checked_at DATETIME,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  
+  FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_user_target (user_id, target_level),
+  INDEX idx_qualified (is_qualified),
+  INDEX idx_last_checked (last_checked_at)
+);
+
+-- Create NFTBadge table
+CREATE TABLE nftbadge (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  badge_type ENUM('micro_badge', 'achievement_badge', 'event_badge', 'special_badge') NOT NULL,
+  badge_name VARCHAR(100) NOT NULL,
+  mint_address VARCHAR(44) NOT NULL UNIQUE,
+  metadata_uri VARCHAR(500),
+  is_bound BOOLEAN DEFAULT FALSE,
+  earned_at DATETIME,
+  bound_at DATETIME NULL,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  
+  FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+  INDEX idx_user_id (user_id),
+  INDEX idx_badge_type (badge_type),
+  INDEX idx_is_bound (is_bound)
+);
+
+-- Create NFTUpgradeRequest table
+CREATE TABLE nftupgraderequest (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  from_level TINYINT NOT NULL CHECK (from_level BETWEEN 1 AND 5),
+  to_level TINYINT NOT NULL CHECK (to_level BETWEEN 2 AND 6),
+  old_nft_mint VARCHAR(44) NOT NULL,
+  new_nft_mint VARCHAR(44) NULL,
+  burn_transaction VARCHAR(88) NULL,
+  mint_transaction VARCHAR(88) NULL,
+  status ENUM('pending', 'burn_confirmed', 'mint_confirmed', 'completed', 'failed') DEFAULT 'pending',
+  error_message VARCHAR(500) NULL,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  
+  FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+  INDEX idx_user_id (user_id),
+  INDEX idx_status (status),
+  INDEX idx_created_at (createdAt)
+);
+```
+
+#### Migration 2: Extend User Table
+
+```sql
+-- Add NFT-related columns to existing user table
+ALTER TABLE user 
+ADD COLUMN current_nft_level TINYINT DEFAULT 0 CHECK (current_nft_level BETWEEN 0 AND 6),
+ADD COLUMN current_nft_mint VARCHAR(44) NULL,
+ADD COLUMN last_nft_upgrade DATETIME NULL,
+ADD COLUMN total_trading_volume DECIMAL(30,10) DEFAULT 0,
+ADD COLUMN last_volume_update DATETIME NULL;
+
+-- Add indexes for performance
+ALTER TABLE user 
+ADD INDEX idx_nft_level (current_nft_level),
+ADD INDEX idx_trading_volume (total_trading_volume);
+```
 
 ---
 

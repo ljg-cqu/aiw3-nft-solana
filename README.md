@@ -1,19 +1,33 @@
-# aiw3-nft-solana
+# AIW3 NFT System - Solana Integration with lastmemefi-api Backend
+
+## Project Overview
+
+The AIW3 NFT System is a comprehensive Solana-based equity NFT implementation designed to integrate seamlessly with the existing **lastmemefi-api** backend infrastructure. This system provides tiered user benefits, trading fee reductions, and enhanced AI agent access based on user trading volume and engagement metrics.
+
+## Backend Integration Architecture
+
+**Primary Backend**: `lastmemefi-api` (Sails.js Node.js application)
+- **Framework**: Sails.js with Waterline ORM
+- **Database**: MySQL 5.7 with Redis caching
+- **Blockchain**: Solana Web3.js integration
+- **Storage**: IPFS via Pinata SDK
+- **Real-time**: Socket.io WebSocket infrastructure
+- **Authentication**: JWT tokens with Solana wallet signatures
 
 ## Documentation Overview
 
-This project's documentation is organized into focused, modular documents for improved clarity and maintainability:
+This project's documentation is organized into focused, modular documents optimized for integration with the existing AIW3 backend system:
 
 ### Core Documentation
-- **[AIW3 NFT Tiers and Policies](./docs/AIW3-NFT-Tiers-and-Policies.md)**: Business rules, tier requirements, and user policies for the NFT system
-- **[AIW3 NFT System Design](./docs/AIW3-NFT-System-Design.md)**: High-level technical architecture and lifecycle management overview
-- **[AIW3 NFT Implementation Guide](./docs/AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide with process flows and code-level details
-- **[AIW3 NFT Data Model](./docs/AIW3-NFT-Data-Model.md)**: On-chain and off-chain data structures, schemas, and metadata specifications
+- **[AIW3 NFT Tiers and Policies](./docs/AIW3-NFT-Tiers-and-Policies.md)**: Business rules, tier requirements, and user policies integrated with lastmemefi-api user system
+- **[AIW3 NFT System Design](./docs/AIW3-NFT-System-Design.md)**: High-level technical architecture leveraging existing lastmemefi-api infrastructure
+- **[AIW3 NFT Implementation Guide](./docs/AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide using lastmemefi-api patterns and services
+- **[AIW3 NFT Data Model](./docs/AIW3-NFT-Data-Model.md)**: Database schemas extending existing User model and API response formats
 - **[AIW3 NFT Appendix](./docs/AIW3-NFT-Appendix.md)**: Glossary of terms and external references
 
-### Integration & Implementation
-- **[AIW3 NFT Legacy Backend Integration](./docs/AIW3-NFT-Legacy-Backend-Integration.md)**: Comprehensive analysis and strategy for integrating NFT services with existing `lastmemefi-api` backend
-- **[AIW3 NFT Integration Issues & PRs](./docs/AIW3-NFT-Integration-Issues-PRs.md)**: Detailed phased implementation plan with frontend-backend integration requirements, API contracts, and collaborative development guidance
+### Backend Integration & Implementation
+- **[AIW3 NFT Legacy Backend Integration](./docs/AIW3-NFT-Legacy-Backend-Integration.md)**: Comprehensive analysis and strategy for extending lastmemefi-api with NFT services
+- **[AIW3 NFT Integration Issues & PRs](./docs/AIW3-NFT-Integration-Issues-PRs.md)**: Detailed 51-issue implementation plan with API contracts, database migrations, and frontend integration requirements
 
 ## Business Process and Rules
 
