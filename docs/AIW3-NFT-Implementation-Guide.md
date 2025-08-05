@@ -96,7 +96,7 @@ The backend is the intermediary between the user-facing frontend and the standar
 ### 4. **Monitoring Service**
 - **Action:** Develop a background service to monitor the blockchain for relevant events.
   - **Event Listener:** Use WebSocket connections to listen for `Mint` and `Burn` events related to the NFT collection.
-  - **Database Updates:** Update the `nft_ownership` cache table in real-time as events occur.
+  - **Cache Updates:** Update Redis NFT status cache in real-time as events occur using `RedisService.delCache()` for cache invalidation.
 - **Rationale:** A monitoring service ensures that the off-chain database remains synchronized with the on-chain state, providing users with an accurate and up-to-date view of their assets.
 
 ---
@@ -266,7 +266,7 @@ flowchart TD
     O --> P[User approves via wallet]
     P --> Q[SPL Token Program mints NFT to user's ATA]
     Q --> R[Backend: Create UserNFT record in MySQL]
-    R --> S[Backend: Publish nft:claimed event to Kafka]
+    R --> S[Backend: Publish claimed event to Kafka nft-events topic]
     S --> T[Frontend: WebSocket notification and NFT display]
 ```
 
@@ -307,7 +307,7 @@ flowchart TD
         V --> W[Backend: Update User.current_nft_level to 2]
         W --> X[Backend: Create new UserNFT record]
         X --> Y[Redis: Invalidate cached user NFT status]
-        Y --> Z[Kafka: Publish nft:upgraded event]
+        Y --> Z[Kafka: Publish upgraded event to nft-events topic]
         Z --> AA[WebSocket: Notify frontend of completion]
     end
 ```
@@ -336,7 +336,7 @@ flowchart TD
     subgraph MetadataProcessing ["NFT Level Extraction"]
         J --> K[Parse JSON metadata attributes array]
         K --> L[Find attribute with trait_type: Level]
-        L --> M[Extract level value 1-6]
+        L --> M[Extract level value 1-5 or Special]
         M --> N[Store NFT level and mint address]
     end
 
