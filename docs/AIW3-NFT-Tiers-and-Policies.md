@@ -62,6 +62,70 @@ From a business perspective, the user journey for an upgrade is as follows:
 
 ---
 
+## 🏛️ Core NFT Operations and Rules
+
+This section details the specific actions users can take regarding their NFTs, outlining the conditions and outcomes for each operation.
+
+### Claiming an NFT
+
+-   **Description:** A **user-initiated** action to mint an "Unlockable" NFT to their wallet. This applies to the initial Lv.1 NFT for new users, and can also apply to higher-level NFTs that are awarded or airdropped by the system.
+-   **Pre-condition:**
+    -   User has met the system-defined criteria to be eligible for the NFT.
+    -   The NFT is in an "Unlockable" state for the user.
+-   **Post-condition:**
+    -   A new NFT is minted and transferred to the user's wallet.
+    -   The NFT is initially in an `Inactive` state, requiring activation.
+-   **Rules/Constraints:**
+    -   This is a one-time operation per eligible NFT.
+
+### Activating an NFT
+
+-   **Description:** A **user-initiated** action to change an NFT's status from `Inactive` to `Active`, thereby enabling its associated benefits.
+-   **Pre-condition:**
+    -   User owns the NFT.
+    -   The NFT is currently in an `Inactive` state.
+-   **Post-condition:**
+    -   The NFT's status is changed to `Active`.
+    -   The user begins receiving all benefits associated with that NFT tier.
+
+### Binding a Badge NFT
+
+-   **Description:** A **user-initiated** action to link a required Badge NFT to their account, making it available as a condition for a future tier upgrade.
+-   **Pre-condition:**
+    -   User owns a designated Badge NFT.
+    -   The Badge NFT is not already bound.
+-   **Post-condition:**
+    -   The Badge NFT is registered as "bound" in the user's on-chain state account.
+-   **Rules/Constraints:**
+    -   This is a permanent, one-way action. A bound badge cannot be unbound or sold.
+
+### Unlocking a Higher-Tier NFT (Synthesis)
+
+-   **Description:** A **user-initiated** action to acquire the next level of Equity NFT after meeting all prerequisites. This is the core progression mechanic.
+-   **Pre-condition:**
+    -   User's cumulative trading volume meets the threshold for the target tier.
+    -   User has bound the required number of Badge NFTs.
+    -   User pays the required CGas fee.
+-   **Post-condition:**
+    -   A new, higher-tier Equity NFT is minted to the user's wallet in an `Active` state.
+    -   The user's on-chain state is updated to reflect their new, higher level.
+-   **Rules/Constraints:**
+    -   Progression is linear; a user must unlock levels in order.
+    -   The unlock criteria (volume, badges) are defined by the system and displayed to the user.
+
+### Selling/Transferring an NFT
+
+-   **Description:** A **user-initiated** action to trade an NFT on an **External System** (a marketplace). The AIW3 **System** reacts to the ownership change.
+-   **Pre-condition:**
+    -   User owns the NFT.
+-   **Post-condition:**
+    -   The NFT is transferred to a new owner.
+-   **Rules/Constraints:**
+    -   The AIW3 system is not a party to the trade but must monitor the blockchain to update its internal records.
+    -   Upon detecting a transfer, the AIW3 backend must immediately revoke any platform benefits from the seller and grant them to the new owner (if the new owner links their wallet to AIW3).
+
+---
+
 ## 🖼️ User Experience and Visual Flow
 
 This section illustrates the user journey as depicted in the system prototypes, providing visual context for the business rules.
@@ -138,3 +202,36 @@ This section defines the official business rules for each NFT level, including t
 - **Currency Conversion**: Establish how to handle multi-asset volumes and price conversions
 - **Verification Frequency**: Determine how often to re-verify volume requirements for existing NFT holders
 - **Grace Periods**: Consider transition periods for users whose volume drops below thresholds
+
+---
+
+## Terminologies
+
+This section defines the core concepts used throughout this document.
+
+-   **NFT (Non-Fungible Token):** A unique digital certificate of ownership for an asset, stored on a blockchain.
+    -   **Analogy:** Think of it as a digital deed or a one-of-a-kind collectible card. While anyone can have a copy of a digital image, the NFT is the proof of owning the original. It's like having the artist's signature on a print, certifying it as authentic.
+
+-   **Equity NFTs:** The official name for the platform's primary NFTs that represent user status and benefits. They are organized into different **Levels** (or **Tiers**).
+    -   **Synonyms:** You may see these referred to as **Tiered NFTs**, **Tier NFTs**, or **Level NFTs** in different contexts. "Equity NFT" is the canonical term for the main progression NFTs.
+    -   **Progression Model:** The primary way to acquire higher-level Equity NFTs is by meeting cumulative **trading volume** thresholds and binding a required number of **Badge NFTs**.
+    -   **Utility:** While each token is a unique non-fungible asset on the blockchain, its utility is fungible within its tier. This means any Lv.2 NFT provides the exact same benefits as any other Lv.2 NFT.
+    -   **Analogy:** This is similar to a customer loyalty program (e.g., Bronze, Silver, Gold status) or leveling up a character in a game. Each new tier provides enhanced status and perks, with the top tier granting equity-like benefits. Your "Gold" membership card is unique to you, but it gives you the same benefits as every other "Gold" member.
+
+
+-   **Synthesis:** The official user-facing term for the process of upgrading an Equity NFT to the next level. This action involves meeting specific criteria (like trading volume and owning Badge NFTs) and results in the user acquiring a higher-tier NFT. While the underlying technical process may be referred to as an 'upgrade' or 'unlock,' the user interacts with this feature as **Synthesis**.
+    -   **Analogy:** This is like crafting a more powerful item from a weaker one in a game. The user gathers the required materials (trading volume, badges) and then initiates the synthesis to create the next-level asset.
+
+-   **CGas:** A platform-specific token required to pay for certain transactions, such as unlocking a new Equity NFT tier.
+    -   **Analogy:** Similar to "gas" on Ethereum, CGas is the fuel for specific platform operations.
+
+-   **Solana:** A high-performance blockchain network on which the AIW3 NFTs are built, recorded, and traded.
+    -   **Analogy:** If an NFT is a valuable package, Solana is the global, super-fast, and secure courier service that handles its delivery and tracks its ownership history transparently.
+
+-   **Unlockable State:** A state where a user has met the conditions to acquire an NFT but has not yet claimed or minted it. This requires a user action to complete the acquisition.
+    -   **Analogy:** This is like having a coupon you are eligible for but haven't redeemed yet. You need to take the step to present the coupon to get the item.
+
+-   **Micro Badge:** A small, icon-like representation of a user's highest-level NFT, displayed on their profile and in community spaces to signify their status.
+    -   **Analogy:** This is like a digital lapel pin or a rank insignia on a uniform, quickly communicating a person's level or achievements to others.
+
+-   **Special NFTs (e.g., Breeder Reward NFT):** These are distinct NFTs awarded for specific achievements, such as winning a trading competition. They are acquired through airdrops, not synthesis, and may have their own unique benefits. They are separate from the main Equity NFT progression ladder.
