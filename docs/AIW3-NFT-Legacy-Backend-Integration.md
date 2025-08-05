@@ -24,8 +24,8 @@ The `lastmemefi-api` provides a robust set of services and components that will 
 
 - **`Web3Service`**: Manages Solana RPC connections and basic on-chain queries (e.g., SOL balance). This will be extended for NFT operations.
 - **`UserService`**: Handles user data management, including wallet addresses and profile information.
-- **`RedisService`**: Provides utility functions for interacting with the Redis cache.
-- **`KafkaService`**: Manages producing and consuming messages from Kafka topics.
+- **`RedisService`**: Provides comprehensive Redis caching functionality using `ioredis` client with connection management, TTL support, and advanced operations like `setCache()`, `getCache()`, `setex()`, `sadd()`, and distributed locking capabilities.
+- **`KafkaService`**: Manages Kafka messaging using `kafkajs` library with producer/consumer instances, supports `sendMessage()` for publishing events and `receiveMessage()` for consuming, configured with broker `172.23.1.63:29092`, clientId `my-nodejs-app`, and groupId `test-group`.
 - **`AccessTokenService`**: Manages JWT generation and verification for API authentication.
 
 ### Required Modifications
@@ -251,9 +251,86 @@ module.exports = {
         // 5. Send Kafka notification
     },
     
+    // Redis caching integration using actual RedisService methods
+    cacheNFTQualification: async function(userId, qualificationData, ttl = 300) {
+        try {
+            const cacheKey = `nft_qual:${userId}`;
+            await RedisService.setCache(cacheKey, qualificationData, ttl);
+            return true;
+        } catch (error) {
+            sails.log.error('Failed to cache NFT qualification:', error);
+            return false;
+        }
+    },
+    
+    getCachedNFTQualification: async function(userId) {
+        try {
+            const cacheKey = `nft_qual:${userId}`;
+            const cached = await RedisService.getCache(cacheKey);
+            return cached ? JSON.parse(cached) : null;
+        } catch (error) {
+            sails.log.error('Failed to get cached NFT qualification:', error);
+            return null;
+        }
+    },
+    
+    // Distributed locking using RedisService for concurrent operations
+    acquireNFTOperationLock: async function(userId, operation = 'upgrade', ttl = 600) {
+        try {
+            const lockKey = `nft_lock:${operation}:${userId}`;
+            const lockValue = await RedisService.setCache(lockKey, 'locked', ttl, { lockMode: true });
+            return lockValue !== false ? lockValue : null;
+        } catch (error) {
+            sails.log.error('Failed to acquire NFT operation lock:', error);
+            return null;
+        }
+    },
+    
+    releaseNFTOperationLock: async function(userId, operation = 'upgrade') {
+        try {
+            const lockKey = `nft_lock:${operation}:${userId}`;
+            await RedisService.delCache(lockKey);
+            return true;
+        } catch (error) {
+            sails.log.error('Failed to release NFT operation lock:', error);
+            return false;
+        }
+    },
+    
+    // Kafka event publishing using actual KafkaService methods
+    publishNFTEvent: async function(eventType, eventData) {
+        try {
+            const topic = 'nft-events'; // Use existing Kafka topic or create new one
+            const message = {
+                eventType: eventType,
+                timestamp: new Date().toISOString(),
+                data: eventData
+            };
+            
+            await KafkaService.sendMessage(topic, message);
+            sails.log.info(`NFT event published: ${eventType}`, eventData);
+            return true;
+        } catch (error) {
+            sails.log.error('Failed to publish NFT event:', error);
+            return false;
+        }
+    },
+    
     applyNFTBenefits: async function(userId) {
         // Apply fee reductions and other benefits based on NFT level
         // Integrate with existing trading fee calculations
+        try {
+            const userNFTs = await UserNFT.find({ user_id: userId, status: 'active' });
+            const highestLevel = Math.max(...userNFTs.map(nft => nft.nft_level));
+            
+            // Cache the benefit level for quick access during trading
+            await RedisService.setCache(`nft_benefits:${userId}`, { level: highestLevel }, 3600);
+            
+            return { level: highestLevel, benefits: this.getBenefitsForLevel(highestLevel) };
+        } catch (error) {
+            sails.log.error('Failed to apply NFT benefits:', error);
+            return { level: 0, benefits: {} };
+        }
     }
 };
 ```

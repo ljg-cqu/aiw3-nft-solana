@@ -204,7 +204,7 @@ sequenceDiagram
     MYSQL-->>NFT: NFT record created
     
     %% Publish event
-    NFT->>KAFKA: publish("nft.claimed", eventData)
+    NFT->>KAFKA: KafkaService.sendMessage("nft-events", {eventType: "claimed", data: eventData})
     KAFKA->>WS: broadcast to user
     WS-->>UI: real-time update
     
@@ -228,15 +228,16 @@ sequenceDiagram
     UI->>API: POST /api/nft/upgrade
     API->>NFT: upgradeNFT(userId, fromLevel, toLevel)
     
-    %% Verify upgrade eligibility
-    NFT->>REDIS: get("upgrade_lock:" + userId)
+    %% Verify upgrade eligibility using actual RedisService methods
+    NFT->>REDIS: RedisService.getCache("nft_lock:upgrade:" + userId)
     REDIS-->>NFT: check for pending upgrades
     
     NFT->>MYSQL: SELECT badges_collected, required_volume FROM user_nft_qualifications
     MYSQL-->>NFT: qualification status
     
-    %% Set upgrade lock
-    NFT->>REDIS: setex("upgrade_lock:" + userId, 600, "processing")
+    %% Set upgrade lock using RedisService with lock mode
+    NFT->>REDIS: RedisService.setCache("nft_lock:upgrade:" + userId, "locked", 600, {lockMode: true})
+    REDIS-->>NFT: lock acquired with unique value
     
     %% Create upgrade request record
     NFT->>MYSQL: INSERT INTO nft_upgrade_requests (...)
@@ -261,10 +262,10 @@ sequenceDiagram
     NFT->>MYSQL: INSERT INTO user_nfts (new NFT record)
     NFT->>MYSQL: UPDATE nft_upgrade_requests SET status='completed'
     
-    %% Clear cache and publish event
-    NFT->>REDIS: del("upgrade_lock:" + userId)
-    NFT->>REDIS: del("nft_qual:" + userId)
-    NFT->>KAFKA: publish("nft.upgraded", upgradeData)
+    %% Clear cache and publish event using actual service methods
+    NFT->>REDIS: RedisService.delCache("nft_lock:upgrade:" + userId)
+    NFT->>REDIS: RedisService.delCache("nft_qual:" + userId)
+    NFT->>KAFKA: KafkaService.sendMessage("nft-events", {eventType: "upgraded", data: upgradeData})
     
     NFT-->>API: upgrade success
     API-->>UI: NFT upgraded successfully

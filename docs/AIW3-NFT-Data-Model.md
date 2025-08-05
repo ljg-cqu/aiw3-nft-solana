@@ -708,7 +708,80 @@ This section defines the standardized API response formats for frontend-backend 
 }
 ```
 
-### WebSocket Event Data Formats
+### Redis Cache Structure
+
+### NFT Qualification Cache (using RedisService.setCache/getCache)
+```json
+nft_qual:{user_id} -> {
+    "trading_volume": 50000,
+    "badges_collected": ["tech_chicken", "quant_ape"],
+    "eligible_levels": [1, 2, 3],
+    "last_calculated": "2024-01-15T10:30:00Z",
+    "ttl": 300
+}
+
+// Set using: RedisService.setCache(`nft_qual:${userId}`, qualificationData, 300)
+// Get using: RedisService.getCache(`nft_qual:${userId}`)
+```
+
+### NFT Operation Locks (using RedisService distributed locking)
+```
+nft_lock:upgrade:{user_id} -> "locked" (TTL: 600s)
+nft_lock:claim:{user_id} -> "locked" (TTL: 300s)
+nft_lock:burn:{user_id} -> "locked" (TTL: 180s)
+
+// Acquire lock: RedisService.setCache(lockKey, "locked", ttl, {lockMode: true})
+// Release lock: RedisService.delCache(lockKey)
+```
+
+### NFT Benefits Cache (using RedisService with 1-hour TTL)
+```
+nft_benefits:{user_id} -> {
+    "level": 3,
+    "feeReduction": 0.15,
+    "agentUses": 30,
+    "cached_at": "2024-01-15T10:30:00Z"
+}
+
+// Set using: RedisService.setCache(`nft_benefits:${userId}`, benefitsData, 3600)
+```
+
+### Kafka Event Patterns (using KafkaService.sendMessage)
+
+#### NFT Events Topic: "nft-events"
+```json
+// NFT Claimed Event
+{
+  "eventType": "claimed",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "data": {
+    "userId": "user123",
+    "nftLevel": 1,
+    "tierName": "Tech Chicken",
+    "mintAddress": "5J7GpqXVf7Kx8rY3nZ9...",
+    "transactionSignature": "3Nc2yi7yoACnKqiuW5c6..."
+  }
+}
+
+// NFT Upgraded Event
+{
+  "eventType": "upgraded",
+  "timestamp": "2024-01-15T10:35:00Z",
+  "data": {
+    "userId": "user123",
+    "fromLevel": 1,
+    "toLevel": 2,
+    "fromTier": "Tech Chicken",
+    "toTier": "Quant Ape",
+    "oldMintAddress": "5J7GpqXVf7Kx8rY3nZ9...",
+    "newMintAddress": "8K9HrqYWg8Ly9sZ4oA1..."
+  }
+}
+
+// Published using: KafkaService.sendMessage("nft-events", eventData)
+```
+
+### WebSocket Event Data Formats (Frontend Integration)
 
 ```json
 // NFT Status Changed Event
