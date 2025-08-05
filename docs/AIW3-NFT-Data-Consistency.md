@@ -7,11 +7,27 @@
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Distributed Data Consistency & Verification](#distributed-data-consistency--verification)
-3. [Implementation Requirements](#implementation-requirements)
-4. [Monitoring & Operations](#monitoring--operations)
-5. [Recovery Procedures](#recovery-procedures)
+1.  [Overview](#overview)
+    -   [Data Layer Architecture](#data-layer-architecture)
+2.  [Distributed Data Consistency & Verification](#distributed-data-consistency--verification)
+    -   [The Multi-Layer Data Challenge](#the-multi-layer-data-challenge)
+    -   [Critical Consistency Requirements](#critical-consistency-requirements)
+    -   [Post-Mint Verification Protocol](#post-mint-verification-protocol)
+    -   [Data Consistency Failure Scenarios](#data-consistency-failure-scenarios)
+    -   [Consistency Verification Implementation](#consistency-verification-implementation)
+    -   [Data Layer Reconciliation](#data-layer-reconciliation)
+3.  [Implementation Requirements](#implementation-requirements)
+    -   [Multi-Layer Verification Protocol](#multi-layer-verification-protocol)
+    -   [Critical Success Factors](#critical-success-factors)
+4.  [Monitoring & Operations](#monitoring--operations)
+    -   [Automated Consistency Monitoring](#automated-consistency-monitoring)
+    -   [Operational Dashboards](#operational-dashboards)
+    -   [Alerting and Escalation](#alerting-and-escalation)
+5.  [Recovery Procedures](#recovery-procedures)
+    -   [Automated Recovery Strategies](#automated-recovery-strategies)
+    -   [Manual Intervention Procedures](#manual-intervention-procedures)
+    -   [Emergency Consistency Procedures](#emergency-consistency-procedures)
+    -   [Recovery Tools and Utilities](#recovery-tools-and-utilities)
 
 ---
 

@@ -2,18 +2,29 @@
 
 **Data Model Scope**: This document provides comprehensive specifications for data structures supporting all NFT business flows documented in **AIW3 NFT Business Flows and Processes**, ensuring complete prototype alignment.
 
-This document provides comprehensive specifications for data structures in the AIW3 NFT system, designed for seamless integration with the existing lastmemefi-api backend. It covers database extensions, API response formats, and data relationships optimized for the Sails.js/MySQL infrastructure.
+This document provides comprehensive specifications for data structures in the AIW3 NFT system, designed for seamless integration with the existing `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). It covers database extensions, API response formats, and data relationships optimized for the Sails.js/MySQL infrastructure.
 
 ---
 
 ## Table of Contents
 
-1. [Database Schema Extensions](#database-schema-extensions)
-2. [API Response Data Formats](#api-response-data-formats)
-3. [On-Chain Data Structures](#on-chain-data-structures)
-4. [Off-Chain Data Storage](#off-chain-data-storage)
-5. [Data Model Relationships](#data-model-relationships)
-6. [WebSocket Event Formats](#websocket-event-formats)
+1.  [Database Schema Extensions](#database-schema-extensions)
+    -   [New Models](#new-models)
+        -   [UserNFT Model](#usernft-model-apimodelsusernftjs)
+        -   [UserNFTQualification Model](#usernftqualification-model-apimodelsusernftqualificationjs)
+        -   [NFTBadge Model](#nftbadge-model-apimodelsnftbadgejs)
+        -   [NFTUpgradeRequest Model](#nftupgraderequest-model-apimodelsnftupgraderequestjs)
+    -   [Extended User Model](#extended-user-model)
+    -   [Database Migration Scripts](#database-migration-scripts)
+2.  [API Response Data Formats](#api-response-data-formats)
+3.  [On-Chain Data Structures](#on-chain-data-structures)
+4.  [Off-Chain Data Storage](#off-chain-data-storage)
+5.  [Data Model Relationships](#data-model-relationships)
+6.  [System Data Flow & Caching](#websocket-event-formats)
+    -   [Redis Cache Structure](#redis-cache-structure)
+    -   [Kafka Event Patterns](#kafka-event-patterns-using-kafkaservicesendmessage)
+    -   [WebSocket Event Data Formats](#websocket-event-data-formats-frontend-integration)
+    -   [Error Response Format](#error-response-format)
 
 ---
 

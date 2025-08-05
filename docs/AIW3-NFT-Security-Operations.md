@@ -9,12 +9,10 @@
 
 1. [Overview](#overview)
 2. [System Key Management & Security](#system-key-management--security)
-3. [Production Security Requirements](#production-security-requirements)
-4. [Key Rotation & Recovery Procedures](#key-rotation--recovery-procedures)
-5. [Emergency Response](#emergency-response)
-6. [Monitoring & Alerting](#monitoring--alerting)
-7. [Compliance & Audit](#compliance--audit)
-8. [Operational Guidelines](#operational-guidelines)
+3. [Key Rotation & Recovery Procedures](#key-rotation--recovery-procedures)
+4. [Monitoring & Alerting](#monitoring--alerting)
+5. [Compliance & Audit](#compliance--audit)
+6. [Operational Guidelines](#operational-guidelines)
 
 ---
 

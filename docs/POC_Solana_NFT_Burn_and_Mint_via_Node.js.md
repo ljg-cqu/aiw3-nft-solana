@@ -2,6 +2,36 @@
 
 **POC Scope**: This proof of concept validates the technical feasibility of core NFT operations documented in **AIW3 NFT Business Flows and Processes**, specifically focusing on the burn-and-mint synthesis process.
 
+## Table of Contents
+
+1.  [Introduction](#1-introduction)
+2.  [Objectives](#2-objectives)
+3.  [Technologies Used](#3-technologies-used)
+4.  [Prerequisites](#4-prerequisites)
+    -   [Business Flow Overview](#41-business-flow-overview)
+    -   [Required Environment Variables](#42-required-environment-variables)
+    -   [Account Roles](#43-account-roles)
+5.  [Understanding Solana Accounts](#5-understanding-solana-accounts)
+6.  [Setting up a Local Solana Testing Network](#6-setting-up-a-local-solana-testing-network)
+    -   [Install `@solana/test-validator`](#61-install-solanatest-validator)
+    -   [Run the Test Validator](#62-run-the-test-validator)
+    -   [Airdrop SOL to your wallet](#63-airdrop-sol-to-your-wallet)
+    -   [Create Test NFT (Optional)](#64-create-test-nft-optional---for-reference-only)
+7.  [Setup and Running the POC](#7-setup-and-running-the-poc)
+    -   [Navigate to POC Directory](#71-navigate-to-poc-directory)
+    -   [Install Dependencies](#72-install-dependencies)
+    -   [Configure Environment](#73-configure-environment)
+    -   [Run the POC](#74-run-the-poc)
+8.  [Verifying the Burn with Solana CLI](#8-verifying-the-burn-with-solana-cli)
+9.  [Verifying the Minting with Solana CLI](#9-verifying-the-minting-with-solana-cli)
+10. [Inspecting Token Accounts](#10-inspecting-token-accounts)
+11. [Using the Solana Explorer](#11-using-the-solana-explorer-devnettestnet)
+12. [Third-Party Solana Explorers](#12-third-party-solana-explorers-localnet---use-with-caution)
+13. [Implementing the Minting](#13-implementing-the-minting)
+14. [Troubleshooting](#14-troubleshooting)
+    -   [Common Issues](#common-issues)
+    -   [Error Messages](#error-messages)
+
 ## 1. Introduction
 
 This document outlines a Proof of Concept (POC) for demonstrating the core functionality of burning and minting a Solana NFT using a Node.js backend. This POC validates the feasibility of burning an NFT, minting a new NFT, and verifying these actions on-chain.

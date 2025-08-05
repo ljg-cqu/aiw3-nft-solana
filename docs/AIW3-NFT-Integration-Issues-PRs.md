@@ -4,7 +4,27 @@
 
 ## Overview
 
-This document provides a detailed breakdown of issues and pull requests for integrating the AIW3 NFT system with the existing `lastmemefi-api` backend. Each issue is designed to be small, controllable, and testable with appropriate granularity for team collaboration.
+This document provides a detailed breakdown of issues and pull requests for integrating the AIW3 NFT system with the existing `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). Each issue is designed to be small, controllable, and testable with appropriate granularity for team collaboration.
+
+---
+
+## Table of Contents
+
+- **Project Phases**
+  - [Phase 1: Foundation & Database Schema](#phase-1-foundation--database-schema-week-1-2)
+  - [Phase 2: Core Service Extensions](#phase-2-core-service-extensions-week-2-3)
+  - [Phase 3: API Layer Implementation](#phase-3-api-layer-implementation-week-3-4)
+  - [Phase 4: Integration with Existing Systems](#phase-4-integration-with-existing-systems-week-4-5)
+  - [Phase 5: Background Jobs & Asynchronous Operations](#phase-5-background-jobs--asynchronous-operations-week-5-6)
+  - [Phase 6: Security, Testing & Documentation](#phase-6-security-testing--documentation-week-6-7)
+  - [Phase 7: Staging Deployment & QA](#phase-7-staging-deployment--qa-week-7-8)
+  - [Phase 8: Deployment & Monitoring](#phase-8-deployment--monitoring-week-8-9)
+- [Technical Specifications](#technical-specifications)
+- [Risk Assessment Summary](#risk-assessment-summary)
+- [Team Assignment Recommendations](#team-assignment-recommendations)
+- [Critical Path](#critical-path)
+
+---
 
 ## Legend
 

@@ -6,12 +6,20 @@ This document provides a comprehensive overview of all NFT-related business flow
 
 ## Table of Contents
 
-1. [Unlocking and Activation Processes](#unlocking-and-activation-processes)
-2. [Synthesis and Upgrade Processes](#synthesis-and-upgrade-processes)
-3. [User Profiles and Community Views](#user-profiles-and-community-views)
-4. [Notifications and Badge Systems](#notifications-and-badge-systems)
-5. [Cross-Referencing and Document Structure](#cross-referencing-and-document-structure)
-6. [Conclusion](#conclusion)
+1.  [Unlocking and Activation Processes](#unlocking-and-activation-processes)
+    -   [Unlockable to Active Transition](#unlockable-to-active-transition)
+    -   [Activation Popups and Notifications](#activation-popups-and-notifications)
+2.  [Synthesis and Upgrade Processes](#synthesis-and-upgrade-processes)
+    -   [Synthesis Workflow](#synthesis-workflow)
+    -   [Post-Synthesis Status](#post-synthesis-status)
+3.  [User Profiles and Community Views](#user-profiles-and-community-views)
+    -   [Personal Center Design and Interaction](#personal-center-design-and-interaction)
+    -   [Community-Mini Homepage Visibility](#community-mini-homepage-visibility)
+4.  [Notifications and Badge Systems](#notifications-and-badge-systems)
+    -   [System-Wide Alerts](#system-wide-alerts)
+    -   [Badge Integration](#badge-integration)
+5.  [Cross-Referencing and Document Structure](#cross-referencing-and-document-structure)
+6.  [Conclusion](#conclusion)
 
 ---
 

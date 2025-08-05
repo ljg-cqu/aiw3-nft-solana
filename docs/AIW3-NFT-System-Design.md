@@ -7,12 +7,23 @@ This document provides technical specifications for integrating AIW3's Equity NF
 
 ## Table of Contents
 
-1. [Executive Summary](#executive-summary)
-2. [Integration with lastmemefi-api Backend](#integration-with-lastmemefi-api)
-3. [NFT Lifecycle Overview](#nft-lifecycle-overview)
-4. [Core Technical Architecture](#core-technical-architecture)
-5. [Visual Architecture](#visual-architecture)
-6. [Related Documents](#related-documents)
+1.  [Executive Summary](#executive-summary)
+    -   [Key Benefits](#key-benefits)
+    -   [Strategic Approach](#strategic-approach)
+2.  [NFT Lifecycle Overview](#nft-lifecycle-overview)
+    -   [Lifecycle Characteristics](#lifecycle-characteristics)
+3.  [Core Technical Architecture](#core-technical-architecture)
+    -   [Multi-System Integration Overview](#multi-system-integration-overview)
+    -   [System Component Responsibilities](#system-component-responsibilities)
+    -   [NFT Operation Data Flows](#nft-operation-data-flows)
+        -   [1. NFT Claiming Flow](#1-nft-claiming-flow)
+        -   [2. NFT Upgrade Flow](#2-nft-upgrade-flow)
+    -   [Transaction Volume Qualification](#transaction-volume-qualification)
+    -   [Metadata and Storage Flow](#metadata-and-storage-flow)
+4.  [Visual Architecture](#visual-architecture)
+    -   [NFT Ecosystem Entity Relationship](#nft-ecosystem-entity-relationship)
+    -   [Multi-System Infrastructure Topology](#multi-system-infrastructure-topology)
+5.  [Related Documents](#related-documents)
 
 ---
 

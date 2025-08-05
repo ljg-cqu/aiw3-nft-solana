@@ -1,5 +1,22 @@
 # AIW3 NFT Solana POC - Setup Guide
 
+## Table of Contents
+
+1.  [Account Relationships & Business Flow](#account-relationships--business-flow)
+    -   [Critical Understanding: Account Pairs](#-critical-understanding-account-pairs)
+    -   [Business Flow Overview](#-business-flow-overview)
+2.  [Environment Configuration](#environment-configuration)
+    -   [Required Variables](#required-variables)
+    -   [Account Roles](#account-roles)
+3.  [Verification Steps](#verification-steps)
+    -   [Verify Account Relationship](#1-verify-account-relationship)
+    -   [Check Balances](#2-check-balances)
+4.  [Running the POC](#running-the-poc)
+5.  [Expected Flow](#expected-flow)
+6.  [Troubleshooting](#troubleshooting)
+    -   [Common Issues](#common-issues)
+    -   [Error Messages](#error-messages)
+
 ## Account Relationships & Business Flow
 
 ### 🔑 Critical Understanding: Account Pairs

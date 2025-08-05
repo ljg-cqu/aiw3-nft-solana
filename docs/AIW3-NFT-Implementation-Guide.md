@@ -1,17 +1,36 @@
 
 # AIW3 NFT Implementation Guide
 
-This document provides comprehensive implementation guidelines for the AIW3 NFT system, emphasizing integration with the lastmemefi-api backend. It outlines standard program integration, backend service utilization, frontend application development, and process flows.
+This document provides comprehensive implementation guidelines for the AIW3 NFT system, emphasizing integration with the `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). It outlines standard program integration, backend service utilization, frontend application development, and process flows.
 
 ---
 
 ## Table of Contents
 
-1. [Standard Solana Programs Integration](#standard-solana-programs-integration)
-2. [Backend Services Integration](#backend-services-integration)
-3. [Frontend Application Development](#frontend-application-development)
-4. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
-5. [Integration Process Flows](#integration-process-flows)
+1.  [Standard Solana Programs Integration](#standard-solana-programs-integration)
+    -   [Standard Program Dependencies](#1-standard-program-dependencies)
+    -   [Backend Business Logic Implementation](#2-backend-business-logic-implementation)
+    -   [Security Through Standard Programs](#3-security-through-standard-programs)
+    -   [Integration Testing and Deployment](#4-integration-testing-and-deployment)
+2.  [Backend Services](#backend-services)
+    -   [API Endpoint Creation & Frontend Integration](#2-api-endpoint-creation--frontend-integration)
+    -   [Monitoring Service](#4-monitoring-service)
+3.  [Frontend Application Development](#frontend-application-development)
+    -   [Personal Center Dashboard](#personal-center-dashboard)
+    -   [Synthesis (Upgrade) Interface](#synthesis-upgrade-interface)
+4.  [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
+    -   [Recommended Model: Burn-and-Mint](#recommended-model-burn-and-mint)
+    -   [Burn-and-Mint Workflow](#burn-and-mint-workflow)
+5.  [Integration Process Flows](#integration-process-flows)
+    -   [New User Onboarding and First NFT Claim](#1-new-user-onboarding-and-first-nft-claim)
+    -   [NFT Synthesis (Upgrade) Flow](#2-nft-synthesis-upgrade-flow)
+6.  [Frontend-Backend API & Integration Specification](#frontend-backend-api--integration-specification)
+    -   [Core API Endpoints](#core-api-endpoints)
+    -   [Standardized Error Codes](#standardized-error-codes)
+    -   [Real-time Communication (WebSockets)](#real-time-communication-websockets)
+    -   [Frontend Integration Points](#frontend-integration-points)
+    -   [Technical Implementation Plan & Dependencies](#technical-implementation-plan--dependencies)
+    -   [Testing & Development Support](#testing--development-support)
 
 ---
 
