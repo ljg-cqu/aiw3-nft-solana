@@ -149,7 +149,11 @@ graph TB
     KAFKA --> WS
 ```
 
-### System Component Responsibilities
+*Figure 1: High-level system architecture showing the main components and their interactions.*
+
+---
+
+## System Component Responsibilities
 
 | Component | NFT-Related Responsibilities | Data Flow |
 |-----------|----------------------------|----------|

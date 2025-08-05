@@ -22,10 +22,10 @@ This document provides comprehensive implementation guidelines for the AIW3 NFT 
 4.  [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
     -   [Recommended Model: Burn-and-Mint](#recommended-model-burn-and-mint)
     -   [Burn-and-Mint Workflow](#burn-and-mint-workflow)
-5.  [Integration Process Flows](#integration-process-flows)
+5.  [Error Handling and Resilience](#error-handling-and-resilience)
+6.  [Integration Process Flows](#integration-process-flows)
     -   [New User Onboarding and First NFT Claim](#1-new-user-onboarding-and-first-nft-claim)
     -   [NFT Synthesis (Upgrade) Flow](#2-nft-synthesis-upgrade-flow)
-
 
 ---
 
@@ -77,27 +77,22 @@ The backend is the intermediary between the user-facing frontend and the standar
 ### 2. **API Endpoint Creation & Frontend Integration**
 - **Action:** Develop a comprehensive REST API with standardized endpoints and real-time communication for seamless frontend integration.
 
-#### Core API Endpoints
-  - `GET /api/nft/status`: Returns user's current NFT level and progress toward the next tier.
-  - `POST /api/nft/claim`: Initiates the process to claim a new NFT once qualification is met.
-  - `POST /api/nft/upgrade`: Initiates the burn-and-mint upgrade process.
-  - `GET /api/nft/history`: Returns a paginated list of the user's NFT activities (claims, upgrades).
-  - `GET /api/nft/benefits`: Returns current benefits and fee reductions associated with the user's tier.
-  - `GET /api/nft/badges`: Returns the user's badge collection with unlock status.
-  - `POST /api/nft/badges/claim`: Claims new badges required for upgrade qualification.
+#### API Endpoints Overview
 
-#### Frontend Integration Features
-  - **Standardized Response Format**: Consistent success/error responses following existing `lastmemefi-api` patterns
-  - **Real-time Updates**: WebSocket events (`nft:status_changed`, `nft:upgrade_progress`, `nft:qualification_updated`, `nft:transaction_status`)
-  - **Transaction Tracking**: Solana transaction signatures returned for frontend monitoring
-  - **Authentication**: Integration with existing JWT middleware from `AccessTokenService`
-  - **Error Handling**: User-friendly error messages with technical details for debugging
+The NFT system provides a comprehensive REST API with standardized endpoints for all NFT operations. For detailed API specifications, endpoint documentation, request/response formats, and integration examples, see the [AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md#core-api-endpoints) document.
 
-#### API Documentation & Testing Support
-  - **Interactive Documentation**: Swagger UI at `/docs/nft` with live examples
-  - **Mock Data**: Sandbox endpoints with `/api/nft/sandbox/` prefix for development
-  - **Code Examples**: JavaScript, React, Vue.js integration samples
-  - **Client SDK**: JavaScript library for easy WebSocket and API integration
+**Key Endpoints:**
+- `GET /api/nft/status` - User NFT status and progress
+- `POST /api/nft/claim` - Initial NFT claiming
+- `POST /api/nft/upgrade` - NFT upgrade process
+- `GET /api/nft/benefits` - Current tier benefits
+- `GET /api/nft/badges` - Badge collection management
+
+**Integration Features:**
+- Standardized response formats following existing `lastmemefi-api` patterns
+- Real-time WebSocket events for status updates
+- JWT authentication integration
+- Comprehensive error handling following the [AIW3 NFT Error Handling Reference](./AIW3-NFT-Error-Handling-Reference.md)
 
 - **Rationale:** Comprehensive API design with frontend integration support ensures seamless end-to-end functionality and developer productivity.
 
@@ -250,6 +245,139 @@ sequenceDiagram
   1.  An initial confirmation in the UI (e.g., a checkbox saying, "I understand my Lv.1 NFT will be burned").
   2.  The final transaction approval in their wallet.
 - **Transaction Status Tracking:** The frontend should provide real-time feedback on the status of the burn and mint transactions, so the user is not left wondering what is happening.
+
+## Error Handling and Resilience
+
+This section outlines the comprehensive error handling strategies and resilience patterns implemented throughout the AIW3 NFT system. For a complete reference, see the [AIW3 NFT Error Handling Reference](./AIW3-NFT-Error-Handling-Reference.md).
+
+### Error Categories
+
+1. **Transient Errors** (Automatic Retry)
+   - Network timeouts and connectivity issues
+   - Solana RPC rate limiting
+   - IPFS via Pinata temporary unavailability
+   - Lock timeouts due to high contention
+
+2. **Permanent Errors** (User Action Required)
+   - Invalid user wallet addresses
+   - Insufficient system wallet balance
+   - Malformed metadata or image data
+   - Authentication/authorization failures
+
+3. **Critical Errors** (Immediate Escalation)
+   - System wallet private key compromise
+   - Nonce desynchronization requiring manual fix
+   - Database corruption or inconsistency
+   - Security breach or unauthorized access
+
+### Key Error Handling Patterns
+
+#### 1. Exponential Backoff Retry
+```javascript
+async function withExponentialBackoff(fn, maxRetries = 3, initialDelay = 1000) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (!isRetryable(error) || attempt === maxRetries) throw error;
+      await new Promise(resolve => 
+        setTimeout(resolve, initialDelay * Math.pow(2, attempt)));
+    }
+  }
+}
+```
+
+#### 2. Circuit Breaker Pattern
+```javascript
+class CircuitBreaker {
+  constructor(failureThreshold = 5, resetTimeout = 60000) {
+    this.failureThreshold = failureThreshold;
+    this.resetTimeout = resetTimeout;
+    this.failureCount = 0;
+    this.lastFailureTime = null;
+    this.state = 'CLOSED';
+  }
+  
+  async execute(fn) {
+    if (this.state === 'OPEN') {
+      if (Date.now() - this.lastFailureTime > this.resetTimeout) {
+        this.state = 'HALF-OPEN';
+      } else {
+        throw new Error('Circuit breaker is open');
+      }
+    }
+    
+    try {
+      const result = await fn();
+      if (this.state === 'HALF-OPEN') this.reset();
+      return result;
+    } catch (error) {
+      this.recordFailure();
+      throw error;
+    }
+  }
+}
+```
+
+### Solana-Specific Error Handling
+
+#### Common Solana Errors
+- **Blockhash not found**: Refresh blockhash and retry
+- **Insufficient lamports**: Check and top up system wallet
+- **AccountInUse**: Implement proper account management
+- **AccountNotFound**: Verify account creation
+
+### IPFS Error Handling
+
+#### Multiple Gateway Strategy
+```javascript
+const gateways = [
+  'https://gateway.pinata.cloud/ipfs/',
+  'https://ipfs.io/ipfs/',
+  'https://cloudflare-ipfs.com/ipfs/'
+];
+
+async function fetchFromIPFS(hash) {
+  let lastError;
+  for (const gateway of gateways) {
+    try {
+      const response = await fetch(`${gateway}${hash}`);
+      if (response.ok) return await response.json();
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error('All IPFS gateways failed');
+}
+```
+
+### Monitoring and Alerting
+
+#### Key Metrics
+- **API Error Rate**: By endpoint and error type
+- **Solana RPC Performance**: Success rate and latency
+- **IPFS Upload Success Rate**: Track failures and retries
+- **Database Query Performance**: Slow queries and timeouts
+
+#### Alert Thresholds
+| Metric | Warning | Critical |
+|--------|---------|----------|
+| API Error Rate | > 1% | > 5% |
+| Solana RPC Error Rate | > 2% | > 10% |
+| IPFS Upload Failure Rate | > 5% | > 20% |
+| Database Query Time | > 500ms | > 2000ms |
+
+### Recovery Procedures
+
+#### Failed NFT Mint Recovery
+1. **Detect Failure**: Monitor for pending transactions exceeding expected confirmation time
+2. **Verify State**: Check Solana blockchain for transaction status
+3. **Recovery Actions**:
+   - If transaction failed but not submitted: Retry with new blockhash
+   - If transaction confirmed but NFT not in wallet: Resync wallet state
+   - If IPFS upload failed: Retry upload with new CID
+
+For complete implementation details and additional error handling patterns, refer to the [AIW3 NFT Error Handling Reference](./AIW3-NFT-Error-Handling-Reference.md).
 
 ---
 
