@@ -7,7 +7,7 @@ This document provides step-by-step implementation instructions for developers b
 
 ## Table of Contents
 
-1. [On-Chain Program (Smart Contract)](#on-chain-program-smart-contract)
+1. [Standard Solana Programs Integration](#standard-solana-programs-integration)
 2. [Backend Services](#backend-services)
 3. [Frontend Application](#frontend-application)
 4. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
@@ -15,35 +15,37 @@ This document provides step-by-step implementation instructions for developers b
 
 ---
 
-## On-Chain Program (Smart Contract)
+## Standard Solana Programs Integration
 
-This section details the implementation steps for the on-chain program, which is the core of the NFT system's logic and security.
+The AIW3 NFT system uses **only standard Solana programs** without requiring any custom smart contract development. This approach leverages battle-tested blockchain functionality while eliminating development complexity and security risks.
 
-### 1. **Project Scaffolding**
-- **Action:** Initialize a new Anchor project.
-  ```bash
-  anchor init aiw3-nft-program
-  ```
-- **Rationale:** Anchor provides a secure and idiomatic framework for Solana program development, reducing boilerplate and preventing common security vulnerabilities.
+### 1. **Standard Program Dependencies**
+- **Action:** Integrate with existing Solana programs using standard libraries and SDKs.
+  - **SPL Token Program:** Use for all NFT minting, burning, and transfer operations
+  - **Metaplex Token Metadata Program:** Use for NFT metadata management and creator verification
+  - **Associated Token Account Program:** Use for user wallet NFT storage
+- **Rationale:** Using standard programs eliminates custom development complexity, reduces security risks, and ensures compatibility with the entire Solana ecosystem.
 
-### 2. **Define Account Structs**
-- **Action:** In `lib.rs`, define the Rust structs that represent on-chain accounts.
-  - `UserNftState`: Stores the user's current NFT level and a list of bound badge NFTs.
-  - `TierConfiguration`: A system-level account storing the requirements for each NFT tier (e.g., required transaction volume, number of badges).
-- **Rationale:** These structs define the on-chain data schema, ensuring data is stored in a structured and predictable way.
+### 2. **Backend Business Logic Implementation**
+- **Action:** Implement all business rules in the backend service layer, not on-chain.
+  - **Level Verification:** Backend verifies user qualifications before authorizing minting operations
+  - **Upgrade Logic:** Backend orchestrates the burn-and-mint process using standard token operations
+  - **Access Control:** Backend controls system wallet operations and user authorization
+- **Rationale:** Off-chain business logic provides flexibility for rule changes while on-chain operations remain simple and standard.
 
-### 3. **Implement Instruction Logic**
-- **Action:** Implement the core business logic functions.
-  - `initialize(ctx, tier_config)`: Sets up the initial `TierConfiguration` account. Can only be called by the program's deployer.
-  - `unlock_tier(ctx, level)`: The main user-facing function. Verifies that the user meets the off-chain (trading volume) and on-chain (badge ownership) requirements before minting the new NFT.
-  - `bind_badge(ctx, badge_mint_address)`: Allows a user to "bind" a special Badge NFT to their account, making it eligible for use in tier upgrades.
-- **Rationale:** These functions translate the business rules defined in the **AIW3 NFT Tiers and Policies** document into executable on-chain logic.
+### 3. **Security Through Standard Programs**
+- **Action:** Leverage the security of battle-tested standard Solana programs.
+  - **Proven Security:** SPL Token and Metaplex programs have been extensively audited and tested
+  - **Access Controls:** Use standard token authority patterns for secure operations
+  - **No Custom Attack Vectors:** Eliminates security risks from custom smart contract code
+- **Rationale:** Standard programs provide enterprise-grade security without the risks and costs of custom smart contract development and auditing.
 
-### 4. **Write Comprehensive Tests**
-- **Action:** Create a suite of tests in the `tests/` directory.
-  - **Unit Tests:** Test individual functions in isolation.
-  - **Integration Tests:** Test the full user flow (e.g., initializing, binding badges, unlocking a new tier).
-- **Rationale:** Rigorous testing is critical for on-chain programs, as bugs can lead to financial loss and are difficult to fix after deployment.
+### 4. **Integration Testing and Deployment**
+- **Action:** Test integration with standard Solana programs and deploy backend services.
+  - **Standard Program Integration Tests:** Test interactions with SPL Token and Metaplex programs
+  - **Backend Service Tests:** Test business logic and standard program interactions
+  - **Deployment Scripts:** Automate backend service deployment and configuration
+- **Rationale:** Testing focuses on integration with proven standard programs rather than custom contract logic, reducing complexity and risk.
 
 ---
 
@@ -51,18 +53,17 @@ This section details the implementation steps for the on-chain program, which is
 
 The backend is the intermediary between the user-facing frontend and the on-chain program.
 
-### 1. **Database Schema Design**
-- **Action:** Design and create the necessary MySQL tables.
-  - `users`: Stores user profile information.
-  - `user_transactions`: Aggregates user trading volume.
-  - `nft_ownership`: Caches on-chain NFT ownership data for faster lookups.
-- **Rationale:** A well-designed database provides a reliable and performant way to store and query the off-chain data needed to support the NFT system.
+### 1. **Standard Program Integration**
+- **Action:** Integrate with existing Solana programs using standard libraries and SDKs.
+  - **SPL Token Program:** Use for all NFT minting, burning, and transfer operations.
+  - **Metaplex Token Metadata:** Use for NFT metadata management and creator verification.
+  - **Associated Token Account Program:** Use for user wallet NFT storage.
+- **Rationale:** Using standard programs eliminates custom development complexity, reduces security risks, and ensures compatibility with the entire Solana ecosystem.
 
 ### 2. **API Endpoint Creation**
 - **Action:** Develop a REST API with endpoints for the frontend.
   - `GET /api/user/nft-status`: Returns the user's current NFT level and progress toward the next tier.
   - `POST /api/nft/unlock-tier`: Initiates the on-chain `unlock_tier` instruction after verifying off-chain requirements.
-  - `GET /api/user/badges`: Lists the user's owned and bound Badge NFTs.
 - **Rationale:** The API provides a secure and controlled interface for the frontend to interact with backend services and, indirectly, the blockchain.
 
 ### 3. **Solana Integration**
