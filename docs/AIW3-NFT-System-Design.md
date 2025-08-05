@@ -1,14 +1,14 @@
 # AIW3 NFT System Design
 ## High-Level Architecture & Lifecycle Management for Integrated Solana-Based Equity NFTs
 
-This document provides technical specifications for integrating AIW3's Equity NFT system with lastmemefi-api, focusing on compatibility, backend service utilization, and ecosystem interaction.
+This document provides technical specifications for integrating AIW3's Equity NFT system with `/home/zealy/aiw3/gitlab.com/lastmemefi-api`, focusing on compatibility, backend service utilization, and ecosystem interaction.
 
 ---
 
 ## Table of Contents
 
 1. [Executive Summary](#executive-summary)
-2. [Integration with lastmemefi-api](#integration-with-lastmemefi-api)
+2. [Integration with lastmemefi-api Backend](#integration-with-lastmemefi-api)
 3. [NFT Lifecycle Overview](#nft-lifecycle-overview)
 4. [Core Technical Architecture](#core-technical-architecture)
 4. [Visual Architecture](#visual-architecture)
@@ -182,7 +182,7 @@ sequenceDiagram
     alt Cache Miss
         NFT->>MYSQL: SELECT SUM(total_usd_price) FROM trades WHERE user_id = ?
         MYSQL-->>NFT: calculated trading volume
-        NFT->>REDIS: setex("nft_qual:" + userId, 300, qualData)
+        NFT->>REDIS: RedisService.setCache("nft_qual:" + userId, qualData, 300)
     end
     
     %% Check existing NFTs

@@ -407,7 +407,7 @@ GROUP BY u.id;
 ```javascript
 // Cache user NFT status for 5 minutes
 const cacheKey = `user:${userId}:nft:status`;
-await RedisService.setex(cacheKey, 300, JSON.stringify(nftStatus));
+await RedisService.setCache(cacheKey, JSON.stringify(nftStatus), 300);
 ```
 
 ### 3. Kafka Message Queue Integration
@@ -426,7 +426,7 @@ const upgradeMessage = {
     timestamp: new Date().toISOString(),
     mintAddress: newNFTMintAddress
 };
-await KafkaService.publishMessage('nft-upgrades', upgradeMessage);
+await KafkaService.sendMessage('nft-events', upgradeMessage);
 ```
 
 ### 4. IPFS Storage (Pinata) Integration

@@ -575,7 +575,7 @@ erDiagram
         int current_nft_level
         string current_nft_mint
         datetime last_nft_upgrade
-        decimal total_trading_volume
+        decimal cached_trading_volume
         datetime last_volume_update
         datetime createdAt
         datetime updatedAt
