@@ -254,7 +254,7 @@ flowchart TD
     C -->|Existing User| E[Load user data and trading history]
     D --> F[Check if user qualifies for Lv.1 NFT]
     E --> F
-    F --> G{Meets 100k USDT volume requirement?}
+    F --> G{Meets 100,000 USDT volume requirement?}
     G -->|Yes| H[Mark Lv.1 NFT as unlockable in UserNFTQualification table]
     G -->|No| I[Display volume requirement progress]
     H --> J[Frontend: Display Claim Your Lv.1 NFT button]
@@ -280,8 +280,8 @@ flowchart TD
         A[User with Lv.1 NFT navigates to Synthesis page] --> B[Frontend: GET /api/nft/status]
         B --> C[Backend: Query MySQL for user trading volume]
         C --> D[Backend: Query NFTBadge table for bound badges]
-        D --> E{Check Lv.2 requirements: 500k USDT + 2 badges}
-        E -->|Volume insufficient| F[Display current volume vs required 500k USDT]
+        D --> E{Check Lv.2 requirements: 500,000 USDT + 2 badges}
+        E -->|Volume insufficient| F[Display current volume vs required 500,000 USDT]
         E -->|Missing badges| G[Display badge collection status and requirements]
     end
 
