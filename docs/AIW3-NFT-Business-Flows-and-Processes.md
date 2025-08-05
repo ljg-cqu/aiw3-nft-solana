@@ -64,7 +64,7 @@ This document provides a comprehensive overview of all NFT-related business flow
 
 - **Objective**: To clearly reflect the user's new, upgraded status across the platform.
 - **Visual Changes**: The user's Personal Center immediately updates to display the new NFT card, removing the old one. Any associated benefits, such as reduced trading fees, are applied to their account.
-- **Data State**: The old `UserNFT` record is marked as `burned`, and a new `UserNFT` record is created for the new tier. The user's `current_nft_level` in the `User` model is updated.
+- **Data State**: The old `UserNFT` record is marked as `burned`, and a new `UserNFT` record is created for the new tier. The user's current NFT level is now determined by the new active NFT record in the `UserNFT` table, which serves as the single source of truth.
 
 ---
 

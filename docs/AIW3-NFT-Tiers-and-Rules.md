@@ -36,14 +36,14 @@ Qualification for each NFT tier is based on a user's total trading volume, calcu
 
 ### NFT Level Summary Table
 
-| Level | NFT Name              | Required Trading Volume (USDT) | Image                                                                                              |
-|:------|:----------------------|:-------------------------------|:---------------------------------------------------------------------------------------------------|
-| 1     | Tech Chicken          | ≥ 100,000                      | ![[prototype_L1.png]](../aiw3-prototypes/L1_Tech_Chicken_NFT_Card_and_Personal_Center_Dashboard.png)  |
-| 2     | Quant Ape             | ≥ 500,000                      | ![[prototype_L2.png]](../aiw3-prototypes/L2_Quant_Ape_NFT_Card_and_Personal_Center_Dashboard.png)      |
-| 3     | On-chain Hunter       | ≥ 1,000,000                    | ![[prototype_L3.png]](../aiw3-prototypes/L3_On-chain_Hunter_NFT_Card_and_Personal_Center_Dashboard.png) |
-| 4     | Alpha Alchemist       | ≥ 5,000,000                    | ![[prototype_L4.png]](../aiw3-prototypes/L4_Alpha_Alchemist_NFT_Card_and_Personal_Center_Dashboard.png) |
-| 5     | Quantum Alchemist     | ≥ 10,000,000                   | ![[prototype_L5.png]](../aiw3-prototypes/L5_Quantum_Alchemist_NFT_Card_and_Personal_Center_Dashboard.png)|
-| Special | Trophy Breeder (Special) | By community contribution      | ![[prototype_L6.png]](../aiw3-prototypes/L6_Trophy_Breeder_NFT_Card_and_Personal_Center_Dashboard.png) |
+| Level | NFT Name              | Required Trading Volume (USDT) | Image                                          |
+|:------|:----------------------|:-------------------------------|:-----------------------------------------------|
+| 1     | Tech Chicken          | ≥ 100,000                      | ![[NFT_Level_1.png]](../assets/images/NFT_Level_1.png) |
+| 2     | Quant Ape             | ≥ 500,000                      | ![[NFT_Level_2.png]](../assets/images/NFT_Level_2.png) |
+| 3     | On-chain Hunter       | ≥ 1,000,000                    | ![[NFT_Level_3.png]](../assets/images/NFT_Level_3.png) |
+| 4     | Alpha Alchemist       | ≥ 5,000,000                    | ![[NFT_Level_4.png]](../assets/images/NFT_Level_4.png) |
+| 5     | Quantum Alchemist     | ≥ 10,000,000                   | ![[NFT_Level_5.png]](../assets/images/NFT_Level_5.png) |
+| Special | Trophy Breeder (Special) | By community contribution      | ![[NFT_Level_6.png]](../assets/images/NFT_Level_6.png) |
 
 ---
 
@@ -72,7 +72,7 @@ For a detailed description of the user-facing and backend processes for claiming
 
 ## 🖼️ Visual Prototypes
 
-All business rules and user flows are derived from the 41 official prototype images. Key prototypes related to tiers and policies include:
+The visual representation for each NFT tier is defined by the official assets located in the `assets/images` directory. Key visual elements related to the tiers and policies include:
 
 -   **Personal Center Dashboards**: Showing locked and unlocked NFT states.
 -   **NFT Cards**: Displaying tier, name, and artwork.

@@ -25,24 +25,23 @@ Each term in this appendix is cross-referenced with the respective NFT workflows
 This section defines the core concepts used throughout the AIW3 NFT documentation.
 
 -   **Equity NFT:** The primary NFT representing a user's status and benefits, organized into **Levels** or **Tiers**. Higher tiers are acquired by meeting trading volume thresholds and owning required **Badge NFTs**.
-    -   **Analogy:** Like a loyalty program status (e.g., Bronze, Silver, Gold). Your "Gold" card is unique, but it provides the same benefits as all other "Gold" members.
+    -   **Flow Reference:** See [Unlocking and Activation Processes](./AIW3-NFT-Business-Flows-and-Processes.md#unlocking-and-activation-processes) and [Synthesis and Upgrade Processes](./AIW3-NFT-Business-Flows-and-Processes.md#synthesis-and-upgrade-processes).
 
 -   **Badge NFT:** A secondary, collectible NFT that acts as a prerequisite or "key" for synthesizing a higher-level **Equity NFT**. These are typically awarded for specific achievements or participation.
-    -   **Analogy:** The "materials" needed to craft a more powerful item in a game. You must collect them before you can perform the upgrade.
+    -   **Flow Reference:** See [Badge Integration](./AIW3-NFT-Business-Flows-and-Processes.md#badge-integration).
 
 -   **Synthesis:** The official term for upgrading an Equity NFT. This process consumes the user's current NFT (and any required Badge NFTs) to mint a new, higher-level one.
-    -   **Analogy:** The act of "crafting" or "forging" a better item from existing components.
+    -   **Flow Reference:** See [Synthesis and Upgrade Processes](./AIW3-NFT-Business-Flows-and-Processes.md#synthesis-and-upgrade-processes).
 
 -   **Unlockable State:** A state where a user has met the criteria to claim an NFT but has not yet minted it. It requires a final user action.
-    -   **Analogy:** A coupon you are eligible for but have not yet redeemed.
+    -   **Flow Reference:** See [Unlockable to Active Transition](./AIW3-NFT-Business-Flows-and-Processes.md#unlockable-to-active-transition).
 
 -   **Micro Badge:** A small icon representing a user's highest NFT level, displayed on their profile for status.
-    -   **Analogy:** A digital lapel pin or rank insignia.
+    -   **Flow Reference:** See [Community-Mini Homepage Visibility](./AIW3-NFT-Business-Flows-and-Processes.md#community-mini-homepage-visibility).
 
--   **Special NFT:** A distinct NFT awarded for special achievements (e.g., winning a competition), acquired via airdrop, not Synthesis.
+-   **Special NFT:** A distinct NFT awarded for special achievements (e.g., winning a competition), acquired via airdrop, not Synthesis. The acquisition flow is typically a direct airdrop managed by the system administrators.
 
--   **Solana:** The high-performance blockchain network where AIW3 NFTs are built, recorded, and traded.
-    -   **Analogy:** The global, secure courier service that delivers and tracks the ownership of valuable packages (NFTs).
+-   **Solana:** The high-performance blockchain network where AIW3 NFTs are built, recorded, and traded. All on-chain operations described in the business flows occur on this network.
 
 ---
 
