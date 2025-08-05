@@ -20,7 +20,7 @@ This document provides comprehensive specifications for data structures in the A
 3.  [On-Chain Data Structures](#on-chain-data-structures)
 4.  [Off-Chain Data Storage](#off-chain-data-storage)
 5.  [Data Model Relationships](#data-model-relationships)
-6.  [System Data Flow & Caching](#websocket-event-formats)
+6.  [System Data Flow & Caching](#system-data-flow--caching)
     -   [Redis Cache Structure](#redis-cache-structure)
     -   [Kafka Event Patterns](#kafka-event-patterns-using-kafkaservicesendmessage)
     -   [WebSocket Event Data Formats](#websocket-event-data-formats-frontend-integration)

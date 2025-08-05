@@ -74,13 +74,16 @@ Encrypted Key Storage
 - ❌ **Latency Issues**: Additional confirmation delays impact user experience
 - ❌ **Complexity Overhead**: Coordination requirements hinder system efficiency
 
-**Recommended Alternative: Single Key with Enhanced Protection**
+**Recommended Key Management Strategy**
 
-**Primary Approach: Hardware Security Module (HSM) with Single Key**
-- **Hot Wallet Operations**: Single system wallet for automated minting
-- **Enhanced Security**: HSM-protected private key with tamper resistance
-- **Operational Efficiency**: No approval delays for standard minting operations
-- **Automated Monitoring**: Real-time anomaly detection for unauthorized activity
+**Tier 1 (Ideal/Future State): Hardware Security Module (HSM)**
+- **Enhanced Security**: An HSM provides the highest level of security by ensuring the system wallet's private key never leaves the tamper-resistant hardware.
+- **Recommendation**: For long-term, high-value operations, migrating to an HSM-based solution (like AWS CloudHSM or a physical HSM) is the recommended best practice.
+
+**Tier 2 (Current Implementation): Secure Vault Integration via `Web3Service`**
+- **Practical Security**: The `lastmemefi-api`'s `Web3Service` is designed to integrate with a secure key management system (like HashiCorp Vault, AWS KMS, or another secrets manager).
+- **Implementation**: The `Web3Service` fetches the private key from the secure vault only when needed to sign a transaction, minimizing its exposure in memory.
+- **Access Control**: Access to the vault is strictly controlled via IAM roles or other authentication mechanisms, ensuring only the `Web3Service` can request the key.
 
 **Transaction Security Model**:
 - **Standard Minting**: Single system wallet signature (automated)
@@ -89,11 +92,21 @@ Encrypted Key Storage
 
 ### Automated Security Controls for High-Frequency Operations
 
-**Real-Time Monitoring**
-- **Transaction Rate Limiting**: Maximum mints per time period
-- **Anomaly Detection**: Unusual minting patterns or destinations
-- **Automated Circuit Breakers**: Temporary suspension on suspicious activity
-- **Compliance Monitoring**: Automated validation of minting rules
+The AIW3 NFT system leverages its existing backend services to implement robust, automated security controls.
+
+**Service-Based Controls**:
+-   **Authentication (`SolanaChainAuthController`)**: All sensitive operations require a valid JWT, which is issued only after a user successfully signs a message with their Solana wallet, proving ownership.
+-   **Rate Limiting (`RedisService`)**: The `RedisService` is used to enforce rate limits on a per-user and per-IP basis for critical API endpoints, mitigating abuse and DoS attacks.
+-   **Concurrency Control (`RedisService`)**: As detailed in the Concurrency Control document, distributed locks (`nft_lock:upgrade:{user_id}`) prevent race conditions and duplicate minting/upgrade operations for the same user.
+
+**Event-Driven Security Monitoring (`KafkaService` & `Elasticsearch`)**:
+-   **Security Event Streaming**: The `NFTService` and other components publish security-relevant events to a dedicated Kafka topic (e.g., `security-events`).
+-   **Events to Monitor**:
+    -   `nft_mint_failed`: A high volume of failures could indicate a configuration issue or an attack.
+    -   `nft_upgrade_rejected`: Frequent rejections for a user might signal attempts to bypass business logic.
+    -   `auth_failure`: Repeated authentication failures for a wallet address.
+    -   `rate_limit_exceeded`: Indicates a user or IP is hitting API limits.
+-   **Real-Time Analysis**: A separate monitoring service consumes from the `security-events` topic, aggregates the data, and pushes it to **Elasticsearch** for analysis and visualization. This enables the creation of dashboards to track unusual activity, such as a spike in failed transactions from a specific region or an abnormal minting rate, allowing for a swift response.
 
 **Emergency Response Automation**
 - **Automatic Key Rotation**: Scheduled or triggered key updates

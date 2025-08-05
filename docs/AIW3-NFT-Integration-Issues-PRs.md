@@ -148,7 +148,7 @@ Each issue includes specific frontend integration requirements to ensure seamles
 
 ## Technical Specifications
 
-All detailed technical specifications, including API contracts, data models, service architecture, and integration requirements, have been consolidated into the **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md#frontend-backend-api--integration-specification)**.
+All detailed technical specifications, including API contracts, data models, service architecture, and integration requirements, have been consolidated into the **[AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)** document.
 
 This document will now focus solely on the high-level project plan, task tracking, and risk management.
 

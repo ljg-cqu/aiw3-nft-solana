@@ -13,13 +13,11 @@ This document provides technical specifications for integrating AIW3's Equity NF
 2.  [NFT Lifecycle Overview](#nft-lifecycle-overview)
     -   [Lifecycle Characteristics](#lifecycle-characteristics)
 3.  [Core Technical Architecture](#core-technical-architecture)
-    -   [Multi-System Integration Overview](#multi-system-integration-overview)
-    -   [System Component Responsibilities](#system-component-responsibilities)
-    -   [NFT Operation Data Flows](#nft-operation-data-flows)
-        -   [1. NFT Claiming Flow](#1-nft-claiming-flow)
-        -   [2. NFT Upgrade Flow](#2-nft-upgrade-flow)
-    -   [Transaction Volume Qualification](#transaction-volume-qualification)
-    -   [Metadata and Storage Flow](#metadata-and-storage-flow)
+    -   [3.1 NFT Operation Data Flows](#31-nft-operation-data-flows)
+        -   [3.1.1 NFT Claiming Flow](#311-nft-claiming-flow)
+        -   [3.1.2 NFT Upgrade Flow](#312-nft-upgrade-flow)
+    -   [3.2 Transaction Volume Qualification](#32-transaction-volume-qualification)
+    -   [3.3 Metadata and Storage Flow](#33-metadata-and-storage-flow)
 4.  [Visual Architecture](#visual-architecture)
     -   [NFT Ecosystem Entity Relationship](#nft-ecosystem-entity-relationship)
     -   [Multi-System Infrastructure Topology](#multi-system-infrastructure-topology)
@@ -166,9 +164,9 @@ graph TB
 
 The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a URI reference to off-chain JSON metadata that stores the actual level data and references to IPFS-hosted images.
 
-### NFT Operation Data Flows
+### 3.1 NFT Operation Data Flows
 
-#### 1. NFT Claiming Flow
+#### 3.1.1 NFT Claiming Flow
 ```mermaid
 sequenceDiagram
     participant UI as Personal Center UI
@@ -223,7 +221,7 @@ sequenceDiagram
     API-->>UI: NFT claimed successfully
 ```
 
-#### 2. NFT Upgrade Flow
+#### 3.1.2 NFT Upgrade Flow
 ```mermaid
 sequenceDiagram
     participant UI as Personal Center UI
@@ -282,7 +280,7 @@ sequenceDiagram
     API-->>UI: NFT upgraded successfully
 ```
 
-### Transaction Volume Qualification
+### 3.2 Transaction Volume Qualification
 
 **Qualification Rules**:
 The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)** document.

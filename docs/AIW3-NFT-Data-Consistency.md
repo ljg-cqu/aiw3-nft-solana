@@ -151,123 +151,50 @@ AIW3 NFT minting involves **four distinct data layers** that must remain consist
 - **Recovery**: Multi-layer reconciliation using blockchain as source of truth
 - **Prevention**: Atomic-style operations with comprehensive rollback procedures
 
-### Consistency Verification Implementation
+### Event-Driven Consistency Model
 
-**Pre-Mint Validation**
-```javascript
-const validateMintingReadiness = async (levelData) => {
-  // Verify source image exists and is readable
-  const sourceImagePath = `assets/images/${levelData.level}.png`;
-  const sourceImageExists = await fs.access(sourceImagePath).then(() => true).catch(() => false);
-  if (!sourceImageExists) throw new Error(`Source image not found: ${sourceImagePath}`);
-  
-  // Verify IPFS via Pinata connectivity and upload capacity
-  const ipfsHealth = await checkIPFSConnectivity();
-  if (!ipfsHealth.canUpload) throw new Error('IPFS upload unavailable');
-  
-  // Confirm database transaction capability
-  const dbHealth = await checkDatabaseHealth();
-  if (!dbHealth.canWrite) throw new Error('Database writes unavailable');
-  
-  // Test Solana RPC endpoint responsiveness
-  const solanaHealth = await checkSolanaRPCHealth();
-  if (!solanaHealth.responsive) throw new Error('Solana RPC unavailable');
-  
-  return { 
-    sourceImage: sourceImagePath, 
-    ipfs: ipfsHealth, 
-    database: dbHealth, 
-    solana: solanaHealth 
-  };
-};
-```
+To ensure data consistency in a distributed environment, the AIW3 NFT system adopts a robust, event-driven architecture centered around Kafka. Instead of a single, monolithic function, each NFT operation is broken down into a series of small, independent, and idempotent steps orchestrated by messages on a Kafka topic. This approach is inherently more resilient and scalable.
 
-**Atomic-Style Operations with Compensation**
-```javascript
-const mintWithConsistencyGuarantees = async (mintRequest) => {
-  const operations = [];
-  let currentState = 'INITIATED';
-  
-  try {
-    // Phase 1: Source Preparation
-    const sourceImagePath = `assets/images/${mintRequest.level}.png`;
-    const sourceImageBuffer = await fs.readFile(sourceImagePath);
-    currentState = 'SOURCE_READ';
-    
-    // Phase 2: IPFS Upload
-    const imageUri = await uploadImageToIPFS(sourceImageBuffer, `${mintRequest.level}.png`);
-    operations.push({ type: 'IPFS_UPLOAD', resource: imageUri });
-    
-    const metadata = createMetadata(mintRequest, imageUri);
-    const metadataUri = await uploadMetadataToIPFS(metadata);
-    operations.push({ type: 'IPFS_UPLOAD', resource: metadataUri });
-    
-    currentState = 'IPFS_UPLOADED';
-    
-    // Phase 3: Database Preparation
-    const dbRecord = await createPendingMintRecord(mintRequest, metadataUri, imageUri);
-    operations.push({ type: 'DATABASE_CREATE', resource: dbRecord.id });
-    
-    currentState = 'DATABASE_PREPARED';
-    
-    // Phase 4: Blockchain Minting
-    const transaction = await submitMintTransaction(mintRequest.userWallet, metadataUri);
-    operations.push({ type: 'BLOCKCHAIN_TRANSACTION', resource: transaction.signature });
-    
-    await waitForTransactionConfirmation(transaction.signature);
-    currentState = 'BLOCKCHAIN_CONFIRMED';
-    
-    // Phase 5: End-to-End Verification
-    await verifyCompleteConsistency(mintRequest, metadataUri, imageUri, transaction.signature);
-    currentState = 'VERIFIED';
-    
-    // Phase 6: Finalization
-    await markMintComplete(dbRecord.id);
-    currentState = 'COMPLETED';
-    
-    return {
-      success: true,
-      transactionSignature: transaction.signature,
-      metadataUri,
-      imageUri,
-      state: currentState
-    };
-    
-  } catch (error) {
-    console.error(`Mint failed at state ${currentState}:`, error);
-    await executeCompensatingTransactions(operations, currentState);
-    throw error;
-  }
-};
-```
+**Core Principles**:
+-   **State Machine**: Every NFT operation (claim, upgrade) is treated as a state machine. The current state is tracked in the database (e.g., in the `NFTUpgradeRequest` model).
+-   **Idempotent Workers**: The `NFTService` acts as a worker that consumes events from Kafka. Each worker is designed to be idempotent, meaning it can safely re-process the same message without causing duplicate actions. It achieves this by first checking the current state of the operation in the database before proceeding.
+-   **Single Responsibility**: Each worker is responsible for executing only one step of the process and then publishing a new event to trigger the next step.
+-   **Dead-Letter Queue (DLQ)**: If a step repeatedly fails, the message is moved to a DLQ. This prevents a single failed operation from blocking the entire queue and allows for manual inspection and intervention.
 
-**Compensating Transaction Implementation**
-```javascript
-const executeCompensatingTransactions = async (operations, failureState) => {
-  console.log(`Executing rollback for failure at state: ${failureState}`);
-  
-  for (const operation of operations.reverse()) {
-    try {
-      switch (operation.type) {
-        case 'IPFS_UPLOAD':
-          await cleanupIPFSContent(operation.resource);
-          break;
-        case 'DATABASE_CREATE':
-          await deleteDatabaseRecord(operation.resource);
-          break;
-        case 'BLOCKCHAIN_TRANSACTION':
-          // Note: Blockchain transactions cannot be rolled back
-          // Must be handled through reconciliation procedures
-          await logBlockchainInconsistency(operation.resource);
-          break;
-      }
-    } catch (cleanupError) {
-      console.error(`Cleanup failed for ${operation.type}:`, cleanupError);
-      // Log for manual intervention
+**Event-Driven Workflow for NFT Claiming**:
+
+1.  **API Request**: A user initiates a claim. The API controller performs initial validation (e.g., `validateMintingReadiness`) and, if successful, creates an `NFTUpgradeRequest` record with a `pending` status and publishes a `nft_claim_requested` event to Kafka using `KafkaService.sendMessage`.
+
+    ```javascript
+    // API Controller (Simplified)
+    async function requestClaim(req, res) {
+        const { userId, level } = req.body;
+
+        // 1. Create a record to track the operation state
+        const request = await NFTUpgradeRequest.create({ userId, to_level: level, status: 'pending' }).fetch();
+
+        // 2. Publish an event to Kafka to start the process
+        await KafkaService.sendMessage('nft-operations', {
+            type: 'CLAIM_REQUESTED',
+            requestId: request.id,
+            userId,
+            level
+        });
+
+        return res.ok({ message: 'NFT claim process initiated.', requestId: request.id });
     }
-  }
-};
-```
+    ```
+
+2.  **Worker Consumes Event**: The `NFTService` worker consumes the `nft_claim_requested` event.
+
+3.  **Idempotency Check**: The worker checks the status of the `NFTUpgradeRequest`. If it's not `pending`, it skips the message.
+
+4.  **Execute Step & Update State**: The worker performs the next logical step (e.g., uploading the image to IPFS). If successful, it updates the request status to `image_uploaded` and publishes a new event, `nft_image_uploaded`.
+
+5.  **Continue or Fail**: This cycle continues for each step (metadata upload, minting, database update). If any step fails after several retries, the worker updates the request status to `failed` and publishes the message to a **dead-letter queue (DLQ)** for manual review.
+
+**Failure Handling with a Dead-Letter Queue**:
+Instead of complex compensating transactions, this model isolates failures. An administrator can inspect messages in the DLQ, diagnose the issue (e.g., IPFS service was down), and either discard the message or manually retry it once the external issue is resolved.
 
 ### Data Layer Reconciliation
 

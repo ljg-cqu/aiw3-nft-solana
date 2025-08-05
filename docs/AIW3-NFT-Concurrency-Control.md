@@ -210,28 +210,6 @@ User Request → Message Queue → Worker Pool → Blockchain → Confirmation
 ```
 
 **Queue Operations**:
-- **Enqueue**: Add minting request with deduplication
-- **Dequeue**: Worker pulls next request for processing
-- **Acknowledge**: Confirm successful processing
-- **Retry**: Requeue failed requests with backoff
-
-### Worker Pool Design
-
-**Architecture**:
-```
-Queue → Load Balancer → Worker Pool → System Wallet → Blockchain
-                    ↓
-                  Monitoring & Logging
-```
-
-**Worker Responsibilities**:
-1. **Request Validation**: Verify user eligibility and request format
-2. **Metadata Preparation**: Generate and upload JSON/images to IPFS via Pinata
-3. **Transaction Construction**: Build Solana minting transaction
-4. **Nonce Management**: Acquire and coordinate nonce usage
-5. **Transaction Execution**: Sign and submit to blockchain
-6. **Confirmation Monitoring**: Track transaction status
-7. **Error Handling**: Implement retry logic and failure recovery
 
 ### Database Transactions
 
@@ -262,30 +240,47 @@ COMMIT;
 
 ### Distributed Locks
 
-**Redis-Based Implementation**:
+**Approach**: Use the existing `RedisService` in the `lastmemefi-api` backend, which provides a purpose-built method for acquiring and releasing distributed locks. This ensures a consistent, project-wide approach to managing resource contention.
 
-```python
-# Pseudo-code for distributed locking
-def acquire_system_wallet_lock(timeout=30):
-    lock_key = "system_wallet_lock"
-    lock_value = f"{worker_id}:{timestamp}"
-    
-    # Atomic set-if-not-exists with expiration
-    if RedisService.setCache(lock_key, lock_value, timeout, {lockMode: true}):
-        return lock_value
-    return None
+**Implementation**: The `RedisService.setCache` method, when called with the `lockMode: true` option, provides an atomic way to acquire a lock. Releasing the lock is done via `RedisService.delCache`.
 
-def release_system_wallet_lock(lock_value):
-    # Ensure only lock owner can release
-    lua_script = """
-    if redis.call("get", KEYS[1]) == ARGV[1] then
-        return redis.call("del", KEYS[1])
-    else
-        return 0
-    end
-    """
-    return redis.eval(lua_script, 1, "system_wallet_lock", lock_value)
+**Locking Pattern**:
+```javascript
+// Define a unique lock key for the operation
+const lockKey = `nft_lock:upgrade:${userId}`;
+const lockTTL = 30; // Lock timeout in seconds
+
+let lockAcquired = false;
+try {
+    // 1. Acquire Lock
+    lockAcquired = await RedisService.setCache(lockKey, "locked", lockTTL, { lockMode: true });
+
+    if (!lockAcquired) {
+        throw new Error("Could not acquire lock for NFT upgrade. Please try again.");
+    }
+
+    // 2. --- Critical Section ---
+    // Perform all sensitive operations here, such as:
+    // - Burning the old NFT via Web3Service
+    // - Minting the new NFT via Web3Service
+    // - Updating the UserNFT and User tables in the database
+    // --- End Critical Section ---
+
+} catch (error) {
+    // Handle errors
+    Logger.error(`NFT upgrade failed for user ${userId}:`, error);
+
+} finally {
+    // 3. Release Lock
+    if (lockAcquired) {
+        await RedisService.delCache(lockKey);
+    }
+}
 ```
+
+**Key Lock Identifiers**:
+-   **Upgrade Lock**: `nft_lock:upgrade:{user_id}`
+-   **Claim Lock**: `nft_lock:claim:{user_id}`
 
 ---
 
@@ -495,25 +490,25 @@ def mint_with_retry(request, max_retries=3):
 
 ## Implementation Checklist
 
-### Phase 1: Foundation (Week 1-2)
+### Phase 1: Configuration & Integration (Week 1)
 
-- [ ] **Message Queue Setup**
-  - [ ] Deploy Redis/RabbitMQ infrastructure
-  - [ ] Configure queue persistence and durability
-  - [ ] Implement basic enqueue/dequeue operations
-  - [ ] Set up dead letter queue handling
+- [ ] **Kafka Topic Configuration**
+  - [ ] Define and create the necessary Kafka topics (e.g., `nft-operations`, `nft-events`) on the existing Kafka cluster.
+  - [ ] Configure topic settings like partitions and replication factor for durability.
+  - [ ] Establish consumer groups for the `NFTService` workers.
 
-- [ ] **Database Schema**
-  - [ ] Create minting operations table
-  - [ ] Create system wallet state table
-  - [ ] Implement nonce management procedures
-  - [ ] Set up database connection pooling
+- [ ] **Integrate with `KafkaService`**
+  - [ ] In the API controllers, replace direct service calls with `KafkaService.sendMessage` to publish operation requests.
+  - [ ] Ensure message payloads are standardized and match the format expected by consumers.
 
-- [ ] **Basic Worker Implementation**
-  - [ ] Single-threaded worker prototype
-  - [ ] Basic request processing pipeline
-  - [ ] Error handling and logging framework
-  - [ ] Integration with existing minting logic
+- [ ] **Develop `NFTService` Consumer**
+  - [ ] Implement the Kafka consumer logic within the `NFTService`.
+  - [ ] Structure the service to listen to the `nft-operations` topic.
+  - [ ] Implement the core processing pipeline (validation, locking, web3 calls, db updates).
+
+- [ ] **Integrate with `RedisService` for Locking**
+  - [ ] Wrap all critical sections (burn/mint, database updates) within the `RedisService` locking pattern (`setCache` with `lockMode: true` and `delCache`).
+  - [ ] Implement robust error handling for lock acquisition failures.
 
 ### Phase 2: Concurrency Control (Week 3-4)
 

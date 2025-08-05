@@ -43,7 +43,7 @@ Qualification for each NFT tier is based on a user's total trading volume, calcu
 | 3     | On-chain Hunter       | ≥ 1,000,000                    | ![[prototype_L3.png]](..//aiw3-prototypes/L3_On-chain_Hunter_NFT_Card_and_Personal_Center_Dashboard.png) |
 | 4     | Alpha Alchemist       | ≥ 5,000,000                    | ![[prototype_L4.png]](..//aiw3-prototypes/L4_Alpha_Alchemist_NFT_Card_and_Personal_Center_Dashboard.png) |
 | 5     | Quantum Alchemist     | ≥ 10,000,000                   | ![[prototype_L5.png]](..//aiw3-prototypes/L5_Quantum_Alchemist_NFT_Card_and_Personal_Center_Dashboard.png)|
-| 6     | Trophy Breeder (Special) | By community contribution      | ![[prototype_L6.png]](..//aiw3-prototypes/L6_Trophy_Breeder_NFT_Card_and_Personal_Center_Dashboard.png) |
+| Special | Trophy Breeder (Special) | By community contribution      | ![[prototype_L6.png]](..//aiw3-prototypes/L6_Trophy_Breeder_NFT_Card_and_Personal_Center_Dashboard.png) |
 
 ---
 
@@ -60,7 +60,7 @@ Each NFT tier provides a set of benefits, including trading fee reductions and a
 | 3     | On-chain Hunter       | 30%                   | Real-time on-chain data streams                   |
 | 4     | Alpha Alchemist       | 40%                   | Predictive modeling and alpha signals             |
 | 5     | Quantum Alchemist     | 50%                   | Access to proprietary quantitative models         |
-| 6     | Trophy Breeder (Special) | 75%                   | Full access to all AI features and direct support |
+| Special | Trophy Breeder (Special) | 75%                   | Full access to all AI features and direct support |
 
 ---
 

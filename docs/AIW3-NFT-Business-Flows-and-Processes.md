@@ -27,13 +27,22 @@ This document provides a comprehensive overview of all NFT-related business flow
 
 ### Unlockable to Active Transition
 
-- **Objective**: Transition NFTs from an unlockable to an active state.
-- **Details**: Describes the specific user interactions required and the system checks involved in full activation.
+- **Objective**: Transition an NFT from a potential (unlockable) state to an active, owned state for a user.
+- **Trigger**: A user's aggregated trading volume, calculated from the `Trades` model in the `lastmemefi-api` database, meets or exceeds the threshold for a specific NFT tier as defined in the **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**.
+- **Process**:
+    1.  The `NFTService` backend component periodically or on-demand calculates the user's total trading volume.
+    2.  If the user qualifies for a new NFT tier, the system creates a `UserNFTQualification` record.
+    3.  The frontend, particularly the **Personal Center**, reflects this unlockable status, prompting the user to claim their new NFT.
+    4.  Upon user confirmation, the `NFTService` initiates the minting process via `Web3Service`.
+    5.  A new `UserNFT` record is created in the database with an `active` status, linking the NFT mint address to the user.
 
 ### Activation Popups and Notifications
 
-- **Purpose**: Ensure users are aware of activation and the steps needed to finalize it.
-- **Structure**: Triggers and conditions that launch popups and notifications.
+- **Purpose**: To provide clear, real-time feedback to the user about their NFT status, guiding them through the claiming process.
+- **Structure**:
+    -   **Unlock Notification**: When a user becomes eligible for a new NFT, a WebSocket event (`nft:qualification_achieved`) is sent to the UI, triggering a notification or a visual cue in the Personal Center.
+    -   **Claim Confirmation**: When the user clicks "Claim," a modal popup appears to confirm the transaction.
+    -   **Success/Failure Alerts**: After the minting process, a final notification confirms whether the NFT was claimed successfully or if an error occurred, driven by Kafka events consumed by the backend and relayed to the UI.
 
 ---
 
@@ -41,12 +50,21 @@ This document provides a comprehensive overview of all NFT-related business flow
 
 ### Synthesis Workflow
 
-- **Workflow Summary**: High-level steps involved in NFT synthesis.
-- **User Interaction**: Actions users must take part in, including confirmations and checks before synthesis.
+- **Workflow Summary**: The synthesis process follows a "burn-and-mint" strategy to upgrade a user's NFT to the next tier. This ensures a clean, atomic transition and maintains the integrity of the NFT collection.
+- **User Interaction**:
+    1.  A user who qualifies for a higher tier initiates the upgrade from their **Personal Center**.
+    2.  The UI displays a confirmation dialog detailing the NFT that will be burned and the new NFT that will be minted.
+    3.  The user approves the transaction, which may require a wallet signature.
+- **Backend Process**:
+    1.  The `NFTService` validates the user's qualification for the target tier.
+    2.  It instructs the `Web3Service` to execute a transaction that first burns the old NFT (updating its status to `burned` in the `UserNFT` table) and then mints the new, higher-level NFT.
+    3.  An `upgraded` event is published via Kafka.
 
 ### Post-Synthesis Status
 
-- **Objective**: Define the state after synthesis, including what users see and the changes in their NFT collections.
+- **Objective**: To clearly reflect the user's new, upgraded status across the platform.
+- **Visual Changes**: The user's Personal Center immediately updates to display the new NFT card, removing the old one. Any associated benefits, such as reduced trading fees, are applied to their account.
+- **Data State**: The old `UserNFT` record is marked as `burned`, and a new `UserNFT` record is created for the new tier. The user's `current_nft_level` in the `User` model is updated.
 
 ---
 
@@ -54,12 +72,17 @@ This document provides a comprehensive overview of all NFT-related business flow
 
 ### Personal Center Design and Interaction
 
-- **Objective**: Describe how user profiles accommodate NFTs and what features they offer.
-- **High-Level Details**: Interaction points, visible changes, and user capabilities.
+- **Objective**: The **Personal Center** is the central hub for all user interactions with their NFTs.
+- **Features**:
+    -   **NFT Gallery**: Displays all currently owned (active) NFTs, showing their name, level, and artwork.
+    -   **Unlockable Tiers**: Shows which NFT tiers the user is close to unlocking, potentially with a progress bar indicating trading volume accumulation.
+    -   **Synthesis Interface**: Provides the entry point for initiating an NFT upgrade.
+    -   **Benefits Summary**: Clearly lists the benefits associated with the user's current NFT level (e.g., fee reductions).
 
 ### Community-Mini Homepage Visibility
 
-- **Purpose**: Explain visibility into user achievements, including public access and privacy controls.
+- **Purpose**: To allow users to showcase their NFT achievements to the community, fostering engagement and social proof.
+- **Implementation**: A user's public-facing profile or "mini homepage" will display their highest-achieved NFT badge. Users may have privacy settings to control this visibility.
 
 ---
 
@@ -67,17 +90,27 @@ This document provides a comprehensive overview of all NFT-related business flow
 
 ### System-Wide Alerts
 
-- **Structure**: Describes different alert types, what triggers them, and their significance to NFTs.
+- **Structure**: Real-time alerts are critical for user engagement and are powered by a combination of Kafka and WebSockets.
+- **Alert Types**:
+    -   **Qualification Met**: "Congratulations! You can now claim the Quant Ape NFT."
+    -   **Transaction Success**: "Your Alpha Alchemist NFT has been successfully minted."
+    -   **Transaction Failed**: "There was an error upgrading your NFT. Please try again."
 
 ### Badge Integration
 
-- **Use**: How badges integrate with and support NFT progression, including the visible display.
+- **Use**: In addition to the primary NFTs, users can earn special "Badge-Type NFTs" for completing specific tasks or participating in events. These are stored in the `NFTBadge` model.
+- **Function**: While some badges are purely for display, others may be required as part of the qualification criteria for upgrading to higher NFT tiers, creating an additional layer of engagement.
 
 ---
 
 ## Cross-Referencing and Document Structure
 
-**Linkages**: Points to related documents like AIW3 NFT System Design, AIW3 NFT Implementation Guide for seamless cross-referencing.
+**Linkages**: This document describes the "what" and "why" of user-facing flows. For technical implementation details, refer to the following:
+
+-   **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: For the high-level architecture and component responsibilities.
+-   **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: For detailed database schemas, API responses, and event formats.
+-   **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: For code-level guidance and integration patterns.
+-   **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**: For the definitive business logic on qualification and benefits.
 
 ---
 

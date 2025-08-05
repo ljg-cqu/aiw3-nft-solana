@@ -66,14 +66,7 @@ The AIW3 NFT system uses **only standard Solana programs** without requiring any
 
 The backend is the intermediary between the user-facing frontend and the standard Solana programs.
 
-### 1. **Standard Program Integration**
-- **Action:** Integrate with existing Solana programs using standard libraries and SDKs.
-  - **SPL Token Program:** Use for all NFT minting, burning, and transfer operations.
-  - **Metaplex Token Metadata:** Use for NFT metadata management and creator verification.
-  - **Associated Token Account Program:** Use for user wallet NFT storage.
-- **Rationale:** Using standard programs eliminates custom development complexity, reduces security risks, and ensures compatibility with the entire Solana ecosystem.
-
-### 2. **API Endpoint Creation & Frontend Integration**
+### 1. **API Endpoint Creation & Frontend Integration**
 - **Action:** Develop a comprehensive REST API with standardized endpoints and real-time communication for seamless frontend integration.
 
 #### Core API Endpoints
@@ -99,14 +92,14 @@ The backend is the intermediary between the user-facing frontend and the standar
 
 - **Rationale:** Comprehensive API design with frontend integration support ensures seamless end-to-end functionality and developer productivity.
 
-### 3. **Solana Integration**
+### 2. **Solana Integration**
 - **Action:** Use the `@solana/web3.js` library to communicate with the Solana network.
   - **RPC Communication:** Connect to a Solana RPC node to read on-chain data and submit transactions.
   - **Standard Operations:** Use SPL Token Program instructions for minting, burning, and transferring NFTs.
   - **Metadata Management:** Use Metaplex Token Metadata Program for NFT metadata operations.
 - **Rationale:** Direct integration with standard Solana programs allows the backend to verify on-chain state and execute transactions without custom smart contract complexity.
 
-### 4. **Monitoring Service**
+### 3. **Monitoring Service**
 - **Action:** Develop a background service to monitor the blockchain for relevant events.
   - **Event Listener:** Use WebSocket connections to listen for `Mint` and `Burn` events related to the NFT collection.
   - **Cache Updates:** Update Redis NFT status cache in real-time as events occur using `RedisService.delCache()` for cache invalidation.
@@ -388,17 +381,3 @@ For comprehensive information about the AIW3 NFT system, please refer to these r
 ### Integration & Implementation
 - **[AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)**: Comprehensive analysis and strategy for integrating NFT services with existing `lastmemefi-api` backend, including service architecture and infrastructure reuse
 - **[AIW3 NFT Integration Issues & PRs](./AIW3-NFT-Integration-Issues-PRs.md)**: Detailed phased implementation plan with frontend-backend integration requirements, API contracts, WebSocket events, and collaborative development guidance
-
----
-
-## Frontend-Backend API & Integration Specification
-
-This section provides the detailed technical contract for frontend and backend development.
-
-<details>
-<summary><strong>Click to expand/collapse API Specification Sections</strong></summary>
-
-- [Key Business Logic & Rules](#key-business-logic--rules)
-- [Service Integration Architecture](#service-integration-architecture)
-- [API Contract Specifications](#api-contract-specifications)
-  

@@ -388,193 +388,59 @@ if (error.code === 'ETIMEDOUT') {
 ### Cross-Service Coordination
 
 **Dependency Management**
-- **Service Prerequisites**: Verify dependencies before beginning operations
-- **Cascading Failures**: Prevent failure propagation across services
-- **Rollback Coordination**: Coordinate rollbacks across multiple services
-- **State Synchronization**: Maintain consistent state during retry operations
+
+*   **Service Prerequisites**: Verify dependencies before beginning operations
+*   **Cascading Failures**: Prevent failure propagation across services
+*   **Rollback Coordination**: Coordinate rollbacks across multiple services
+*   **State Synchronization**: Maintain consistent state during retry operations
 
 **Resource Management**
-- **Connection Sharing**: Reuse connections across retry attempts
-- **Memory Management**: Prevent memory leaks during extended retry cycles
-- **CPU Throttling**: Limit retry operations to prevent system overload
-- **Priority Queuing**: Prioritize critical operations during resource constraints
 
----
+*   **Connection Sharing**: Reuse connections across retry attempts
+*   **Memory Management**: Prevent memory leaks during extended retry cycles
+*   **CPU Throttling**: Limit retry operations to prevent system overload
+*   **Priority Queuing**: Prioritize critical operations during resource constraints
 
-## Exponential Backoff Implementation
+### Resilience Through Event-Driven Architecture
 
-### Base Retry Strategy
+The AIW3 NFT system's network resilience strategy is fundamentally built on its event-driven architecture, which leverages Kafka to decouple services and manage failures gracefully. This model is inherently more resilient than traditional synchronous, procedural approaches.
 
-```javascript
-const retryWithBackoff = async (operation, maxAttempts = 3, baseDelay = 1000) => {
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      return await operation();
-    } catch (error) {
-      if (attempt === maxAttempts) throw error;
-      
-      const delay = baseDelay * Math.pow(2, attempt - 1);
-      const jitter = Math.random() * 0.1 * delay; // Add 10% jitter
-      await sleep(delay + jitter);
+**Core Resilience Principles**:
+-   **Decoupling with Kafka**: When an API controller receives a request (e.g., for an NFT upgrade), it doesn't execute the entire workflow at once. Instead, it publishes an event to a Kafka topic (e.g., `nft-operations`). This decouples the API from the backend workers, meaning an `NFTService` failure won't crash the API call. The user receives an immediate acknowledgment that their request is being processed.
+-   **Persistent Queues**: Kafka topics act as durable, persistent queues. If the `NFTService` workers are temporarily down or overloaded, the requests are safely stored in the topic and will be processed once the service recovers. No data is lost.
+-   **Automatic Retries via Consumer Groups**: The `NFTService` workers are part of a Kafka consumer group. If a worker fails to process a message (e.g., due to a temporary network error when calling the Solana RPC), it won't acknowledge the message. Kafka will automatically re-deliver the message to another available worker in the group after a configured delay. This provides a powerful, automatic retry mechanism without complex application-level code.
+-   **Failure Isolation with Dead-Letter Queues (DLQ)**: If a message repeatedly fails to be processed (a "poison pill" message), the Kafka consumer is configured to move it to a Dead-Letter Queue. This is a critical resilience pattern that prevents a single bad request from blocking all subsequent operations. The operations team can then inspect the DLQ to diagnose and resolve the issue manually.
+
+### Service-Level Resilience Patterns
+
+While the Kafka-based architecture provides the primary layer of resilience, traditional patterns like **endpoint failover** and the **circuit breaker pattern** are still implemented at the service level, within the idempotent workers.
+
+**RPC/Gateway Endpoint Failover**:
+-   **`Web3Service`**: This service is configured with a list of primary and backup Solana RPC endpoints. If a transaction fails due to an RPC-specific error, the service will automatically retry the transaction using the next endpoint in the list.
+-   **IPFS Service**: Similarly, the service responsible for interacting with IPFS maintains a list of public gateways. If content retrieval fails on the primary gateway (e.g., Pinata's), it will automatically fall back to others (e.g., Cloudflare's, IPFS.io's).
+
+**Circuit Breaker within Workers**:
+-   **Purpose**: The circuit breaker pattern is used inside a worker to prevent it from repeatedly calling an external service that is known to be failing. This avoids wasting resources and overwhelming a struggling downstream dependency.
+-   **Implementation**: A library like `opossum` can be used to wrap calls to external services (e.g., Pinata). If calls to Pinata start failing repeatedly, the circuit breaker will "open," and for a configured period, any new attempts to call Pinata from that worker will fail immediately without making a network request. The message being processed will fail and be retried later by Kafka, by which time the circuit breaker may have closed.
+
+    ```javascript
+    // Inside an NFTService worker
+    const circuitBreaker = new CircuitBreaker(callPinata, options);
+
+    // The worker consumes a message from Kafka
+    async function processUploadRequest(message) {
+        try {
+            // The call is protected by the circuit breaker
+            const ipfsHash = await circuitBreaker.fire(message.imageBuffer);
+            // ...if successful, update state and publish next event
+        } catch (error) {
+            // If the breaker is open or the call fails, this will throw an error.
+            // The Kafka consumer will catch this and handle the re-delivery.
+            Logger.error('Pinata call failed:', error);
+            throw error; // Ensure the message is not acknowledged
+        }
     }
-  }
-};
-```
-
-### Service-Specific Backoff Parameters
-
-**Solana RPC Operations**
-- **Base Delay**: 2000ms (2 seconds)
-- **Maximum Attempts**: 3
-- **Jitter**: 20% to prevent thundering herd
-- **Max Delay**: 8000ms (8 seconds)
-
-**IPFS via Pinata Operations**
-- **Base Delay**: 1000ms (1 second)
-- **Maximum Attempts**: 5
-- **Jitter**: 10% for upload operations
-- **Max Delay**: 16000ms (16 seconds)
-
-**Database Operations**
-- **Base Delay**: 500ms (0.5 seconds)
-- **Maximum Attempts**: 3
-- **Jitter**: 5% for minimal delay
-- **Max Delay**: 2000ms (2 seconds)
-
-### Advanced Backoff Strategies
-
-**Adaptive Backoff**
-```javascript
-class AdaptiveBackoff {
-  constructor() {
-    this.successRate = 1.0;
-    this.recentAttempts = [];
-  }
-  
-  calculateDelay(attempt, baseDelay) {
-    // Adjust delay based on recent success rate
-    const adaptiveMultiplier = Math.max(0.5, 2 - this.successRate);
-    const exponentialDelay = baseDelay * Math.pow(2, attempt - 1);
-    return exponentialDelay * adaptiveMultiplier;
-  }
-  
-  recordAttempt(success) {
-    this.recentAttempts.push(success);
-    if (this.recentAttempts.length > 10) {
-      this.recentAttempts.shift();
-    }
-    this.successRate = this.recentAttempts.filter(s => s).length / this.recentAttempts.length;
-  }
-}
-```
-
----
-
-## Circuit Breaker Pattern
-
-### Implementation Strategy
-
-```
-Circuit States:
-├── CLOSED: Normal operation, monitor failure rate
-├── OPEN: Fail fast, bypass service calls
-└── HALF-OPEN: Test service recovery with limited requests
-```
-
-### State Transition Logic
-
-**CLOSED → OPEN Transition**
-- **Failure Threshold**: 50% failures in 1-minute sliding window
-- **Volume Threshold**: Minimum 10 requests to activate
-- **Timeout Period**: 30 seconds in OPEN state
-- **Error Types**: Only count retriable errors toward threshold
-
-**OPEN → HALF-OPEN Transition**
-- **Time-Based**: Automatic transition after timeout period
-- **Manual Override**: Administrative control for emergency recovery
-- **Test Request**: Single probe request to verify service recovery
-- **Monitoring**: Enhanced logging during transition
-
-**HALF-OPEN → CLOSED/OPEN Transition**
-- **Success Threshold**: 3 consecutive successful requests
-- **Failure Response**: Return to OPEN on any failure
-- **Request Limiting**: Maximum 5 requests in HALF-OPEN state
-- **Timeout**: Return to OPEN if no requests within 60 seconds
-
-### Circuit Breaker Implementation
-
-```javascript
-class CircuitBreaker {
-  constructor(options = {}) {
-    this.failureThreshold = options.failureThreshold || 5;
-    this.timeout = options.timeout || 30000;
-    this.monitor = options.monitor || (() => {});
-    
-    this.state = 'CLOSED';
-    this.failureCount = 0;
-    this.lastFailureTime = null;
-    this.successCount = 0;
-  }
-  
-  async execute(operation) {
-    if (this.state === 'OPEN') {
-      if (Date.now() - this.lastFailureTime < this.timeout) {
-        throw new Error('Circuit breaker is OPEN');
-      }
-      this.state = 'HALF-OPEN';
-      this.successCount = 0;
-    }
-    
-    try {
-      const result = await operation();
-      this.onSuccess();
-      return result;
-    } catch (error) {
-      this.onFailure();
-      throw error;
-    }
-  }
-  
-  onSuccess() {
-    this.failureCount = 0;
-    if (this.state === 'HALF-OPEN') {
-      this.successCount++;
-      if (this.successCount >= 3) {
-        this.state = 'CLOSED';
-      }
-    }
-  }
-  
-  onFailure() {
-    this.failureCount++;
-    this.lastFailureTime = Date.now();
-    
-    if (this.failureCount >= this.failureThreshold) {
-      this.state = 'OPEN';
-    }
-  }
-}
-```
-
-### Service-Specific Circuit Breakers
-
-**Solana RPC Circuit Breaker**
-- **Failure Threshold**: 3 consecutive failures
-- **Timeout**: 60 seconds (account for blockchain confirmation times)
-- **Recovery Test**: Simple getHealth() call
-- **Fallback**: Automatic failover to backup RPC endpoint
-
-**IPFS via Pinata Circuit Breaker**
-- **Failure Threshold**: 5 failures in 2 minutes
-- **Timeout**: 30 seconds
-- **Recovery Test**: Small file upload/retrieval test
-- **Fallback**: Switch to alternative IPFS gateway
-
-**Database Circuit Breaker**
-- **Failure Threshold**: 3 connection failures
-- **Timeout**: 10 seconds
-- **Recovery Test**: Simple SELECT 1 query
-- **Fallback**: Queue operations for later processing
+    ```
 
 ---
 
