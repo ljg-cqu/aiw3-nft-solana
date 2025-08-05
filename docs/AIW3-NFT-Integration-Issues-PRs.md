@@ -215,6 +215,23 @@ Each issue includes specific frontend integration requirements to ensure seamles
 - **Error Scenarios**: Comprehensive error handling examples
 - **Authentication**: Step-by-step wallet connection guide
 
+### Technical Implementation Plan & Dependencies
+
+This section outlines the specific technical components required to implement the features defined above, distinguishing between existing internal services and external libraries.
+
+| Feature / Requirement | Internal Services (`lastmemefi-api`) | External Libraries & Dependencies (with versions) |
+| :--- | :--- | :--- |
+| **Wallet Authentication** | `SolanaChainAuthController`, `UserService` | `@solana/web3.js: ^1.98.0` |
+| **JWT Integration** | `AccessTokenService` (existing middleware) | `jsonwebtoken: ^9.0.2` |
+| **Standardized Responses** | Core Sails.js response handlers | N/A (Architectural Pattern) |
+| **Real-time (WebSockets)** | `sails-hook-sockets: ^3.0.0` | `socket.io-client: ^4.x` (Frontend, version to match server) |
+| **Transaction Tracking** | `Web3Service`, `WebSocketService` | `@solana/web3.js: ^1.98.0` |
+| **Personal Center** | `NFTService` (new), `UserService`, `RedisService` | N/A (Backend logic) |
+| **Synthesis (Upgrade) Flow**| `NFTService`, `Web3Service`, `RedisService` (for locking) | `@solana/web3.js: ^1.98.0`, `@metaplex-foundation/mpl-token-metadata: (To be added)` |
+| **Badge System** | `NFTService`, `UserService`, `Database` (new models) | N/A (Backend logic) |
+| **Mock Data & Sandbox** | Sails.js seeders, new `SandboxController` | N/A (Internal tooling) |
+| **API Documentation** | Existing Swagger/OpenAPI setup | `swagger-ui-express: (To be added, if needed)` |
+
 ### Service Integration Architecture
 
 #### Backend Service Flow
