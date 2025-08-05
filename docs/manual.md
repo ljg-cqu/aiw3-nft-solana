@@ -24,61 +24,54 @@ This category includes unique NFTs awarded for specific, one-time achievements. 
 -   **Function:** Their benefits are specific to the NFT itself and do not necessarily align with the tiered benefits of Equity NFTs. They serve as a trophy or badge of honor for a particular achievement.
 -   **Example:** The **Breeder Reward NFT**, which is airdropped to the top winners of trading competitions.
 
-## 3. Equity NFT Lifecycle and User Journeys
+## 3. The User Journey: From Novice to VIP
 
-```mermaid
-{{#include diagrams/lifecycle-overview.mmd}}
-```
+This section provides a visual walkthrough of the user experience, from acquiring your first NFT to showcasing your VIP status in the community.
 
-This section outlines the primary end-to-end user journeys within the AIW3 NFT ecosystem.
+### 3.1 Your Personal Center: The Hub of Your Collection
 
-### 3.1 Use Case Overview
+The **Personal Center** is your private dashboard for managing and tracking your NFT collection. Here, you can see the NFTs you've earned and what you need to do to reach the next level.
 
-The following diagram illustrates the primary use cases from a user's perspective.
+- **Unlocked NFTs**: This shows the Equity NFT you currently own and its benefits.
+  *![Unlocked NFT in Personal Center](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/1.%20Unlocked.png)*
 
-```mermaid
-{{#include diagrams/use-case-overview.mmd}}
-```
+- **Unlockable NFTs**: This displays the next-tier NFT you can aspire to achieve, motivating you to meet the requirements.
+  *![Unlockable NFT in Personal Center](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/2.%20Unlockable.png)*
 
-### 3.2 New User Onboarding
-This process describes how a new user joins the platform. Acquiring an Equity NFT is a subsequent step that requires meeting platform criteria.
+### 3.2 Earning Your Stripes: Acquiring Badge NFTs
 
-```mermaid
-{{#include diagrams/onboarding-flow.mmd}}
-```
-1.  **[User] Registration:** A user creates an account on the AIW3 platform.
-2.  **[System] Outcome:** The user has a standard account and can begin using platform features like trading. They do not hold any Equity NFT at this stage. The journey to acquire their first NFT begins when they start trading.
+To upgrade to higher tiers, you must collect **Badge NFTs**. These are special NFTs awarded for completing platform tasks or participating in events. They are essential components for Synthesis.
 
-### 3.3 NFT Level Progression via Trading Volume
-This is the core process for a user to upgrade their status on the platform by meeting trading volume and other criteria.
+*![Badge-Type NFT](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/6.%20Badge-Type%20NFT.png)*
 
-```mermaid
-{{#include diagrams/progression-flow.mmd}}
-```
-1.  **[User] Trading Activity:** The **[User]** engages in trading on the AIW3 platform. The **[System]** tracks their cumulative trading volume.
-2.  **[System] Threshold Check:** Once the user's volume reaches the threshold for the next NFT level (e.g., ≥ 100,000 USDT for Lv.1), the **[System]** checks for any other requirements.
-3.  **[User] Fulfilling Additional Requirements:** For Lv.2 and above, the **[User]** must also earn and bind a specific number of "Badge NFTs" by completing platform tasks or participating in campaigns.
-4.  **[User & System] Unlocking and Activation:** When all criteria are met, the **[System]** makes the corresponding Equity NFT available to the user as "Unlockable". The **[User]** must then pay a small fee in **CGas** to perform the action that unlocks and activates the NFT.
-5.  **[System] Outcome:** Upon activation, the **[System]** grants the user the new tier's benefits (e.g., fee discounts) and updates their public "Micro Badge".
+### 3.3 The Path to Power: Synthesizing a Higher-Tier NFT
 
-### 3.4 Community Status and Benefit Realization
-This process is ongoing and demonstrates the value of holding an active NFT.
+**Synthesis** is the exciting process of upgrading your current Equity NFT to the next level. It's how you climb the VIP ladder.
 
-```mermaid
-{{#include diagrams/benefit-realization-flow.mmd}}
-```
-1.  **[System] Public Display:** The **[System]** continuously displays the user's active NFT level as a "Micro Badge" on their profile, mini-homepage, and next to their name in community discussions, signaling their status to others.
-2.  **[System] Benefit Application:** The **[System]** automatically applies platform benefits, such as trading fee discounts or airdrop bonuses, to the user's account based on their active NFT's level.
+1.  **Activation**: Before you can synthesize, you may be prompted to activate your account, ensuring you are ready for the upgrade.
+    *![Trigger Activation Popup](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/7.%20Trigger%20Activation%20Popup.png)*
 
-### 3.5 Exiting or Downgrading (Selling NFTs)
-This process describes how a user can liquidate their NFT assets.
+2.  **Initiating Synthesis**: Once you meet all the requirements (trading volume and required badges), you can begin the Synthesis process.
+    *![Synthesis Screen](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/4.%20Synthesis.png)*
 
-```mermaid
-{{#include diagrams/exit-flow.mmd}}
-```
-1.  **[User & External System] Listing on Marketplace:** The **[User]** lists their NFT (e.g., a Lv.4 "Master" NFT) for sale on an **[External System]** (a Solana marketplace).
-2.  **[External System] Sale:** Another user purchases the NFT on the marketplace.
-3.  **[System & External System] Outcome:** The NFT is transferred out of the original user's wallet by the **[External System]**. The **[System]** detects this change, revokes all associated benefits, and automatically downgrades the user's public "Micro Badge" to the next-highest NFT they hold (or removes it).
+3.  **Synthesis Success**: Upon completion, you will receive a confirmation that you have successfully acquired your new, more powerful NFT!
+    *![Synthesis Success](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/5.%20Lv2%20Synthesis%20Success.png)*
+
+### 3.4 Showcasing Your Status: Your Community Profile
+
+Your achievements are not just for you—they are visible to the entire community on your **Mini-Homepage**. This public profile displays your highest-level NFT and the badges you've collected.
+
+- **Your Mini-Homepage**: This is how you present your status to the community.
+  *![Community Mini-Homepage](..//aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/9.%20Community-Mini%20Homepage.png)*
+
+- **How Others See You**: Other users can visit your profile to see the impressive collection you've built.
+  *![Other Users View Homepage](..//aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/10.%20Other%20Users%20View%20Homepage.png)*
+
+### 3.5 Staying Informed: System Messages
+
+The platform will keep you updated with important notifications through **System Messages**. This is where you'll be informed about newly acquired badges, successful synthesis, and other important events.
+
+*![System Messages](..//aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/11.%20System%20Messages.png)*
 
 ## 4. Equity NFT Levels, Benefits, and Upgrade Conditions
 
@@ -104,7 +97,27 @@ There are 5 levels of Equity NFTs that users can unlock through platform activit
 An NFT can exist in several states throughout its lifecycle on the platform.
 
 ```mermaid
-{{#include diagrams/status-lifecycle.mmd}}
+graph TD
+    title NFT Status Journey
+
+    subgraph "Your Collection"
+        A[Unlockable] -- You Meet the Goals --> B(Owned)
+    end
+
+    subgraph "Your Actions"
+        B -- You Activate It --> C{Active}
+        C -- You Synthesize It --> E[Upgraded!]
+    end
+
+    subgraph "Leaving Your Collection"
+        C -- You Sell or Transfer It --> D[Transferred]
+    end
+
+    style A fill:#e1f5fe,stroke:#333
+    style B fill:#fff9c4,stroke:#333
+    style C fill:#c8e6c9,stroke:#333
+    style D fill:#f1f8e9,stroke:#333
+    style E fill:#d1c4e9,stroke:#333
 ```
 
 -   **Unlockable:** This is a pre-mint state where a user has met the criteria to receive an NFT (e.g., by registering) but has not yet claimed it. The NFT does not exist on the blockchain at this point. The user must perform an action to mint it.
@@ -243,7 +256,32 @@ The AIW3 system interacts with the Solana blockchain in two ways: by calling cus
 The following diagram illustrates the interaction between the user, AIW3's off-chain services, and the on-chain Solana programs.
 
 ```mermaid
-{{#include diagrams/system-architecture.mmd}}
+graph TD
+    title System Architecture
+    
+    subgraph "User Experience"
+        User[👤 User] -- Interacts with --> Frontend[🌐 AIW3 Frontend]
+    end
+
+    subgraph "AIW3 Platform (Off-Chain)"
+        Frontend -- Manages UI for --> PersonalCenter[🖼️ Personal Center]
+        Frontend -- Initiates --> SynthesisFlow[✨ Synthesis Flow]
+        PersonalCenter -- Fetches Data via --> Backend
+        SynthesisFlow -- Sends Requests to --> Backend[⚙️ AIW3 Backend]
+        Backend -- Reads/Writes --> Database[(MySQL Database)]
+    end
+
+    subgraph "Solana Blockchain (On-Chain)"
+        Backend -- Sends Transactions --> RPC[Solana JSON RPC]
+        RPC -- Interacts with --> CustomProgram[📜 AIW3 NFT Program]
+        CustomProgram -- Manages --> UserState[On-Chain User State]
+        CustomProgram -- Mints/Burns --> SPL[SPL Token Program]
+    end
+
+    style User fill:#cce,stroke:#333
+    style Frontend fill:#ccf,stroke:#333
+    style Backend fill:#cfc,stroke:#333
+    style CustomProgram fill:#f96,stroke:#333
 ```
 
 **Interaction Flow:**
@@ -266,7 +304,37 @@ The following diagram illustrates the interaction between the user, AIW3's off-c
 To execute the business logic described in this manual, the AIW3 smart contract must store and manage state on the Solana blockchain. This is achieved through several custom on-chain accounts (data structures). The following diagram illustrates the relationships between these core data models.
 
 ```mermaid
-{{#include diagrams/on-chain-data-model.mmd}}
+erDiagram
+    title On-Chain Data Model
+    USER {
+        PublicKey publicKey "User's Wallet (Owner)"
+    }
+
+    USER_NFT_STATE {
+        PublicKey owner PK "FK to User"
+        int current_level
+        PublicKey active_nft_mint
+        list_PublicKey bound_badges
+    }
+
+    TIER_CONFIGURATION {
+        PublicKey authority "Admin Key"
+        int unlock_fee_cgas
+        list_TierRequirement tier_requirements
+    }
+
+    AIW3_PROGRAM {
+        string program_id "Program Address"
+    }
+
+    SPL_TOKEN_PROGRAM {
+        string program_id "Standard Program"
+    }
+
+    USER ||--o{ USER_NFT_STATE : "has one"
+    AIW3_PROGRAM }o--|| TIER_CONFIGURATION : "is governed by"
+    AIW3_PROGRAM }o--o{ USER_NFT_STATE : "manages"
+    AIW3_PROGRAM ..> SPL_TOKEN_PROGRAM : "invokes"
 ```
 
 ### 11.1 Data Model Descriptions
@@ -358,7 +426,8 @@ This section defines the core concepts used throughout this document.
     -   **Analogy:** This is similar to a customer loyalty program (e.g., Bronze, Silver, Gold status) or leveling up a character in a game. Each new tier provides enhanced status and perks, with the top tier granting equity-like benefits. Your "Gold" membership card is unique to you, but it gives you the same benefits as every other "Gold" member.
 
 
--   **Synthesis (Legacy Term):** This term may appear in some older materials and refers to the process of combining and consuming lower-level NFTs to create a higher-level one. **This progression model is not in use for Equity NFTs.** The current and correct progression model is **Unlocking** via trading volume and binding Badge NFTs. The FAQ question "How to Obtain the Required Badge NFTs for Synthesis?" should be interpreted as "How to Obtain the Required Badge NFTs for *upgrading*?".
+-   **Synthesis:** The official user-facing term for the process of upgrading an Equity NFT to the next level. This action involves meeting specific criteria (like trading volume and owning Badge NFTs) and results in the user acquiring a higher-tier NFT. While the underlying technical process may be referred to as an 'upgrade' or 'unlock,' the user interacts with this feature as **Synthesis**.
+    -   **Analogy:** This is like crafting a more powerful item from a weaker one in a game. The user gathers the required materials (trading volume, badges) and then initiates the synthesis to create the next-level asset.
 
 -   **CGas:** A platform-specific token required to pay for certain transactions, such as unlocking a new Equity NFT tier.
     -   **Analogy:** Similar to "gas" on Ethereum, CGas is the fuel for specific platform operations.
