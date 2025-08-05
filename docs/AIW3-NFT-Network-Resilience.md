@@ -387,17 +387,11 @@ if (error.code === 'ETIMEDOUT') {
 
 ### Cross-Service Coordination
 
-**Dependency Management**
+**Architectural Approach**: In the AIW3 event-driven architecture, cross-service coordination is not managed through direct, synchronous communication. Instead, it is achieved **asynchronously** through Kafka and a persistent state record in the database.
 
-*   **Service Prerequisites**: Verify dependencies before beginning operations
-*   **Cascading Failures**: Prevent failure propagation across services
-*   **Rollback Coordination**: Coordinate rollbacks across multiple services
-*   **State Synchronization**: Maintain consistent state during retry operations
-
-**Resource Management**
-
-*   **Connection Sharing**: Reuse connections across retry attempts
-*   **Memory Management**: Prevent memory leaks during extended retry cycles
+*   **Decoupled Services**: Each worker consumes a message from a Kafka topic, performs a single, well-defined task (e.g., upload to IPFS), and, upon success, updates the state in the database and emits a new event to the next topic. Services do not call each other directly.
+*   **State-Driven Coordination**: The state of an operation (e.g., `image_uploaded`, `blockchain_submitted`) is stored in the database. This record acts as the single source of truth, coordinating the overall workflow without requiring services to be aware of each other.
+*   **Implicit Rollback**: A rollback is not a complex, multi-service transaction. If a step fails and cannot be retried (e.g., after hitting the max retry limit), the operation's state is simply marked as `FAILED` in the database. This stops the workflow and flags the operation for manual review. There is no need to 'undo' the previous steps in a complex chain.
 *   **CPU Throttling**: Limit retry operations to prevent system overload
 *   **Priority Queuing**: Prioritize critical operations during resource constraints
 
@@ -445,6 +439,16 @@ While the Kafka-based architecture provides the primary layer of resilience, tra
 ---
 
 ## Error Recovery & Compensation
+
+**Architectural Philosophy**: The AIW3 NFT system avoids traditional, complex **compensating transactions** that attempt to programmatically undo a series of operations across multiple services. Such patterns are brittle and difficult to maintain.
+
+Instead, our resilience and recovery strategy is based on the **event-driven, state-machine model** detailed in the [Data Consistency](./AIW3-NFT-Data-Consistency.md) document.
+
+**Recovery Through Idempotent Retries**:
+-   **Discrete, Idempotent Steps**: Each NFT operation (claim, upgrade) is broken down into a series of small, idempotent steps, each triggered by a Kafka event (e.g., `UPLOAD_IMAGE_TO_IPFS`, `SUBMIT_MINT_TRANSACTION`).
+-   **State Persistence**: The state of the operation is persisted in the database (e.g., in the `minting_operations` table). For example, after the image is uploaded, the state is updated to `IMAGE_UPLOADED`.
+-   **Failure and Retry**: If a worker fails to complete a step (e.g., a network error during IPFS upload), the message is not acknowledged and will be redelivered by Kafka. Because the database state has not been updated, the next worker to process the message will retry the exact same idempotent step.
+-   **No Compensation Needed**: Since a failed step doesn't alter the state, there is nothing to 'undo'. The system simply retries the step until it succeeds. If it ultimately fails after all retries, the state is marked as `FAILED`, and the process stops, awaiting manual intervention. This model ensures that the system either moves forward to the next state or remains in the current state, but never gets stuck in an inconsistent, partially-completed state.
 
 ### Partial Success Scenarios
 

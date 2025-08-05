@@ -1,125 +1,119 @@
-# AIW3 NFT Solana POC - Setup Guide
+# AIW3 NFT - Development Environment Setup Guide
 
-## Table of Contents
+This guide provides instructions for setting up the complete development environment for the AIW3 NFT system, which includes the `lastmemefi-api` backend and its dependent services.
 
-1.  [Account Relationships & Business Flow](#account-relationships--business-flow)
-    -   [Critical Understanding: Account Pairs](#-critical-understanding-account-pairs)
-    -   [Business Flow Overview](#-business-flow-overview)
-2.  [Environment Configuration](#environment-configuration)
-    -   [Required Variables](#required-variables)
-    -   [Account Roles](#account-roles)
-3.  [Verification Steps](#verification-steps)
-    -   [Verify Account Relationship](#1-verify-account-relationship)
-    -   [Check Balances](#2-check-balances)
-4.  [Running the POC](#running-the-poc)
-5.  [Expected Flow](#expected-flow)
-6.  [Troubleshooting](#troubleshooting)
-    -   [Common Issues](#common-issues)
-    -   [Error Messages](#error-messages)
+## 📋 Table of Contents
 
-## Account Relationships & Business Flow
+1.  [Prerequisites](#1-prerequisites)
+2.  [Repository Setup](#2-repository-setup)
+3.  [Backend Configuration](#3-backend-configuration)
+4.  [Running the System](#4-running-the-system)
+    -   [Step 1: Launch Backend Infrastructure](#step-1-launch-backend-infrastructure)
+    -   [Step 2: Start the Backend Application](#step-2-start-the-backend-application)
+5.  [Appendix: Running the Standalone POC](#appendix-running-the-standalone-poc)
 
-### 🔑 Critical Understanding: Account Pairs
+---
 
-**USER_WALLET_ADDRESS** and **USER_SECRET_KEY** MUST correspond to the same wallet!
+## 1. Prerequisites
 
-- `USER_WALLET_ADDRESS` = Public key derived from `USER_SECRET_KEY`
-- Use `solana-keygen pubkey <keypair-file>` to verify this relationship
+Ensure the following tools are installed on your system:
+- **Git**: For cloning the repositories.
+- **Node.js**: v16.x or later.
+- **Docker** and **Docker Compose**: For running backend infrastructure (database, cache, message queue).
+- **Solana CLI**: For any direct on-chain interaction or verification.
 
-### 🏢 Business Flow Overview
+## 2. Repository Setup
 
-This POC demonstrates a realistic business scenario:
+The development environment requires two repositories:
 
-1. **System Account** (Backend) mints NFT directly to **User Account**
-2. **User Account** owns and controls the NFT  
-3. **User Account** burns their own NFT using their private key
+1.  **AIW3 NFT Solana (Documentation & Assets)**:
+    ```bash
+    git clone git@github.com:ljg-cqu/aiw3-nft-solana.git
+    ```
 
-This separation ensures proper ownership and authorization, reflecting real-world usage.
+2.  **LastMeFi API (Backend System)**:
+    ```bash
+    git clone git@gitlab.com:lastmemefi/lastmemefi-api.git
+    ```
 
-## Environment Configuration
+## 3. Backend Configuration
 
-### Required Variables
+Navigate to the `lastmemefi-api` directory and create a `.env` file by copying the `.env.example` file. Populate it with the following configuration:
 
 ```env
-# Solana Network Configuration
-SOLANA_NETWORK="devnet"
+# Application Port
+PORT=1337
 
-# System Account (Backend/Minting Authority)
-# - Mints NFTs to users
-# - Pays for minting transactions  
-# - Acts as mint authority
-# - Needs: >0.01 SOL for minting operations
-SYSTEM_SECRET_KEY="YOUR_SYSTEM_SECRET_KEY"
+# JWT Secret for Authentication
+JWT_SECRET="YOUR_STRONG_JWT_SECRET"
 
-# User Account (NFT Owner/Burner)
-# - Owns the NFTs after minting
-# - Performs burn operations
-# - MUST match: USER_WALLET_ADDRESS = PublicKey(USER_SECRET_KEY)
-# - Needs: >0.001 SOL for burn transaction fees
-USER_WALLET_ADDRESS="YOUR_USER_WALLET_ADDRESS"  # Public key
-USER_SECRET_KEY="YOUR_USER_SECRET_KEY"          # Private key
+# Database Configuration (for Docker Compose)
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_db_password
+DB_DATABASE=lastmemefi
+
+# Redis Configuration (for Docker Compose)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+# Kafka Configuration (for Docker Compose)
+# Use host.docker.internal to allow the Node.js application (running on the host) to connect to the Kafka container.
+KAFKA_BROKER="host.docker.internal:29092"
+
+# Solana Configuration
+SOLANA_RPC_URL="https://api.devnet.solana.com" # Or your preferred RPC
+SYSTEM_WALLET_SECRET_KEY="YOUR_BACKEND_SYSTEM_WALLET_SECRET_KEY"
+
+# IPFS Configuration (Pinata)
+PINATA_API_KEY="YOUR_PINATA_API_KEY"
+PINATA_SECRET_API_KEY="YOUR_PINATA_SECRET_KEY"
 ```
 
-### Account Roles
+## 4. Running the System
 
-| Account | Role | Responsibilities | SOL Requirements |
-|---------|------|------------------|------------------|
-| System | Backend/Minting Authority | • Mints NFTs<br>• Pays minting costs<br>• Creates ATAs | >0.01 SOL |
-| User | NFT Owner/Burner | • Owns NFTs<br>• Burns NFTs<br>• Signs burn transactions | >0.001 SOL |
+The setup process involves two main steps:
 
-## Verification Steps
+### Step 1: Launch Backend Infrastructure
 
-### 1. Verify Account Relationship
+From the `lastmemefi-api` root directory, use Docker Compose to start the required services (MySQL, Redis, Kafka) in the background.
+
 ```bash
-# Generate public key from private key
-solana-keygen pubkey <user-keypair.json>
-# Should match USER_WALLET_ADDRESS
+docker-compose up -d
 ```
 
-### 2. Check Balances
-```bash
-# Check system account balance
-solana balance <SYSTEM_PUBLIC_KEY>
+### Step 2: Start the Backend Application
 
-# Check user account balance  
-solana balance <USER_WALLET_ADDRESS>
-```
-
-## Running the POC
+Once the Docker services are running, install the Node.js dependencies and start the Sails.js application.
 
 ```bash
-cd poc/solana-nft-burn-mint
+# Install dependencies
 npm install
+
+# Run database migrations
+# (Consult lastmemefi-api documentation for specific migration commands)
+
+# Start the application
 npm start
 ```
 
-## Expected Flow
+Your integrated development environment is now running. The API should be accessible at `http://localhost:1337`.
 
-```
-=== BUSINESS FLOW: MINT-TO-USER + BURN-BY-USER ===
-1. System mints NFT directly to user's wallet
-2. User burns the NFT from their own account
+## Appendix: Running the Standalone POC
 
-Step 1: System minting NFT to user's wallet...
-Step 2: Creating/verifying user's associated token account...
-Step 3: User burning NFT from their account...
+For isolated testing of the core on-chain burn/mint logic, you can run the standalone POC located in the `aiw3-nft-solana` repository.
 
-✅ COMPLETE FLOW SUCCESSFUL!
-- System minted NFT to user ✅
-- User burned their own NFT ✅
-```
+1.  **Navigate to the POC directory**:
+    ```bash
+    cd ../aiw3-nft-solana/poc/solana-nft-burn-mint
+    ```
 
-## Troubleshooting
+2.  **Configure the POC's `.env` file**: This is separate from the backend `.env` file and only requires `SOLANA_NETWORK`, `SYSTEM_SECRET_KEY`, and user wallet keys for testing.
 
-### Common Issues
-
-1. **Address Mismatch**: Ensure `USER_WALLET_ADDRESS` matches public key from `USER_SECRET_KEY`
-2. **Insufficient Funds**: System needs >0.01 SOL, User needs >0.001 SOL
-3. **Network Issues**: Verify `SOLANA_NETWORK` is correct and accessible
-4. **Permission Errors**: User must own NFT to burn it
-
-### Error Messages
-
-- `USER_WALLET_ADDRESS does not match derived key`: Fix account relationship
-- `Insufficient SOL balance`: Add SOL to the specified account
-- `InvalidAccountOwner`: User doesn't own the NFT being burned
+3.  **Run the POC**:
+    ```bash
+    npm install
+    npm start
+    ```

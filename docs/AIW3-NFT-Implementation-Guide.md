@@ -13,8 +13,9 @@ This document provides comprehensive implementation guidelines for the AIW3 NFT 
     -   [Security Through Standard Programs](#3-security-through-standard-programs)
     -   [Integration Testing and Deployment](#4-integration-testing-and-deployment)
 2.  [Backend Services](#backend-services)
-    -   [API Endpoint Creation & Frontend Integration](#2-api-endpoint-creation--frontend-integration)
-    -   [Monitoring Service](#4-monitoring-service)
+    -   [1. NFT Service (`NFTService.js`)](#1-nft-service-nftservicejs)
+    -   [2. API Endpoint Creation & Frontend Integration](#2-api-endpoint-creation--frontend-integration)
+    -   [3. Monitoring Service](#3-monitoring-service)
 3.  [Frontend Application Development](#frontend-application-development)
     -   [Personal Center Dashboard](#personal-center-dashboard)
     -   [Synthesis (Upgrade) Interface](#synthesis-upgrade-interface)
@@ -66,16 +67,24 @@ The AIW3 NFT system uses **only standard Solana programs** without requiring any
 
 The backend is the intermediary between the user-facing frontend and the standard Solana programs.
 
-### 1. **API Endpoint Creation & Frontend Integration**
+### 1. **NFT Service (`NFTService.js`)**
+- **Action:** Create a new service to orchestrate all NFT-related business logic.
+  - **Qualification Logic:** Check user trading volume against `Tiers and Rules`
+  - **Minting/Burning Orchestration:** Coordinate with `Web3Service` for on-chain actions
+  - **State Management:** Update user NFT status in the database
+- **Rationale:** A dedicated service encapsulates NFT logic, making the system modular and easier to maintain.
+
+### 2. **API Endpoint Creation & Frontend Integration**
 - **Action:** Develop a comprehensive REST API with standardized endpoints and real-time communication for seamless frontend integration.
 
 #### Core API Endpoints
-  - `GET /api/nft/status`: Returns user's current NFT, qualification progress, and benefits with standardized JSON format
-  - `POST /api/nft/claim`: Initiates first NFT claim with transaction status tracking and WebSocket progress events
-  - `POST /api/nft/upgrade`: Executes burn-and-mint upgrade process with multi-step progress tracking
-  - `GET /api/nft/benefits`: Returns current benefits and fee reductions
-  - `GET /api/nft/badges`: Returns user's badge collection with unlock status
-  - `POST /api/nft/badges/claim`: Claims new badges affecting upgrade qualification
+  - `GET /api/nft/status`: Returns user's current NFT level and progress toward the next tier.
+  - `POST /api/nft/claim`: Initiates the process to claim a new NFT once qualification is met.
+  - `POST /api/nft/upgrade`: Initiates the burn-and-mint upgrade process.
+  - `GET /api/nft/history`: Returns a paginated list of the user's NFT activities (claims, upgrades).
+  - `GET /api/nft/benefits`: Returns current benefits and fee reductions associated with the user's tier.
+  - `GET /api/nft/badges`: Returns the user's badge collection with unlock status.
+  - `POST /api/nft/badges/claim`: Claims new badges required for upgrade qualification.
 
 #### Frontend Integration Features
   - **Standardized Response Format**: Consistent success/error responses following existing `lastmemefi-api` patterns

@@ -2,35 +2,33 @@
 
 **POC Scope**: This proof of concept validates the technical feasibility of core NFT operations documented in **AIW3 NFT Business Flows and Processes**, specifically focusing on the burn-and-mint synthesis process.
 
-## Table of Contents
+## 📋 Table of Contents
 
 1.  [Introduction](#1-introduction)
 2.  [Objectives](#2-objectives)
 3.  [Technologies Used](#3-technologies-used)
 4.  [Prerequisites](#4-prerequisites)
-    -   [Business Flow Overview](#41-business-flow-overview)
-    -   [Required Environment Variables](#42-required-environment-variables)
-    -   [Account Roles](#43-account-roles)
-5.  [Understanding Solana Accounts](#5-understanding-solana-accounts)
-6.  [Setting up a Local Solana Testing Network](#6-setting-up-a-local-solana-testing-network)
-    -   [Install `@solana/test-validator`](#61-install-solanatest-validator)
-    -   [Run the Test Validator](#62-run-the-test-validator)
-    -   [Airdrop SOL to your wallet](#63-airdrop-sol-to-your-wallet)
-    -   [Create Test NFT (Optional)](#64-create-test-nft-optional---for-reference-only)
-7.  [Setup and Running the POC](#7-setup-and-running-the-poc)
-    -   [Navigate to POC Directory](#71-navigate-to-poc-directory)
-    -   [Install Dependencies](#72-install-dependencies)
-    -   [Configure Environment](#73-configure-environment)
-    -   [Run the POC](#74-run-the-poc)
-8.  [Verifying the Burn with Solana CLI](#8-verifying-the-burn-with-solana-cli)
-9.  [Verifying the Minting with Solana CLI](#9-verifying-the-minting-with-solana-cli)
-10. [Inspecting Token Accounts](#10-inspecting-token-accounts)
-11. [Using the Solana Explorer](#11-using-the-solana-explorer-devnettestnet)
-12. [Third-Party Solana Explorers](#12-third-party-solana-explorers-localnet---use-with-caution)
-13. [Implementing the Minting](#13-implementing-the-minting)
-14. [Troubleshooting](#14-troubleshooting)
-    -   [Common Issues](#common-issues)
-    -   [Error Messages](#error-messages)
+    -   [4.1 Business Flow Overview](#41-business-flow-overview)
+    -   [4.2 Required Environment Variables](#42-required-environment-variables)
+    -   [4.3 Account Roles](#43-account-roles)
+5.  [Integration with Production Backend](#5-integration-with-production-backend)
+6.  [Local Test Setup](#6-local-test-setup)
+    -   [6.1 Solana Test Validator](#61-solana-test-validator)
+    -   [6.2 Create Test NFT](#62-create-test-nft)
+    -   [6.3 Configure `.env` file](#63-configure-your-env-file)
+    -   [6.4 Solana CLI Configuration](#64-solana-cli-configuration)
+7.  [Running the POC](#7-setup-and-running-the-poc)
+    -   [7.1 Navigate to POC Directory](#71-navigate-to-poc-directory)
+    -   [7.2 Install Dependencies](#72-install-dependencies)
+    -   [7.3 Run the POC](#73-run-the-poc)
+8.  [On-Chain Verification](#8-on-chain-verification)
+    -   [8.1 Verifying the Burn](#81-verifying-the-burn-with-solana-cli)
+    -   [8.2 Verifying the Mint](#82-verifying-the-minting-with-solana-cli)
+    -   [8.3 Inspecting Token Accounts](#83-inspecting-token-accounts)
+    -   [8.4 Using Solana Explorer](#84-using-the-solana-explorer-devnettestnet)
+9.  [Troubleshooting](#9-troubleshooting)
+    -   [9.1 Common Issues](#91-common-issues)
+    -   [9.2 Error Messages](#92-error-messages)
 
 ## 1. Introduction
 
@@ -93,6 +91,22 @@ Solana's account model is fundamental to how data is stored and accessed on the 
   - **Token Account:** Stores the balance of a specific token (NFT) held by a specific user. Also known as an Associated Token Account (ATA).
 - **System Program:** The core program on Solana responsible for basic account management, such as creating accounts and transferring SOL.
 - **Token Program:** A program that defines the rules for creating and managing tokens (including NFTs) on Solana.
+
+## 5. Integration with Production Backend
+
+This POC validates the core on-chain logic using standard Solana and Metaplex SDKs in a local, standalone environment. The production implementation will adapt this logic into the existing `lastmemefi-api` backend architecture.
+
+**Key Integration Points:**
+
+1.  **Service-Oriented Architecture**: The functions demonstrated in `nft-manager.js` will not be run as a standalone script. Instead, the logic will be encapsulated within the existing **`Web3Service`**. This service is responsible for all direct interactions with the Solana blockchain.
+
+2.  **Business Logic Orchestration**: The end-to-end business flows, such as NFT claiming or synthesis (burn-and-mint), will be orchestrated by the **`NFTService`**. The `NFTService` will call methods on the `Web3Service` to execute the required on-chain transactions.
+
+3.  **Secure Key Management**: In the production environment, secret keys for the system wallet will **not** be stored in `.env` files. They will be managed by a secure vault or secrets manager, which the `Web3Service` will access through a secure API.
+
+4.  **Connection Management**: The `Web3Service` manages a persistent, robust connection to the designated Solana RPC endpoint specified in the production configuration. The generic `SOLANA_NETWORK` variable from the POC will be replaced by this managed connection.
+
+This approach ensures that the proven on-chain logic is integrated into a scalable, secure, and maintainable backend system, leveraging the existing infrastructure for logging, monitoring, and error handling.
 
 ## 6. Setting up a Local Solana Testing Network
 

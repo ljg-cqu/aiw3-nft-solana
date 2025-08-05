@@ -746,23 +746,15 @@ To ensure consistent communication, all API responses must follow the formats be
   - `nft:transaction_status`: Solana transaction updates.
 - **Payload**: Consistent structure with user ID, event type, and data.
 
-### Frontend Integration Points
+### Core API Endpoints
 
-#### Personal Center Dashboard
-- **Endpoint**: `GET /api/nft/status` - Fetches current NFT, progress, and benefits.
-- **Real-time**: Subscribes to WebSocket events for live status changes.
-- **UI Components**: NFT display card, progress bars, upgrade buttons.
-
-#### Synthesis (Upgrade) Flow
-- **Process**: Qualification check → Burn old NFT → Mint new NFT → Confirmation.
-- **Tracking**: Uses WebSocket events for each step with progress percentages.
-- **Error Recovery**: Clear error messages and retry mechanisms.
-
-#### Badge System Integration
-- **Endpoints**:
-  - `GET /api/nft/badges`: View user's badge collection.
-  - `POST /api/nft/badges/claim`: Claim new badges.
-- **UI**: Displays badges with locked/unlocked states.
+- **`GET /api/nft/status`**: Returns the user's current NFT level, tier name, and progress toward the next tier, including trading volume and required badges.
+- **`POST /api/nft/claim`**: Initiates the process to claim a new NFT once qualification criteria are met. The backend orchestrates metadata upload to IPFS and minting on Solana.
+- **`POST /api/nft/upgrade`**: Handles the burn-and-mint upgrade process. The backend verifies qualifications, coordinates the burning of the old NFT, and mints the new one.
+- **`GET /api/nft/history`**: Provides a paginated history of the user's NFT activities, including claims, upgrades, and badge achievements.
+- **`GET /api/nft/benefits`**: Fetches the current benefits associated with the user's NFT tier, such as fee reductions and increased `aiagentUses`.
+- **`GET /api/nft/badges`**: Returns the user's full collection of badges, indicating which are unlocked and which are still required for the next upgrade.
+- **`POST /api/nft/badges/claim`**: Allows the user to claim a badge they have earned through specific achievements.
 
 ### Technical Implementation Plan & Dependencies
 

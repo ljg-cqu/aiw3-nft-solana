@@ -191,7 +191,9 @@ User Request → Message Queue → Worker Pool → Blockchain → Confirmation
 
 ### Message Queue System
 
-**Recommended Technology**: Redis Streams or RabbitMQ
+**Recommended Technology**: Kafka
+
+**Rationale**: The `lastmemefi-api` backend has a mature, existing `KafkaService` that is used for asynchronous event processing across the platform. Utilizing the existing Kafka infrastructure ensures consistency, leverages proven production-hardened components, and simplifies the integration effort.
 
 **Queue Structure**:
 ```json

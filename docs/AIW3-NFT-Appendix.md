@@ -6,13 +6,14 @@ This document serves as a centralized reference for terminology definitions and 
 
 ## Table of Contents
 
-1.  [Terminologies](#terminologies)
+1.  [Glossary of Terms](#glossary-of-terms)
 2.  [Related Documentation](#related-documentation)
-    -   [Core AIW3 NFT Documentation](#core-aiw3-nft-documentation)
-    -   [Integration & Implementation Documentation](#integration--implementation-documentation)
+    1.  [Core AIW3 NFT Documentation](#core-aiw3-nft-documentation)
+    2.  [Integration & Implementation Documentation](#integration--implementation-documentation)
+    3.  [System Quality Documentation](#system-quality-documentation)
 3.  [External References](#external-references)
-    -   [Solana Ecosystem](#solana-ecosystem)
-    -   [Infrastructure & Services](#infrastructure--services)
+    1.  [Solana Ecosystem](#solana-ecosystem)
+    2.  [Infrastructure & Services](#infrastructure--services)
 
 ---
 
@@ -23,6 +24,9 @@ Each term in this appendix is cross-referenced with the respective NFT workflows
 ## Glossary of Terms
 
 This section defines the core concepts used throughout the AIW3 NFT documentation.
+
+-   **`aiagentUses`**: A numerical value representing the number of times a user can access premium AI-powered agent features per month. This benefit is tied to the user's current **Equity NFT** tier.
+    -   **Reference:** See the [Benefit Summary Table](./AIW3-NFT-Tiers-and-Rules.md#benefit-summary-table) for specific values per tier.
 
 -   **Equity NFT:** The primary NFT representing a user's status and benefits, organized into **Levels** or **Tiers**. Higher tiers are acquired by meeting trading volume thresholds and owning required **Badge NFTs**.
     -   **Flow Reference:** See [Unlocking and Activation Processes](./AIW3-NFT-Business-Flows-and-Processes.md#unlocking-and-activation-processes) and [Synthesis and Upgrade Processes](./AIW3-NFT-Business-Flows-and-Processes.md#synthesis-and-upgrade-processes).

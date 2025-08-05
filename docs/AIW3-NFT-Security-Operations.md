@@ -83,6 +83,7 @@ Encrypted Key Storage
 **Tier 2 (Current Implementation): Secure Vault Integration via `Web3Service`**
 - **Practical Security**: The `lastmemefi-api`'s `Web3Service` is designed to integrate with a secure key management system (like HashiCorp Vault, AWS KMS, or another secrets manager).
 - **Implementation**: The `Web3Service` fetches the private key from the secure vault only when needed to sign a transaction, minimizing its exposure in memory.
+- **Security Controls**: Access to this signing function is protected by the `RedisService`, which enforces strict rate-limiting and temporary lockouts for suspicious activity (e.g., rapid, repeated requests from a single user).
 - **Access Control**: Access to the vault is strictly controlled via IAM roles or other authentication mechanisms, ensuring only the `Web3Service` can request the key.
 
 **Transaction Security Model**:

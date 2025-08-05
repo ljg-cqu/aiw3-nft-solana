@@ -201,9 +201,9 @@ Instead of complex compensating transactions, this model isolates failures. An a
 **Source-IPFS Reconciliation**
 ```javascript
 const reconcileSourceIPFS = async () => {
-  // Verify all level images exist in source directory
-  const expectedLevels = ['Bronze', 'Silver', 'Gold', 'Platinum'];
-  
+  // Dynamically load the expected NFT levels from the configuration table
+  const expectedLevels = await NFTTierConfig.getLevels(); // Pseudocode
+
   for (const level of expectedLevels) {
     const sourceImagePath = `assets/images/${level}.png`;
     const sourceExists = await fs.access(sourceImagePath).then(() => true).catch(() => false);
@@ -384,6 +384,8 @@ const monitorDataConsistency = async () => {
 - **Deep**: Daily for historical data validation and source image verification
 
 ### Database Schema Requirements
+
+**Note on Data Modeling**: The tables defined below (`minting_operations`, `source_image_verification`) are proposed as **operational and auditing tables** to manage the state of asynchronous processes. They are not intended to replace the core entity tables defined in **AIW3-NFT-Data-Model.md**. For final implementation, these schemas should be formally incorporated into the canonical `AIW3-NFT-Data-Model.md` to maintain a single source of truth for the database structure.
 
 **Enhanced Consistency Tracking Tables**
 ```sql

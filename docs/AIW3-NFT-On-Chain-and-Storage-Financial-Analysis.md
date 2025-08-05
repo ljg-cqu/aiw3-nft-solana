@@ -8,35 +8,34 @@
 ## Table of Contents
 
 1.  [Executive Summary](#executive-summary)
-    -   [Key Findings](#key-findings)
-    -   [Strategic Recommendation](#strategic-recommendation)
+    1.  [Key Findings](#key-findings)
+    2.  [Strategic Recommendation](#strategic-recommendation)
 2.  [Detailed On-Chain and Storage Cost Components](#detailed-on-chain-and-storage-cost-components)
-    -   [1. Solana Rent Costs (Associated Token Accounts)](#1-solana-rent-costs-associated-token-accounts)
-    -   [2. Transaction Fees](#2-transaction-fees)
-    -   [3. IPFS Storage Costs (Pinata)](#3-ipfs-storage-costs-pinata)
-3.  [Quantitative Cost Analysis](#quantitative-cost-analysis)
-    -   [Tiered Storage Calculation](#tiered-storage-calculation)
-4.  [Cost Scenarios & Business Impact](#cost-scenarios--business-impact)
-    -   [Scenario 1: Conservative (SOL @ $20)](#scenario-1-conservative-sol--20)
-    -   [Scenario 2: Moderate (SOL @ $60)](#scenario-2-moderate-sol--60)
-    -   [Scenario 3: Optimistic (SOL @ $200)](#scenario-3-optimistic-sol--200)
-5.  [Strategic Cost Optimization](#strategic-cost-optimization)
-    -   [Recommended Strategy: Pre-paid Rent Transfer](#recommended-strategy-pre-paid-rent-transfer)
-6.  [Implementation Strategies](#implementation-strategies)
-    -   [Phase 1: Initial Launch (0-6 months)](#phase-1-initial-launch-0-6-months)
-    -   [Phase 2: Optimization Period (6-18 months)](#phase-2-optimization-period-6-18-months)
-    -   [Phase 3: Full Ecosystem Maturity (18+ months)](#phase-3-full-ecosystem-maturity-18-months)
-7.  [ROI & Business Justification](#roi--business-justification)
-    -   [Revenue Opportunities](#revenue-opportunities)
-    -   [Break-Even Analysis](#break-even-analysis)
-8.  [Risk Analysis & Mitigation](#risk-analysis--mitigation)
-    -   [Primary Risk Factors](#primary-risk-factors)
-    -   [Risk Mitigation Strategies](#risk-mitigation-strategies)
-9.  [Conclusions & Recommendations](#conclusions--recommendations)
-    -   [Strategic Recommendations](#strategic-recommendations)
-    -   [Expected Outcomes](#expected-outcomes)
-    -   [Financial Projections Summary](#financial-projections-summary)
-10. [Appendix](#appendix)
+    1.  [Solana Rent Costs (Associated Token Accounts)](#1-solana-rent-costs-associated-token-accounts)
+    2.  [Transaction Fees](#2-transaction-fees)
+    3.  [IPFS Storage Costs (Pinata)](#3-ipfs-storage-costs-pinata)
+    4.  [Tier Distribution Impact](#4-tier-distribution-impact)
+3.  [Cost Scenarios & Business Impact](#cost-scenarios--business-impact)
+    1.  [Scenario 1: Conservative (SOL @ $20)](#scenario-1-conservative-sol--20)
+    2.  [Scenario 2: Moderate (SOL @ $60)](#scenario-2-moderate-sol--60)
+    3.  [Scenario 3: Optimistic (SOL @ $200)](#scenario-3-optimistic-sol--200)
+4.  [Strategic Cost Optimization](#strategic-cost-optimization)
+    1.  [Recommended Strategy: Pre-paid Rent Transfer](#recommended-strategy-pre-paid-rent-transfer)
+5.  [Implementation Strategies](#implementation-strategies)
+    1.  [Phase 1: Initial Launch (0-6 months)](#phase-1-initial-launch-0-6-months)
+    2.  [Phase 2: Optimization Period (6-18 months)](#phase-2-optimization-period-6-18-months)
+    3.  [Phase 3: Full Ecosystem Maturity (18+ months)](#phase-3-full-ecosystem-maturity-18-months)
+6.  [ROI & Business Justification](#roi--business-justification)
+    1.  [Revenue Opportunities](#revenue-opportunities)
+    2.  [Break-Even Analysis](#break-even-analysis)
+7.  [Risk Analysis & Mitigation](#risk-analysis--mitigation)
+    1.  [Primary Risk Factors](#primary-risk-factors)
+    2.  [Risk Mitigation Strategies](#risk-mitigation-strategies)
+8.  [Conclusions & Recommendations](#conclusions--recommendations)
+    1.  [Strategic Recommendations](#strategic-recommendations)
+    2.  [Expected Outcomes](#expected-outcomes)
+    3.  [Financial Projections Summary](#financial-projections-summary)
+9.  [Appendix](#appendix)
 
 ---
 
@@ -153,11 +152,11 @@ const storageCostUSD = {
 
 ```typescript
 const USER_DISTRIBUTION = {
-    Bronze: 0.70,    // 70% - 7,000,000 users
-    Silver: 0.20,    // 20% - 2,000,000 users
-    Gold: 0.08,      // 8%  - 800,000 users
-    Platinum: 0.015, // 1.5% - 150,000 users
-    Diamond: 0.005   // 0.5% - 50,000 users
+    "Tech Chicken": 0.70,      // 70% - 7,000,000 users
+    "Quant Ape": 0.20,      // 20% - 2,000,000 users
+    "On-chain Hunter": 0.08,    // 8%  - 800,000 users
+    "Alpha Alchemist": 0.015,   // 1.5% - 150,000 users
+    "Quantum Alchemist": 0.005 // 0.5% - 50,000 users
 };
 
 // Storage requirements by tier
@@ -263,7 +262,7 @@ This strategy is recommended for its balance of low capital risk for AIW3 and a 
 - Deploy **Pre-paid Rent Transfer** for Gold+ tier users
 - Implement **Premium Feature Revenue Model** for Bronze/Silver cost offset
 - Begin **Standard Program Integration** development
-- Maintain **System-Paid Rent** for Bronze/Silver tiers
+- Maintain **System-Paid Rent** for Tech Chicken/Quant Ape tiers
 
 ### Phase 2: Optimization Period (6-18 months)
 - Expand **Pre-paid Transfer** to Silver tier
@@ -306,13 +305,13 @@ const PREPAID_STRATEGY_PROJECTIONS = {
 
 **Premium Feature Revenue Model:**
 
-| Feature Category | Target Users | Annual Revenue Potential |
-|------------------|-------------|------------------------|
-| **Advanced Analytics** | Gold+ | $120M |
-| **Priority Support** | Platinum+ | $45M |
-| **Exclusive Access** | Diamond | $30M |
-| **API Access** | Partners | $60M |
-| **Total Annual Revenue** | **All Tiers** | **$255M** |
+| Feature Category       | Target Users        | Annual Revenue Potential |
+|------------------------|---------------------|--------------------------|
+| **Advanced Analytics** | On-chain Hunter+    | $120M                    |
+| **Priority Support**   | Alpha Alchemist+    | $45M                     |
+| **Exclusive Access**   | Quantum Alchemist   | $30M                     |
+| **API Access**         | Partners            | $60M                     |
+| **Total Annual Revenue** | **All Tiers**       | **$255M**                |
 
 ### Break-Even Analysis
 
@@ -343,7 +342,7 @@ const PREPAID_STRATEGY_PROJECTIONS = {
 | Risk Category | Impact Level | Mitigation Strategy |
 |---------------|-------------|-------------------|
 | **SOL Price Volatility** | High | Pre-paid transfer, tiered implementation |
-| **User Adoption Rate** | Medium | Bronze tier free entry, premium upsell |
+| **User Adoption Rate** | Medium | Tech Chicken tier free entry, premium upsell |
 | **Technical Complexity** | Medium | Phased implementation, robust testing |
 | **Regulatory Changes** | Low | Compliance monitoring, legal review |
 
@@ -372,7 +371,7 @@ const PREPAID_STRATEGY_PROJECTIONS = {
 - 🔒 **Maintained system control** for authenticity verification
 - 💰 **Revenue positive within 1 month** through premium features
 - 🎯 **Scalable to 100M+ users** without proportional cost increases
-- ✅ **Preserved user experience** for entry-level Bronze tier
+- ✅ **Preserved user experience** for entry-level Tech Chicken tier
 
 ### Financial Projections Summary
 

@@ -43,12 +43,12 @@ This document provides a comprehensive analysis of storage solutions currently i
 - **Implementation**: 
   - Uses `sails-mysql` adapter
   - MySQL 5.7 via Docker container
-  - Database: `aiweb3_aitrading_db`
+  - Database: `lastmemefi`
   - Character set: `utf8mb4` with `utf8mb4_unicode_ci` collation
 - **Usage**: 
   - User data, trading records, contest data
   - Primary ORM through Sails.js models
-  - Connection: `mysql://aiw3_trade_user1:NEWPASS123@host.docker.internal:3306/aiweb3_aitrading_db`
+  - Connection: `mysql://root:your_db_password@host.docker.internal:3306/lastmemefi`
 - **Cloud Platform**: Self-hosted (Docker)
 
 #### 2. Redis Cache
@@ -76,7 +76,7 @@ This document provides a comprehensive analysis of storage solutions currently i
   - Search functionality across trading data
   - Analytics and reporting
   - Data indexing from MySQL via scheduled jobs
-- **Configuration**: `http://111.119.236.179:9200`
+- **Configuration**: Endpoint is managed via environment variables.
 - **Cloud Platform**: External hosted service
 
 #### 4. Apache Kafka
@@ -194,7 +194,7 @@ File Storage: OBS (Centralized) + IPFS/Pinata (Decentralized)
 #### Consider Alternatives
 - **MySQL → PostgreSQL + Blockchain indexing**: Better Web3 integration
 - **Elasticsearch → The Graph Protocol**: Decentralized indexing
-- **Huawei OBS → Continue with IPFS via Pinata**: Maintain decentralized storage consistency
+- **Huawei OBS → Use IPFS/Pinata Exclusively**: For all new NFT-related assets (images, metadata), IPFS/Pinata is the mandatory storage solution to ensure decentralization and align with Web3 principles. Huawei OBS should be considered a legacy system for non-NFT assets only.
 
 #### New Additions
 - **Solana RPC nodes**: Direct blockchain data access
@@ -226,6 +226,6 @@ The lastmemefi-api project demonstrates a mature, production-ready storage archi
 
 ---
 
-*Report generated on: 2025-08-04*  
+  
 *Analysis scope: lastmemefi-api codebase*  
 *Target application: aiw3-nft-solana storage decisions*

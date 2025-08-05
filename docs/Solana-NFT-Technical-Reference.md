@@ -84,67 +84,52 @@ A tool by Metaplex for interacting with on-chain programs, providing simplified 
 **Required Dependencies:**
 
 ```bash
-npm install @solana/web3.js @metaplex-foundation/umi @metaplex-foundation/mpl-token-metadata @metaplex-foundation/umi-uploader-irys
-```
-
-**Alternative for direct SPL interactions:**
-```bash
-npm install @solana/spl-token
+npm install @solana/web3.js @metaplex-foundation/umi @metaplex-foundation/umi-bundle-defaults @metaplex-foundation/mpl-token-metadata
+# Note: The Pinata SDK (`@pinata/sdk`) should be part of the backend service dependencies.
 ```
 
 #### Step 2: Wallet and Network Configuration
 
-**Initialize Umi Connection:**
-
 ```typescript
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { clusterApiUrl } from "@solana/web3.js";
-
-const umi = createUmi(clusterApiUrl("mainnet-beta"));
-// Load your keypair (signer)
-// const myKeypair = ... // your keypair (from secret key or file)
-// umi.use(keypairIdentity(myKeypair));
-```
-
-**Add Metaplex Plugins:**
-
-```typescript
+import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
 import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
-import { irysUploader } from "@metaplex-foundation/umi-uploader-irys";
 
-umi.use(mplTokenMetadata()).use(irysUploader());
+// In the backend, the Umi instance is configured once.
+umi.use(mplTokenMetadata());
 ```
 
-#### Step 3: Metadata Preparation
+#### Step 3: Upload Assets to IPFS via Pinata
+
+Before creating the on-chain NFT, the image and metadata must be uploaded to IPFS. Our architecture uses the **Pinata SDK** for this purpose within the backend `NFTService`.
+
+1.  **Upload Image**: Upload the NFT image (e.g., `NFT_Level_1.png`) to Pinata. This returns an IPFS hash (e.g., `Qm...ImageHash`).
+2.  **Prepare Metadata**: Create a JSON file conforming to the Metaplex standard. The `image` URI must point to the IPFS gateway URL for the image hash from the previous step.
+3.  **Upload Metadata**: Upload the JSON file to Pinata. This returns a final IPFS hash for the metadata (e.g., `Qm...MetadataHash`). This hash will be used as the `uri` in the on-chain transaction.
 
 **NFT Metadata JSON Structure:**
 
 ```json
 {
-  "name": "My Awesome NFT",
-  "symbol": "MAN",
-  "description": "A brief description of the NFT",
-  "image": "https://gateway.pinata.cloud/ipfs/your-image-hash",
+  "name": "AIW3 Quant Ape",
+  "symbol": "AIW3QA",
+  "description": "An AIW3 Level 2 Equity NFT.",
+  "image": "https://gateway.pinata.cloud/ipfs/Qm...ImageHash",
   "seller_fee_basis_points": 500,
   "attributes": [
-    { "trait_type": "Background", "value": "Blue" },
-    { "trait_type": "Level", "value": "1" }
+    {
+      "trait_type": "Level",
+      "value": "2"
+    }
   ],
   "properties": {
-    "files": [{ 
-      "uri": "https://gateway.pinata.cloud/ipfs/your-image-hash", 
-      "type": "image/png" 
-    }],
-    "creators": [
+    "files": [
       {
-        "address": "YOUR_CREATOR_ADDRESS",
-        "verified": true,
-        "share": 100
+        "uri": "https://gateway.pinata.cloud/ipfs/Qm...ImageHash",
+        "type": "image/png"
       }
-    ]
-  },
-  "collection": {
-    "name": "AIW3 Equity NFTs",
+    ],
+    "category": "image"
     "family": "AIW3"
   }
 }
