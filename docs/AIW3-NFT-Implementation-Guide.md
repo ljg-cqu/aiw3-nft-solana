@@ -1,5 +1,12 @@
-
 # AIW3 NFT Implementation Guide
+
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Provides a step-by-step developer guide for implementing the AIW3 NFT system.
+
+---
 
 This document provides comprehensive implementation guidelines for the AIW3 NFT system, emphasizing integration with the `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). It outlines standard program integration, backend service utilization, frontend application development, and process flows.
 

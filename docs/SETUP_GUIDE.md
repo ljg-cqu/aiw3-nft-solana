@@ -1,5 +1,13 @@
 # AIW3 NFT - Development Environment Setup Guide
 
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Development environment setup guide for the AIW3 NFT system
+
+---
+
 This guide provides instructions for setting up the complete development environment for the AIW3 NFT system, which includes the `lastmemefi-api` backend and its dependent services.
 
 ## 📋 Table of Contents

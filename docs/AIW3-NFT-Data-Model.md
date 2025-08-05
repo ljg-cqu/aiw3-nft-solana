@@ -1,5 +1,13 @@
 # AIW3 NFT Data Model
 
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Defines the data structures and relationships for the AIW3 NFT system.
+
+---
+
 **Data Model Scope**: This document provides comprehensive specifications for data structures supporting all NFT business flows documented in **AIW3 NFT Business Flows and Processes**, ensuring complete prototype alignment.
 
 This document provides comprehensive specifications for data structures in the AIW3 NFT system, designed for seamless integration with the existing `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). It covers database extensions, API response formats, and data relationships optimized for the Sails.js/MySQL infrastructure.

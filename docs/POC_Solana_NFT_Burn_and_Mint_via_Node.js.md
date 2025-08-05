@@ -1,5 +1,13 @@
 # POC: Solana NFT Burn and Mint via Node.js
 
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Proof of concept for Solana NFT burn-and-mint operations
+
+---
+
 **POC Scope**: This proof of concept validates the technical feasibility of core NFT operations documented in **AIW3 NFT Business Flows and Processes**, specifically focusing on the burn-and-mint synthesis process.
 
 ## 📋 Table of Contents

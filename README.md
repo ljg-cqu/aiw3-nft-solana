@@ -1,5 +1,13 @@
 # AIW3 NFT System - Solana Integration with lastmemefi-api Backend
 
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Project overview and integration architecture documentation
+
+---
+
 ## Project Overview
 
 The AIW3 NFT System is a comprehensive Solana-based equity NFT implementation **fully integrated** with the existing **lastmemefi-api** backend infrastructure. This system provides tiered user benefits, trading fee reductions, and enhanced AI agent access based on user trading volume and engagement metrics.

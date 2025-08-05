@@ -1,5 +1,13 @@
 # AIW3 NFT Tiers and Rules
 
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Defines the official tiers, benefits, and operational policies for the AIW3 NFT collection, serving as the single source of truth for business rules.
+
+---
+
 ## Executive Summary
 
 This document defines the official tiers, benefits, and operational policies for the AIW3 NFT collection. It serves as the single source of truth for business rules governing NFT qualification, synthesis (upgrading), and the associated user benefits. All system components, from the `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`) to the frontend UI, must adhere to these policies.

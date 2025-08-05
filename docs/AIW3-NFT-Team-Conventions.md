@@ -1,8 +1,10 @@
 # AIW3 NFT Team Conventions
 
-**Purpose**: This document establishes team collaboration workflows, communication protocols, and development processes to ensure efficient coordination and high-quality delivery of the AIW3 NFT system.
-
-**Scope**: Covers all aspects of team collaboration from git workflows to meeting cadences, designed to complement the technical standards in [AIW3 NFT Best Practices](./AIW3-NFT-Best-Practices.md).
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Establishes team collaboration workflows, communication protocols, and development processes.
 
 ---
 
@@ -625,9 +627,3 @@ What we learned and how to prevent similar incidents.
 - [AIW3 NFT Testing Strategy](./AIW3-NFT-Testing-Strategy.md) - Testing approach and standards
 - [AIW3 NFT Deployment Guide](./AIW3-NFT-Deployment-Guide.md) - Deployment procedures
 - [AIW3 NFT Error Handling Reference](./AIW3-NFT-Error-Handling-Reference.md) - Error management
-
----
-
-*Document Version: 1.0*  
-*Last Updated: 2025-08-06*  
-*Purpose: Team collaboration and workflow standards*

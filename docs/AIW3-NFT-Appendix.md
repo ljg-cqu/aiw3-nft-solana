@@ -1,5 +1,13 @@
 # AIW3 NFT Appendix
 
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Terminology definitions and cross-reference guide
+
+---
+
 This document serves as a centralized reference for terminology definitions and external resources used throughout the AIW3 NFT documentation. It provides consistent definitions of key concepts and links to relevant external documentation and standards.
 
 ---

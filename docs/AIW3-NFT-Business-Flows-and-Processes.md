@@ -1,5 +1,13 @@
 # AIW3 NFT Business Flows and Processes
 
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Business flows and process definitions
+
+---
+
 ## Introduction
 
 This document provides a comprehensive overview of all NFT-related business flows and processes. Each flow is carefully detailed to ensure full consistency with the AIW3 prototype designs and accurate implementation across the system.

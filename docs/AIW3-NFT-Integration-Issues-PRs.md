@@ -1,4 +1,12 @@
-# AIW3 NFT Integration Issues/PRs Breakdown
+# AIW3 NFT Integration Issues & PRs
+
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Defines the phased implementation plan, API contracts, and integration points for the AIW3 NFT system.
+
+---
 
 **Implementation Note**: All integration issues and PRs are designed to support the complete NFT business flows documented in **AIW3 NFT Business Flows and Processes**, ensuring alignment with all 41 prototype designs.
 

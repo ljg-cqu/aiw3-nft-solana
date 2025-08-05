@@ -1,4 +1,13 @@
 # AIW3 NFT System Design
+
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** High-level technical architecture and lifecycle management
+
+---
+
 ## High-Level Architecture & Lifecycle Management for Integrated Solana-Based Equity NFTs
 
 This document provides technical specifications for integrating AIW3's Equity NFT system with `/home/zealy/aiw3/gitlab.com/lastmemefi-api`, focusing on compatibility, backend service utilization, and ecosystem interaction.
