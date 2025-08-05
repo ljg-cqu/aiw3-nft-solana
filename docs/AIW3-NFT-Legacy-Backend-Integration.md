@@ -25,7 +25,7 @@ The `lastmemefi-api` provides a robust set of services and components that will 
 - **`Web3Service`**: Manages Solana RPC connections and basic on-chain queries (e.g., SOL balance). This will be extended for NFT operations.
 - **`UserService`**: Handles user data management, including wallet addresses and profile information.
 - **`RedisService`**: Provides comprehensive Redis caching functionality using `ioredis` client with connection management, TTL support, and advanced operations like `setCache()`, `getCache()`, `delCache()`, `sadd()`, and distributed locking capabilities.
-- **`KafkaService`**: Manages Kafka messaging using `kafkajs` library with producer/consumer instances, supports `sendMessage()` for publishing events and `receiveMessage()` for consuming, configured with broker `172.23.1.63:29092`, clientId `my-nodejs-app`, and groupId `test-group`.
+- **`KafkaService`**: Manages Kafka messaging using `kafkajs` library with producer/consumer instances, supports `sendMessage()` for publishing events and `receiveMessage()` for consuming, configured with broker `host.docker.internal:29092`, clientId `my-nodejs-app`, and groupId `test-group`.
 - **`AccessTokenService`**: Manages JWT generation and verification for API authentication.
 
 ### Required Modifications
@@ -435,7 +435,7 @@ await KafkaService.sendMessage('nft-events', upgradeMessage);
 
 ```javascript
 // Leverage existing Pinata configuration
-const metadataUri = await PinataService.uploadNFTMetadata({
+const metadataUri = await pinata.upload({
     name: "Tech Chicken #1",
     description: "Level 1 AIW3 NFT",
     image: "https://gateway.pinata.cloud/ipfs/...",
@@ -452,7 +452,8 @@ const metadataUri = await PinataService.uploadNFTMetadata({
 
 ```javascript
 // Log NFT events to Elasticsearch
-await ElasticsearchService.logEvent('nft_upgrade', {
+// Log to existing monitoring system
+const logData = {
     userId: user.id,
     walletAddress: user.wallet_address,
     fromLevel: 1,

@@ -408,7 +408,7 @@ graph TD
         Backend <-->|Existing connection| Redis[(🔴 Redis Cache)]
         Backend -->|Existing integration| Kafka[📨 Kafka Message Queue]
         Backend -->|Existing directory| Assets[📁 assets/images]
-        Backend -->|Existing service| PinataService[📌 Pinata IPFS SDK]
+        Backend -->|Existing integration| PinataSDK[📌 Pinata SDK Integration]
         Backend -->|Waterline ORM| MySQL[(💾 MySQL Database)]
         Backend -->|Background jobs| CronJobs[⏰ Volume Calculation Jobs]
         Backend -->|Existing monitoring| Elasticsearch[📊 Elasticsearch Logging]
@@ -423,7 +423,7 @@ graph TD
     end
 
     subgraph DecentralizedStorage ["IPFS via Pinata"]
-        PinataService -->|Upload images/metadata| IPFS[🌐 IPFS Network]
+        PinataSDK -->|Upload images/metadata| IPFS[🌐 IPFS Network]
         IPFS -->|Public gateways| IPFSGateway[🌍 gateway.pinata.cloud]
         IPFS -->|Backup access| PublicGateways[🌍 Public IPFS Gateways]
     end
