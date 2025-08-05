@@ -135,39 +135,39 @@ This section illustrates the user journey as depicted in the system prototypes, 
 Users can view their collected NFTs in their **Personal Center**. Each NFT has two states: unlocked (owned) and unlockable (not yet owned).
 
 - **Unlocked NFT**: Displays the NFT the user currently owns.
-  *![Unlocked NFT](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/1.%20Unlocked.png)*
+  *![Unlocked NFT](../aiw3-prototypes/Personal%20Center/Personal%20Homepage/1.%20Unlocked.png)*
 - **Unlockable NFT**: Shows the next tier the user can work towards.
-  *![Unlockable NFT](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/2.%20Unlockable.png)*
+  *![Unlockable NFT](../aiw3-prototypes/Personal%20Center/Personal%20Homepage/2.%20Unlockable.png)*
 
 ### 2. The "Synthesis" (Upgrade) Process
 
 To upgrade to a higher tier, users go through a process called "Synthesis." This is the user-facing term for the burn-and-mint mechanism.
 
 1.  **Initiating Synthesis**: When a user is eligible, they can start the synthesis process.
-    *![Synthesis Screen](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/4.%20Synthesis.png)*
+    *![Synthesis Screen](../aiw3-prototypes/Personal%20Center/Personal%20Homepage/4.%20Synthesis.png)*
 
 2.  **Synthesis Success**: Upon successful completion, the system informs the user they have acquired the new, higher-level NFT.
-    *![Synthesis Success](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/5.%20Lv2%20Synthesis%20Success.png)*
+    *![Synthesis Success](../aiw3-prototypes/Personal%20Center/Personal%20Homepage/5.%20Lv2%20Synthesis%20Success.png)*
 
 ### 3. Badge-Type NFTs and Special Awards
 
 In addition to the main tiered NFTs, users can earn **Badge-Type NFTs** for specific achievements or participation in events. These are required for higher-level upgrades.
 
 - **Micro Badge**: A small, collectible badge that signifies a specific accomplishment.
-  *![Micro Badge](..//aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/6.%20Micro%20Badge.png)*
+  *![Micro Badge](../aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/6.%20Micro%20Badge.png)*
 
 - **Badge Display**: These badges are displayed prominently in the user's Personal Center alongside their main NFT.
-  *![Badge-Type NFT](..//aiw3-prototypes/Personal%20Center/Personal%20Homepage/6.%20Badge-Type%20NFT.png)*
+  *![Badge-Type NFT](../aiw3-prototypes/Personal%20Center/Personal%20Homepage/6.%20Badge-Type%20NFT.png)*
 
 ### 4. Profile and Community Display
 
 NFTs serve as a core part of a user's identity on the platform.
 
 - **Personal Center**: The user's central hub for managing and viewing their NFTs and badges.
-  *![Personal Center](..//aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/7.%20Personal%20Center.png)*
+  *![Personal Center](../aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/7.%20Personal%20Center.png)*
 
 - **Community Mini-Homepage**: A public-facing profile where other users can see the NFTs and badges a user has earned.
-  *![Community Homepage](..//aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/9.%20Community-Mini%20Homepage.png)*
+  *![Community Homepage](../aiw3-prototypes/AIW3%20Distribution%20System/VIP%20Level%20Plan/9.%20Community-Mini%20Homepage.png)*
 
 ---
 
