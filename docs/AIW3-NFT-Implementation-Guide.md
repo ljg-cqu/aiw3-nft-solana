@@ -375,3 +375,179 @@ For comprehensive information about the AIW3 NFT system, please refer to these r
 ### Integration & Implementation
 - **[AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)**: Comprehensive analysis and strategy for integrating NFT services with existing `lastmemefi-api` backend, including service architecture and infrastructure reuse
 - **[AIW3 NFT Integration Issues & PRs](./AIW3-NFT-Integration-Issues-PRs.md)**: Detailed phased implementation plan with frontend-backend integration requirements, API contracts, WebSocket events, and collaborative development guidance
+
+---
+
+## Frontend-Backend API & Integration Specification
+
+This section provides the detailed technical contract for frontend and backend development.
+
+### API Contract Specifications
+
+#### Authentication & Authorization
+- **Wallet Authentication**: Extend existing Solana wallet signature verification
+- **JWT Integration**: NFT endpoints use existing JWT middleware from `AccessTokenService`
+- **Permission Levels**: NFT operations require authenticated user context
+
+#### Standardized Response Formats
+
+To ensure consistent communication, all API responses must follow the formats below. For a comprehensive list of error codes, see the `Standardized Error Codes` section.
+
+```json
+// Success Response (following existing lastmemefi-api patterns)
+{
+  "success": true,
+  "data": {
+    "currentNFT": {
+      "level": 1,
+      "tierName": "Tech Chicken",
+      "mintAddress": "ABC123...",
+      "benefits": { "feeReduction": 0.05, "aiagentUses": 10 }
+    },
+    "qualification": {
+      "nextLevel": 2,
+      "progress": 0.75,
+      "requirements": { "tradingVolume": 50000, "badges": ["early_adopter"] }
+    }
+  },
+  "meta": { "timestamp": "2024-01-01T00:00:00Z", "version": "v1" }
+}
+
+// Error Response (consistent with existing error handling)
+{
+  "success": false,
+  "error": {
+    "code": "NFT_UPGRADE_FAILED",
+    "message": "Insufficient trading volume for upgrade",
+    "details": { "required": 100000, "current": 75000 }
+  }
+}
+```
+
+#### Real-time Communication
+- **WebSocket Events**: Extend existing socket.io infrastructure
+  - `nft:status_changed` - NFT level or benefits updated
+  - `nft:upgrade_progress` - Multi-step upgrade progress
+  - `nft:qualification_updated` - Progress toward next tier
+  - `nft:transaction_status` - Solana transaction updates
+- **Event Payload**: Consistent structure with user ID, event type, and data
+- **Client SDK**: JavaScript library for easy frontend integration
+
+#### Standardized Error Codes
+
+| Error Code | HTTP Status | Description |
+| :--- | :--- | :--- |
+| `UNAUTHORIZED` | 401 | Missing or invalid JWT token. |
+| `INSUFFICIENT_FUNDS` | 400 | User's wallet has insufficient SOL for the transaction. |
+| `NFT_NOT_FOUND` | 404 | The specified NFT does not exist or belong to the user. |
+| `QUALIFICATION_NOT_MET` | 403 | User does not meet trading volume or badge requirements for an action. |
+| `BADGE_ALREADY_CLAIMED` | 409 | User has already claimed this badge. |
+| `SOLANA_RPC_ERROR` | 503 | The Solana RPC node is unavailable or returned an error. |
+| `IPFS_ERROR` | 503 | Could not upload or retrieve data from IPFS. |
+| `CONCURRENCY_LOCK_FAILED` | 429 | The user's account is currently busy with another operation. |
+| `INTERNAL_SERVER_ERROR` | 500 | A generic, unexpected error occurred on the server. |
+
+#### Transaction Status Tracking
+- **Transaction IDs**: Return Solana transaction signatures for frontend tracking
+- **Status Updates**: Real-time progress via WebSocket events
+- **Error Handling**: Network failures, insufficient funds, transaction timeouts
+
+### Frontend Integration Points
+
+#### Personal Center Dashboard
+- **Primary Endpoint**: `GET /api/nft/status` - Current NFT, progress, benefits
+- **Real-time Updates**: WebSocket subscription for live status changes
+- **UI Components**: NFT display card, progress bars, upgrade buttons
+- **Data Flow**: Status endpoint → WebSocket updates → UI refresh
+
+#### Synthesis (Upgrade) Flow
+- **Multi-step Process**: Qualification check → Burn old NFT → Mint new NFT → Confirmation
+- **Progress Tracking**: WebSocket events for each step with progress percentages
+- **Error Recovery**: Clear error messages and retry mechanisms
+- **UI States**: Loading, processing, success, error with appropriate messaging
+
+#### Badge System Integration
+- **Badge Collection**: `GET /api/nft/badges` - User's badge collection with unlock status
+- **Badge Claiming**: `POST /api/nft/badges/claim` - Claim new badges
+- **Visual Display**: Badge gallery with locked/unlocked states
+- **Integration**: Badges affect NFT upgrade qualification
+
+### Testing & Development Support
+
+#### Mock Data & Sandbox
+- **Test Users**: Pre-configured users with different NFT levels (1-5 + Special)
+- **Mock Transactions**: Simulated blockchain operations for development
+- **Sandbox Endpoints**: Safe testing environment with `/api/nft/sandbox/` prefix
+- **Test Scenarios**: Upgrade success, upgrade failure, network errors
+
+#### API Documentation
+- **Interactive Docs**: Swagger UI with live examples at `/docs/nft`
+- **Code Examples**: JavaScript, React, Vue.js integration samples
+- **Error Scenarios**: Comprehensive error handling examples
+- **Authentication**: Step-by-step wallet connection guide
+
+### Technical Implementation Plan & Dependencies
+
+This section outlines the specific technical components required to implement the features defined above, distinguishing between existing internal services and external libraries.
+
+| Feature / Requirement | Internal Services (`lastmemefi-api`) | External Libraries & Dependencies (with versions) |
+| :--- | :--- | :--- |
+| **Wallet Authentication** | `SolanaChainAuthController`, `UserService` | `@solana/web3.js: ^1.98.0` |
+| **JWT Integration** | `AccessTokenService` (existing middleware) | `jsonwebtoken: ^9.0.2` |
+| **Standardized Responses** | Core Sails.js response handlers | N/A (Architectural Pattern) |
+| **Real-time (WebSockets)** | `sails-hook-sockets: ^3.0.0` | `socket.io-client: ^4.x` (Frontend, version to match server) |
+| **Transaction Tracking** | `Web3Service`, `WebSocketService` | `@solana/web3.js: ^1.98.0` |
+| **Personal Center** | `NFTService` (new), `UserService`, `RedisService` | N/A (Backend logic) |
+| **Synthesis (Upgrade) Flow**| `NFTService`, `Web3Service`, `RedisService` (for locking) | `@solana/web3.js: ^1.98.0`, `@metaplex-foundation/mpl-token-metadata: (To be added)` |
+| **Badge System** | `NFTService`, `UserService`, `Database` (new models) | N/A (Backend logic) |
+| **Mock Data & Sandbox** | Sails.js seeders, new `SandboxController` | N/A (Internal tooling) |
+| **API Documentation** | Existing Swagger/OpenAPI setup | `swagger-ui-express: (To be added, if needed)` |
+
+### Key Business Logic & Rules
+
+To ensure development aligns with business objectives, the following core logic must be accurately implemented:
+
+- **Trading Volume Calculation**: Qualification for NFT tiers is based on a user's total trading volume. This data is aggregated from the `Trades` model, not stored directly on the `User` model. The aggregation logic must be efficient and consistent.
+- **NFT Upgrade Requirements**: A user can only upgrade their NFT if they meet both the trading volume threshold AND possess the required badges for the next level.
+- **Badge Uniqueness**: Badges are unique and can only be claimed once per user.
+- **Special NFT Tier**: The "Special" NFT tier is not attainable through the standard upgrade path and must be assigned manually or through special conditions defined by the business.
+- **Benefit Application**: NFT benefits (e.g., fee reductions, `aiagentUses`) must be applied in real-time to relevant user actions.
+
+### Service Integration Architecture
+
+#### Backend Service Flow
+
+```mermaid
+graph TD
+    subgraph "User Request"
+        A[API Request] --> B{NFTController}
+    end
+
+    subgraph "Core Logic"
+        B --> C{NFTService}
+    end
+
+    subgraph "Supporting Services"
+        C --> D[UserService];
+        C --> E[RedisService for Caching/Locks];
+        C --> F[KafkaService for Events];
+        C --> G[Web3Service for On-Chain];
+    end
+
+    subgraph "Data & External"
+        D --> H[(Database)];
+        G --> I[Solana RPC];
+        G --> J[IPFS/Pinata];
+    end
+
+    subgraph "Real-time Feedback"
+        F --> K((WebSocket));
+    end
+```
+
+#### Frontend Integration Flow
+```
+User Action → API Call → Backend Processing → WebSocket Event → UI Update
+     ↓           ↓            ↓                ↓            ↓
+Button Click  HTTP Request  NFT Service      Real-time Event  Component Refresh
+```
