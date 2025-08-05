@@ -18,6 +18,8 @@ This document provides a detailed breakdown of issues and pull requests for inte
 
 ## Table of Contents
 
+- **Development Workflow**
+  - [Branching Strategy & Git Workflow](#branching-strategy--git-workflow)
 - **Project Phases**
   - [Phase 1: Foundation & Database Schema](#phase-1-foundation--database-schema-week-1-2)
   - [Phase 2: Core Service Extensions](#phase-2-core-service-extensions-week-2-3)
@@ -57,6 +59,66 @@ Each issue includes specific frontend integration requirements to ensure seamles
 - **Authentication Flow**: Integration with existing wallet authentication
 - **Documentation**: Comprehensive API docs with examples and SDK support
 - **Testing Support**: Mock endpoints and test data for frontend development
+
+---
+
+## Branching Strategy & Git Workflow
+
+### Branch Structure
+
+The project follows a three-tier branching strategy optimized for NFT development:
+
+```
+agent                    # Production-ready code (production branch)
+├── agent_dev           # Development collaboration (integration branch)
+    ├── agent_dev_nft   # NFT-specific development (feature branch)
+        ├── agent_dev_nft_001_fix    # Issue-specific branches
+        ├── agent_dev_nft_023_feat   # Feature implementation
+        └── agent_dev_nft_042_test   # Testing improvements
+```
+
+### Branch Naming Conventions
+
+#### Core Branches
+- **`agent`**: Production-ready code, equivalent to main/master
+- **`agent_dev`**: Team collaboration and integration branch
+- **`agent_dev_nft`**: NFT feature development base branch
+
+#### Issue/PR Branches
+Follow the format: `agent_dev_nft_[ISSUE_ID]_[TYPE]`
+
+**Examples:**
+- `agent_dev_nft_001_fix` - Database migration fix (Issue NFT-001)
+- `agent_dev_nft_005_feat` - Web3Service extension (Issue NFT-005) 
+- `agent_dev_nft_023_test` - Integration testing (Issue NFT-023)
+- `agent_dev_nft_042_perf` - Performance optimization (Issue NFT-042)
+
+**Type Suffixes:**
+- `_fix` - Bug fixes and patches
+- `_feat` - New feature implementation
+- `_test` - Testing and QA improvements
+- `_perf` - Performance optimizations
+- `_docs` - Documentation updates
+
+### Merge Flow
+
+```
+Issue Branches → agent_dev_nft → agent_dev → agent
+```
+
+1. **Issue branches** merge into `agent_dev_nft` after code review
+2. **`agent_dev_nft`** merges into `agent_dev` after integration testing
+3. **`agent_dev`** merges into `agent` for production releases
+
+### PR Requirements by Branch
+
+| Target Branch | Reviewers Required | CI Checks | Additional Requirements |
+|---------------|-------------------|-----------|------------------------|
+| `agent_dev_nft` | 1 Senior Developer | Unit tests, lint | NFT-specific testing |
+| `agent_dev` | 2 Senior Developers | Integration tests | Cross-system testing |
+| `agent` | Tech Lead + QA Lead | Full test suite | Production readiness |
+
+---
 
 ## Phase 1: Foundation & Database Schema (Week 1-2)
 
