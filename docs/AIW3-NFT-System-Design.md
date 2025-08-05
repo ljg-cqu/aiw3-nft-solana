@@ -7,79 +7,39 @@
 
 1. [Executive Summary](#executive-summary)
 2. [NFT Lifecycle Overview](#nft-lifecycle-overview)
-3. [Technical Architecture](#technical-architecture)
+3. [Core Technical Architecture](#core-technical-architecture)
 4. [Visual Architecture](#visual-architecture)
-5. [Implementation Guide](#implementation-guide)
-6. [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
-7. [Detailed Process Flows](#detailed-process-flows)
-8. [Recommendations](#recommendations)
-9. [Implementation Requirements](#implementation-requirements)
-10. [Appendix](#appendix)
+5. [Related Documents](#related-documents)
 
 ---
 
 ## Executive Summary
 
-This document provides a comprehensive technical guide for implementing AIW3's Equity NFT system on Solana. The recommended approach uses **system-direct minting** combined with **user-controlled burning**, leveraging the Metaplex Token Metadata standard for maximum ecosystem compatibility.
+This document provides a high-level technical overview for AIW3's Equity NFT system on Solana. The recommended approach uses **system-direct minting** combined with **user-controlled burning**, leveraging the Metaplex Token Metadata standard for maximum ecosystem compatibility.
 
 ### Key Benefits
 
 - ✅ **Authenticity Guaranteed**: Creator verification through on-chain metadata
 - ✅ **User Autonomy**: Full user control over NFT ownership and burning
-- ✅ **Cost Effective**: No custom smart contracts required
+- ✅ **Cost Effective**: No custom smart contracts required for basic lifecycle
 - ✅ **Industry Standard**: Compatible with all major Solana NFT tools
 
 ### Strategic Approach
 
 The optimal implementation uses a **hybrid lifecycle pattern** that balances authenticity, user autonomy, and ecosystem compatibility through:
-- **System-controlled minting** for authenticity guarantee
-- **Partner-driven verification** for ecosystem integration
-- **User-controlled burning** for ownership autonomy
-
----
-
-## NFT Lifecycle Overview
-
-The AIW3 NFT ecosystem operates through three distinct phases:
-
-| Phase | Description | Control | Key Technology |
-|-------|-------------|---------|----------------|
-| **🏗️ MINT** | NFT creation with metadata URI linking to level data | AIW3 System Wallet | Solana Token Program + Metaplex |
-| **🔍 USE** | Verification and data access by partners | Ecosystem Partners | Metadata queries + IPFS via Pinata |
-| **🔥 BURN** | NFT destruction for upgrades/exits | User Wallet | User-initiated transactions |
-
-### Lifecycle Characteristics
-
-**Phase 1: Minting (System-Controlled)**
-- Images sourced from AIW3 backend `assets/images` directory
-- Images uploaded to IPFS via Pinata for decentralized access
-- JSON metadata created with IPFS image URIs and level data
-- JSON metadata uploaded to IPFS via Pinata
-- AIW3 System Wallet mints NFT to user's Associated Token Account (ATA)
-- User becomes owner upon transaction confirmation without additional transfer
-- Metadata URI points to IPFS-hosted JSON containing level data and image references
-
-**Phase 2: Usage (Partner-Initiated)**
-- Partners verify authenticity via on-chain creator field
-- Level queried from IPFS-hosted JSON metadata attributes
-- Images retrieved directly from IPFS via Pinata gateway
-
-**Phase 3: Burning (User-Controlled)**
-- User initiates burn transaction
-- Token supply reduced to zero
 - Associated Token Account closed
 - SOL rent returned to user
 
 ---
 
-## Technical Architecture
+## Core Technical Architecture
 
 The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a URI reference to off-chain JSON metadata that stores the actual level data and references to IPFS-hosted images.
 
 ### Transaction Volume Qualification
 
 **Qualification Rules**:
-The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **AIW3 NFT Tiers and Policies** document.
+The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **[AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)** document.
 
 **Technical Verification Process**:
 1. Query user's total transaction volume from MySQL database
@@ -87,13 +47,6 @@ The system qualifies users for NFT levels based on a combination of transaction 
 3. Verify user doesn't already possess NFT of that level or higher
 4. Check for any pending minting operations for the user
 5. Authorize minting for qualified level only
-
-**Qualification Business Rules**:
-- Users can only mint NFTs for levels they have transaction volume to support
-- Users cannot mint multiple NFTs of the same level
-- Users cannot mint lower-level NFTs if they already possess higher-level ones
-- Transaction volume is calculated from all completed transactions in the system
-- Real-time volume calculation ensures current qualification status
 
 ### Image and Metadata Flow
 
@@ -113,63 +66,11 @@ AIW3 Backend assets/images Directory
 
 **Note**: The NFT is minted to the user's Associated Token Account (ATA), which is deterministically derived from the user's wallet address and the NFT mint address. Ownership is established when the minting transaction is confirmed on-chain.
 
-### On-Chain Metadata Account Details
-
-Data stored directly on **Solana blockchain** for trust and authenticity verification:
-
-| Field | Type | Source | Required | Description & AIW3 Usage |
-|-------|------|--------|----------|--------------------------|
-| `update_authority` | `Pubkey` | AIW3 System Wallet | Yes | AIW3 System Wallet public key |
-| `mint` | `Pubkey` | Solana | Yes | NFT's unique identifier |
-| `data.name` | `String` | AIW3 System Wallet | Yes | NFT name (e.g., "Tech Chicken", "Quant Ape") |
-| `data.symbol` | `String` | AIW3 System Wallet | Yes | Collection symbol (e.g., "AIW3E") |
-| `data.uri` | `String` | AIW3 System Wallet | Yes | IPFS via Pinata URI for off-chain JSON |
-| `data.creators` | `Vec<Creator>` | AIW3 System Wallet | Yes | **Core authenticity verification** |
-| `is_mutable` | `bool` | AIW3 System Wallet | Yes | Set to `false` for permanence |
-
-### Off-Chain JSON Metadata Details
-
-The `uri` field in the on-chain metadata contains an IPFS via Pinata link to this JSON file where the **actual Level data is stored** and **images are referenced via IPFS**:
-
-```json
-{
-  "name": "On-chain Hunter",
-  "symbol": "AIW3E",
-  "description": "Represents Level 3 equity and status within the AIW3 ecosystem.",
-  "image": "https://gateway.pinata.cloud/ipfs/QmImageHashExample123",
-  "external_url": "https://aiw3.io",
-  "attributes": [
-    {
-      "trait_type": "Level",
-      "value": "3",
-      "display_type": "number"
-    },
-    {
-      "trait_type": "Name",
-      "value": "On-chain Hunter",
-      "display_type": "string"
-    }
-  ],
-  "properties": {
-    "files": [
-      {
-        "uri": "https://gateway.pinata.cloud/ipfs/QmImageHashExample123",
-        "type": "image/png"
-      }
-    ],
-    "creators": [
-      {
-        "address": "AIW3_SYSTEM_WALLET_PUBLIC_KEY",
-        "share": 100
-      }
-    ]
-  }
-}
-```
-
 ---
 
 ## Visual Architecture
+
+This section contains high-level diagrams illustrating the system's structure and flows.
 
 ### NFT Ecosystem Entity Relationship
 
@@ -186,115 +87,6 @@ erDiagram
     MetadataPDA ||--|| JSONMetadata : "points to"
     JSONMetadata }o--|| IPFSImages : "references"
     JSONMetadata }o--|| IPFSStorage : "stored in"
-
-    AIW3Backend {
-        string assetsDirectory "assets/images"
-        string purpose "Source repository for images"
-    }
-    
-    SourceImages {
-        string filePath "Local file system path"
-        string purpose "Original image files"
-    }
-    
-    IPFSImages {
-        string ipfsHash "Content-addressable hash"
-        string gatewayUrl "Public access URL"
-    }
-    
-    UserWallet {
-        string publicKey "User's public key"
-        string purpose "Proves NFT ownership"
-    }
-    
-    TokenAccount {
-        string owner "UserWallet public key"
-        string associatedMint "MintAccount public key"
-        int balance "1 (for NFTs)"
-    }
-    
-    MintAccount {
-        string mintAuthority "AIW3SystemWallet"
-        int supply "1 (unique)"
-        int decimals "0"
-    }
-    
-    MetadataPDA {
-        string updateAuthority "AIW3SystemWallet"
-        string creators "AIW3 as verified creator"
-        string uri "IPFS URI for JSON"
-        boolean isMutable "false"
-    }
-    
-    JSONMetadata {
-        string imageUri "IPFS URI for image"
-        string levelData "Level and tier information"
-    }
-    
-    IPFSStorage {
-        string network "Decentralized storage"
-        string access "Public gateway access"
-    }
-```
-
-### Partner Verification Flow
-
-```mermaid
-flowchart TD
-    A["User provides Wallet Address"] --> B["Query Solana: Find Token Accounts"]
-    B --> C["Filter: Token Accounts with balance = 1"]
-    C --> D["Extract: Mint Account addresses"]
-    D --> E["Derive: Metadata PDA from Mint"]
-    E --> F["Verify: creators[0] == AIW3 && verified == true"]
-    F --> |Valid| G["Read: URI field from metadata"]
-    F --> |Invalid| H["❌ Reject: Not authentic AIW3 NFT"]
-    G --> I["Fetch: JSON metadata from IPFS via Pinata"]
-    I --> J["Extract: Level from attributes"]
-    I --> K["Extract: Image URI from JSON (IPFS)"]
-    J --> L["✅ Display: User's NFT level"]
-    K --> M["✅ Display: NFT image from IPFS"]
-
-    style A fill:#e1f5fe
-    style L fill:#c8e6c9
-    style M fill:#c8e6c9
-    style H fill:#ffcdd2
-```
-
-### Complete Minting Process Flow
-
-```mermaid
-flowchart TD
-    subgraph "AIW3 System Actions"
-        A["Initiate Mint for User"]
-        B["Query Transaction Volume from MySQL Database"]
-        C["Verify Level Qualification Based on Volume"]
-        D["Check No Existing NFT of Same Level"]
-        E["Read Image from assets/images"]
-        F["Upload Image to IPFS via Pinata"]
-        G["Create JSON Metadata with IPFS Image URI"]
-        H["Upload JSON to IPFS via Pinata"]
-        I["Create Mint Account"]
-        J["Create User's ATA"]
-        K["Mint Token to User's ATA"]
-        L["Create Metaplex Metadata PDA with IPFS JSON URI"]
-        M["Revoke Authorities (Optional)"]
-    end
-
-    subgraph "User Interaction"
-        N["Provides Public Key and Requests Level"]
-        O["NFT appears in wallet"]
-    end
-
-    N --> A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K --> L --> M --> O
-
-    style A fill:#fff3e0
-    style B fill:#e3f2fd
-    style C fill:#e3f2fd
-    style D fill:#fce4ec
-    style N fill:#e3f2fd
-    style O fill:#c8e6c9
-    style F fill:#e8f5e8
-    style H fill:#e8f5e8
 ```
 
 ### System Architecture for Operations
@@ -307,7 +99,7 @@ graph TD
     end
 
     subgraph "AIW3 Services"
-        Frontend -->|HTTPS REST API| Backend[🖥️ AIW3 Backend]
+        Frontend -->|HTTPS REST API| Backend[⚙️ AIW3 Backend]
         Backend -->|Read Images| Assets[📁 assets/images]
         Backend -->|Upload Content| PinataService[📌 Pinata IPFS Service]
         Backend -->|Database Queries| DB[(📦 Backend Database)]
@@ -341,205 +133,15 @@ graph TD
     style Partners fill:#afa,stroke:#333,stroke-width:2px
 ```
 
-### Data Model Relationships
-
-```mermaid
-erDiagram
-    USER {
-        string userId
-        string walletAddress
-        datetime createdAt
-    }
-    
-    USER_TRANSACTIONS {
-        string transactionId
-        string userId
-        decimal transactionAmount
-        string status
-        datetime createdAt
-    }
-
-    NFT {
-        string nftId
-        string mintAddress
-        string ownerWalletAddress
-        string level
-        string ipfsImageHash
-        string ipfsMetadataHash
-        string status
-        decimal qualifyingVolume
-    }
-
-    UPGRADE_REQUEST {
-        string requestId
-        string userId
-        string originalNftId
-        string newNftId
-        string status
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    USER ||--o{ USER_TRANSACTIONS : "has"
-    USER ||--o{ UPGRADE_REQUEST : "initiates"
-    USER ||--o{ NFT : "owns"
-    UPGRADE_REQUEST }|--|| NFT : "for"
-```
-
 ---
 
-### Frontend Interaction and User Experience
+## Related Documents
 
----
+For more detailed information, please refer to the following documents:
 
-## On-Chain Program Design
-
-This section outlines the high-level architecture of the Solana smart contract (program) that governs the AIW3 Equity NFT system. All operations that change the state or ownership of an NFT are handled by this on-chain program, which is written in Rust. The AIW3 backend and frontend are responsible for calling these on-chain functions in response to user actions.
-
-### Mapping User Operations to On-Chain Interactions
-
-The AIW3 system interacts with the Solana blockchain in two ways: by calling custom-built smart contract functions for its unique business logic, and by utilizing standard Solana programs (like the SPL Token program) for common tasks.
-
-| User Operation                  | On-Chain Interaction            | Interaction Type                | Description |
-|---------------------------------|---------------------------------|---------------------------------|-------------|
-| **Unlocking an Equity NFT**     | `unlock_tier(level)`            | **Custom Smart Contract**       | The core progression function. The AIW3 backend first verifies off-chain criteria (trading volume). If met, it authorizes the user to call this function. The program then performs on-chain checks: verifies ownership of the required *bound* Badge NFTs, confirms the user is unlocking the next sequential level, transfers the CGas fee, and mints the new Equity NFT directly into the `Active` state by calling the SPL Token program. |
-| **Binding a Badge NFT**         | `bind_badge(badge_nft_mint)`    | **Custom Smart Contract**       | A prerequisite for unlocking higher tiers. The user initiates this action for a Badge NFT they own. The program verifies the user's ownership of the `badge_nft_mint` and records it in a user-specific on-chain state account, marking it as "bound" and available for `unlock_tier` checks. |
-| **Activating an NFT**           | `activate_nft(nft_mint)`        | **Custom Smart Contract**       | Used for special, airdropped NFTs (like the Breeder Reward NFT) that are minted in an `Inactive` state. The program verifies the user owns the `nft_mint` and flips its on-chain status from `Inactive` to `Active`, enabling its benefits. |
-| **Claiming an NFT**             | `claim_reward(reward_id)`       | **Custom Smart Contract**       | A system-controlled minting function for special awards. The AIW3 backend whitelists a user for a `reward_id`. The user then calls this function, which verifies their eligibility on-chain and mints the corresponding NFT to their wallet in an `Inactive` state. |
-| **Selling/Transferring an NFT** | Standard `spl-token` transfer   | **Standard Solana Program**     | This is **not** a function of the AIW3 program. It is a standard Solana token transfer handled by external marketplace programs. The AIW3 backend must **monitor** the blockchain for transfer events involving its NFTs to reactively update user benefits and badges. |
-
-### System Architecture and Technology Stack
-
-#### Architectural Diagram
-
-The following diagram illustrates the interaction between the user, AIW3's off-chain services, and the on-chain Solana programs.
-
-```mermaid
-graph TD
-    title System Architecture
-    
-    subgraph "User Experience"
-        User[👤 User] -- Interacts with --> Frontend[🌐 AIW3 Frontend]
-    end
-
-    subgraph "AIW3 Platform (Off-Chain)"
-        Frontend -- Manages UI for --> PersonalCenter[🖼️ Personal Center]
-        Frontend -- Initiates --> SynthesisFlow[✨ Synthesis Flow]
-        PersonalCenter -- Fetches Data via --> Backend
-        SynthesisFlow -- Sends Requests to --> Backend[⚙️ AIW3 Backend]
-        Backend -- Reads/Writes --> Database[(MySQL Database)]
-    end
-
-    subgraph "Solana Blockchain (On-Chain)"
-        Backend -- Sends Transactions --> RPC[Solana JSON RPC]
-        RPC -- Interacts with --> CustomProgram[📜 AIW3 NFT Program]
-        CustomProgram -- Manages --> UserState[On-Chain User State]
-        CustomProgram -- Mints/Burns --> SPL[SPL Token Program]
-    end
-
-    style User fill:#cce,stroke:#333
-    style Frontend fill:#ccf,stroke:#333
-    style Backend fill:#cfc,stroke:#333
-    style CustomProgram fill:#f96,stroke:#333
-```
-
-**Interaction Flow:**
-1.  The **User** interacts with the **Frontend**.
-2.  The **Frontend** sends requests to the **AIW3 Backend**.
-3.  For operations like unlocking, the **Backend** first verifies off-chain data (e.g., cumulative trade volume from its **Database**).
-4.  If conditions are met, the **Backend** constructs a transaction to call the appropriate on-chain program and sends it via the **Solana JSON RPC API**.
-5.  The transaction is processed by the network, executing functions in either the **Custom AIW3 Program** (for business logic) or the **Standard SPL Token Program** (for simple transfers).
-6.  The **Backend** also monitors the blockchain via the **RPC API** to read on-chain state and react to events like NFT transfers.
-
-#### Core Technology Stack
-
--   **Rust:** The programming language used to write secure and high-performance Solana smart contracts.
--   **Anchor Framework:** A framework for Solana's Sealevel runtime that simplifies writing Rust-based smart contracts by handling boilerplate, providing a domain-specific language (DSL), and ensuring security best practices.
--   **Solana Program Library (SPL):** A collection of pre-audited, standard on-chain programs for common tasks. We will primarily use the `spl-token` program for creating, minting, and transferring NFTs, which are a type of SPL token.
--   **Solana JSON RPC API:** The primary interface for off-chain clients (like the AIW3 backend) to interact with the Solana blockchain—sending transactions and querying on-chain data.
-
-### On-Chain Data Models
-
-To execute the business logic described in this manual, the AIW3 smart contract must store and manage state on the Solana blockchain. This is achieved through several custom on-chain accounts (data structures). The following diagram illustrates the relationships between these core data models.
-
-```mermaid
-erDiagram
-    title On-Chain Data Model
-    USER {
-        PublicKey publicKey "User's Wallet (Owner)"
-    }
-
-    USER_NFT_STATE {
-        PublicKey owner PK "FK to User"
-        int current_level
-        PublicKey active_nft_mint
-        list_PublicKey bound_badges
-    }
-
-    TIER_CONFIGURATION {
-        PublicKey authority "Admin Key"
-        int unlock_fee_cgas
-        list_TierRequirement tier_requirements
-    }
-
-    AIW3_PROGRAM {
-        string program_id "Program Address"
-    }
-
-    SPL_TOKEN_PROGRAM {
-        string program_id "Standard Program"
-    }
-
-    USER ||--o{ USER_NFT_STATE : "has one"
-    AIW3_PROGRAM }o--|| TIER_CONFIGURATION : "is governed by"
-    AIW3_PROGRAM }o--o{ USER_NFT_STATE : "manages"
-    AIW3_PROGRAM ..> SPL_TOKEN_PROGRAM : "invokes"
-```
-
-#### Data Model Descriptions
-
-##### UserNftState Account
-This is the most critical account for tracking a user's progress. A unique `UserNftState` account is created for each user who interacts with the NFT system, typically as a Program Derived Address (PDA) derived from the user's public key.
--   **`owner: PublicKey`**: The wallet address of the user this state belongs to.
--   **`current_level: u8`**: The user's current active Equity NFT level (e.g., 1 for "Tech Chicken"). A value of 0 indicates they hold no Equity NFT.
--   **`active_nft_mint: PublicKey`**: The mint address of the user's currently active Equity NFT. This allows for quick verification of their highest-tier NFT.
--   **`bound_badges: Vec<PublicKey>`**: A list of the mint addresses of the Badge NFTs the user has permanently bound to their account to meet upgrade requirements.
-
-##### TierConfiguration Account
-This is a singleton account (only one exists per program deployment) that acts as the global configuration for the entire Equity NFT system. It is controlled by a central authority key.
--   **`authority: PublicKey`**: The wallet address with permission to update this configuration.
--   **`unlock_fee_cgas: u64`**: The amount of CGas required for a user to execute the `unlock_tier` function.
--   **`tier_requirements: Vec<TierRequirement>`**: A list defining the upgrade conditions for each level. Each `TierRequirement` struct would contain:
-    -   `level: u8`: The tier this requirement is for.
-    -   `required_badges: u8`: The number of badges that must be in the `UserNftState.bound_badges` vector to unlock this level.
-
-#### Model Relationships and Interaction
-
--   **User and State:** Each **User** (identified by their wallet `PublicKey`) has a one-to-one relationship with a `UserNftState` account. This account acts as their profile within the AIW3 NFT system.
--   **State and Badges:** The `UserNftState` account holds a list of `bound_badges`, representing a one-to-many relationship. This list is checked by the smart contract during an upgrade attempt.
--   **Program Governance:** The `TierConfiguration` account governs the rules of the **AIW3 Program**. When a user calls `unlock_tier`, the program reads this account to verify the fee and badge requirements for the target level.
--   **Interaction with Standard Programs:** The custom **AIW3 Program** does not handle token transfers itself. When `unlock_tier` is successful, it makes a cross-program invocation to the standard **SPL Token Program** to mint the new Equity NFT to the user's wallet. This separates our unique business logic from standard token operations.
-
-### Feature Implementation Strategy: On-Chain vs. Off-Chain
-
-This section clarifies which features are implemented within the custom smart contract versus those handled by off-chain components (backend/frontend). This distinction is critical for security, performance, and cost.
-
-#### Guiding Principles
-
--   **On-Chain (Smart Contract):** Must be used for actions that change ownership, modify core state, or enforce rules that require decentralized trust. The contract is the ultimate arbiter of "who owns what" and "what the rules are."
--   **Off-Chain (Backend/Frontend):** Should be used for reading/displaying data, complex calculations, and business logic that doesn't require on-chain enforcement (e.g., applying a fee discount). It is cheaper, faster, and more flexible to do this off-chain.
-
-#### Feature Breakdown
-
-##### Must-Have On-Chain Features (Smart Contract)
-These functions are non-negotiable and form the core of the trustless system.
-
-| Feature / Function              | Rationale & Impact on State                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            -   **`unlock_tier`**: Changes a user's `current_level` and mints a new NFT. This is the core state-changing function. Rationale: Must be on-chain to prevent unauthorized level-ups and ensure atomic updates.
--   **`bind_badge`**: Adds a badge's mint address to the `bound_badges` vector. Rationale: The list of bound badges is a critical prerequisite for `unlock_tier` and must be stored in a trustless on-chain account.
--   **`activate_nft`**: Flips an on-chain status flag from `Inactive` to `Active`. Rationale: The active status determines real-time benefits and must be publicly verifiable.
-
-##### Off-Chain Features (Backend/Frontend)
-These features are handled by centralized services for efficiency and flexibility.
+- **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: Provides a step-by-step guide for developers, including process flows and code-level details.
+- **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: Details the on-chain and off-chain data structures, including table schemas and metadata specifications.
+- **[AIW3 NFT Appendix](./AIW3-NFT-Appendix.md)**: Contains a glossary of terms and a list of external references.
 
 | Feature / Function              | Rationale & Implementation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          -   **Calculating Trading Volume**: The backend runs complex queries on its MySQL database to sum up a user's historical trading volume. Rationale: This calculation is too computationally expensive and data-intensive to perform on-chain.
 -   **Displaying NFT Images/Metadata**: The frontend fetches metadata and images from IPFS via a public gateway. Rationale: Storing large files like images on-chain is prohibitively expensive. IPFS provides a cost-effective decentralized alternative.
