@@ -145,7 +145,7 @@ Each issue includes specific frontend integration requirements to ensure seamles
       "level": 1,
       "tierName": "Tech Chicken",
       "mintAddress": "ABC123...",
-      "benefits": { "feeReduction": 0.05, "agentUses": 10 }
+      "benefits": { "feeReduction": 0.05, "aiagentUses": 10 }
     },
     "qualification": {
       "nextLevel": 2,

@@ -689,7 +689,7 @@ This section defines the standardized API response formats for frontend-backend 
       "mintAddress": "ABC123...",
       "benefits": {
         "feeReduction": 0.05,
-        "agentUses": 10
+        "aiagentUses": 10
       }
     },
     "qualification": {
@@ -739,7 +739,7 @@ nft_lock:burn:{user_id} -> "locked" (TTL: 180s)
 nft_benefits:{user_id} -> {
     "level": 3,
     "feeReduction": 0.15,
-    "agentUses": 30,
+    "aiagentUses": 30,
     "cached_at": "2024-01-15T10:30:00Z"
 }
 
@@ -793,7 +793,7 @@ nft_benefits:{user_id} -> {
     "tierName": "Quant Ape",
     "benefits": {
       "feeReduction": 0.10,
-      "agentUses": 20
+      "aiagentUses": 20
     }
   },
   "timestamp": "2024-01-01T00:00:00Z"
