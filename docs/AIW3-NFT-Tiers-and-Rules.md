@@ -36,14 +36,14 @@ Qualification for each NFT tier is based on a user's total trading volume, calcu
 
 ### NFT Level Summary Table
 
-| Level | NFT Name              | Required Trading Volume (USDT) | Image                                                                                                |
-|:------|:----------------------|:-------------------------------|:-----------------------------------------------------------------------------------------------------|
-| 1     | Tech Chicken          | ≥ 100,000                      | ![[prototype_L1.png]](..//aiw3-prototypes/L1_Tech_Chicken_NFT_Card_and_Personal_Center_Dashboard.png)   |
-| 2     | Quant Ape             | ≥ 500,000                      | ![[prototype_L2.png]](..//aiw3-prototypes/L2_Quant_Ape_NFT_Card_and_Personal_Center_Dashboard.png)       |
-| 3     | On-chain Hunter       | ≥ 1,000,000                    | ![[prototype_L3.png]](..//aiw3-prototypes/L3_On-chain_Hunter_NFT_Card_and_Personal_Center_Dashboard.png) |
-| 4     | Alpha Alchemist       | ≥ 5,000,000                    | ![[prototype_L4.png]](..//aiw3-prototypes/L4_Alpha_Alchemist_NFT_Card_and_Personal_Center_Dashboard.png) |
-| 5     | Quantum Alchemist     | ≥ 10,000,000                   | ![[prototype_L5.png]](..//aiw3-prototypes/L5_Quantum_Alchemist_NFT_Card_and_Personal_Center_Dashboard.png)|
-| Special | Trophy Breeder (Special) | By community contribution      | ![[prototype_L6.png]](..//aiw3-prototypes/L6_Trophy_Breeder_NFT_Card_and_Personal_Center_Dashboard.png) |
+| Level | NFT Name              | Required Trading Volume (USDT) | Image                                                                                              |
+|:------|:----------------------|:-------------------------------|:---------------------------------------------------------------------------------------------------|
+| 1     | Tech Chicken          | ≥ 100,000                      | ![[prototype_L1.png]](../aiw3-prototypes/L1_Tech_Chicken_NFT_Card_and_Personal_Center_Dashboard.png)  |
+| 2     | Quant Ape             | ≥ 500,000                      | ![[prototype_L2.png]](../aiw3-prototypes/L2_Quant_Ape_NFT_Card_and_Personal_Center_Dashboard.png)      |
+| 3     | On-chain Hunter       | ≥ 1,000,000                    | ![[prototype_L3.png]](../aiw3-prototypes/L3_On-chain_Hunter_NFT_Card_and_Personal_Center_Dashboard.png) |
+| 4     | Alpha Alchemist       | ≥ 5,000,000                    | ![[prototype_L4.png]](../aiw3-prototypes/L4_Alpha_Alchemist_NFT_Card_and_Personal_Center_Dashboard.png) |
+| 5     | Quantum Alchemist     | ≥ 10,000,000                   | ![[prototype_L5.png]](../aiw3-prototypes/L5_Quantum_Alchemist_NFT_Card_and_Personal_Center_Dashboard.png)|
+| Special | Trophy Breeder (Special) | By community contribution      | ![[prototype_L6.png]](../aiw3-prototypes/L6_Trophy_Breeder_NFT_Card_and_Personal_Center_Dashboard.png) |
 
 ---
 
@@ -66,17 +66,7 @@ Each NFT tier provides a set of benefits, including trading fee reductions and a
 
 ## 🔄 NFT Operations
 
-### Claiming (Minting)
-
--   **Trigger**: User's trading volume meets a tier's requirement.
--   **Process**: The backend verifies the volume, and the user can claim (mint) the corresponding NFT in their Personal Center.
--   **Event**: A `claimed` event is published via Kafka to notify the frontend.
-
-### Synthesis (Upgrading/Burning)
-
--   **Trigger**: User's trading volume meets the requirement for the next tier.
--   **Process**: The user initiates the synthesis process from their Personal Center. The current NFT is burned, and the new, higher-tier NFT is minted.
--   **Event**: An `upgraded` event is published via Kafka.
+For a detailed description of the user-facing and backend processes for claiming, minting, and upgrading (Synthesis) NFTs, please refer to the **[AIW3 NFT Business Flows and Processes](./AIW3-NFT-Business-Flows-and-Processes.md)** document.
 
 ---
 

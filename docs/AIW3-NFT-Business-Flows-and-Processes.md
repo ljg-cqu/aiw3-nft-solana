@@ -57,7 +57,7 @@ This document provides a comprehensive overview of all NFT-related business flow
     3.  The user approves the transaction, which may require a wallet signature.
 - **Backend Process**:
     1.  The `NFTService` validates the user's qualification for the target tier.
-    2.  It instructs the `Web3Service` to execute a transaction that first burns the old NFT (updating its status to `burned` in the `UserNFT` table) and then mints the new, higher-level NFT.
+    2.  It instructs the `Web3Service` to execute a single, atomic transaction that bundles two instructions: one to burn the old NFT and another to mint the new, higher-level NFT. This ensures the process is all-or-nothing, protecting the user from asset loss. The backend then updates the status of the burned NFT in the `UserNFT` table.
     3.  An `upgraded` event is published via Kafka.
 
 ### Post-Synthesis Status
@@ -111,6 +111,8 @@ This document provides a comprehensive overview of all NFT-related business flow
 -   **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: For detailed database schemas, API responses, and event formats.
 -   **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: For code-level guidance and integration patterns.
 -   **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**: For the definitive business logic on qualification and benefits.
+-   **[AIW3 NFT Data Consistency](./AIW3-NFT-Data-Consistency.md)**: For how the system guarantees the integrity of the burn-and-mint process.
+-   **[AIW3 NFT Concurrency Control](./AIW3-NFT-Concurrency-Control.md)**: For how simultaneous operations are managed safely.
 
 ---
 

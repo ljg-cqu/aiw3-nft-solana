@@ -61,13 +61,11 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 ### Lifecycle Characteristics
 
 **Phase 1: Minting (System-Controlled)**
-- Images sourced from AIW3 backend `assets/images` directory
-- Images uploaded to IPFS via Pinata for decentralized access
-- JSON metadata created with IPFS image URIs and level data
-- JSON metadata uploaded to IPFS via Pinata
-- AIW3 System Wallet mints NFT to user's Associated Token Account (ATA)
-- User becomes owner upon transaction confirmation without additional transfer
-- Metadata URI points to IPFS-hosted JSON containing level data and image references
+- **Asset Preparation**: Visual assets (images, videos) for each NFT tier are prepared and uploaded to IPFS via the Pinata service. This is a managed, offline process that generates a unique IPFS URI for each asset.
+- **Metadata Generation**: When a user qualifies for an NFT, the `NFTService` generates a JSON metadata file. This file includes the NFT's name, attributes (e.g., level), and the pre-uploaded IPFS URI for the corresponding visual asset.
+- **Metadata Upload**: The generated JSON metadata is then uploaded to IPFS via Pinata, creating a final, permanent IPFS URI for the metadata itself.
+- **On-Chain Minting**: The `Web3Service`, directed by the `NFTService`, mints the NFT to the user's Associated Token Account (ATA). The on-chain Metaplex metadata record is set to point to the permanent IPFS URI of the JSON metadata file.
+- **Ownership**: The user gains full ownership of the NFT in their wallet upon transaction confirmation.
 
 **Phase 2: Usage (Partner-Initiated)**
 - Partners verify authenticity via on-chain creator field
