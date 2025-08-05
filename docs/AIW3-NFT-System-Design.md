@@ -278,7 +278,7 @@ The system qualifies users for NFT levels based on a combination of transaction 
 
 **Technical Verification Process**:
 1. **Redis Cache Check**: Query cached qualification data (`nft_qual:{userId}`) with 5-minute TTL
-2. **Database Query**: If cache miss, query `total_trading_volume` from MySQL `users` table
+2. **Database Query**: If cache miss, aggregate trading volume from MySQL `trades` table using `SUM(total_usd_price) WHERE user_id = ?`
 3. **NFT Ownership Check**: Query existing NFTs from `user_nfts` table to prevent duplicates
 4. **Badge Verification**: Check badge requirements from `user_nft_qualifications` table
 5. **Concurrency Control**: Use Redis locks to prevent duplicate operations
