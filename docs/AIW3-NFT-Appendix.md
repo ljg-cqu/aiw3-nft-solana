@@ -44,10 +44,28 @@ This section defines the core concepts used throughout the AIW3 NFT documentatio
 
 ---
 
+## Related Documentation
+
+### Core AIW3 NFT Documentation
+- **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: High-level technical architecture and lifecycle management overview
+- **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide with process flows and code-level details
+- **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: On-chain and off-chain data structures, schemas, and metadata specifications
+- **[AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)**: Business rules, tier requirements, and user policies for the NFT system
+
+### Integration & Implementation Documentation
+- **[AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)**: Comprehensive analysis and strategy for integrating NFT services with existing `lastmemefi-api` backend
+- **[AIW3 NFT Integration Issues & PRs](./AIW3-NFT-Integration-Issues-PRs.md)**: Detailed phased implementation plan with frontend-backend integration requirements, API contracts, and collaborative development guidance
+
 ## External References
 
+### Solana Ecosystem
 - [Solana Documentation](https://docs.solana.com/)
 - [SPL Token Program](https://spl.solana.com/token)
 - [Metaplex Token Metadata Standard](https://docs.metaplex.com/programs/token-metadata/)
-- [Pinata IPFS Service](https://pinata.cloud)
 - [Associated Token Account Program](https://spl.solana.com/associated-token-account)
+
+### Infrastructure & Services
+- [Pinata IPFS Service](https://pinata.cloud)
+- [Sails.js Framework](https://sailsjs.com/) (Legacy Backend Framework)
+- [Socket.io Documentation](https://socket.io/docs/) (WebSocket Integration)
+- [MySQL Documentation](https://dev.mysql.com/doc/) (Database Integration)

@@ -60,11 +60,31 @@ The backend is the intermediary between the user-facing frontend and the standar
   - **Associated Token Account Program:** Use for user wallet NFT storage.
 - **Rationale:** Using standard programs eliminates custom development complexity, reduces security risks, and ensures compatibility with the entire Solana ecosystem.
 
-### 2. **API Endpoint Creation**
-- **Action:** Develop a REST API with endpoints for the frontend.
-  - `GET /api/user/nft-status`: Returns the user's current NFT level and progress toward the next tier.
-  - `POST /api/nft/upgrade-tier`: Initiates the burn-and-mint upgrade process using standard SPL Token operations after verifying off-chain requirements.
-- **Rationale:** The API provides a secure and controlled interface for the frontend to interact with backend services and standard Solana programs.
+### 2. **API Endpoint Creation & Frontend Integration**
+- **Action:** Develop a comprehensive REST API with standardized endpoints and real-time communication for seamless frontend integration.
+
+#### Core API Endpoints
+  - `GET /api/nft/status`: Returns user's current NFT, qualification progress, and benefits with standardized JSON format
+  - `POST /api/nft/claim`: Initiates first NFT claim with transaction status tracking and WebSocket progress events
+  - `POST /api/nft/upgrade`: Executes burn-and-mint upgrade process with multi-step progress tracking
+  - `GET /api/nft/benefits`: Returns current benefits and fee reductions
+  - `GET /api/nft/badges`: Returns user's badge collection with unlock status
+  - `POST /api/nft/badges/claim`: Claims new badges affecting upgrade qualification
+
+#### Frontend Integration Features
+  - **Standardized Response Format**: Consistent success/error responses following existing `lastmemefi-api` patterns
+  - **Real-time Updates**: WebSocket events (`nft:status_changed`, `nft:upgrade_progress`, `nft:qualification_updated`, `nft:transaction_status`)
+  - **Transaction Tracking**: Solana transaction signatures returned for frontend monitoring
+  - **Authentication**: Integration with existing JWT middleware from `AccessTokenService`
+  - **Error Handling**: User-friendly error messages with technical details for debugging
+
+#### API Documentation & Testing Support
+  - **Interactive Documentation**: Swagger UI at `/docs/nft` with live examples
+  - **Mock Data**: Sandbox endpoints with `/api/nft/sandbox/` prefix for development
+  - **Code Examples**: JavaScript, React, Vue.js integration samples
+  - **Client SDK**: JavaScript library for easy WebSocket and API integration
+
+- **Rationale:** Comprehensive API design with frontend integration support ensures seamless end-to-end functionality and developer productivity.
 
 ### 3. **Solana Integration**
 - **Action:** Use the `@solana/web3.js` library to communicate with the Solana network.
@@ -243,7 +263,12 @@ flowchart TD
 
 For comprehensive information about the AIW3 NFT system, please refer to these related documents:
 
+### Core Documentation
 - **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: High-level technical architecture and lifecycle management overview
 - **[AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)**: Business rules, tier requirements, and user policies for the NFT system
 - **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: On-chain and off-chain data structures, schemas, and metadata specifications
 - **[AIW3 NFT Appendix](./AIW3-NFT-Appendix.md)**: Glossary of terms and external references
+
+### Integration & Implementation
+- **[AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)**: Comprehensive analysis and strategy for integrating NFT services with existing `lastmemefi-api` backend, including service architecture and infrastructure reuse
+- **[AIW3 NFT Integration Issues & PRs](./AIW3-NFT-Integration-Issues-PRs.md)**: Detailed phased implementation plan with frontend-backend integration requirements, API contracts, WebSocket events, and collaborative development guidance

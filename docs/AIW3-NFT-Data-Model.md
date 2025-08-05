@@ -142,11 +142,106 @@ The AIW3 system interacts with the Solana blockchain using **only standard Solan
 
 ---
 
+## API Response Data Formats
+
+This section defines the standardized API response formats for frontend-backend integration, following existing `lastmemefi-api` patterns.
+
+### NFT Status Response Format
+
+```json
+{
+  "success": true,
+  "data": {
+    "currentNFT": {
+      "level": 1,
+      "tierName": "Tech Chicken",
+      "mintAddress": "ABC123...",
+      "benefits": {
+        "feeReduction": 0.05,
+        "agentUses": 10
+      }
+    },
+    "qualification": {
+      "nextLevel": 2,
+      "progress": 0.75,
+      "requirements": {
+        "tradingVolume": 50000,
+        "badges": ["early_adopter"]
+      }
+    }
+  },
+  "meta": {
+    "timestamp": "2024-01-01T00:00:00Z",
+    "version": "v1"
+  }
+}
+```
+
+### WebSocket Event Data Formats
+
+```json
+// NFT Status Changed Event
+{
+  "event": "nft:status_changed",
+  "userId": "user123",
+  "data": {
+    "newLevel": 2,
+    "tierName": "Quant Ape",
+    "benefits": {
+      "feeReduction": 0.10,
+      "agentUses": 20
+    }
+  },
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+
+// Transaction Status Event
+{
+  "event": "nft:transaction_status",
+  "userId": "user123",
+  "data": {
+    "transactionId": "5J7...",
+    "status": "confirmed",
+    "step": "mint_completed",
+    "progress": 100
+  },
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+```
+
+### Error Response Format
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NFT_UPGRADE_FAILED",
+    "message": "Insufficient trading volume for upgrade",
+    "details": {
+      "required": 100000,
+      "current": 75000,
+      "shortfall": 25000
+    }
+  },
+  "meta": {
+    "timestamp": "2024-01-01T00:00:00Z",
+    "requestId": "req_123"
+  }
+}
+```
+
+---
+
 ## Related Documents
 
 For comprehensive information about the AIW3 NFT system, please refer to these related documents:
 
+### Core Documentation
 - **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: High-level technical architecture and lifecycle management overview
 - **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide with process flows and code-level details
 - **[AIW3 NFT Tiers and Policies](./AIW3-NFT-Tiers-and-Policies.md)**: Business rules, tier requirements, and user policies for the NFT system
 - **[AIW3 NFT Appendix](./AIW3-NFT-Appendix.md)**: Glossary of terms and external references
+
+### Integration & Implementation
+- **[AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)**: Comprehensive analysis and strategy for integrating NFT services with existing `lastmemefi-api` backend, including service architecture and infrastructure reuse
+- **[AIW3 NFT Integration Issues & PRs](./AIW3-NFT-Integration-Issues-PRs.md)**: Detailed phased implementation plan with frontend-backend integration requirements, API contracts, WebSocket events, and collaborative development guidance
