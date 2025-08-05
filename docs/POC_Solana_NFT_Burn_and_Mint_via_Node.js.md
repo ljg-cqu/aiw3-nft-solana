@@ -206,6 +206,9 @@ Replace `<MINT_ADDRESS>` with the mint address you created in the previous step.
 
 ## 7. Setup and Running the POC
 
+### Quick Command Reference
+See **[AGENT.md](../AGENT.md)** for essential POC commands and setup shortcuts.
+
 ### 7.1 Navigate to POC Directory
 
 ```bash

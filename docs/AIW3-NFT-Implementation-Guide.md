@@ -10,6 +10,10 @@
 
 This document provides comprehensive implementation guidelines for the AIW3 NFT system, emphasizing integration with the `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). It outlines standard program integration, backend service utilization, frontend application development, and process flows.
 
+## ⚡ Quick Development Reference
+
+For instant access to build commands, test procedures, and coding conventions while implementing features, see **[AGENT.md](../AGENT.md)**.
+
 ---
 
 ## Table of Contents

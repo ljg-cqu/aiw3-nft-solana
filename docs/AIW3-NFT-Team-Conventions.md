@@ -507,6 +507,7 @@ Use only standard Solana programs (SPL Token, Metaplex) without custom contracts
 - **Runbooks**: Operational procedures
 - **Troubleshooting guides**: Common issues and solutions
 - **Onboarding guides**: New team member resources
+- **[AGENT.md](../AGENT.md)**: Quick reference for build commands, architecture, and coding conventions
 
 ---
 

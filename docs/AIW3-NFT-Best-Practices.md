@@ -626,6 +626,10 @@ async function healthCheck() {
 
 ---
 
+## Quick Development Reference
+
+For instant access to build commands, architecture overview, and essential coding conventions, see **[AGENT.md](../AGENT.md)** - designed specifically for AI coding agents and rapid onboarding.
+
 ## Related Documents
 
 - [AIW3 NFT System Design](./AIW3-NFT-System-Design.md)

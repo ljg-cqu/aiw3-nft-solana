@@ -20,6 +20,10 @@ This guide provides instructions for setting up the complete development environ
     -   [Step 2: Start the Backend Application](#step-2-start-the-backend-application)
 5.  [Appendix: Running the Standalone POC](#appendix-running-the-standalone-poc)
 
+## ⚡ Quick Reference
+
+For essential build commands, testing procedures, and development conventions, see **[AGENT.md](../AGENT.md)** - your go-to reference for rapid development.
+
 ---
 
 ## 1. Prerequisites
