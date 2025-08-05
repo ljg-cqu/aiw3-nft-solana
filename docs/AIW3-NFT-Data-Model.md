@@ -484,7 +484,7 @@ CREATE TABLE nftupgraderequest (
 -- wallet_address, accessToken, referralCode, points, energy, quick_amount, auto_amount
 
 ALTER TABLE user
-ADD COLUMN current_nft_level TINYINT DEFAULT 0 COMMENT 'Current highest NFT level owned by user (1-5 regular, 6 special)',
+ADD COLUMN current_nft_level TINYINT DEFAULT 0 COMMENT 'Current highest NFT level owned by user (1-5 regular, Special for Trophy Breeder)',
 ADD COLUMN last_active_nft_id INT NULL COMMENT 'Reference to user\'s currently active/primary NFT',
 ADD COLUMN cached_trading_volume DECIMAL(30,10) DEFAULT 0 COMMENT 'Cached total trading volume (calculated from trades table)',
 ADD COLUMN last_volume_update DATETIME NULL COMMENT 'Timestamp of last trading volume cache update',
