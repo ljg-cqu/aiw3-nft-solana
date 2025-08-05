@@ -178,10 +178,10 @@ sequenceDiagram
     NFT->>REDIS: get("nft_qual:" + userId)
     REDIS-->>NFT: cached qualification data
     
-    %% If not cached, query database
+    %% If not cached, calculate from Trades model
     alt Cache Miss
-        NFT->>MYSQL: SELECT total_trading_volume FROM users WHERE id = ?
-        MYSQL-->>NFT: user trading volume
+        NFT->>MYSQL: SELECT SUM(total_usd_price) FROM trades WHERE user_id = ?
+        MYSQL-->>NFT: calculated trading volume
         NFT->>REDIS: setex("nft_qual:" + userId, 300, qualData)
     end
     

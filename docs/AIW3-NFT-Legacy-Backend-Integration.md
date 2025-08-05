@@ -52,19 +52,63 @@ const Web3Service = {
 The existing `User` model in `lastmemefi-api` already contains fields that are essential for the NFT system's business logic.
 
 ```javascript
-// api/models/User.js - Existing attributes to leverage
+// api/models/User.js - Actual existing attributes in backend
 {
-    wallet_address: { type: 'string', unique: true }, // Primary key for all blockchain interactions
+    wallet_address: { type: 'string', unique: false }, // Primary blockchain identifier
     accessToken: { type: 'string' }, // Existing JWT managed by AccessTokenService
-    referralCode: { type: 'string', unique: true },
-
-    // IMPORTANT: These fields are critical for NFT tier qualification
-    total_trading_volume: { type: 'number' }, // Use this for level qualification
-    points: { type: 'number' } // Can be used for badge or benefit systems
+    referralCode: { type: 'string', unique: true }, // Auto-generated unique referral code
+    
+    // IMPORTANT: These fields exist and can be used for NFT systems
+    points: { type: 'number' }, // User points system
+    energy: { type: 'number' }, // User energy system
+    quick_amount: { type: 'number', columnType: 'DECIMAL(30,10)' }, // Quick trading amount
+    auto_amount: { type: 'number', columnType: 'DECIMAL(30,10)' }, // Auto trading amount
+    
+    // NOTE: Trading volume must be calculated from Trades model aggregation
+    // No total_trading_volume field exists on User model
 }
 ```
 
 **Integration Requirements**: Add NFT-specific fields without breaking existing functionality.
+
+#### 3. Trades Model Structure (Critical for NFT Qualification)
+
+The existing `Trades` model contains the actual trading data needed for NFT tier qualification:
+
+```javascript
+// api/models/Trades.js - Existing trading data structure
+{
+    user_id: { model: 'user', required: true }, // Links to User model
+    wallet_address: { type: 'string', required: true }, // User's wallet address
+    
+    // CRITICAL: These fields contain the trading volume data for NFT qualification
+    total_price: { type: 'number', columnType: 'DECIMAL(30,10)' }, // Trade value in tokens
+    total_usd_price: { type: 'number', columnType: 'DECIMAL(30,10)' }, // Trade value in USD
+    
+    amount: { type: 'number', columnType: 'DECIMAL(30,10)' }, // Tokens traded
+    price_per_token: { type: 'number', columnType: 'DECIMAL(20,10)' }, // Price per token
+    trade_type: { type: 'string', isIn: ['buy', 'sell', 'BUY', 'SELL'] }, // Trade direction
+    
+    token_id: { model: 'tokens' }, // Reference to traded token
+    tokenMintAddress: { type: 'string' }, // Solana mint address
+    hash: { type: 'string' } // Transaction signature
+}
+```
+
+**NFT Qualification Logic**: Trading volume must be calculated by aggregating `total_usd_price` from the Trades model:
+
+```javascript
+// Calculate user's total trading volume for NFT qualification
+const calculateTradingVolume = async (userId) => {
+    const query = `
+        SELECT SUM(total_usd_price) as trading_volume 
+        FROM trades 
+        WHERE user_id = ? AND total_usd_price IS NOT NULL
+    `;
+    const result = await sails.sendNativeQuery(query, [userId]);
+    return result.rows[0]?.trading_volume || 0;
+};
+```
 
 #### 3. Authentication Patterns
 
@@ -155,11 +199,47 @@ The `NFTService` will act as an orchestrator, coordinating operations between ex
 ```javascript
 // api/services/NFTService.js
 module.exports = {
-    checkUserQualification: async function(userId, targetLevel) {
-        // Check if user meets volume and badge requirements
-        const user = await User.findOne(userId);
-        const qualification = await this.calculateQualification(user, targetLevel);
-        return qualification;
+    // Check if user qualifies for NFT level based on trading volume from Trades model
+    checkNFTQualification: async function(userId, targetLevel) {
+        try {
+            // Calculate user's total trading volume from Trades model
+            const tradingVolume = await this.calculateTradingVolume(userId);
+            const requiredVolume = this.getRequiredVolumeForLevel(targetLevel);
+            
+            // Check if user already has NFT of this level or higher
+            const existingNFT = await UserNFT.findOne({
+                user_id: userId,
+                nft_level: { '>=': targetLevel },
+                status: 'active'
+            });
+            
+            return {
+                qualified: tradingVolume >= requiredVolume && !existingNFT,
+                currentVolume: tradingVolume,
+                requiredVolume: requiredVolume,
+                targetLevel: targetLevel,
+                hasExistingNFT: !!existingNFT
+            };
+        } catch (error) {
+            sails.log.error('NFT qualification check failed:', error);
+            return { qualified: false, reason: 'System error' };
+        }
+    },
+    
+    // Calculate user's total trading volume from Trades model
+    calculateTradingVolume: async function(userId) {
+        try {
+            const query = `
+                SELECT SUM(total_usd_price) as trading_volume 
+                FROM trades 
+                WHERE user_id = ? AND total_usd_price IS NOT NULL
+            `;
+            const result = await sails.sendNativeQuery(query, [userId]);
+            return parseFloat(result.rows[0]?.trading_volume) || 0;
+        } catch (error) {
+            sails.log.error('Trading volume calculation failed:', error);
+            return 0;
+        }
     },
     
     processNFTUpgrade: async function(userId, fromLevel, toLevel) {
@@ -169,11 +249,6 @@ module.exports = {
         // 3. Mint new NFT
         // 4. Update database records
         // 5. Send Kafka notification
-    },
-    
-    calculateTradingVolume: async function(userId, timeframe = 'all-time') {
-        // Leverage existing trading data to calculate volume
-        // Integrate with existing Trades model
     },
     
     applyNFTBenefits: async function(userId) {

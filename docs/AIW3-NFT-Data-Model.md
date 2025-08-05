@@ -321,72 +321,70 @@ module.exports = {
 
 ### Extended User Model
 
-**Note**: The NFT qualification logic will use the existing `total_trading_volume` field from the `user` table. The extensions below are for tracking NFT-specific state and relationships.
+**Note**: The NFT qualification logic will calculate trading volume by aggregating `total_usd_price` from the existing `trades` table. The User model does not contain a `total_trading_volume` field. The extensions below are for tracking NFT-specific state and relationships.
 
 #### User Model Extensions (api/models/User.js)
 
-```javascript
-// Add these attributes to existing User model
-{
-  // NFT-related fields
-  current_nft_level: {
-    type: 'number',
-    allowNull: true,
-    min: 0,
-    max: 6,
-    defaultsTo: 0,
-    description: 'Current NFT level (0 = no NFT)'
-  },
-  
-  current_nft_mint: {
-    type: 'string',
-    allowNull: true,
-    maxLength: 44,
-    description: 'Mint address of current active NFT'
-  },
-  
-  last_nft_upgrade: {
-    type: 'ref',
-    columnType: 'datetime',
-    allowNull: true,
-    description: 'When user last upgraded their NFT'
-  },
-  
-  total_trading_volume: {
-    type: 'number',
-    columnType: 'DECIMAL(30,10)',
-    defaultsTo: 0,
-    description: 'Cached total trading volume for NFT qualification'
-  },
-  
-  last_volume_update: {
-    type: 'ref',
-    columnType: 'datetime',
-    allowNull: true,
-    description: 'When trading volume was last calculated'
-  },
-  
-  // Relationships
-  nfts: {
-    collection: 'usernft',
-    via: 'user_id'
-  },
-  
-  badges: {
-    collection: 'nftbadge',
-    via: 'user_id'
-  },
-  
-  qualifications: {
-    collection: 'usernftqualification',
-    via: 'user_id'
-  },
-  
-  upgradeRequests: {
-    collection: 'nftupgraderequest',
-    via: 'user_id'
+// Extensions to existing User model for NFT integration
+// NOTE: The actual User model already contains these fields:
+// - wallet_address, accessToken, referralCode, points, energy, quick_amount, auto_amount
+
+module.exports = {
+  attributes: {
+    // ... existing User attributes (wallet_address, accessToken, referralCode, etc.) ...
+    
+    // NFT-related extensions (NEW FIELDS TO ADD)
+    current_nft_level: {
+      type: 'number',
+      allowNull: true,
+      min: 0,
+      max: 6,
+      description: 'Current highest NFT level owned by user (1-5 regular, 6 special)'
+    },
+    
+    last_active_nft_id: {
+      model: 'usernft',
+      allowNull: true,
+      description: 'Reference to user\'s currently active/primary NFT'
+    },
+    
+    // Cached trading volume for performance (calculated from Trades model)
+    cached_trading_volume: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'Cached total trading volume for quick NFT qualification checks (calculated from trades table)'
+    },
+    
+    last_volume_update: {
+      type: 'ref',
+      columnType: 'datetime',
+      allowNull: true,
+      description: 'Timestamp of last trading volume cache update'
+    },
+    
+    // Relationships
+    nfts: {
+      collection: 'usernft',
+      via: 'user_id'
+    },
+    
+    badges: {
+      collection: 'nftbadge',
+      via: 'user_id'
+    },
+    
+    qualifications: {
+      collection: 'usernftqualification',
+      via: 'user_id'
+    },
+    
+    upgradeRequests: {
+      collection: 'nftupgraderequest',
+      via: 'user_id'
+    }
   }
-}
+};
 ```
 
 ### Database Migration Scripts
@@ -482,17 +480,17 @@ CREATE TABLE nftupgraderequest (
 
 ```sql
 -- Add NFT-related columns to existing user table
-ALTER TABLE user 
-ADD COLUMN current_nft_level TINYINT DEFAULT 0 CHECK (current_nft_level BETWEEN 0 AND 6),
-ADD COLUMN current_nft_mint VARCHAR(44) NULL,
-ADD COLUMN last_nft_upgrade DATETIME NULL,
-ADD COLUMN total_trading_volume DECIMAL(30,10) DEFAULT 0,
-ADD COLUMN last_volume_update DATETIME NULL;
+-- NOTE: The following fields already exist in the backend User model:
+-- wallet_address, accessToken, referralCode, points, energy, quick_amount, auto_amount
 
--- Add indexes for performance
-ALTER TABLE user 
+ALTER TABLE user
+ADD COLUMN current_nft_level TINYINT DEFAULT 0 COMMENT 'Current highest NFT level owned by user (1-5 regular, 6 special)',
+ADD COLUMN last_active_nft_id INT NULL COMMENT 'Reference to user\'s currently active/primary NFT',
+ADD COLUMN cached_trading_volume DECIMAL(30,10) DEFAULT 0 COMMENT 'Cached total trading volume (calculated from trades table)',
+ADD COLUMN last_volume_update DATETIME NULL COMMENT 'Timestamp of last trading volume cache update',
 ADD INDEX idx_nft_level (current_nft_level),
-ADD INDEX idx_trading_volume (total_trading_volume);
+ADD INDEX idx_cached_volume (cached_trading_volume),
+ADD FOREIGN KEY (last_active_nft_id) REFERENCES usernft(id) ON DELETE SET NULL;
 ```
 
 ---
