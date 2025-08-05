@@ -120,7 +120,7 @@ The NFT system provides a comprehensive REST API with standardized endpoints for
 
 ## Frontend Application Development
 
-This section outlines the structure and key components of the user-facing application, with the **Personal Center** as its core feature. The design should align with the user experience flows detailed in the `aiw3-prototypes`.
+This section outlines the structure and key components of the user-facing application. All frontend development revolves around the **Personal Center**, which serves as the core feature and central hub for all user interaction. The design must align with the user experience flows detailed in the `aiw3-prototypes`.
 
 ### 1. **The Personal Center: A Central Hub**
 

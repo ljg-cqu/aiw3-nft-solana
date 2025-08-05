@@ -1,5 +1,13 @@
 # Quick Start Guide: Solana NFT Burn and Mint POC
 
+<!-- Document Metadata -->
+**Version:** v1.0.0  
+**Last Updated:** 2025-08-06  
+**Status:** Active  
+**Purpose:** Quick start guide for the Solana NFT Burn and Mint POC
+
+---
+
 This guide helps newcomers quickly set up and run the Solana NFT Burn and Mint Proof of Concept.
 
 ## ⚡ Quick Setup (5 minutes)
