@@ -51,8 +51,8 @@ module.exports = {
       type: 'number', 
       required: true,
       min: 1,
-      max: 6,
-      description: 'NFT tier level (1-5 regular, 6 special)'
+      max: 5,
+      description: 'NFT tier level (1-5 regular, Special for Trophy Breeder)'
     },
     
     nft_name: { 
@@ -126,7 +126,7 @@ module.exports = {
       type: 'number', 
       required: true,
       min: 1,
-      max: 6
+      max: 5
     },
     
     // Volume tracking
@@ -266,7 +266,7 @@ module.exports = {
       type: 'number',
       required: true,
       min: 2,
-      max: 6
+      max: 5
     },
     
     old_nft_mint: {
@@ -338,8 +338,8 @@ module.exports = {
       type: 'number',
       allowNull: true,
       min: 0,
-      max: 6,
-      description: 'Current highest NFT level owned by user (1-5 regular, 6 special)'
+      max: 5,
+      description: 'Current highest NFT level owned by user (1-5 regular, Special for Trophy Breeder)'
     },
     
     last_active_nft_id: {
@@ -397,7 +397,7 @@ CREATE TABLE usernft (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   nft_mint_address VARCHAR(44) NOT NULL UNIQUE,
-  nft_level TINYINT NOT NULL CHECK (nft_level BETWEEN 1 AND 6),
+  nft_level TINYINT NOT NULL CHECK (nft_level BETWEEN 1 AND 5),
   nft_name VARCHAR(100) NOT NULL,
   metadata_uri VARCHAR(500),
   image_uri VARCHAR(500),
@@ -418,7 +418,7 @@ CREATE TABLE usernft (
 CREATE TABLE usernftqualification (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
-  target_level TINYINT NOT NULL CHECK (target_level BETWEEN 1 AND 6),
+  target_level TINYINT NOT NULL CHECK (target_level BETWEEN 1 AND 5),
   current_volume DECIMAL(30,10) DEFAULT 0,
   required_volume DECIMAL(30,10) NOT NULL,
   badges_collected INT DEFAULT 0,
@@ -459,7 +459,7 @@ CREATE TABLE nftupgraderequest (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   from_level TINYINT NOT NULL CHECK (from_level BETWEEN 1 AND 5),
-  to_level TINYINT NOT NULL CHECK (to_level BETWEEN 2 AND 6),
+  to_level TINYINT NOT NULL CHECK (to_level BETWEEN 2 AND 5),
   old_nft_mint VARCHAR(44) NOT NULL,
   new_nft_mint VARCHAR(44) NULL,
   burn_transaction VARCHAR(88) NULL,
