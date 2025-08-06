@@ -62,18 +62,18 @@ Both conditions must be met before a user can claim or upgrade an NFT. There is 
 
 ## ✨ NFT Benefits
 
-Each NFT tier provides a set of benefits, including trading fee reductions and access to exclusive AI agent features.
+Each NFT tier provides a set of benefits, primarily trading fee reductions.
 
 ### Benefit Summary Table
 
-| Level | NFT Name              | Trading Fee Reduction | Monthly AI Agent Credits (`aiAgentCredits`) | AI Agent Feature Access                           |
-|:------|:----------------------|:----------------------|:------------------------------------------|:--------------------------------------------------|
-| 1     | Tech Chicken          | 10%                   | 100                                       | Basic Market Data Feed                            |
-| 2     | Quant Ape             | 20%                   | 300                                       | Advanced Charting & TA Tools                      |
-| 3     | On-chain Hunter       | 30%                   | 500                                       | Real-Time On-Chain Event Alerts                   |
-| 4     | Alpha Alchemist       | 40%                   | 1,000                                     | Predictive Analytics & Signal Bot                 |
-| 5     | Quantum Alchemist     | 50%                   | 2,500                                     | Proprietary Quant Model Access                    |
-| Special | Trophy Breeder (Special) | 75%                   | Unlimited                                 | Bespoke Strategy Consulting & Full API Access     |
+| Level | NFT Name              | Trading Fee Reduction |
+|:------|:----------------------|:----------------------|
+| 1     | Tech Chicken          | 10%                   |
+| 2     | Quant Ape             | 20%                   |
+| 3     | On-chain Hunter       | 30%                   |
+| 4     | Alpha Alchemist       | 40%                   |
+| 5     | Quantum Alchemist     | 50%                   |
+| Special | Trophy Breeder (Special) | 75%                   |
 
 ---
 

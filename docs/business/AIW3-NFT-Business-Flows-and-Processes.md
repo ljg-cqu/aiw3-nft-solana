@@ -90,7 +90,7 @@ This document provides a comprehensive overview of all NFT-related business flow
     -   **NFT Gallery**: Displays all currently owned (active) NFTs, showing their name, level, and artwork.
     -   **Unlockable Tiers**: Shows which NFT tiers the user is close to unlocking, potentially with a progress bar indicating trading volume accumulation.
     -   **Synthesis Interface**: Provides the entry point for initiating an NFT upgrade.
-    -   **Benefits Summary**: Clearly lists the benefits associated with the user's current NFT level (e.g., fee reductions).
+    -   **Benefits Summary**: Clearly lists the trading fee reduction associated with the user's current NFT level.
 
 ### Community-Mini Homepage Visibility
 
