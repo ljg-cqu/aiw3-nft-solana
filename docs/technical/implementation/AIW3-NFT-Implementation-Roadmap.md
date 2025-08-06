@@ -33,7 +33,7 @@ This document provides a realistic, phase-by-phase implementation roadmap for th
 cd $HOME/aiw3/lastmemefi-api
 npm install @solana/web3.js@^1.98.0
 npm install @solana/spl-token@^0.3.8  
-npm install @metaplex-foundation/mpl-token-metadata@^2.13.0
+npm install @metaplex-foundation/js@^0.19.4
 npm install @metaplex-foundation/umi@^0.9.0
 npm install @metaplex-foundation/umi-bundle-defaults@^0.9.0
 ```

@@ -26,11 +26,17 @@ npm install
 ```
 
 ### Step 3: Configure Environment
+Copy the example environment file and edit with your actual values:
+```bash
+cp .env.example .env
+```
+
 Edit the `.env` file with your actual values:
 ```env
 SOLANA_NETWORK="devnet"
 USER_WALLET_ADDRESS="YOUR_ACTUAL_WALLET_ADDRESS"
-PAYER_SECRET_KEY="YOUR_ACTUAL_SECRET_KEY"
+USER_SECRET_KEY="YOUR_USER_SECRET_KEY_AS_COMMA_SEPARATED_NUMBERS"
+SYSTEM_SECRET_KEY="YOUR_SYSTEM_SECRET_KEY_AS_COMMA_SEPARATED_NUMBERS"
 ```
 
 ### Step 4: Run the POC

@@ -75,10 +75,14 @@ This POC demonstrates a realistic business scenario:
 
 ### 4.2 Required Environment Variables
 
-- `SOLANA_NETWORK`: Target Solana network ("devnet", "testnet", "mainnet-beta")
-- `SYSTEM_SECRET_KEY`: Backend system keypair for minting operations
+- `SOLANA_NETWORK`: Target Solana network ("devnet", "testnet", "mainnet-beta", "localnet")
+- `SYSTEM_SECRET_KEY`: Backend system keypair for minting operations (comma-separated numbers)
 - `USER_WALLET_ADDRESS`: User's public wallet address (must match USER_SECRET_KEY)
-- `USER_SECRET_KEY`: User's private key for burning operations
+- `USER_SECRET_KEY`: User's private key for burning operations (comma-separated numbers)
+
+**For burn-only script (index.js):**
+- `NFT_MINT_ADDRESS`: Existing NFT mint address to burn
+- `PAYER_SECRET_KEY`: Payer's private key for transaction fees (comma-separated numbers)
 
 ### 4.3 Account Roles
 
@@ -138,11 +142,19 @@ This starts a local Solana cluster with a single validator node. It also creates
 
 ### 6.3 Configure your `.env` file
 
+Copy the example environment file and configure it:
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file with your actual values:
 ```env
 SOLANA_NETWORK="localnet"
 USER_WALLET_ADDRESS="YOUR_WALLET_ADDRESS"
+USER_SECRET_KEY="YOUR_USER_SECRET_KEY_AS_COMMA_SEPARATED_NUMBERS"
+SYSTEM_SECRET_KEY="YOUR_SYSTEM_SECRET_KEY_AS_COMMA_SEPARATED_NUMBERS"
 NFT_MINT_ADDRESS="YOUR_NFT_MINT_ADDRESS"
-PAYER_SECRET_KEY="YOUR_PAYER_SECRET_KEY"
+PAYER_SECRET_KEY="YOUR_PAYER_SECRET_KEY_AS_COMMA_SEPARATED_NUMBERS"
 ```
 
 **Important:**

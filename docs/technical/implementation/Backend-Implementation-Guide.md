@@ -37,7 +37,7 @@ Ensure these packages are installed in the lastmemefi-api project:
 ```bash
 npm install @solana/web3.js@^1.98.0
 npm install @solana/spl-token@^0.3.8  
-npm install @metaplex-foundation/mpl-token-metadata@^2.13.0
+npm install @metaplex-foundation/js@^0.19.4
 ```
 
 ---
