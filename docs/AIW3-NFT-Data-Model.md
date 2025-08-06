@@ -196,7 +196,7 @@ module.exports = {
 };
 ```
 
-#### NFTBadge Model (api/models/NFTBadge.js)
+#### Badge Model (api/models/Badge.js)
 
 ```javascript
 module.exports = {
@@ -222,18 +222,18 @@ module.exports = {
       description: 'Human-readable badge name'
     },
     
-    mint_address: {
+    badge_identifier: {
       type: 'string',
       required: true,
       unique: true,
-      maxLength: 44,
-      description: 'Solana mint address of the badge NFT'
+      maxLength: 100,
+      description: 'Unique identifier for the badge (not an NFT mint address)'
     },
     
     metadata_uri: {
       type: 'string',
       maxLength: 500,
-      description: 'IPFS URI for badge metadata'
+      description: 'URI for badge metadata'
     },
     
     is_bound: {
@@ -389,7 +389,7 @@ module.exports = {
     },
     
     badges: {
-      collection: 'nftbadge',
+      collection: 'badge',
       via: 'user_id'
     },
     
@@ -453,13 +453,13 @@ CREATE TABLE usernftqualification (
   INDEX idx_last_checked (last_checked_at)
 );
 
--- Create NFTBadge table
-CREATE TABLE nftbadge (
+-- Create Badge table
+CREATE TABLE badge (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   badge_type ENUM('micro_badge', 'achievement_badge', 'event_badge', 'special_badge') NOT NULL,
   badge_name VARCHAR(100) NOT NULL,
-  mint_address VARCHAR(44) NOT NULL UNIQUE,
+  badge_identifier VARCHAR(100) NOT NULL UNIQUE,
   metadata_uri VARCHAR(500),
   is_bound BOOLEAN DEFAULT FALSE,
   earned_at DATETIME,
@@ -630,12 +630,12 @@ erDiagram
         datetime updatedAt
     }
 
-    NFTBADGE {
+    BADGE {
         int id PK
         int user_id FK
         string badge_type
         string badge_name
-        string mint_address UK
+        string badge_identifier UK
         string metadata_uri
         boolean is_bound
         datetime earned_at
@@ -669,11 +669,11 @@ erDiagram
 
     USER ||--o{ USERNFT : owns
     USER ||--o{ USERNFTQUALIFICATION : has_qualification_for
-    USER ||--o{ NFTBADGE : earned
+    USER ||--o{ BADGE : earned
     USER ||--o{ NFTUPGRADEREQUEST : initiated
     USER ||--o{ TRADES : executed
     USERNFT ||--o{ NFTUPGRADEREQUEST : involved_in
-    USERNFTQUALIFICATION }o--|| NFTBADGE : requires_badges
+    USERNFTQUALIFICATION }o--|| BADGE : requires_badges
 ```
 
 ---
@@ -686,7 +686,7 @@ The AIW3 system interacts with the Solana blockchain using **only standard Solan
 |---------------------------------|---------------------------------|---------------------------------|-------------|
 | **Minting a New NFT**           | `mintTo(...)`                   | **Standard SPL Token Program**  | The AIW3 backend uses the system wallet to mint new NFTs directly to user wallets using standard SPL Token operations. All business logic verification (trading volume, tier eligibility) is handled off-chain before minting. |
 | **Upgrading an Equity NFT**     | `burn(...)` + `mintTo(...)`     | **Standard SPL Token Program**  | The upgrade process uses standard token operations: user burns their current NFT, then the system mints the new tier NFT. The AIW3 backend verifies all off-chain criteria (trading volume, badge requirements) before authorizing the upgrade. |
-| **Managing Badge NFTs**         | Standard NFT operations         | **Standard SPL Token Program**  | Badge NFTs are managed using standard NFT operations. The backend tracks badge ownership through standard token account queries and enforces binding requirements through off-chain business logic. |
+| **Managing Badges**             | Off-chain operations            | **Backend Database Only**       | Badges are managed entirely off-chain in the backend database. They are not NFTs and do not require blockchain operations. The backend tracks badge ownership and enforces binding requirements through database queries and business logic. |
 | **Selling/Transferring an NFT** | `transfer(...)`                 | **Standard SPL Token Program**  | This is a standard token transfer. The AIW3 system does not need a custom function for this. Users can freely trade their NFTs on any marketplace that supports Solana NFTs. |
 | **Burning an NFT**              | `burn(...)`                     | **Standard SPL Token Program**  | This is a standard token burn. It is used in the **Synthesis** process to destroy the lower-level NFT before the higher-level one is minted. |
 

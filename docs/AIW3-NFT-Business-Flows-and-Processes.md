@@ -40,7 +40,7 @@ This document provides a comprehensive overview of all NFT-related business flow
     - **Unlockable**: The user has met the criteria to unlock the NFT but has not yet claimed it.
     - **Unlocked**: The user has claimed the NFT, but it is not yet active. This state is visually represented in the Personal Center.
     - **Active**: The user has activated the NFT, and it is now providing benefits.
-- **Trigger**: A user's aggregated trading volume, calculated from the `Trades` model in the `lastmemefi-api` database, meets or exceeds the threshold for a specific NFT tier as defined in the **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**.
+- **Trigger**: A user meets both the trading volume and badge requirements for a specific NFT tier, as defined in the **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**. The `NFTService` verifies both conditions before proceeding.
 - **Process**:
     1.  The `NFTService` backend component periodically or on-demand calculates the user's total trading volume.
     2.  If the user qualifies for a new NFT tier, the system creates a `UserNFTQualification` record.
@@ -69,7 +69,7 @@ This document provides a comprehensive overview of all NFT-related business flow
     2.  The UI displays a confirmation dialog detailing the NFT that will be burned and the new NFT that will be minted.
     3.  The user approves the transaction, which may require a wallet signature.
 - **Backend Process**:
-    1.  The `NFTService` validates the user's qualification for the target tier.
+    1.  The `NFTService` validates that the user meets both the trading volume and badge requirements for the target tier.
     2.  It instructs the `Web3Service` to execute a single, atomic transaction that bundles two instructions: one to burn the old NFT and another to mint the new, higher-level NFT. This ensures the process is all-or-nothing, protecting the user from asset loss. The backend then updates the status of the burned NFT in the `UserNFT` table.
     3.  An `upgraded` event is published via Kafka.
 
@@ -111,7 +111,7 @@ This document provides a comprehensive overview of all NFT-related business flow
 
 ### Badge Integration
 
-- **Use**: In addition to the primary NFTs, users can earn special "Badge-Type NFTs" for completing specific tasks or participating in events. These are stored in the `NFTBadge` model.
+- **Use**: In addition to the primary NFTs, users can earn special badges for completing specific tasks or participating in events. These are stored in the `Badge` model.
 - **Function**: While some badges are purely for display, others may be required as part of the qualification criteria for upgrading to higher NFT tiers, creating an additional layer of engagement.
 
 ---

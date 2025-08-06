@@ -39,20 +39,24 @@ This document defines the official tiers, benefits, and operational policies for
 
 Qualification for each NFT tier is based on a user's total trading volume, calculated in USDT. The levels range from 1 to 5, with an additional Special tier.
 
-### Data Source for Qualification
+### Qualification Conditions
 
-A user's qualification for an NFT tier is determined *exclusively* by aggregating their total trading volume from the `Trades` model in the `lastmemefi-api` database. There is no `total_trading_volume` field on the `User` model itself.
+A user's qualification for an NFT tier is determined by two mandatory conditions:
+1.  **Total Trading Volume**: Aggregated from the `Trades` model in the `lastmemefi-api` database.
+2.  **Required Badges**: The user must own a specific number of bound badges to be eligible for an upgrade.
+
+Both conditions must be met before a user can claim or upgrade an NFT. There is no `total_trading_volume` field on the `User` model itself; it must always be calculated.
 
 ### NFT Level Summary Table
 
-| Level | NFT Name              | Required Trading Volume (USDT) | Image                                          |
-|:------|:----------------------|:-------------------------------|:-----------------------------------------------|
-| 1     | Tech Chicken          | ≥ 100,000                      | ![[NFT_Level_1.png]](../assets/images/NFT_Level_1.png) |
-| 2     | Quant Ape             | ≥ 500,000                      | ![[NFT_Level_2.png]](../assets/images/NFT_Level_2.png) |
-| 3     | On-chain Hunter       | ≥ 1,000,000                    | ![[NFT_Level_3.png]](../assets/images/NFT_Level_3.png) |
-| 4     | Alpha Alchemist       | ≥ 5,000,000                    | ![[NFT_Level_4.png]](../assets/images/NFT_Level_4.png) |
-| 5     | Quantum Alchemist     | ≥ 10,000,000                   | ![[NFT_Level_5.png]](../assets/images/NFT_Level_5.png) |
-| Special | Trophy Breeder (Special) | By community contribution      | ![[NFT_Special.png]](../assets/images/NFT_Special.png) |
+| Level | NFT Name              | Required Trading Volume (USDT) | Required Badges | Image                                          |
+|:------|:----------------------|:-------------------------------|:----------------|:-----------------------------------------------|
+| 1     | Tech Chicken          | ≥ 100,000                      | None            | ![[NFT_Level_1.png]](../assets/images/NFT_Level_1.png) |
+| 2     | Quant Ape             | ≥ 500,000                      | 1               | ![[NFT_Level_2.png]](../assets/images/NFT_Level_2.png) |
+| 3     | On-chain Hunter       | ≥ 1,000,000                    | 2               | ![[NFT_Level_3.png]](../assets/images/NFT_Level_3.png) |
+| 4     | Alpha Alchemist       | ≥ 5,000,000                    | 3               | ![[NFT_Level_4.png]](../assets/images/NFT_Level_4.png) |
+| 5     | Quantum Alchemist     | ≥ 10,000,000                   | 4               | ![[NFT_Level_5.png]](../assets/images/NFT_Level_5.png) |
+| Special | Trophy Breeder (Special) | By community contribution      | Special Event Badge | ![[NFT_Special.png]](../assets/images/NFT_Special.png) |
 
 ---
 

@@ -171,7 +171,7 @@ The Personal Center is the primary interface for users to manage their NFTs, tra
   - **Unlocked:** Displays the NFT the user owns, along with options for synthesis.
   - **Unlockable:** Shows the next available NFT tier and the requirements to obtain it.
 - **Synthesis (Upgrade) Interface:** A dedicated module where users can initiate the burn-and-mint upgrade process. The UI must clearly communicate the requirements and outcomes, as seen in `4. Synthesis.png` and `5. VIP2 Synthesis Success.png`.
-- **Badge-Type NFT Display:** A section to display collected badges (`6. Micro Badge.png`), which are prerequisites for certain NFT tier upgrades.
+- **Badge Display:** A section to display collected badges (`6. Micro Badge.png`), which are prerequisites for certain NFT tier upgrades.
 - **Community Hub Integration:** Features a link to the user's public-facing "Mini Homepage" (`9. Community-Mini Homepage.png`) to foster social interaction and display achievements to others.
 
 ### 2. **Wallet Integration**
@@ -477,8 +477,8 @@ flowchart TD
     subgraph LegacyIntegration ["Integration with lastmemefi-api"]
         A[User with Lv.1 NFT navigates to Synthesis page] --> B[Frontend: GET /api/nft/status]
         B --> C[Backend: Query MySQL for user trading volume]
-        C --> D[Backend: Query NFTBadge table for bound badges]
-        D --> E{Check Lv.2 requirements: 500,000 USDT + 2 badges}
+        C --> D[Backend: Query Badge table for bound badges]
+        D --> E{Check Lv.2 requirements: 500,000 USDT + 1 badge}
         E -->|Volume insufficient| F[Display current volume vs required 500,000 USDT]
         E -->|Missing badges| G[Display badge collection status and requirements]
     end
