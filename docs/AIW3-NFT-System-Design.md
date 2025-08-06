@@ -177,7 +177,11 @@ The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a 
 
 ### 3.1 NFT Operation Data Flows
 
-#### 3.1.1 NFT Claiming Flow
+#### 3.1.1 NFT Claiming and Activation Flow
+This flow is now separated into two distinct stages: Claiming (transitioning the NFT to an `unlocked` state) and Activating (making the NFT fully active and its benefits available).
+
+**Claiming Flow (`unlocked` state):**
+
 ```mermaid
 sequenceDiagram
     participant UI as Personal Center UI
@@ -190,46 +194,85 @@ sequenceDiagram
     participant IPFS as IPFS/Pinata
     participant KAFKA as KafkaService
     participant WS as WebSocket
-    
+
     UI->>API: POST /api/nft/claim
     API->>NFT: claimNFT(userId, level)
-    
+
     %% Check qualification from cache first
     NFT->>REDIS: get("nft_qual:" + userId)
     REDIS-->>NFT: cached qualification data
-    
+
     %% If not cached, calculate from Trades model
     alt Cache Miss
         NFT->>MYSQL: SELECT SUM(total_usd_price) FROM trades WHERE user_id = ?
         MYSQL-->>NFT: calculated trading volume
         NFT->>REDIS: RedisService.setCache("nft_qual:" + userId, qualData, 300)
     end
-    
+
     %% Check existing NFTs
     NFT->>MYSQL: SELECT * FROM user_nfts WHERE user_id = ? AND status = 'active'
     MYSQL-->>NFT: existing NFTs
-    
+
     %% Upload metadata to IPFS
     NFT->>IPFS: uploadMetadata(nftData)
     IPFS-->>NFT: metadata IPFS hash
-    
+
     %% Mint NFT on Solana
     NFT->>WEB3: mintNFT(userWallet, metadataUri)
     WEB3->>SOLANA: mintTo() transaction
     SOLANA-->>WEB3: transaction signature
     WEB3-->>NFT: mint result
-    
-    %% Store in database
-    NFT->>MYSQL: INSERT INTO user_nfts (...)
+
+    %% Store in database with 'unlocked' status
+    NFT->>MYSQL: INSERT INTO user_nfts (..., status='unlocked')
     MYSQL-->>NFT: NFT record created
-    
+
     %% Publish event
-    NFT->>KAFKA: KafkaService.sendMessage("nft-events", {eventType: "claimed", data: eventData})
+    NFT->>KAFKA: KafkaService.sendMessage("nft-events", {eventType: "unlocked", data: eventData})
     KAFKA->>WS: broadcast to user
     WS-->>UI: real-time update
-    
+
     NFT-->>API: success response
-    API-->>UI: NFT claimed successfully
+    API-->>UI: NFT unlocked successfully
+```
+
+**Activation Flow (`active` state):**
+
+```mermaid
+sequenceDiagram
+    participant UI as Personal Center UI
+    participant API as Sails.js API
+    participant NFT as NFTService
+    participant MYSQL as MySQL DB
+    participant WEB3 as Web3Service
+    participant SOLANA as Solana Blockchain
+    participant KAFKA as KafkaService
+    participant WS as WebSocket
+
+    UI->>API: POST /api/nft/activate
+    API->>NFT: activateNFT(userId, nftId)
+
+    %% Verify NFT ownership and status
+    NFT->>MYSQL: SELECT * FROM user_nfts WHERE user_id = ? AND id = ? AND status = 'unlocked'
+    MYSQL-->>NFT: unlocked NFT record
+
+    %% Perform on-chain activation (if necessary)
+    NFT->>WEB3: activateOnChain(userWallet, nftMintAddress)
+    WEB3->>SOLANA: on-chain activation transaction
+    SOLANA-->>WEB3: transaction signature
+    WEB3-->>NFT: activation result
+
+    %% Update database to 'active' status
+    NFT->>MYSQL: UPDATE user_nfts SET status='active' WHERE id = ?
+    MYSQL-->>NFT: NFT record updated
+
+    %% Publish event
+    NFT->>KAFKA: KafkaService.sendMessage("nft-events", {eventType: "activated", data: eventData})
+    KAFKA->>WS: broadcast to user
+    WS-->>UI: real-time update
+
+    NFT-->>API: success response
+    API-->>UI: NFT activated successfully
 ```
 
 #### 3.1.2 NFT Upgrade Flow
