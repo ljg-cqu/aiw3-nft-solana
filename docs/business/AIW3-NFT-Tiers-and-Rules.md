@@ -66,14 +66,14 @@ Each NFT tier provides a set of benefits, including trading fee reductions and a
 
 ### Benefit Summary Table
 
-| Level | NFT Name              | Trading Fee Reduction | Monthly AI Agent Uses (`aiagentUses`) | AI Agent Feature Access                           |
-|:------|:----------------------|:----------------------|:--------------------------------------|:--------------------------------------------------|
-| 1     | Tech Chicken          | 10%                   | 10                                    | Basic features                                    |
-| 2     | Quant Ape             | 20%                   | 30                                    | Advanced market analysis tools                    |
-| 3     | On-chain Hunter       | 30%                   | 50                                    | Real-time on-chain data streams                   |
-| 4     | Alpha Alchemist       | 40%                   | 100                                   | Predictive modeling and alpha signals             |
-| 5     | Quantum Alchemist     | 50%                   | 200                                   | Access to proprietary quantitative models         |
-| Special | Trophy Breeder (Special) | 75%                   | Unlimited                             | Full access to all AI features and direct support |
+| Level | NFT Name              | Trading Fee Reduction | Monthly AI Agent Credits (`aiAgentCredits`) | AI Agent Feature Access                           |
+|:------|:----------------------|:----------------------|:------------------------------------------|:--------------------------------------------------|
+| 1     | Tech Chicken          | 10%                   | 100                                       | Basic Market Data Feed                            |
+| 2     | Quant Ape             | 20%                   | 300                                       | Advanced Charting & TA Tools                      |
+| 3     | On-chain Hunter       | 30%                   | 500                                       | Real-Time On-Chain Event Alerts                   |
+| 4     | Alpha Alchemist       | 40%                   | 1,000                                     | Predictive Analytics & Signal Bot                 |
+| 5     | Quantum Alchemist     | 50%                   | 2,500                                     | Proprietary Quant Model Access                    |
+| Special | Trophy Breeder (Special) | 75%                   | Unlimited                                 | Bespoke Strategy Consulting & Full API Access     |
 
 ---
 
