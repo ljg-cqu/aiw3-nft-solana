@@ -45,11 +45,13 @@ ___________
 
 ### Testing Principles
 
-1. **Test Early, Test Often**: Implement tests during development
-2. **Fail Fast**: Quick feedback on code changes
-3. **Isolation**: Tests should be independent and repeatable
-4. **Coverage**: Aim for 80%+ code coverage on critical paths
-5. **Realistic Data**: Use production-like test data
+1. **Test-Driven Development (TDD)**: Write tests before implementation using Red-Green-Refactor cycle
+2. **Test Early, Test Often**: Implement tests during development
+3. **Fail Fast**: Quick feedback on code changes
+4. **Isolation**: Tests should be independent and repeatable
+5. **Coverage**: Aim for 80%+ code coverage on critical paths
+6. **Realistic Data**: Use production-like test data
+7. **Risk-Based Testing**: Prioritize testing based on business impact and technical risk
 
 ---
 

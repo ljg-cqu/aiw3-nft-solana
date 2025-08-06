@@ -545,6 +545,509 @@ graph TD
 
 ---
 
+## System Health and Observability
+
+The AIW3 NFT system implements comprehensive observability through structured logging, metrics collection, and distributed tracing to ensure production-ready monitoring and debugging capabilities.
+
+### Logging Strategy
+
+**Structured Logging Framework**:
+```javascript
+// Centralized logging configuration
+const logger = {
+  info: (message, metadata = {}) => {
+    console.log(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: 'INFO',
+      service: 'nft-service',
+      message,
+      ...metadata,
+      traceId: getCurrentTraceId(),
+      userId: getCurrentUserId()
+    }));
+  },
+  
+  error: (message, error, metadata = {}) => {
+    console.error(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: 'ERROR',
+      service: 'nft-service',
+      message,
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      },
+      ...metadata,
+      traceId: getCurrentTraceId(),
+      userId: getCurrentUserId()
+    }));
+  }
+};
+```
+
+**Log Categories and Levels**:
+- **TRACE**: Detailed execution flow for debugging
+- **DEBUG**: Development and troubleshooting information
+- **INFO**: General operational information
+- **WARN**: Potential issues that don't affect functionality
+- **ERROR**: Error conditions requiring attention
+- **FATAL**: Critical errors causing system failure
+
+**Key Logging Points**:
+```javascript
+// NFT Claiming Process Logging
+const claimNFT = async (userId, level) => {
+  const traceId = generateTraceId();
+  
+  logger.info('NFT claim initiated', {
+    userId,
+    targetLevel: level,
+    traceId,
+    operation: 'nft_claim_start'
+  });
+  
+  try {
+    // Qualification check
+    const qualification = await checkQualification(userId, level);
+    logger.info('Qualification check completed', {
+      userId,
+      qualified: qualification.qualified,
+      currentVolume: qualification.currentVolume,
+      requiredVolume: qualification.requiredVolume,
+      traceId,
+      operation: 'qualification_check'
+    });
+    
+    if (!qualification.qualified) {
+      logger.warn('NFT claim rejected - insufficient qualification', {
+        userId,
+        shortfall: qualification.requiredVolume - qualification.currentVolume,
+        traceId,
+        operation: 'claim_rejected'
+      });
+      throw new Error('Insufficient qualification');
+    }
+    
+    // IPFS upload
+    const ipfsHash = await uploadToIPFS(metadata);
+    logger.info('Metadata uploaded to IPFS', {
+      userId,
+      ipfsHash,
+      uploadDuration: Date.now() - startTime,
+      traceId,
+      operation: 'ipfs_upload_success'
+    });
+    
+    // Blockchain minting
+    const mintResult = await Web3Service.mintNFT({
+      userWallet: user.wallet_address,
+      metadataUri: `ipfs://${ipfsHash}`,
+      level
+    });
+    
+    logger.info('NFT minted successfully', {
+      userId,
+      mintAddress: mintResult.mintAddress,
+      transactionSignature: mintResult.signature,
+      blockTime: mintResult.blockTime,
+      traceId,
+      operation: 'mint_success'
+    });
+    
+    return mintResult;
+    
+  } catch (error) {
+    logger.error('NFT claim failed', error, {
+      userId,
+      targetLevel: level,
+      traceId,
+      operation: 'nft_claim_error'
+    });
+    throw error;
+  }
+};
+```
+
+### Metrics Collection
+
+**Business Metrics**:
+```javascript
+const businessMetrics = {
+  // NFT Operations
+  nftClaimsTotal: new Counter({
+    name: 'nft_claims_total',
+    help: 'Total number of NFT claims attempted',
+    labelNames: ['level', 'status', 'user_tier']
+  }),
+  
+  nftClaimDuration: new Histogram({
+    name: 'nft_claim_duration_seconds',
+    help: 'Time taken to complete NFT claim process',
+    labelNames: ['level', 'status'],
+    buckets: [1, 5, 10, 30, 60, 120, 300]
+  }),
+  
+  nftUpgradesTotal: new Counter({
+    name: 'nft_upgrades_total',
+    help: 'Total number of NFT upgrades attempted',
+    labelNames: ['from_level', 'to_level', 'status']
+  }),
+  
+  // User Engagement
+  activeUsers: new Gauge({
+    name: 'active_users_total',
+    help: 'Number of active users in the system',
+    labelNames: ['time_period']
+  }),
+  
+  tradingVolumeTotal: new Counter({
+    name: 'trading_volume_usd_total',
+    help: 'Total trading volume in USD',
+    labelNames: ['user_tier', 'time_period']
+  })
+};
+```
+
+**Technical Metrics**:
+```javascript
+const technicalMetrics = {
+  // API Performance
+  httpRequestDuration: new Histogram({
+    name: 'http_request_duration_seconds',
+    help: 'Duration of HTTP requests',
+    labelNames: ['method', 'route', 'status_code'],
+    buckets: [0.1, 0.5, 1, 2, 5, 10]
+  }),
+  
+  httpRequestsTotal: new Counter({
+    name: 'http_requests_total',
+    help: 'Total number of HTTP requests',
+    labelNames: ['method', 'route', 'status_code']
+  }),
+  
+  // External Service Performance
+  solanaRpcDuration: new Histogram({
+    name: 'solana_rpc_duration_seconds',
+    help: 'Duration of Solana RPC calls',
+    labelNames: ['method', 'endpoint', 'status'],
+    buckets: [0.5, 1, 2, 5, 10, 30]
+  }),
+  
+  ipfsUploadDuration: new Histogram({
+    name: 'ipfs_upload_duration_seconds',
+    help: 'Duration of IPFS uploads',
+    labelNames: ['content_type', 'size_bucket', 'status'],
+    buckets: [1, 3, 5, 10, 30, 60]
+  }),
+  
+  // Database Performance
+  databaseQueryDuration: new Histogram({
+    name: 'database_query_duration_seconds',
+    help: 'Duration of database queries',
+    labelNames: ['operation', 'table', 'status'],
+    buckets: [0.01, 0.05, 0.1, 0.5, 1, 2]
+  }),
+  
+  // System Resources
+  memoryUsage: new Gauge({
+    name: 'memory_usage_bytes',
+    help: 'Memory usage in bytes',
+    labelNames: ['type']
+  }),
+  
+  cpuUsage: new Gauge({
+    name: 'cpu_usage_percent',
+    help: 'CPU usage percentage',
+    labelNames: ['core']
+  })
+};
+```
+
+### Distributed Tracing
+
+**OpenTelemetry Integration**:
+```javascript
+const { NodeSDK } = require('@opentelemetry/sdk-node');
+const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
+
+// Initialize tracing
+const sdk = new NodeSDK({
+  traceExporter: new JaegerExporter({
+    endpoint: process.env.JAEGER_ENDPOINT || 'http://localhost:14268/api/traces'
+  }),
+  instrumentations: [getNodeAutoInstrumentations()]
+});
+
+sdk.start();
+
+// Custom span creation for NFT operations
+const tracer = require('@opentelemetry/api').trace.getTracer('nft-service');
+
+const traceNFTOperation = async (operationName, userId, operation) => {
+  const span = tracer.startSpan(operationName, {
+    attributes: {
+      'user.id': userId,
+      'operation.type': operationName,
+      'service.name': 'nft-service'
+    }
+  });
+  
+  try {
+    const result = await operation(span);
+    span.setStatus({ code: SpanStatusCode.OK });
+    return result;
+  } catch (error) {
+    span.recordException(error);
+    span.setStatus({ 
+      code: SpanStatusCode.ERROR, 
+      message: error.message 
+    });
+    throw error;
+  } finally {
+    span.end();
+  }
+};
+```
+
+**Trace Context Propagation**:
+```javascript
+// Propagate trace context through Kafka messages
+const publishWithTrace = async (topic, message) => {
+  const span = tracer.startSpan('kafka_publish');
+  const traceContext = {};
+  
+  // Inject trace context into message headers
+  propagation.inject(context.active(), traceContext);
+  
+  await KafkaService.sendMessage(topic, {
+    ...message,
+    traceContext
+  });
+  
+  span.end();
+};
+
+// Extract trace context from Kafka messages
+const consumeWithTrace = async (message, handler) => {
+  const traceContext = message.traceContext || {};
+  const parentContext = propagation.extract(context.active(), traceContext);
+  
+  return context.with(parentContext, async () => {
+    const span = tracer.startSpan('kafka_consume');
+    try {
+      await handler(message);
+      span.setStatus({ code: SpanStatusCode.OK });
+    } catch (error) {
+      span.recordException(error);
+      span.setStatus({ code: SpanStatusCode.ERROR, message: error.message });
+      throw error;
+    } finally {
+      span.end();
+    }
+  });
+};
+```
+
+### Monitoring Dashboards
+
+**Grafana Dashboard Configuration**:
+```yaml
+# NFT System Overview Dashboard
+dashboard:
+  title: "AIW3 NFT System Overview"
+  panels:
+    - title: "NFT Claims Rate"
+      type: "graph"
+      targets:
+        - expr: "rate(nft_claims_total[5m])"
+          legendFormat: "Claims/sec - Level {{level}}"
+    
+    - title: "Claim Success Rate"
+      type: "stat"
+      targets:
+        - expr: "rate(nft_claims_total{status='success'}[5m]) / rate(nft_claims_total[5m]) * 100"
+          legendFormat: "Success Rate %"
+    
+    - title: "API Response Times"
+      type: "graph"
+      targets:
+        - expr: "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))"
+          legendFormat: "95th percentile"
+        - expr: "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))"
+          legendFormat: "50th percentile"
+    
+    - title: "External Service Health"
+      type: "table"
+      targets:
+        - expr: "up{job=~'solana-rpc|ipfs-pinata|mysql'}"
+          format: "table"
+    
+    - title: "Error Rate by Service"
+      type: "graph"
+      targets:
+        - expr: "rate(http_requests_total{status_code=~'5..'}[5m])"
+          legendFormat: "{{service}} errors/sec"
+```
+
+### Alerting Rules
+
+**Prometheus Alerting Rules**:
+```yaml
+groups:
+  - name: nft_system_alerts
+    rules:
+      - alert: HighNFTClaimFailureRate
+        expr: rate(nft_claims_total{status="failed"}[5m]) / rate(nft_claims_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High NFT claim failure rate detected"
+          description: "NFT claim failure rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+      
+      - alert: SolanaRPCDown
+        expr: up{job="solana-rpc"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Solana RPC endpoint is down"
+          description: "Solana RPC endpoint {{ $labels.instance }} has been down for more than 30 seconds"
+      
+      - alert: HighAPILatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile API response time is {{ $value }}s"
+      
+      - alert: DatabaseConnectionPoolExhausted
+        expr: database_connection_pool_active / database_connection_pool_max > 0.9
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "Database connection pool utilization is {{ $value | humanizePercentage }}"
+```
+
+### Log Aggregation and Analysis
+
+**ELK Stack Configuration**:
+```yaml
+# Logstash configuration for NFT logs
+input {
+  kafka {
+    bootstrap_servers => "kafka:9092"
+    topics => ["nft-logs"]
+    codec => "json"
+  }
+}
+
+filter {
+  if [service] == "nft-service" {
+    mutate {
+      add_field => { "[@metadata][index]" => "nft-logs-%{+YYYY.MM.dd}" }
+    }
+    
+    # Parse error stack traces
+    if [error][stack] {
+      mutate {
+        gsub => [ "[error][stack]", "\n", " | " ]
+      }
+    }
+    
+    # Extract operation metrics
+    if [operation] {
+      mutate {
+        add_field => { "operation_type" => "%{operation}" }
+      }
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["elasticsearch:9200"]
+    index => "%{[@metadata][index]}"
+  }
+}
+```
+
+**Kibana Dashboard Queries**:
+```json
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "service": "nft-service" } },
+        { "term": { "operation": "nft_claim_error" } },
+        { "range": { "timestamp": { "gte": "now-1h" } } }
+      ]
+    }
+  },
+  "aggs": {
+    "error_types": {
+      "terms": {
+        "field": "error.name",
+        "size": 10
+      }
+    },
+    "errors_over_time": {
+      "date_histogram": {
+        "field": "timestamp",
+        "interval": "5m"
+      }
+    }
+  }
+}
+```
+
+### Performance Monitoring
+
+**Application Performance Monitoring (APM)**:
+```javascript
+// Custom performance monitoring
+const performanceMonitor = {
+  trackOperation: async (operationName, operation) => {
+    const startTime = Date.now();
+    const startMemory = process.memoryUsage();
+    
+    try {
+      const result = await operation();
+      
+      // Record success metrics
+      technicalMetrics.operationDuration
+        .labels(operationName, 'success')
+        .observe((Date.now() - startTime) / 1000);
+      
+      return result;
+    } catch (error) {
+      // Record failure metrics
+      technicalMetrics.operationDuration
+        .labels(operationName, 'failure')
+        .observe((Date.now() - startTime) / 1000);
+      
+      throw error;
+    } finally {
+      // Record resource usage
+      const endMemory = process.memoryUsage();
+      const memoryDelta = endMemory.heapUsed - startMemory.heapUsed;
+      
+      technicalMetrics.memoryUsage
+        .labels('heap_delta')
+        .set(memoryDelta);
+    }
+  }
+};
+```
+
+---
+
 ## Related Documents
 
 For more detailed information, please refer to the following documents:
