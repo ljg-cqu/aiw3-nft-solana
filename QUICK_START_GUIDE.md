@@ -10,6 +10,8 @@
 
 This guide helps newcomers quickly set up and run the Solana NFT Burn and Mint Proof of Concept.
 
+⚠️ **Important**: This guide covers the **stand-alone POC only**. It does not connect to any backend services, databases, or Redis/Kafka infrastructure.
+
 ## ⚡ Quick Setup (5 minutes)
 
 ### Step 1: Clone and Navigate

@@ -1,10 +1,10 @@
 # AGENT.md - Codebase Guide for Coding Agents
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
+**Version:** v0.5.0-POC  
 **Last Updated:** 2025-08-06  
-**Status:** Active  
-**Purpose:** A guide for AI coding agents, summarizing key commands, architecture, and conventions for the AIW3 NFT project.
+**Status:** Design Phase  
+**Purpose:** A guide for AI coding agents, summarizing key commands, architecture, and conventions for the AIW3 NFT project (POC + documentation only).
 
 ---
 
@@ -18,7 +18,8 @@
 ## Architecture & Structure
 - **Backend Integration**: Designed to integrate with `/home/zealy/aiw3/gitlab.com/lastmemefi-api` (Sails.js + MySQL + Redis + Kafka)
 - **Blockchain**: Solana-based using SPL Token Program + Metaplex Token Metadata (no custom smart contracts)
-- **Core POC**: `/poc/solana-nft-burn-mint/` - functional NFT mint/burn proof of concept
+- **Core POC**: `/poc/solana-nft-burn-mint/` - functional NFT mint/burn proof of concept (NOT connected to backend)
+- **Implementation Status**: Documentation complete, backend services NOT YET IMPLEMENTED
 - **Documentation**: `/docs/` - comprehensive system design and implementation guides
 - **Prototypes**: `/aiw3-prototypes/` - UI/UX mockups and design assets
 
