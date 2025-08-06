@@ -368,7 +368,7 @@ The frontend is the user's primary interface for interacting with the AIW3 NFT s
 
 This section outlines the recommended strategy for handling NFT upgrades, focusing on a **Burn-and-Mint** model to ensure system integrity and prevent duplicate benefits.
 
-### Recommended Model: Burn-and-Mint
+### Burn-and-Mint Model
 
 The most secure and straightforward approach is to require the user to **burn** their lower-level NFT before the system **mints** the new, higher-level NFT.
 
@@ -377,12 +377,7 @@ The most secure and straightforward approach is to require the user to **burn** 
 - **Atomic State Transition:** The state change is clear and unambiguous. The user either has the old NFT or the new one, never both.
 - **Simplified Auditing:** It is easy to verify on-chain that the old NFT was destroyed before the new one was created.
 
-### Alternative Model (Not Recommended): In-Place Update
 
-An alternative would be to have a mutable NFT whose metadata is updated by the system. This is **not recommended** for the following reasons:
-- **Breaks Immutability:** It violates the core principle that NFTs should be immutable records.
-- **Complex and Error-Prone:** Would require custom smart contract development with authority to modify NFT metadata, which is more complex and introduces potential security risks. Our approach avoids this entirely by using standard programs.
-- **Poor Ecosystem Compatibility:** Many wallets and marketplaces are not designed to handle NFTs whose metadata changes, which could lead to display issues or user confusion.
 
 ### Burn-and-Mint Workflow
 
