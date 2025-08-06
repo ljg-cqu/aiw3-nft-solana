@@ -125,21 +125,13 @@ The backend is the intermediary between the user-facing frontend and the standar
 
 #### API Endpoints Overview
 
-The NFT system provides a comprehensive REST API with standardized endpoints for all NFT operations. For detailed API specifications, endpoint documentation, request/response formats, and integration examples, see the [AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md#core-api-endpoints) document.
+**Reference**: Complete API specifications, endpoint documentation, request/response formats, WebSocket events, and frontend integration patterns are available in the [API Frontend Integration Specification](./api-frontend/API-Frontend-Integration-Specification.md).
 
-**Key Endpoints:**
-- `GET /api/nft/status` - User NFT status and progress
-- `POST /api/nft/claim` - Initial NFT claiming to an `unlocked` state
-- `POST /api/nft/activate` - Activates a claimed NFT to make it `active`
-- `POST /api/nft/upgrade` - NFT upgrade process
-- `GET /api/nft/benefits` - Current tier benefits
-- `GET /api/nft/badges` - Badge collection management
-
-**Integration Features:**
-- Standardized response formats following existing `lastmemefi-api` patterns
+**Key Integration Features:**
+- Standardized REST API endpoints for all NFT operations
 - Real-time WebSocket events for status updates
 - JWT authentication integration
-- Comprehensive error handling following the [AIW3 NFT Error Handling Reference](./AIW3-NFT-Error-Handling-Reference.md)
+- Comprehensive error handling patterns
 
 - **Rationale:** Comprehensive API design with frontend integration support ensures seamless end-to-end functionality and developer productivity.
 

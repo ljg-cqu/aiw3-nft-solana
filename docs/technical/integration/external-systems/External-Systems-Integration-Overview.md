@@ -63,30 +63,12 @@ The AIW3 NFT system integrates with multiple external systems to provide compreh
 
 ## IPFS Storage Integration
 
-### Pinata Integration
+**Reference**: Complete IPFS via Pinata integration details, configuration, upload workflows, error handling, and performance optimization are documented in the [IPFS Pinata Integration Reference](./IPFS-Pinata-Integration-Reference.md).
 
-The system uses Pinata as the IPFS gateway provider for reliable decentralized storage.
-
-**Configuration Requirements**:
-```env
-PINATA_API_KEY=your_api_key
-PINATA_SECRET_API_KEY=your_secret_key
-PINATA_JWT=your_jwt_token
-```
-
-### Storage Architecture
-
-- **Metadata Storage**: JSON metadata files for NFT properties
-- **Asset Storage**: Images, videos, and other media files
-- **Gateway Access**: Public IPFS gateway for asset retrieval
-- **Pinning Service**: Ensures content availability and persistence
-
-### Data Flow
-
-1. **Upload**: Assets and metadata uploaded to IPFS via Pinata
-2. **Pinning**: Content pinned to ensure availability
-3. **Referencing**: IPFS hashes stored in NFT metadata
-4. **Retrieval**: Public gateways serve content to users
+**Key Integration Points**:
+- Decentralized metadata and asset storage
+- Pinata gateway for reliable content delivery
+- Integration with existing AIW3 backend storage architecture
 
 ---
 
@@ -192,6 +174,5 @@ graph TB
 ## Related Documentation
 
 - [Solana NFT Technical Reference](./Solana-NFT-Technical-Reference.md) - Detailed Solana blockchain integration
+- [IPFS Pinata Integration Reference](./IPFS-Pinata-Integration-Reference.md) - Complete IPFS integration guide
 - [Legacy Systems Integration](../legacy-systems/) - Integration with existing AIW3 infrastructure
-- [Network Resilience](../../deep-dives/AIW3-NFT-Network-Resilience.md) - Resilience strategies for external systems
-- [Security Operations](../../quality-and-ops/AIW3-NFT-Security-Operations.md) - Security considerations for external integrations

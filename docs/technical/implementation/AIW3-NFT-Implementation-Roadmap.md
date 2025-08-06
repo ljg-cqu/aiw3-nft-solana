@@ -39,63 +39,12 @@ npm install @metaplex-foundation/umi-bundle-defaults@^0.9.0
 ```
 
 #### Database Migration Scripts
-Create migration files in `config/db/migrations/`:
+**Reference**: Complete database schema definitions and migration scripts are available in the [Data Model Specification](../architecture/AIW3-NFT-Data-Model.md).
 
-**Migration 1: `20250806_create_user_nft_table.sql`**
-```sql
-CREATE TABLE user_nft (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    nft_mint_address VARCHAR(44) NOT NULL UNIQUE,
-    nft_level INT NOT NULL,
-    nft_name VARCHAR(255),
-    claimed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    last_upgraded_at DATETIME,
-    metadata_uri TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-    INDEX idx_user_active (user_id, is_active),
-    INDEX idx_mint_address (nft_mint_address)
-);
-```
-
-**Migration 2: `20250806_create_user_nft_qualification_table.sql`**
-```sql
-CREATE TABLE user_nft_qualification (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    target_level INT NOT NULL,
-    current_volume DECIMAL(30,10) DEFAULT 0,
-    required_volume DECIMAL(30,10) NOT NULL,
-    badges_collected INT DEFAULT 0,
-    badges_required INT DEFAULT 0,
-    is_qualified BOOLEAN DEFAULT FALSE,
-    last_checked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_level (user_id, target_level)
-);
-```
-
-**Migration 3: `20250806_create_badge_table.sql`**
-```sql
-CREATE TABLE badge (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    badge_type VARCHAR(100) NOT NULL,
-    badge_name VARCHAR(255) NOT NULL,
-    badge_identifier VARCHAR(100) NOT NULL UNIQUE,
-    earned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    metadata_uri TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-    INDEX idx_user_badge (user_id, badge_type)
-);
-```
+Create migration files in `config/db/migrations/` for the three required tables:
+- `user_nft` - NFT ownership and status tracking
+- `user_nft_qualification` - User qualification progress
+- `badge` - Achievement and badge tracking
 
 #### Feature Flag System Implementation
 ```javascript

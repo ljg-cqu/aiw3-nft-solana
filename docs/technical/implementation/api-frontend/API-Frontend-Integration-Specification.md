@@ -551,6 +551,6 @@ const NFTDashboard = () => {
 ## Related Documentation
 
 - [Data Model Specification](../../architecture/AIW3-NFT-Data-Model.md) - Database models and API data structures
-- [Legacy Backend Integration](../integration/legacy-systems/AIW3-NFT-Legacy-Backend-Integration.md) - Integration with existing AIW3 infrastructure
-- [Security Operations](../../quality-and-ops/AIW3-NFT-Security-Operations.md) - API security considerations
-- [Error Handling Reference](../../quality-and-ops/AIW3-NFT-Error-Handling-Reference.md) - Comprehensive error handling strategies
+- [Legacy Backend Integration](../../integration/legacy-systems/AIW3-NFT-Legacy-Backend-Integration.md) - Integration with existing AIW3 infrastructure
+- [Security Operations](../../security/AIW3-NFT-Security-Operations.md) - API security considerations
+- [Error Handling Reference](../../operations/AIW3-NFT-Error-Handling-Reference.md) - Comprehensive error handling strategies

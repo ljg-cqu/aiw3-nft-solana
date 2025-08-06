@@ -43,18 +43,17 @@ The AIW3 NFT System is a Solana-based equity NFT **proof of concept and design s
 This project's documentation is organized into focused, modular documents optimized for integration with the existing AIW3 backend system:
 
 ### Core Documentation
-- **[AIW3 NFT Tiers and Rules](./docs/AIW3-NFT-Tiers-and-Rules.md)**: Business rules, tier requirements, and user policies integrated with lastmemefi-api user system
-- **[AIW3 NFT System Design](./docs/AIW3-NFT-System-Design.md)**: High-level technical architecture leveraging existing lastmemefi-api infrastructure
-- **[AIW3 NFT Implementation Guide](./docs/AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide using lastmemefi-api patterns and services
-- **[AIW3 NFT Data Model](./docs/AIW3-NFT-Data-Model.md)**: Database schemas extending existing User model and API response formats
-- **[AIW3 NFT Appendix](./docs/AIW3-NFT-Appendix.md)**: Glossary of terms and external references
+- **[AIW3 NFT Business Rules and Flows](./docs/business/AIW3-NFT-Business-Rules-and-Flows.md)**: Business rules, tier requirements, and user policies integrated with lastmemefi-api user system
+- **[AIW3 NFT System Design](./docs/technical/architecture/AIW3-NFT-System-Design.md)**: High-level technical architecture leveraging existing lastmemefi-api infrastructure
+- **[AIW3 NFT Implementation Guide](./docs/technical/implementation/AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide using lastmemefi-api patterns and services
+- **[AIW3 NFT Data Model](./docs/technical/architecture/AIW3-NFT-Data-Model.md)**: Database schemas extending existing User model and API response formats
 
 ### UI/UX Design & Testing
 
 
 ### Backend Integration Plan 🚧 **DESIGN PHASE**
-- **[AIW3 NFT Legacy Backend Integration](./docs/AIW3-NFT-Legacy-Backend-Integration.md)**: Complete architectural design for RedisService, KafkaService, and Web3Service integration patterns
-- **[AIW3 NFT Integration Issues & PRs](./docs/AIW3-NFT-Integration-Issues-PRs.md)**: Detailed 51-issue implementation roadmap with backend service specifications
+- **[AIW3 NFT Legacy Backend Integration](./docs/technical/integration/legacy-systems/AIW3-NFT-Legacy-Backend-Integration.md)**: Complete architectural design for RedisService, KafkaService, and Web3Service integration patterns
+- **[AIW3 NFT Integration Issues & PRs](./docs/technical/implementation/issues-tracking/AIW3-NFT-Integration-Issues-PRs.md)**: Detailed 51-issue implementation roadmap with backend service specifications
 
 ### Multi-System Integration Architecture 📋 **DESIGNED**
 - **Redis Integration**: Designed caching patterns using `RedisService.setCache()`, `getCache()`, `delCache()` methods
@@ -64,7 +63,7 @@ This project's documentation is organized into focused, modular documents optimi
 
 ## Business Process and Rules
 
-The comprehensive business process and rules for this NFT project are detailed in the [AIW3 NFT Tiers and Rules](./docs/AIW3-NFT-Tiers-and-Rules.md) document.
+The comprehensive business process and rules for this NFT project are detailed in the [AIW3 NFT Business Rules and Flows](./docs/business/AIW3-NFT-Business-Rules-and-Flows.md) document.
 
 ## Project Roadmap, Scope, and Timeline
 
@@ -87,4 +86,4 @@ This project will be developed in three main phases, focusing on building the co
 
 ## Technical Architecture
 
-For detailed technical information, please refer to the [AIW3 NFT System Design](./docs/AIW3-NFT-System-Design.md) document, which provides a high-level overview of the system architecture and links to more detailed implementation guides.
+For detailed technical information, please refer to the [AIW3 NFT System Design](./docs/technical/architecture/AIW3-NFT-System-Design.md) document, which provides a high-level overview of the system architecture and links to more detailed implementation guides.

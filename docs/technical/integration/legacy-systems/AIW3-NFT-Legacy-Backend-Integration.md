@@ -149,58 +149,7 @@ The existing `SolanaChainAuthController` provides the foundation for secure, wal
 
 **⚠️ IMPLEMENTATION STATUS: DATABASE MODELS NOT YET CREATED**
 
-**Migration Scripts Required:**
-```sql
--- Migration 1: Create UserNFT table
-CREATE TABLE user_nft (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    nft_mint_address VARCHAR(44) NOT NULL UNIQUE,
-    nft_level INT NOT NULL,
-    nft_name VARCHAR(255),
-    claimed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    last_upgraded_at DATETIME,
-    metadata_uri TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-    INDEX idx_user_active (user_id, is_active),
-    INDEX idx_mint_address (nft_mint_address)
-);
-
--- Migration 2: Create UserNFTQualification table  
-CREATE TABLE user_nft_qualification (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    target_level INT NOT NULL,
-    current_volume DECIMAL(30,10) DEFAULT 0,
-    required_volume DECIMAL(30,10) NOT NULL,
-    badges_collected INT DEFAULT 0,
-    badges_required INT DEFAULT 0,
-    is_qualified BOOLEAN DEFAULT FALSE,
-    last_checked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_level (user_id, target_level)
-);
-
--- Migration 3: Create Badge table
-CREATE TABLE badge (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    badge_type VARCHAR(100) NOT NULL,
-    badge_name VARCHAR(255) NOT NULL,
-    badge_identifier VARCHAR(100) NOT NULL UNIQUE,
-    earned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    metadata_uri TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-    INDEX idx_user_badge (user_id, badge_type)
-);
-```
+**Database Schema Reference**: Complete database schemas and migration scripts are documented in the [Data Model Specification](../../architecture/AIW3-NFT-Data-Model.md).
 
 **Sails.js Model Structures (To Be Created):**
 ```javascript
