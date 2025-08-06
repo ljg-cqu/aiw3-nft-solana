@@ -667,7 +667,7 @@ flowchart TD
         A[User with Lv.1 NFT navigates to Synthesis page] --> B[Frontend: GET /api/nft/status]
         B --> C[Backend: Query MySQL for user trading volume]
         C --> D[Backend: Query Badge table for bound badges]
-        D --> E{Check Lv.2 requirements: 500,000 USDT + 1 badge}
+        D --> E{Check Lv.2 requirements: 500,000 USDT + 2 badges}
         E -->|Volume insufficient| F[Display current volume vs required 500,000 USDT]
         E -->|Missing badges| G[Display badge collection status and requirements]
     end
