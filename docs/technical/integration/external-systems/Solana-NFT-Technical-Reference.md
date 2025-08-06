@@ -78,6 +78,8 @@ An on-chain program that allows you to attach additional properties (like name, 
 
 #### Off-chain Storage (IPFS via Pinata)
 
+**Integration**: Complete IPFS implementation details are in [IPFS Pinata Integration Reference](./IPFS-Pinata-Integration-Reference.md).
+
 *Note: IPFS via Pinata chosen to align with existing AIW3 backend system storage architecture.*
 NFTs typically store their actual artwork and rich metadata (JSON files) off-chain on decentralized storage solutions. The on-chain metadata then points to this off-chain URI.
 
@@ -92,7 +94,7 @@ A tool by Metaplex for interacting with on-chain programs, providing simplified 
 
 ```bash
 npm install @solana/web3.js @metaplex-foundation/umi @metaplex-foundation/umi-bundle-defaults @metaplex-foundation/mpl-token-metadata
-# Note: The Pinata SDK (`@pinata/sdk`) should be part of the backend service dependencies.
+# Note: For IPFS/Pinata SDK setup, see IPFS Pinata Integration Reference document.
 ```
 
 #### Step 2: Wallet and Network Configuration
@@ -108,11 +110,12 @@ umi.use(mplTokenMetadata());
 
 #### Step 3: Upload Assets to IPFS via Pinata
 
-Before creating the on-chain NFT, the image and metadata must be uploaded to IPFS. Our architecture uses the **Pinata SDK** for this purpose within the backend `NFTService`.
+**Reference**: For complete IPFS upload workflows, error handling, and SDK configuration, see [IPFS Pinata Integration Reference](./IPFS-Pinata-Integration-Reference.md).
 
-1.  **Upload Image**: Upload the NFT image (e.g., `NFT_Level_1.png`) to Pinata. This returns an IPFS hash (e.g., `Qm...ImageHash`).
-2.  **Prepare Metadata**: Create a JSON file conforming to the Metaplex standard. The `image` URI must point to the IPFS gateway URL for the image hash from the previous step.
-3.  **Upload Metadata**: Upload the JSON file to Pinata. This returns a final IPFS hash for the metadata (e.g., `Qm...MetadataHash`). This hash will be used as the `uri` in the on-chain transaction.
+**Solana NFT-Specific Workflow:**
+1.  **Upload Image** → Get IPFS hash for Solana metadata reference
+2.  **Prepare Metadata** → Create JSON conforming to Metaplex standard (see schema below)
+3.  **Upload Metadata** → Get final IPFS hash for on-chain `uri` parameter
 
 **NFT Metadata JSON Structure:**
 
@@ -144,9 +147,7 @@ Before creating the on-chain NFT, the image and metadata must be uploaded to IPF
 
 #### Step 4: Asset Upload to Decentralized Storage
 
-1. **Upload image file to IPFS via Pinata** → Get image URI
-2. **Update metadata JSON** with image URI  
-3. **Upload metadata JSON to IPFS via Pinata** → Get metadata URI
+**Process**: Use the [IPFS Pinata Integration Reference](./IPFS-Pinata-Integration-Reference.md) workflows to complete asset upload and obtain the metadata URI for Step 5.
 
 #### Step 5: NFT Creation with Metaplex Umi
 
@@ -215,7 +216,7 @@ console.log("Minting authority disabled for the NFT.");
 
 - **Transaction Fees**: Every transaction costs a small amount of SOL
 - **Rent Exemption**: Account rent for token accounts and metadata accounts
-- **Storage Costs**: IPFS storage fees for images and metadata (via Pinata)
+- **Storage Costs**: IPFS storage fees for images and metadata (see [IPFS Pinata Integration Reference](./IPFS-Pinata-Integration-Reference.md) for cost details)
 
 ### 🏗️ On-Chain Instructions Deep Dive
 
