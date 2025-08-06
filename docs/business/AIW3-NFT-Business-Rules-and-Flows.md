@@ -53,14 +53,14 @@ Both conditions must be met before a user can claim or upgrade an NFT. There is 
 
 ### NFT Tiers, Rules, and Benefits Summary
 
-| Level | NFT Name              | Required Trading Volume (USDT) | Required Badges | Trading Fee Reduction |
-|:------|:----------------------|:-------------------------------|:----------------|:----------------------|
-| 1     | Tech Chicken          | ≥ 100,000                      | None            | 10%                   |
-| 2     | Quant Ape             | ≥ 500,000                      | 1               | 20%                   |
-| 3     | On-chain Hunter       | ≥ 1,000,000                    | 2               | 30%                   |
-| 4     | Alpha Alchemist       | ≥ 5,000,000                    | 3               | 40%                   |
-| 5     | Quantum Alchemist     | ≥ 10,000,000                   | 4               | 50%                   |
-| Special | Trophy Breeder (Special) | By community contribution      | Special Event Badge | 75%                   |
+| Level | NFT Name              | Required Trading Volume (USDT) | Required Badges | Trading Fee Reduction | Aiagent Benefits |
+|:------|:----------------------|:-------------------------------|:----------------|:----------------------|:-----------------|
+| 1     | Tech Chicken          | ≥ 100,000                      | None            | 10%                   | 10 free uses per week |
+| 2     | Quant Ape             | ≥ 500,000                      | 2 badge-type NFTs | 20%                   | 20 free uses per week |
+| 3     | On-chain Hunter       | ≥ 5,000,000                    | 4 badge-type NFTs | 30%                   | 30 free uses per week |
+| 4     | Alpha Alchemist       | ≥ 10,000,000                   | 6 badge-type NFTs | 40%                   | 40 free uses per week |
+| 5     | Quantum Alchemist     | ≥ 50,000,000                   | 8 badge-type NFTs | 55%                   | 50 free uses per week |
+| Special | Trophy Breeder       | Top 3 in trading competition   | Airdrop         | 25%                   | - |
 
 ---
 
