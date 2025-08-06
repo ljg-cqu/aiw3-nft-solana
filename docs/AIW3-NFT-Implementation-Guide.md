@@ -16,7 +16,7 @@ For instant access to build commands, test procedures, and coding conventions wh
 
 ## 📋 Official Testing & Acceptance Criteria
 
-**MANDATORY**: All implementation work must be validated against the official testing document: **[NFT Level System Testing Document](https://l4dxxsq5eol.sg.larksuite.com/docx/Hq5adpytKoYMGOx3MCillpYngNg)**
+
 
 This document defines the acceptance criteria and testing standards that serve as the **definitive specification** for the NFT system implementation. Any feature or functionality not meeting these standards will be rejected during QA.
 

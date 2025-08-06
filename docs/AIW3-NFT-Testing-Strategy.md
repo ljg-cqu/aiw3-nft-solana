@@ -27,7 +27,7 @@
 
 ### Official Testing Standards
 
-**Primary Testing Document**: [NFT Level System Testing Document](https://l4dxxsq5eol.sg.larksuite.com/docx/Hq5adpytKoYMGOx3MCillpYngNg)
+
 
 This Larksuite document serves as the **official acceptance criteria and testing standard** for the NFT system implementation. All development work must be validated against these requirements before deployment.
 

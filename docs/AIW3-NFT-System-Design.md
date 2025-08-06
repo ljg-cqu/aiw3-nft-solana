@@ -14,7 +14,7 @@ This document provides technical specifications for integrating AIW3's Equity NF
 
 ## 🎯 Implementation Acceptance Criteria
 
-All system design implementations must adhere to the official testing standards: **[NFT Level System Testing Document](https://l4dxxsq5eol.sg.larksuite.com/docx/Hq5adpytKoYMGOx3MCillpYngNg)**
+
 
 This document serves as the **authoritative reference** for system validation and acceptance testing.
 

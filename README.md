@@ -50,9 +50,7 @@ This project's documentation is organized into focused, modular documents optimi
 - **[AIW3 NFT Appendix](./docs/AIW3-NFT-Appendix.md)**: Glossary of terms and external references
 
 ### UI/UX Design & Testing
-- **[UI Design Document](https://app.mockplus.cn/app/share-43243abc91caeec3451d14465f0b94f2share-7hHJcMABGb/comment/p24-p6bxJ/l1cz1EbZFJ)**: Interactive UI prototypes and design specifications (Mockplus)
-- **[Design System Draft](https://www.figma.com/design/FP3lWMHhJ7riy3PTtJpxL0/AIW3?node-id=18238-5193&p=f)**: Complete design system and component library (Figma)
-- **[NFT Level System Testing Document](https://l4dxxsq5eol.sg.larksuite.com/docx/Hq5adpytKoYMGOx3MCillpYngNg)**: Official testing standards and acceptance criteria for NFT system implementation ⭐ **Primary Testing Standard**
+
 
 ### Backend Integration Plan 🚧 **DESIGN PHASE**
 - **[AIW3 NFT Legacy Backend Integration](./docs/AIW3-NFT-Legacy-Backend-Integration.md)**: Complete architectural design for RedisService, KafkaService, and Web3Service integration patterns

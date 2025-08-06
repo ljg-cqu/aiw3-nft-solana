@@ -640,5 +640,4 @@ For instant access to build commands, architecture overview, and essential codin
 - [AIW3 NFT Deployment Guide](./AIW3-NFT-Deployment-Guide.md)
 
 ### UI/UX Design References
-- [UI Design Document](https://app.mockplus.cn/app/share-43243abc91caeec3451d14465f0b94f2share-7hHJcMABGb/comment/p24-p6bxJ/l1cz1EbZFJ) - Interactive UI prototypes and design specifications (Mockplus)
-- [Design System Draft](https://www.figma.com/design/FP3lWMHhJ7riy3PTtJpxL0/AIW3?node-id=18238-5193&p=f) - Complete design system and component library (Figma)
+
