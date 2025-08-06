@@ -1,9 +1,9 @@
 # AGENT.md - Codebase Guide for Coding Agents
 
 <!-- Document Metadata -->
-**Version:** v0.5.0-POC  
+**Version:** v1.0.0  
 **Last Updated:** 2025-08-06  
-**Status:** Design Phase  
+**Status:** Active  
 **Purpose:** A guide for AI coding agents, summarizing key commands, architecture, and conventions for the AIW3 NFT project (POC + documentation only).
 
 ---
