@@ -164,14 +164,14 @@ graph TB
 
 ## System Component Responsibilities
 
-| Component | NFT-Related Responsibilities | Data Flow |
-|-----------|----------------------------|----------|
-| **NFTService** | Orchestrates all NFT business logic, qualification checks, minting/burning coordination | Reads from MySQL, writes to Kafka, calls Web3Service |
-| **Web3Service** | Solana blockchain interactions, mint/burn operations, balance queries | Communicates with Solana RPC, returns transaction signatures |
-| **UserService** | User data management, trading volume tracking, wallet address validation | CRUD operations on MySQL User table |
-| **RedisService** | Caches NFT qualification status, pending operations, rate limiting | Read/write to Redis with TTL for performance |
-| **KafkaService** | Publishes NFT events, processes async operations, handles retries | Produces/consumes messages for real-time updates |
-| **AccessTokenService** | JWT validation for NFT endpoints, wallet-based authentication | Validates tokens, manages user sessions |
+| Component | Implementation Status | NFT-Related Responsibilities | Data Flow |
+|-----------|---------------------|----------------------------|----------|
+| **NFTService** | 🚨 **TO BE CREATED** | Orchestrates all NFT business logic, qualification checks, minting/burning coordination | Reads from MySQL, writes to Kafka, calls Web3Service |
+| **Web3Service** | ✅ **EXISTS** - NFT extensions needed | Solana blockchain interactions, mint/burn operations, balance queries | Communicates with Solana RPC, returns transaction signatures |
+| **UserService** | ✅ **EXISTS** | User data management, trading volume tracking, wallet address validation | CRUD operations on MySQL User table |
+| **RedisService** | ✅ **EXISTS** | Caches NFT qualification status, pending operations, rate limiting | Read/write to Redis with TTL for performance |
+| **KafkaService** | ✅ **EXISTS** | Publishes NFT events, processes async operations, handles retries | Produces/consumes messages for real-time updates |
+| **AccessTokenService** | ✅ **EXISTS** | JWT validation for NFT endpoints, wallet-based authentication | Validates tokens, manages user sessions |
 
 The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a URI reference to off-chain JSON metadata that stores the actual level data and references to IPFS-hosted images.
 

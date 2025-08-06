@@ -606,6 +606,330 @@ jobs:
 
 ---
 
+## Production-Ready Testing Enhancements
+
+### Test-Driven Development (TDD) Process
+
+**Red-Green-Refactor Cycle for NFT Features**:
+```javascript
+// Example: TDD for NFT upgrade business logic
+describe('NFT Upgrade Logic (TDD)', () => {
+  // RED: Write failing test first
+  it('should prevent upgrade when user lacks required trading volume', async () => {
+    // Arrange
+    const userId = 123;
+    const currentLevel = 1;
+    const targetLevel = 2;
+    sinon.stub(NFTService, 'calculateTradingVolume').resolves(50000); // Below requirement
+    
+    // Act & Assert
+    await expect(NFTService.checkUpgradeEligibility(userId, currentLevel, targetLevel))
+      .to.be.rejectedWith('Insufficient trading volume for upgrade');
+  });
+  
+  // GREEN: Implement minimal code to pass
+  // REFACTOR: Improve code quality while maintaining tests
+});
+```
+
+**BDD (Behavior-Driven Development) Scenarios**:
+```gherkin
+Feature: NFT Claim and Upgrade Process
+  As a qualified user
+  I want to claim and upgrade NFTs based on my trading activity
+  So that I can access enhanced platform benefits
+
+  Background:
+    Given I am a registered user with wallet "USER_WALLET_123"
+    And I have completed KYC verification
+    And the system wallet has sufficient balance
+
+  Scenario: Successful NFT Claim for Qualified User
+    Given I have trading volume of $150,000 in the last 30 days
+    And I have collected 3 out of 3 required badges
+    When I request to claim a Level 1 NFT
+    Then the system should verify my qualification
+    And upload metadata to IPFS
+    And mint the NFT to my wallet
+    And update my database record
+    And I should receive confirmation within 30 seconds
+
+  Scenario: NFT Upgrade with Burn and Mint
+    Given I own a Level 1 NFT with mint address "EXISTING_MINT_123"
+    And I have trading volume of $300,000 in the last 30 days
+    When I request to upgrade to Level 2
+    Then the system should burn my existing NFT
+    And mint a new Level 2 NFT
+    And update my benefits eligibility
+    And the process should complete within 60 seconds
+
+  Scenario: Concurrent Upgrade Prevention
+    Given I have initiated an upgrade process
+    When I attempt a second upgrade request
+    Then the system should reject the duplicate request
+    And inform me that an upgrade is already in progress
+```
+
+### Chaos Engineering and Fault Injection
+
+**Network Failure Simulation**:
+```javascript
+// Chaos testing for network resilience
+const ChaosTests = {
+  async simulateNetworkPartition() {
+    // Simulate Solana RPC failures
+    nock('https://api.mainnet-beta.solana.com')
+      .post('/')
+      .times(3)
+      .replyWithError('ECONNRESET');
+    
+    // Test that system gracefully handles failures
+    const result = await NFTService.claimNFT(testUserId, 1);
+    expect(result.success).to.be.true; // Should succeed via backup RPC
+  },
+  
+  async simulateIPFSOutage() {
+    // Simulate Pinata service outage
+    nock('https://api.pinata.cloud')
+      .post('/pinning/pinJSONToIPFS')
+      .times(5)
+      .reply(503, 'Service Unavailable');
+    
+    // Verify failover to alternative IPFS provider
+    const metadata = { name: 'Test NFT', image: 'test.png' };
+    const ipfsHash = await IPFSService.uploadMetadata(metadata);
+    expect(ipfsHash).to.exist;
+  },
+  
+  async simulateDatabaseConnectionLoss() {
+    // Temporarily close database connection
+    await sails.getDatastore().manager.end();
+    
+    // Test that queued operations continue after reconnection
+    const claimPromise = NFTService.claimNFT(testUserId, 1);
+    
+    // Restore connection after delay
+    setTimeout(() => {
+      sails.getDatastore().manager.connect();
+    }, 2000);
+    
+    const result = await claimPromise;
+    expect(result.success).to.be.true;
+  }
+};
+```
+
+**Load Testing with Gradual Degradation**:
+```javascript
+// Progressive load testing
+const LoadTests = {
+  async gradualLoadIncrease() {
+    const loadProfiles = [
+      { duration: 60, rps: 10, description: 'baseline' },
+      { duration: 120, rps: 25, description: 'normal load' },
+      { duration: 180, rps: 50, description: 'peak load' },
+      { duration: 60, rps: 100, description: 'stress test' },
+      { duration: 60, rps: 200, description: 'breaking point' }
+    ];
+    
+    const results = [];
+    
+    for (const profile of loadProfiles) {
+      console.log(`Testing ${profile.description}: ${profile.rps} RPS for ${profile.duration}s`);
+      
+      const result = await this.runLoadTest(profile);
+      results.push({
+        ...profile,
+        averageResponseTime: result.avgResponseTime,
+        errorRate: result.errorRate,
+        p95ResponseTime: result.p95ResponseTime
+      });
+      
+      // Check if system is still healthy
+      if (result.errorRate > 0.05 || result.p95ResponseTime > 5000) {
+        console.warn(`System degradation detected at ${profile.rps} RPS`);
+        break;
+      }
+      
+      // Cool down period
+      await new Promise(resolve => setTimeout(resolve, 30000));
+    }
+    
+    return results;
+  }
+};
+```
+
+### Security Testing Framework
+
+**Penetration Testing Automation**:
+```javascript
+const SecurityTests = {
+  async testAuthenticationBypass() {
+    // Test various authentication bypass techniques
+    const bypassAttempts = [
+      { name: 'No JWT', headers: {} },
+      { name: 'Invalid JWT', headers: { authorization: 'Bearer invalid_token' } },
+      { name: 'Expired JWT', headers: { authorization: 'Bearer expired_token' } },
+      { name: 'Malformed signature', body: { signature: 'malformed_sig' } }
+    ];
+    
+    for (const attempt of bypassAttempts) {
+      const response = await request(app)
+        .post('/api/nft/claim')
+        .set(attempt.headers || {})
+        .send(attempt.body || {});
+      
+      expect(response.status).to.equal(401, `${attempt.name} should be rejected`);
+    }
+  },
+  
+  async testSQLInjection() {
+    // Test SQL injection vulnerabilities
+    const injectionPayloads = [
+      "'; DROP TABLE users; --",
+      "' OR '1'='1",
+      "' UNION SELECT * FROM users --",
+      "admin'/*",
+      "' OR 1=1#"
+    ];
+    
+    for (const payload of injectionPayloads) {
+      const response = await request(app)
+        .get('/api/nft/status')
+        .query({ userId: payload })
+        .set('Authorization', `Bearer ${validToken}`);
+      
+      // Should not return database error or unauthorized data
+      expect(response.status).to.not.equal(500);
+      expect(response.body).to.not.have.property('error').that.includes('SQL');
+    }
+  },
+  
+  async testRateLimitingBypass() {
+    // Test rate limiting evasion techniques
+    const requests = [];
+    
+    // Attempt to exceed rate limits
+    for (let i = 0; i < 100; i++) {
+      requests.push(
+        request(app)
+          .post('/api/nft/claim')
+          .set('Authorization', `Bearer ${validToken}`)
+          .set('X-Forwarded-For', `192.168.1.${i % 255}`) // IP rotation attempt
+      );
+    }
+    
+    const responses = await Promise.allSettled(requests);
+    const rateLimitedCount = responses.filter(r => 
+      r.value?.status === 429
+    ).length;
+    
+    expect(rateLimitedCount).to.be.greaterThan(90, 'Rate limiting should block most requests');
+  }
+};
+```
+
+### Contract Testing for Integration
+
+**Consumer-Driven Contract Testing**:
+```javascript
+// Pact testing for API contracts
+const { Pact } = require('@pact-foundation/pact');
+
+describe('NFT API Consumer Contract', () => {
+  const provider = new Pact({
+    consumer: 'NFT-Frontend',
+    provider: 'NFT-API',
+    port: 1234
+  });
+  
+  before(() => provider.setup());
+  after(() => provider.finalize());
+  
+  it('should return NFT status for valid user', async () => {
+    // Define expected interaction
+    await provider.addInteraction({
+      state: 'user exists with trading volume',
+      uponReceiving: 'a request for NFT status',
+      withRequest: {
+        method: 'GET',
+        path: '/api/nft/status',
+        headers: {
+          'Authorization': 'Bearer valid_token'
+        }
+      },
+      willRespondWith: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: {
+          qualified: true,
+          currentLevel: 1,
+          nextLevel: 2,
+          tradingVolume: 150000,
+          requiredVolume: 100000
+        }
+      }
+    });
+    
+    // Test the interaction
+    const response = await fetch('http://localhost:1234/api/nft/status', {
+      headers: { 'Authorization': 'Bearer valid_token' }
+    });
+    
+    expect(response.status).to.equal(200);
+    const data = await response.json();
+    expect(data.qualified).to.be.true;
+  });
+});
+```
+
+### Quality Gates and Metrics
+
+**Advanced Quality Metrics**:
+```javascript
+const QualityGates = {
+  coverage: {
+    statements: 85,
+    branches: 80,
+    functions: 85,
+    lines: 85,
+    exclude: ['test/**', 'scripts/**']
+  },
+  
+  codeQuality: {
+    cyclomaticComplexity: 10,
+    maintainabilityIndex: 70,
+    technicalDebt: '< 1 hour',
+    duplicatedLines: '< 3%'
+  },
+  
+  security: {
+    vulnerabilities: 0,
+    securityHotspots: 0,
+    dependencyVulnerabilities: 'low or none'
+  },
+  
+  performance: {
+    apiResponseTime: {
+      p50: 200,  // milliseconds
+      p95: 500,
+      p99: 1000
+    },
+    databaseQueryTime: {
+      p95: 100,
+      p99: 500
+    },
+    memoryUsage: '< 512MB',
+    cpuUsage: '< 70%'
+  }
+};
+```
+
+---
+
 ## Related Documents
 
 - [AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)

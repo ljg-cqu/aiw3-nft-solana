@@ -78,11 +78,40 @@ The AIW3 NFT system uses **only standard Solana programs** without requiring any
 
 The backend is the intermediary between the user-facing frontend and the standard Solana programs.
 
-### 1. **NFT Service (`NFTService.js`)**
-- **Action:** Create a new service to orchestrate all NFT-related business logic.
-  - **Qualification Logic:** Check user trading volume against `Tiers and Rules`
-  - **Minting/Burning Orchestration:** Coordinate with `Web3Service` for on-chain actions
-  - **State Management:** Update user NFT status in the database
+### 1. **NFT Service (`NFTService.js`)** - 🚨 **TO BE CREATED**
+
+**⚠️ IMPLEMENTATION STATUS: SERVICE DOES NOT EXIST**
+
+**Step-by-Step Creation Process:**
+
+1. **Create the service file:**
+   ```bash
+   cd /home/zealy/aiw3/gitlab.com/lastmemefi-api
+   touch api/services/NFTService.js
+   ```
+
+2. **Implement basic structure:**
+   ```javascript
+   // api/services/NFTService.js
+   module.exports = {
+     calculateTradingVolume: async function(userId) {
+       // Implementation as shown in Implementation Roadmap
+     },
+     
+     checkNFTQualification: async function(userId, targetLevel) {
+       // Implementation as shown in Implementation Roadmap
+     }
+   };
+   ```
+
+3. **Test the service:**
+   ```bash
+   # Start sails console
+   sails console
+   # Test in console:
+   # NFTService.calculateTradingVolume(1)
+   ```
+
 - **Rationale:** A dedicated service encapsulates NFT logic, making the system modular and easier to maintain.
 
 ### 2. **API Endpoint Creation & Frontend Integration**
