@@ -36,13 +36,13 @@ This section defines the core concepts used throughout the AIW3 NFT documentatio
 -   **`aiagentUses`**: A numerical value representing the number of times a user can access premium AI-powered agent features per month. This benefit is tied to the user's current **Equity NFT** tier.
     -   **Reference:** See the [Benefit Summary Table](./AIW3-NFT-Tiers-and-Rules.md#benefit-summary-table) for specific values per tier.
 
--   **Equity NFT:** The primary NFT representing a user's status and benefits, organized into **Levels** or **Tiers**. Higher tiers are acquired by meeting trading volume thresholds and owning required **Badge NFTs**.
+-   **Equity NFT:** The primary NFT representing a user's status and benefits, organized into **Levels** or **Tiers**. Higher tiers are acquired by meeting trading volume thresholds and earning the required **badges**.
     -   **Flow Reference:** See [Unlocking and Activation Processes](./AIW3-NFT-Business-Flows-and-Processes.md#unlocking-and-activation-processes) and [Synthesis and Upgrade Processes](./AIW3-NFT-Business-Flows-and-Processes.md#synthesis-and-upgrade-processes).
 
--   **Badge NFT:** A secondary, collectible NFT that acts as a prerequisite or "key" for synthesizing a higher-level **Equity NFT**. These are typically awarded for specific achievements or participation.
+-   **Badge:** An off-chain achievement marker that acts as a prerequisite or "key" for synthesizing a higher-level **Equity NFT**. These are awarded for specific achievements or participation and are not NFTs themselves.
     -   **Flow Reference:** See [Badge Integration](./AIW3-NFT-Business-Flows-and-Processes.md#badge-integration).
 
--   **Synthesis:** The official term for upgrading an Equity NFT. This process consumes the user's current NFT (and any required Badge NFTs) to mint a new, higher-level one.
+-   **Synthesis:** The official term for upgrading an Equity NFT. This process consumes the user's current NFT and requires specific **badges** to be earned before a new, higher-level one can be minted.
     -   **Flow Reference:** See [Synthesis and Upgrade Processes](./AIW3-NFT-Business-Flows-and-Processes.md#synthesis-and-upgrade-processes).
 
 -   **Unlockable State:** A state where a user has met the criteria to claim an NFT but has not yet minted it. It requires a final user action.

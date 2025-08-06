@@ -80,14 +80,14 @@ CREATE TABLE user_nft_qualification (
 );
 ```
 
-**Migration 3: `20250806_create_nft_badge_table.sql`**
+**Migration 3: `20250806_create_badge_table.sql`**
 ```sql
-CREATE TABLE nft_badge (
+CREATE TABLE badge (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     badge_type VARCHAR(100) NOT NULL,
     badge_name VARCHAR(255) NOT NULL,
-    mint_address VARCHAR(44) NOT NULL UNIQUE,
+    badge_identifier VARCHAR(100) NOT NULL UNIQUE,
     earned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     metadata_uri TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -183,15 +183,15 @@ module.exports = {
 };
 ```
 
-**File: `api/models/NFTBadge.js`**
+**File: `api/models/Badge.js`**
 ```javascript
 module.exports = {
-  tableName: 'nft_badge',
+  tableName: 'badge',
   attributes: {
     user_id: { model: 'user' },
     badge_type: { type: 'string' },
     badge_name: { type: 'string' },
-    mint_address: { type: 'string', unique: true },
+    badge_identifier: { type: 'string', unique: true },
     earned_at: { type: 'ref', columnType: 'datetime' },
     metadata_uri: { type: 'string' }
   }

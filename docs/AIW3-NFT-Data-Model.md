@@ -20,7 +20,7 @@ This document provides comprehensive specifications for data structures in the A
     -   [New Models](#new-models)
         -   [UserNFT Model](#usernft-model-apimodelsusernftjs)
         -   [UserNFTQualification Model](#usernftqualification-model-apimodelsusernftqualificationjs)
-        -   [NFTBadge Model](#nftbadge-model-apimodelsnftbadgejs)
+        -   [Badge Model](#badge-model-apimodelsbadgejs)
         -   [NFTUpgradeRequest Model](#nftupgraderequest-model-apimodelsnftupgraderequestjs)
     -   [Extended User Model](#extended-user-model)
     -   [Database Migration Scripts](#database-migration-scripts)
@@ -198,6 +198,8 @@ module.exports = {
 
 #### Badge Model (api/models/Badge.js)
 
+This model represents an off-chain achievement badge awarded to a user. It is not an NFT.
+
 ```javascript
 module.exports = {
   attributes: {
@@ -356,15 +358,13 @@ module.exports = {
     current_nft_level: {
       type: 'number',
       allowNull: true,
-      min: 0,
-      max: 5,
-      description: 'Current highest NFT level owned by user (1-5 regular, Special for Trophy Breeder)'
+      description: 'The current highest active NFT level of the user'
     },
     
-    last_active_nft_id: {
-      model: 'usernft',
+    current_nft_mint: {
+      type: 'string',
       allowNull: true,
-      description: 'Reference to user\'s currently active/primary NFT'
+      description: 'The mint address of the current highest active NFT'
     },
     
     // Cached trading volume for performance (calculated from Trades model)

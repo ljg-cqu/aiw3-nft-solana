@@ -301,7 +301,7 @@ sequenceDiagram
     NFT->>REDIS: RedisService.getCache("nft_lock:upgrade:" + userId)
     REDIS-->>NFT: check for pending upgrades
     
-    NFT->>MYSQL: SELECT badges_collected, badges_required FROM user_nft_qualifications
+    NFT->>MYSQL: SELECT COUNT(*) FROM badge WHERE user_id = ? AND is_bound = true
     MYSQL-->>NFT: qualification status
     
     %% Set upgrade lock using RedisService with lock mode
@@ -361,7 +361,7 @@ The system qualifies users for NFT levels based on a combination of transaction 
 1. **Redis Cache Check**: Query cached qualification data (`nft_qual:{userId}`) with 5-minute TTL
 2. **Database Query**: If cache miss, aggregate trading volume from MySQL `trades` table using `SUM(total_usd_price) WHERE user_id = ?`
 3. **NFT Ownership Check**: Query existing NFTs from `user_nfts` table to prevent duplicates
-4. **Badge Verification**: Check badge requirements from `user_nft_qualifications` table
+4. **Badge Verification**: Check earned badges from the `badge` table
 5. **Concurrency Control**: Use Redis locks to prevent duplicate operations
 6. **Authorization**: Authorize minting only for qualified level with proper validation
 
@@ -498,7 +498,7 @@ graph TD
     subgraph NewNFTTables ["NFT Database Extensions"]
         MySQL --> UserNFT[(UserNFT Table)]
         MySQL --> NFTQualification[(UserNFTQualification)]
-        MySQL --> Badge[(Badge Table)]
+        MySQL --o Badge[(Badge Table)]
         MySQL --> UpgradeRequest[(NFTUpgradeRequest)]
         MySQL --> ExistingTrades[(Existing Trades Table)]
     end

@@ -95,7 +95,7 @@ This document provides a comprehensive overview of all NFT-related business flow
 ### Community-Mini Homepage Visibility
 
 - **Purpose**: To allow users to showcase their NFT achievements to the community, fostering engagement and social proof.
-- **Implementation**: A user's public-facing profile or "mini homepage" will display their highest-achieved NFT badge. Users may have privacy settings to control this visibility.
+- **Implementation**: A user's public-facing profile or "mini homepage" will display their highest-achieved Equity NFT. Users may have privacy settings to control this visibility.
 
 ---
 
