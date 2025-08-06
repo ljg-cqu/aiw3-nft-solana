@@ -29,7 +29,7 @@
 - **Error Handling**: Validate environment variables before execution, console.error for failures
 - **Naming**: camelCase for functions, UPPER_CASE for environment variables
 - **Documentation**: All markdown files must include metadata header with Version, Last Updated, Status, Purpose
-- **Dependencies**: Solana Web3.js v1.87.6, SPL Token v0.3.8, Metaplex Foundation JS v0.19.4
+- **Dependencies**: Solana Web3.js v1.98.0, SPL Token v0.3.8, Metaplex Foundation mpl-token-metadata v2.13.0
 
 ## Key Technical Patterns
 - **Keypair Generation**: Use comma-separated secret key arrays converted to Uint8Array
