@@ -25,6 +25,22 @@
 
 ## Testing Overview
 
+### Official Testing Standards
+
+**Primary Testing Document**: [NFT Level System Testing Document](https://l4dxxsq5eol.sg.larksuite.com/docx/Hq5adpytKoYMGOx3MCillpYngNg)
+
+This Larksuite document serves as the **official acceptance criteria and testing standard** for the NFT system implementation. All development work must be validated against these requirements before deployment.
+
+**Key Testing Requirements**:
+- NFT level system functionality validation
+- User interface testing specifications  
+- Business logic acceptance criteria
+- Integration testing standards
+- Performance benchmarks
+- Quality assurance checkpoints
+
+> ⚠️ **Important**: Developers must reference this document for all testing activities. Any implementation that does not meet these standards will be rejected during acceptance testing.
+
 ### Testing Pyramid
 
 ```

@@ -27,6 +27,18 @@ This document provides comprehensive deployment procedures for the AIW3 NFT syst
 
 ## Deployment Overview
 
+### Pre-Deployment Testing Requirements
+
+**CRITICAL**: Before any deployment, the system must pass all tests defined in: **[NFT Level System Testing Document](https://l4dxxsq5eol.sg.larksuite.com/docx/Hq5adpytKoYMGOx3MCillpYngNg)**
+
+**Pre-deployment Checklist**:
+- ✅ All acceptance criteria validated
+- ✅ Testing standards compliance verified  
+- ✅ Quality gates passed
+- ✅ Performance benchmarks met
+
+> ⚠️ **DEPLOYMENT GATE**: Any deployment that has not passed the official testing standards will be blocked and rolled back immediately.
+
 ### Deployment Architecture
 
 ```

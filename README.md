@@ -49,6 +49,9 @@ This project's documentation is organized into focused, modular documents optimi
 - **[AIW3 NFT Data Model](./docs/AIW3-NFT-Data-Model.md)**: Database schemas extending existing User model and API response formats
 - **[AIW3 NFT Appendix](./docs/AIW3-NFT-Appendix.md)**: Glossary of terms and external references
 
+### Testing & Acceptance Criteria
+- **[NFT Level System Testing Document](https://l4dxxsq5eol.sg.larksuite.com/docx/Hq5adpytKoYMGOx3MCillpYngNg)**: Official testing standards and acceptance criteria for NFT system implementation ⭐ **Primary Testing Standard**
+
 ### Backend Integration Plan 🚧 **DESIGN PHASE**
 - **[AIW3 NFT Legacy Backend Integration](./docs/AIW3-NFT-Legacy-Backend-Integration.md)**: Complete architectural design for RedisService, KafkaService, and Web3Service integration patterns
 - **[AIW3 NFT Integration Issues & PRs](./docs/AIW3-NFT-Integration-Issues-PRs.md)**: Detailed 51-issue implementation roadmap with backend service specifications

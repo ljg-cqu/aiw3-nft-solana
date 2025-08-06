@@ -15,6 +15,12 @@
 - **Lint**: `npx eslint` (ESLint configured in package.json)
 - **Validate Docs**: `./scripts/validate_docs.sh` (validates markdown metadata headers)
 
+## Testing & Acceptance Standards
+- **Official Testing Document**: [NFT Level System Testing Document](https://l4dxxsq5eol.sg.larksuite.com/docx/Hq5adpytKoYMGOx3MCillpYngNg) ⭐ **MANDATORY REFERENCE**
+- **Purpose**: Defines acceptance criteria and testing standards for all NFT system implementations
+- **Scope**: All development work must be validated against this document before deployment
+- **Access**: Requires Larksuite authentication - contact team lead if access needed
+
 ## Architecture & Structure
 - **Backend Integration**: Designed to integrate with `/home/zealy/aiw3/gitlab.com/lastmemefi-api` (Sails.js + MySQL + Redis + Kafka)
 - **Blockchain**: Solana-based using SPL Token Program + Metaplex Token Metadata (no custom smart contracts)
