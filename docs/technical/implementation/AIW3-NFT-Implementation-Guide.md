@@ -1,14 +1,68 @@
-# AIW3 NFT Implementation Guide
+# Implementation Guide Index
 
 <!-- Document Metadata -->
 **Version:** v1.0.0  
-**Last Updated:** 2025-08-06  
+**Last Updated:** 2025-08-07  
 **Status:** Active  
-**Purpose:** Provides a step-by-step developer guide for implementing the AIW3 NFT system.
+**Purpose:** Navigation index for all AIW3 NFT implementation guides.
 
 ---
 
-This document provides comprehensive implementation guidelines for the AIW3 NFT system, emphasizing integration with the `lastmemefi-api` backend (located at `$HOME/aiw3/lastmemefi-api`). It outlines standard program integration, backend service utilization, frontend application development, and process flows.
+## Overview
+
+The AIW3 NFT implementation has been organized into focused, single-responsibility guides to ensure clear separation of concerns and easier maintenance. Each guide covers a specific aspect of the implementation process.
+
+## Implementation Guides
+
+### 🏗️ [Backend Implementation Guide](./Backend-Implementation-Guide.md)
+**Focus:** Backend services, APIs, and database integration
+- NFTService creation and implementation
+- NFTController API endpoints
+- Database schema integration
+- Service configuration and testing
+
+### 🎨 [Frontend Implementation Guide](./Frontend-Implementation-Guide.md)  
+**Focus:** User interface and frontend application development
+- Personal Center implementation
+- Wallet integration patterns
+- API connectivity and state management
+- Component development and user flows
+
+### ⛓️ [Blockchain Integration Guide](./Blockchain-Integration-Guide.md)
+**Focus:** Solana blockchain integration and operations
+- Standard Solana programs integration
+- Web3Service extension and configuration
+- Transaction handling and monitoring
+- Blockchain event processing
+
+### 📋 [Process Flow Reference](./Process-Flow-Reference.md)
+**Focus:** Complete system workflows and user interaction flows
+- New user onboarding procedures
+- NFT upgrade and burn-and-mint workflows  
+- Error handling and recovery procedures
+- System state management flows
+
+## Supporting Documentation
+
+### 📊 [Implementation Roadmap](./AIW3-NFT-Implementation-Roadmap.md)
+Project phases, timeline, and dependencies for implementation planning.
+
+### 🔌 [API Frontend Integration](./api-frontend/API-Frontend-Integration-Specification.md)
+Complete API specifications, endpoints, and frontend integration patterns.
+
+### 📝 [Issues Tracking](./issues-tracking/AIW3-NFT-Integration-Issues-PRs.md)
+Development issues, PRs, and project tracking documentation.
+
+## Quick Start
+
+1. **Begin with Backend:** Start with the [Backend Implementation Guide](./Backend-Implementation-Guide.md) to set up core services
+2. **Add Blockchain Integration:** Follow the [Blockchain Integration Guide](./Blockchain-Integration-Guide.md) for Solana connectivity
+3. **Build Frontend:** Use the [Frontend Implementation Guide](./Frontend-Implementation-Guide.md) for UI development
+4. **Reference Workflows:** Consult the [Process Flow Reference](./Process-Flow-Reference.md) for complete user flows
+
+## Development Standards
+
+For coding conventions, build commands, and development practices, see [AGENT.md](../../../AGENT.md).
 
 ## ⚡ Quick Development Reference
 

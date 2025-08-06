@@ -22,7 +22,7 @@
 - **Access**: Requires Larksuite authentication - contact team lead if access needed
 
 ## Architecture & Structure
-- **Backend Integration**: Designed to integrate with `/home/zealy/aiw3/gitlab.com/lastmemefi-api` (Sails.js + MySQL + Redis + Kafka)
+- **Backend Integration**: Designed to integrate with `$HOME/aiw3/lastmemefi-api` (Sails.js + MySQL + Redis + Kafka)
 - **Blockchain**: Solana-based using SPL Token Program + Metaplex Token Metadata (no custom smart contracts)
 - **Core POC**: `/poc/solana-nft-burn-mint/` - functional NFT mint/burn proof of concept (NOT connected to backend)
 - **Implementation Status**: Documentation complete, backend services NOT YET IMPLEMENTED
