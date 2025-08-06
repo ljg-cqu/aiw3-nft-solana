@@ -716,14 +716,6 @@ The existing infrastructure provides excellent foundations for user management, 
 
 ---
 
-## Related Documents
-
-- **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: High-level technical architecture
-- **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: Detailed implementation instructions  
-- **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: Database schemas and data structures
-- **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**: Business rules and tier definitions
-
-**For terminology definitions, please refer to the [AIW3 NFT Appendix](./AIW3-NFT-Appendix.md) document.**
 
 ---
 

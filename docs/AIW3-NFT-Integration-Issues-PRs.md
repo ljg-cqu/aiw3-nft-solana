@@ -403,10 +403,3 @@ The critical path for the project follows these sequential dependencies:
 
 ---
 
-## Related Documents
-
-- **[AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)**: Detailed technical integration analysis
-- **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: High-level system architecture
-- **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: Technical implementation details
-
-**For terminology definitions, please refer to the [AIW3 NFT Appendix](./AIW3-NFT-Appendix.md) document.**

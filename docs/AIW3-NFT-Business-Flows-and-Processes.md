@@ -26,7 +26,7 @@ This document provides a comprehensive overview of all NFT-related business flow
 4.  [Notifications and Badge Systems](#notifications-and-badge-systems)
     1.  [System-Wide Alerts](#system-wide-alerts)
     2.  [Badge Integration](#badge-integration)
-5.  [Cross-Referencing and Document Structure](#cross-referencing-and-document-structure)
+
 6.  [Conclusion](#conclusion)
 
 ---
@@ -116,16 +116,7 @@ This document provides a comprehensive overview of all NFT-related business flow
 
 ---
 
-## Cross-Referencing and Document Structure
 
-**Linkages**: This document describes the "what" and "why" of user-facing flows. For technical implementation details, refer to the following:
-
--   **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: For the high-level architecture and component responsibilities.
--   **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: For detailed database schemas, API responses, and event formats.
--   **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: For code-level guidance and integration patterns.
--   **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**: For the definitive business logic on qualification and benefits.
--   **[AIW3 NFT Data Consistency](./AIW3-NFT-Data-Consistency.md)**: For how the system guarantees the integrity of the burn-and-mint process.
--   **[AIW3 NFT Concurrency Control](./AIW3-NFT-Concurrency-Control.md)**: For how simultaneous operations are managed safely.
 
 ---
 

@@ -668,9 +668,3 @@ nftFeatures: {
 
 ---
 
-## Related Documents
-
-- [AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)
-- [AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)
-- [AIW3 NFT System Design](./AIW3-NFT-System-Design.md)
-- [AIW3 NFT Testing Strategy](./AIW3-NFT-Testing-Strategy.md)

@@ -948,9 +948,3 @@ const QualityGates = {
 
 ---
 
-## Related Documents
-
-- [AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)
-- [AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)
-- [AIW3 NFT Error Handling Reference](./AIW3-NFT-Error-Handling-Reference.md)
-- [AIW3 NFT Integration Issues & PRs](./AIW3-NFT-Integration-Issues-PRs.md)

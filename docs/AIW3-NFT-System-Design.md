@@ -36,7 +36,7 @@ This document serves as the **authoritative reference** for system validation an
 4.  [Visual Architecture](#visual-architecture)
     -   [NFT Ecosystem Entity Relationship](#nft-ecosystem-entity-relationship)
     -   [Multi-System Infrastructure Topology](#multi-system-infrastructure-topology)
-5.  [Related Documents](#related-documents)
+
 
 ---
 
@@ -1054,15 +1054,7 @@ const performanceMonitor = {
 
 ---
 
-## Related Documents
 
-For more detailed information, please refer to the following documents:
-
-### Core Documentation
-- **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**: Contains the business rules, tier requirements, and user policies for the NFT system.
-- **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: Provides a step-by-step guide for developers, including process flows and code-level details.
-- **[AIW3 NFT Data Model](./AIW3-NFT-Data-Model.md)**: Details the on-chain and off-chain data structures, including table schemas and metadata specifications.
-- **[AIW3 NFT Appendix](./AIW3-NFT-Appendix.md)**: Contains a glossary of terms and a list of external references.
 
 ### Integration & Implementation
 - **[AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)**: Comprehensive analysis and strategy for integrating NFT services with existing `lastmemefi-api` backend, including service architecture and infrastructure reuse.

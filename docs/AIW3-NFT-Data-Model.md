@@ -855,14 +855,7 @@ nft_benefits:{user_id} -> {
 
 ---
 
-## Related Documents
 
-For comprehensive information about the AIW3 NFT system, please refer to these related documents:
-
-### Core Documentation
-- **[AIW3 NFT System Design](./AIW3-NFT-System-Design.md)**: High-level technical architecture and lifecycle management overview
-- **[AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)**: Step-by-step developer guide with process flows and code-level details
-- **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**: Business rules, tier requirements, and user policies for the NFT system
 - **[AIW3 NFT Appendix](./AIW3-NFT-Appendix.md)**: Glossary of terms and external references
 
 ### Integration & Implementation
