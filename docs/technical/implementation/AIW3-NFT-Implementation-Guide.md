@@ -96,16 +96,66 @@ The backend is the intermediary between the user-facing frontend and the standar
    touch api/services/NFTService.js
    ```
 
-2. **Implement basic structure:**
+2. **Implement complete NFTService:**
    ```javascript
    // api/services/NFTService.js
    module.exports = {
-     calculateTradingVolume: async function(userId) {
-       // Implementation as shown in Implementation Roadmap
-     },
      
+     // Calculate user's total trading volume from Trades model
+     calculateTradingVolume: async function(userId) {
+       try {
+         const query = `
+           SELECT SUM(total_usd_price) as trading_volume 
+           FROM trades 
+           WHERE user_id = ? AND total_usd_price IS NOT NULL
+         `;
+         const result = await sails.sendNativeQuery(query, [userId]);
+         return parseFloat(result.rows[0]?.trading_volume) || 0;
+       } catch (error) {
+         sails.log.error('Trading volume calculation failed:', error);
+         return 0;
+       }
+     },
+
+     // Check if user qualifies for NFT level
      checkNFTQualification: async function(userId, targetLevel) {
-       // Implementation as shown in Implementation Roadmap
+       try {
+         // Get volume requirement for level
+         const requiredVolume = this.getRequiredVolumeForLevel(targetLevel);
+         
+         // Calculate actual trading volume
+         const tradingVolume = await this.calculateTradingVolume(userId);
+         
+         // Check existing NFTs
+         const existingNFT = await UserNFT.findOne({
+           user_id: userId,
+           nft_level: { '>=': targetLevel },
+           is_active: true
+         });
+         
+         return {
+           qualified: tradingVolume >= requiredVolume && !existingNFT,
+           currentVolume: tradingVolume,
+           requiredVolume: requiredVolume,
+           targetLevel: targetLevel,
+           hasExistingNFT: !!existingNFT
+         };
+       } catch (error) {
+         sails.log.error('NFT qualification check failed:', error);
+         return { qualified: false, reason: 'System error' };
+       }
+     },
+
+     // Get required trading volume for NFT level
+     getRequiredVolumeForLevel: function(level) {
+       const requirements = {
+         1: 100000,    // $100K for Level 1
+         2: 500000,    // $500K for Level 2  
+         3: 1000000,   // $1M for Level 3
+         4: 5000000,   // $5M for Level 4
+         5: 10000000   // $10M for Level 5
+       };
+       return requirements[level] || 0;
      }
    };
    ```
@@ -126,6 +176,104 @@ The backend is the intermediary between the user-facing frontend and the standar
 #### API Endpoints Overview
 
 **Reference**: Complete API specifications, endpoint documentation, request/response formats, WebSocket events, and frontend integration patterns are available in the [API Frontend Integration Specification](./api-frontend/API-Frontend-Integration-Specification.md).
+
+#### NFT Controller Implementation
+
+1. **Create NFTController:**
+   ```bash
+   cd $HOME/aiw3/lastmemefi-api
+   touch api/controllers/NFTController.js
+   ```
+
+2. **Implement controller methods:**
+   ```javascript
+   // api/controllers/NFTController.js
+   module.exports = {
+     
+     getUserNFTStatus: async function(req, res) {
+       try {
+         // Feature flag check
+         if (!sails.config.nftFeatures?.enabled) {
+           return res.badRequest('NFT features are currently disabled');
+         }
+
+         const userId = req.user.id;
+         
+         // Get user's current NFTs
+         const userNFTs = await UserNFT.find({
+           user_id: userId,
+           is_active: true
+         });
+
+         // Check qualification for next level
+         const currentLevel = userNFTs.length > 0 ? Math.max(...userNFTs.map(nft => nft.nft_level)) : 0;
+         const nextLevel = currentLevel + 1;
+         const qualification = await NFTService.checkNFTQualification(userId, nextLevel);
+
+         return res.json({
+           success: true,
+           data: {
+             currentNFTs: userNFTs,
+             currentLevel: currentLevel,
+             nextLevel: nextLevel,
+             qualification: qualification
+           }
+         });
+       } catch (error) {
+         sails.log.error('Failed to get NFT status:', error);
+         return res.serverError('Failed to get NFT status');
+       }
+     },
+
+     claimInitialNFT: async function(req, res) {
+       try {
+         // Feature flag check
+         if (!sails.config.nftFeatures?.enabled) {
+           return res.badRequest('NFT features are currently disabled');
+         }
+
+         const userId = req.user.id;
+
+         // Check if user already has an NFT
+         const existingNFT = await UserNFT.findOne({
+           user_id: userId,
+           is_active: true
+         });
+
+         if (existingNFT) {
+           return res.badRequest('User already has an NFT');
+         }
+
+         // Check qualification for Level 1
+         const qualification = await NFTService.checkNFTQualification(userId, 1);
+         
+         if (!qualification.qualified) {
+           return res.forbidden({
+             message: 'Not qualified for NFT',
+             qualification: qualification
+           });
+         }
+
+         // TODO: Implement actual minting in Phase 2
+         return res.json({
+           success: true,
+           message: 'NFT claiming will be implemented in Phase 2',
+           qualification: qualification
+         });
+       } catch (error) {
+         sails.log.error('Failed to claim NFT:', error);
+         return res.serverError('Failed to claim NFT');
+       }
+     }
+   };
+   ```
+
+3. **Add routes:**
+   ```javascript
+   // Add to config/routes.js
+   'GET /api/nft/status': 'NFTController.getUserNFTStatus',
+   'POST /api/nft/claim': 'NFTController.claimInitialNFT',
+   ```
 
 **Key Integration Features:**
 - Standardized REST API endpoints for all NFT operations

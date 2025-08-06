@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-This document provides a realistic, phase-by-phase implementation roadmap for the AIW3 NFT system. **The current documentation describes the target architecture but the implementation has not yet begun.** This roadmap addresses the critical gaps between documentation and reality.
+This document provides a realistic, phase-by-phase implementation roadmap for the AIW3 NFT system, focusing on project management, timeline, and dependencies. **For detailed technical implementation and code examples, see the [Implementation Guide](./AIW3-NFT-Implementation-Guide.md).**
 
 ### Current Status: **IMPLEMENTATION NOT STARTED**
 
@@ -149,68 +149,12 @@ module.exports = {
 
 #### Create NFTService
 
-**File: `api/services/NFTService.js`**
-```javascript
-module.exports = {
-  
-  // Calculate user's total trading volume from Trades model
-  calculateTradingVolume: async function(userId) {
-    try {
-      const query = `
-        SELECT SUM(total_usd_price) as trading_volume 
-        FROM trades 
-        WHERE user_id = ? AND total_usd_price IS NOT NULL
-      `;
-      const result = await sails.sendNativeQuery(query, [userId]);
-      return parseFloat(result.rows[0]?.trading_volume) || 0;
-    } catch (error) {
-      sails.log.error('Trading volume calculation failed:', error);
-      return 0;
-    }
-  },
+**Implementation**: Complete NFTService code and step-by-step creation process are documented in the [Implementation Guide](./AIW3-NFT-Implementation-Guide.md#1-nft-service-nftservicejs).
 
-  // Check if user qualifies for NFT level
-  checkNFTQualification: async function(userId, targetLevel) {
-    try {
-      // Get volume requirement for level
-      const requiredVolume = this.getRequiredVolumeForLevel(targetLevel);
-      
-      // Calculate actual trading volume
-      const tradingVolume = await this.calculateTradingVolume(userId);
-      
-      // Check existing NFTs
-      const existingNFT = await UserNFT.findOne({
-        user_id: userId,
-        nft_level: { '>=': targetLevel },
-        is_active: true
-      });
-      
-      return {
-        qualified: tradingVolume >= requiredVolume && !existingNFT,
-        currentVolume: tradingVolume,
-        requiredVolume: requiredVolume,
-        targetLevel: targetLevel,
-        hasExistingNFT: !!existingNFT
-      };
-    } catch (error) {
-      sails.log.error('NFT qualification check failed:', error);
-      return { qualified: false, reason: 'System error' };
-    }
-  },
-
-  // Get required trading volume for NFT level
-  getRequiredVolumeForLevel: function(level) {
-    const requirements = {
-      1: 100000,    // $100K for Level 1
-      2: 500000,    // $500K for Level 2  
-      3: 1000000,   // $1M for Level 3
-      4: 5000000,   // $5M for Level 4
-      5: 10000000   // $10M for Level 5
-    };
-    return requirements[level] || 0;
-  }
-};
-```
+**Key methods to implement:**
+- `calculateTradingVolume()` - Aggregate user trading volume from Trades model
+- `checkNFTQualification()` - Validate user eligibility for NFT levels
+- `getRequiredVolumeForLevel()` - Return volume requirements per level
 
 #### Extend Web3Service
 
@@ -260,99 +204,11 @@ module.exports = {
 
 #### Create NFTController
 
-**File: `api/controllers/NFTController.js`**
-```javascript
-module.exports = {
-  
-  getUserNFTStatus: async function(req, res) {
-    try {
-      // Feature flag check
-      if (!sails.config.nftFeatures?.enabled) {
-        return res.badRequest('NFT features are currently disabled');
-      }
+**Implementation**: Complete NFTController code with step-by-step creation process is documented in the [Implementation Guide](./AIW3-NFT-Implementation-Guide.md#nft-controller-implementation).
 
-      const userId = req.user.id;
-      
-      // Get user's current NFTs
-      const userNFTs = await UserNFT.find({
-        user_id: userId,
-        is_active: true
-      });
-
-      // Get qualification status for next level
-      const currentLevel = Math.max(...userNFTs.map(nft => nft.nft_level), 0);
-      const nextLevel = currentLevel + 1;
-      
-      let qualification = null;
-      if (nextLevel <= 5) {
-        qualification = await NFTService.checkNFTQualification(userId, nextLevel);
-      }
-
-      return res.json({
-        success: true,
-        data: {
-          currentNFTs: userNFTs,
-          currentLevel: currentLevel,
-          qualification: qualification
-        }
-      });
-    } catch (error) {
-      sails.log.error('Failed to get NFT status:', error);
-      return res.serverError('Failed to retrieve NFT status');
-    }
-  },
-
-  claimInitialNFT: async function(req, res) {
-    try {
-      // Feature flag check
-      if (!sails.config.nftFeatures?.claiming) {
-        return res.badRequest('NFT claiming is currently disabled');
-      }
-
-      const userId = req.user.id;
-      
-      // Check if user already has an NFT
-      const existingNFT = await UserNFT.findOne({
-        user_id: userId,
-        is_active: true
-      });
-
-      if (existingNFT) {
-        return res.badRequest('User already has an NFT');
-      }
-
-      // Check qualification for Level 1
-      const qualification = await NFTService.checkNFTQualification(userId, 1);
-      
-      if (!qualification.qualified) {
-        return res.forbidden({
-          message: 'Not qualified for NFT',
-          qualification: qualification
-        });
-      }
-
-      // TODO: Implement actual minting in Phase 2
-      return res.json({
-        success: true,
-        message: 'NFT claiming will be implemented in Phase 2',
-        qualification: qualification
-      });
-    } catch (error) {
-      sails.log.error('Failed to claim NFT:', error);
-      return res.serverError('Failed to claim NFT');
-    }
-  }
-};
-```
-
-#### Update Routes
-
-**Add to `config/routes.js`:**
-```javascript
-// NFT routes
-'GET /api/nft/status': 'NFTController.getUserNFTStatus',
-'POST /api/nft/claim': 'NFTController.claimInitialNFT',
-```
+**Key endpoints to implement:**
+- `GET /api/nft/status` - Get user NFT status and qualification info
+- `POST /api/nft/claim` - Initial NFT claiming with qualification validation
 
 #### Validation Checkpoints
 - [ ] Models can be accessed via sails console
@@ -478,29 +334,8 @@ mintNFTToUser: async function(userWalletAddress, metadataUri, nftLevel) {
 ```
 
 #### IPFS Integration
-```javascript
-// Add to NFTService.js
-uploadMetadataToIPFS: async function(nftData) {
-  try {
-    const metadata = {
-      name: nftData.name,
-      description: nftData.description,
-      image: nftData.imageUri,
-      attributes: [
-        { trait_type: "Level", value: nftData.level },
-        { trait_type: "Tier", value: nftData.tierName }
-      ]
-    };
 
-    // Use existing Pinata integration
-    const result = await pinata.upload(metadata);
-    return result.IpfsHash;
-  } catch (error) {
-    sails.log.error('IPFS upload failed:', error);
-    throw error;
-  }
-}
-```
+**Implementation**: Complete IPFS integration patterns and metadata upload workflows are documented in the [IPFS Pinata Integration Reference](../integration/external-systems/IPFS-Pinata-Integration-Reference.md).
 
 #### Validation Checkpoints
 - [ ] Test NFT minting works on devnet
