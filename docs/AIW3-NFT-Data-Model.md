@@ -97,8 +97,8 @@ module.exports = {
     // Status tracking
     status: {
       type: 'string',
-      isIn: ['active', 'inactive', 'burned'],
-      defaultsTo: 'active',
+      isIn: ['unlocked', 'active', 'inactive', 'burned'],
+      defaultsTo: 'unlocked',
       description: 'Current status of the NFT'
     },
     

@@ -123,7 +123,8 @@ The NFT system provides a comprehensive REST API with standardized endpoints for
 
 **Key Endpoints:**
 - `GET /api/nft/status` - User NFT status and progress
-- `POST /api/nft/claim` - Initial NFT claiming
+- `POST /api/nft/claim` - Initial NFT claiming to an `unlocked` state
+- `POST /api/nft/activate` - Activates a claimed NFT to make it `active`
 - `POST /api/nft/upgrade` - NFT upgrade process
 - `GET /api/nft/benefits` - Current tier benefits
 - `GET /api/nft/badges` - Badge collection management
@@ -427,7 +428,7 @@ This section provides detailed, step-by-step flows for the key processes in the 
 
 ### 1. New User Onboarding and First NFT Claim
 
-**Goal:** A new user joins the platform and claims their initial Lv.1 Equity NFT.
+**Goal:** A new user joins the platform, claims their initial Lv.1 Equity NFT to an `unlocked` state, and then activates it.
 
 ```mermaid
 flowchart TD
@@ -448,9 +449,17 @@ flowchart TD
     N --> O[Frontend: Prompt user to approve transaction]
     O --> P[User approves via wallet]
     P --> Q[SPL Token Program mints NFT to user's ATA]
-    Q --> R[Backend: Create UserNFT record in MySQL]
-    R --> S[Backend: Publish claimed event to Kafka nft-events topic]
-    S --> T[Frontend: WebSocket notification and NFT display]
+    Q --> R[Backend: Create UserNFT record in MySQL with 'unlocked' status]
+    R --> S[Backend: Publish 'unlocked' event to Kafka nft-events topic]
+    S --> T[Frontend: WebSocket notification and NFT display with 'Activate' button]
+    T --> U[User clicks Activate]
+    U --> V[Backend: Prepare on-chain activation transaction]
+    V --> W[Frontend: Prompt user to approve activation]
+    W --> X[User approves via wallet]
+    X --> Y[On-chain activation logic executes]
+    Y --> Z[Backend: Update UserNFT record to 'active' status]
+    Z --> AA[Backend: Publish 'activated' event to Kafka]
+    AA --> BB[Frontend: WebSocket notification and updated NFT display]
 ```
 
 ### 2. NFT Synthesis (Upgrade) Flow

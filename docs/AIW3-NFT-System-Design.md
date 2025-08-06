@@ -334,7 +334,19 @@ sequenceDiagram
     API-->>UI: NFT upgraded successfully
 ```
 
-### 3.2 Transaction Volume Qualification
+### Adherence to SOLID Principles
+
+The system architecture is designed to align with SOLID principles, promoting a modular, maintainable, and scalable codebase.
+
+- **Single Responsibility Principle (SRP)**: Each service is responsible for a single part of the system's functionality. For example, `NFTService` handles the business logic of NFTs, `Web3Service` manages blockchain interactions, and `UserService` is responsible for user data. This separation of concerns makes the system easier to understand, test, and maintain.
+
+- **Open/Closed Principle (OCP)**: The system is open to extension but closed for modification. For instance, new NFT tiers or benefits can be added by inserting new records into the database and updating configuration files, without altering the core logic of the `NFTService` or `Web3Service`. This allows for future expansion without risking the stability of the existing codebase.
+
+- **Liskov Substitution Principle (LSP)**: The system's service-oriented architecture and use of well-defined interfaces ensure that different implementations of a service can be used interchangeably. For example, a new implementation of the `Web3Service` that connects to a different Solana cluster could replace the existing one without affecting the `NFTService`.
+
+- **Interface Segregation Principle (ISP)**: The API endpoints are segregated by functionality, ensuring that clients only need to interact with the parts of the system they are concerned with. For example, a client application that only needs to display NFT data would use the `GET /api/nft/status` endpoint, without needing to know about the endpoints for claiming or upgrading NFTs.
+
+- **Dependency Inversion Principle (DIP)**: High-level modules like `NFTService` depend on abstractions, not on concrete implementations. For example, `NFTService` uses the `Web3Service` and `RedisService` through their defined interfaces, not by depending on their specific implementations. This decoupling makes the system more flexible and easier to test, as dependencies can be mocked or replaced.
 
 **Qualification Rules**:
 The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)** document.
