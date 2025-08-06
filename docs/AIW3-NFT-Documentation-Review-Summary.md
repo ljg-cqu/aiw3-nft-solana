@@ -70,7 +70,7 @@ The review was conducted using a systematic approach covering:
 
 2. **Business Alignment Verification**
    - Backend codebase alignment (`$HOME/aiw3/lastmemefi-api`)
-   - Business prototype alignment (`/home/zealy/github.com/ljg-cqu/aiw3-nft-solana/aiw3-prototypes`)
+   - Business prototype alignment (`$HOME/aiw3/aiw3-nft-solana/aiw3-prototypes`)
    - User experience flow validation
 
 3. **Development Lifecycle Assessment**
@@ -173,7 +173,7 @@ The review was conducted using a systematic approach covering:
 
 ### Business Requirements Alignment
 
-**Verified Against**: `/home/zealy/github.com/ljg-cqu/aiw3-nft-solana/aiw3-prototypes`
+**Verified Against**: `$HOME/aiw3/aiw3-nft-solana/aiw3-prototypes`
 
 ✅ **User Experience Flows**
 - Personal Center emphasized as primary interface

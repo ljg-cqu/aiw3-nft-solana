@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-This report validates the alignment between the AIW3 NFT system documentation and the actual codebase located at `$HOME/aiw3/lastmemefi-api` (branch: `agent_dev_nft`) and business logic prototypes at `/home/zealy/github.com/ljg-cqu/aiw3-nft-solana/aiw3-prototypes`.
+This report validates the alignment between the AIW3 NFT system documentation and the actual codebase located at `$HOME/aiw3/lastmemefi-api` (branch: `agent_dev_nft`) and business logic prototypes at `$HOME/aiw3/aiw3-nft-solana/aiw3-prototypes`.
 
 ## Codebase Analysis Results
 
