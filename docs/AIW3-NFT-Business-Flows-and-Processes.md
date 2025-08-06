@@ -36,13 +36,18 @@ This document provides a comprehensive overview of all NFT-related business flow
 ### Unlockable to Active Transition
 
 - **Objective**: Transition an NFT from a potential (unlockable) state to an active, owned state for a user.
+- **States**:
+    - **Unlockable**: The user has met the criteria to unlock the NFT but has not yet claimed it.
+    - **Unlocked**: The user has claimed the NFT, but it is not yet active. This state is visually represented in the Personal Center.
+    - **Active**: The user has activated the NFT, and it is now providing benefits.
 - **Trigger**: A user's aggregated trading volume, calculated from the `Trades` model in the `lastmemefi-api` database, meets or exceeds the threshold for a specific NFT tier as defined in the **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)**.
 - **Process**:
     1.  The `NFTService` backend component periodically or on-demand calculates the user's total trading volume.
     2.  If the user qualifies for a new NFT tier, the system creates a `UserNFTQualification` record.
     3.  The frontend, particularly the **Personal Center**, reflects this unlockable status, prompting the user to claim their new NFT.
     4.  Upon user confirmation, the `NFTService` initiates the minting process via `Web3Service`.
-    5.  A new `UserNFT` record is created in the database with an `active` status, linking the NFT mint address to the user.
+    5.  A new `UserNFT` record is created in the database with an `unlocked` status, linking the NFT mint address to the user.
+    6.  The user must then perform a final on-chain transaction to activate the NFT, at which point the status is updated to `active`.
 
 ### Activation Popups and Notifications
 
