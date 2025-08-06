@@ -111,9 +111,9 @@ npm install @metaplex-foundation/js@^0.19.4
        const requirements = {
          1: 100000,    // $100K for Level 1
          2: 500000,    // $500K for Level 2  
-         3: 1000000,   // $1M for Level 3
-         4: 5000000,   // $5M for Level 4
-         5: 10000000   // $10M for Level 5
+         3: 5000000,   // $5M for Level 3
+         4: 10000000,   // $10M for Level 4
+         5: 50000000   // $50M for Level 5
        };
        return requirements[level] || 0;
      }

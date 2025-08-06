@@ -8,7 +8,7 @@
 
 ---
 
-**Implementation Note**: All integration issues and PRs are designed to support the complete NFT business flows documented in **AIW3 NFT Business Flows and Processes**, ensuring alignment with all 41 prototype designs.
+**Implementation Note**: All integration issues and PRs are designed to support the complete NFT business flows documented in **[AIW3 NFT Business Rules and Flows](../../../../business/AIW3-NFT-Business-Rules-and-Flows.md)**, ensuring alignment with all 41 prototype designs.
 
 ## Overview
 

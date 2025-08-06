@@ -8,7 +8,7 @@
 
 ---
 
-**Data Model Scope**: This document provides comprehensive specifications for data structures supporting all NFT business flows documented in **AIW3 NFT Business Flows and Processes**, ensuring complete prototype alignment.
+**Data Model Scope**: This document provides comprehensive specifications for data structures supporting all NFT business flows documented in **AIW3-NFT-Business-Rules-and-Flows.md**, ensuring complete prototype alignment.
 
 This document provides comprehensive specifications for data structures in the AIW3 NFT system, designed for seamless integration with the existing `lastmemefi-api` backend (located at `$HOME/aiw3/lastmemefi-api`). It covers database extensions, API response formats, and data relationships optimized for the Sails.js/MySQL infrastructure.
 
@@ -71,7 +71,7 @@ module.exports = {
       required: true,
       min: 1,
       max: 5,
-      description: 'NFT tier level (1-5 regular, Special for Trophy Breeder)'
+      description: 'NFT tier level (1-5)'
     },
     
     nft_name: { 
@@ -420,7 +420,7 @@ CREATE TABLE usernft (
   nft_name VARCHAR(100) NOT NULL,
   metadata_uri VARCHAR(500),
   image_uri VARCHAR(500),
-  status ENUM('active', 'inactive', 'burned') DEFAULT 'active',
+  status ENUM('unlocked', 'active', 'inactive', 'burned') DEFAULT 'unlocked',
   claimed_at DATETIME,
   last_upgraded_at DATETIME,
   burned_at DATETIME NULL,
@@ -503,7 +503,7 @@ CREATE TABLE nftupgraderequest (
 -- wallet_address, accessToken, referralCode, points, energy, quick_amount, auto_amount
 
 ALTER TABLE user
-ADD COLUMN current_nft_level TINYINT DEFAULT 0 COMMENT 'Current highest NFT level owned by user (1-5 regular, Special for Trophy Breeder)',
+ADD COLUMN current_nft_level TINYINT DEFAULT 0 COMMENT 'Current highest NFT level owned by user (1-5)',
 ADD COLUMN last_active_nft_id INT NULL COMMENT 'Reference to user\'s currently active/primary NFT',
 ADD COLUMN cached_trading_volume DECIMAL(30,10) DEFAULT 0 COMMENT 'Cached total trading volume (calculated from trades table)',
 ADD COLUMN last_volume_update DATETIME NULL COMMENT 'Timestamp of last trading volume cache update',

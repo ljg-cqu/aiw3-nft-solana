@@ -8,7 +8,7 @@
 
 ---
 
-**Financial Analysis Scope**: This document provides cost analysis for all NFT business flows documented in **AIW3 NFT Business Flows and Processes**, covering all prototype-defined operations and their associated costs.
+**Financial Analysis Scope**: This document provides cost analysis for all NFT business flows documented in **AIW3-NFT-Business-Rules-and-Flows.md**, covering all prototype-defined operations and their associated costs.
 ## Comprehensive Cost Strategy for Solana-Based Equity NFTs at Scale
 
 ---
@@ -169,11 +169,11 @@ const USER_DISTRIBUTION = {
 
 // Storage requirements by tier
 const TIER_STORAGE_MULTIPLIER = {
-    Bronze: 1.0,     // Base storage requirement
-    Silver: 1.2,     // 20% larger images
-    Gold: 1.5,       // 50% larger images
-    Platinum: 2.0,   // Premium artwork quality
-    Diamond: 3.0     // Ultra-premium artwork
+    "Tech Chicken": 1.0,     // Base storage requirement
+    "Quant Ape": 1.2,     // 20% larger images
+    "On-chain Hunter": 1.5,       // 50% larger images
+    "Alpha Alchemist": 2.0,   // Premium artwork quality
+    "Quantum Alchemist": 3.0     // Ultra-premium artwork
 };
 ```
 
@@ -289,11 +289,11 @@ This strategy is recommended for its balance of low capital risk for AIW3 and a 
 ```typescript
 const PREPAID_STRATEGY_PROJECTIONS = {
     tierImplementation: {
-        Bronze: { rentPaidBy: "AIW3_System", userPercentage: 0.70 },
-        Silver: { rentPaidBy: "PrePaid_Transfer", userPercentage: 0.20 },
-        Gold: { rentPaidBy: "PrePaid_Transfer", userPercentage: 0.08 },
-        Platinum: { rentPaidBy: "PrePaid_Transfer", userPercentage: 0.015 },
-        Diamond: { rentPaidBy: "PrePaid_Transfer", userPercentage: 0.005 }
+        "Tech Chicken": { rentPaidBy: "AIW3_System", userPercentage: 0.70 },
+        "Quant Ape": { rentPaidBy: "PrePaid_Transfer", userPercentage: 0.20 },
+        "On-chain Hunter": { rentPaidBy: "PrePaid_Transfer", userPercentage: 0.08 },
+        "Alpha Alchemist": { rentPaidBy: "PrePaid_Transfer", userPercentage: 0.015 },
+        "Quantum Alchemist": { rentPaidBy: "PrePaid_Transfer", userPercentage: 0.005 }
     },
     
     costReduction: {
@@ -403,7 +403,7 @@ The financial projections show exceptional ROI potential with minimal downside r
 For detailed technical implementation guides, see:
 - [AIW3 NFT System Design](./AIW3-NFT-System-Design.md)
 - [AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md)
-- [AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)
+- [AIW3 NFT Business Rules and Flows](./AIW3-NFT-Business-Rules-and-Flows.md)
 
 ### External References
 

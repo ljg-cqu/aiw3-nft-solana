@@ -146,9 +146,9 @@ sequenceDiagram
 **Volume Requirements:**
 - Level 1: $100K USD
 - Level 2: $500K USD  
-- Level 3: $1M USD
-- Level 4: $5M USD
-- Level 5: $10M USD
+- Level 3: $5M USD
+- Level 4: $10M USD
+- Level 5: $50M USD
 
 **Process Validation:**
 1. **Current NFT Check:** Verify user owns NFT at current level

@@ -8,7 +8,7 @@
 
 ---
 
-**Resilience Scope**: Network resilience strategies apply to all NFT business flows documented in **AIW3 NFT Business Flows and Processes**, ensuring system reliability across all prototype-defined user interactions.
+**Resilience Scope**: Network resilience strategies apply to all NFT business flows documented in **[AIW3 NFT Business Rules and Flows](../../business/AIW3-NFT-Business-Rules-and-Flows.md)**, ensuring system reliability across all prototype-defined user interactions.
 ## Network Failure Handling, Retry Strategies, and Service Redundancy
 
 ---

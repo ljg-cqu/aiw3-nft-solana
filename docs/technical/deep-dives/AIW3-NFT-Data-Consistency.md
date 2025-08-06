@@ -8,7 +8,7 @@
 
 ---
 
-**Data Consistency Scope**: This document ensures data consistency across all NFT business flows documented in **AIW3 NFT Business Flows and Processes**, maintaining integrity for all prototype-defined operations.
+**Data Consistency Scope**: This document ensures data consistency across all NFT business flows documented in **[AIW3 NFT Business Rules and Flows](../../business/AIW3-NFT-Business-Rules-and-Flows.md)**, maintaining integrity for all prototype-defined operations.
 ## Multi-Layer Data Verification and Consistency Management
 
 ---
