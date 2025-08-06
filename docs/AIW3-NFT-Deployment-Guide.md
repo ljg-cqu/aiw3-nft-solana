@@ -1406,6 +1406,7 @@ GRANT SELECT ON aiw3_nft_production.* TO 'read_replica_user'@'%';
 
 ## Related Documents
 
+### Technical Documentation
 - [AIW3 NFT System Design](./AIW3-NFT-System-Design.md) - Architecture and component design
 - [AIW3 NFT Implementation Guide](./AIW3-NFT-Implementation-Guide.md) - Development workflows and processes
 - [AIW3 NFT Testing Strategy](./AIW3-NFT-Testing-Strategy.md) - Quality assurance and testing procedures
@@ -1413,5 +1414,9 @@ GRANT SELECT ON aiw3_nft_production.* TO 'read_replica_user'@'%';
 - [AIW3 NFT Security Operations](./AIW3-NFT-Security-Operations.md) - Security deployment considerations
 - [AIW3 NFT Network Resilience](./AIW3-NFT-Network-Resilience.md) - Fault tolerance and recovery strategies
 - [SETUP GUIDE](./SETUP_GUIDE.md) - Initial environment setup and configuration
+
+### UI/UX Design References
+- [UI Design Document](https://app.mockplus.cn/app/share-43243abc91caeec3451d14465f0b94f2share-7hHJcMABGb/comment/p24-p6bxJ/l1cz1EbZFJ) - Interactive UI prototypes and design specifications (Mockplus)
+- [Design System Draft](https://www.figma.com/design/FP3lWMHhJ7riy3PTtJpxL0/AIW3?node-id=18238-5193&p=f) - Complete design system and component library (Figma)
 
 
