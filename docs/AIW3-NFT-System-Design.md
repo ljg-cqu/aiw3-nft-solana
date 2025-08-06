@@ -301,7 +301,7 @@ sequenceDiagram
     NFT->>REDIS: RedisService.getCache("nft_lock:upgrade:" + userId)
     REDIS-->>NFT: check for pending upgrades
     
-    NFT->>MYSQL: SELECT badges_collected, required_volume FROM user_nft_qualifications
+    NFT->>MYSQL: SELECT badges_collected, badges_required FROM user_nft_qualifications
     MYSQL-->>NFT: qualification status
     
     %% Set upgrade lock using RedisService with lock mode
@@ -355,7 +355,7 @@ The system architecture is designed to align with SOLID principles, promoting a 
 - **Dependency Inversion Principle (DIP)**: High-level modules like `NFTService` depend on abstractions, not on concrete implementations. For example, `NFTService` uses the `Web3Service` and `RedisService` through their defined interfaces, not by depending on their specific implementations. This decoupling makes the system more flexible and easier to test, as dependencies can be mocked or replaced.
 
 **Qualification Rules**:
-The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badge-type NFTs. The definitive business rules for each level are maintained in the **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)** document.
+The system qualifies users for NFT levels based on a combination of transaction volume and ownership of specific badges. The definitive business rules for each level are maintained in the **[AIW3 NFT Tiers and Rules](./AIW3-NFT-Tiers-and-Rules.md)** document.
 
 **Technical Verification Process**:
 1. **Redis Cache Check**: Query cached qualification data (`nft_qual:{userId}`) with 5-minute TTL
@@ -498,7 +498,7 @@ graph TD
     subgraph NewNFTTables ["NFT Database Extensions"]
         MySQL --> UserNFT[(UserNFT Table)]
         MySQL --> NFTQualification[(UserNFTQualification)]
-        MySQL --> NFTBadge[(NFTBadge Table)]
+        MySQL --> Badge[(Badge Table)]
         MySQL --> UpgradeRequest[(NFTUpgradeRequest)]
         MySQL --> ExistingTrades[(Existing Trades Table)]
     end

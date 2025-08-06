@@ -186,13 +186,13 @@ CREATE TABLE user_nft_qualification (
     UNIQUE KEY unique_user_level (user_id, target_level)
 );
 
--- Migration 3: Create NFTBadge table
-CREATE TABLE nft_badge (
+-- Migration 3: Create Badge table
+CREATE TABLE badge (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     badge_type VARCHAR(100) NOT NULL,
     badge_name VARCHAR(255) NOT NULL,
-    mint_address VARCHAR(44) NOT NULL UNIQUE,
+    badge_identifier VARCHAR(100) NOT NULL UNIQUE,
     earned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     metadata_uri TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -232,13 +232,13 @@ module.exports = {
   }
 };
 
-// api/models/NFTBadge.js - TO BE CREATED
+// api/models/Badge.js - TO BE CREATED
 module.exports = {
   attributes: {
     user_id: { model: 'user' },
     badge_type: { type: 'string' }, // micro_badge, achievement_badge, etc.
     badge_name: { type: 'string' },
-    mint_address: { type: 'string' },
+    badge_identifier: { type: 'string' },
     earned_at: { type: 'ref', columnType: 'datetime' },
     metadata_uri: { type: 'string' }
   }
@@ -757,7 +757,7 @@ This section provides a detailed specification for the API contracts, data forma
 To ensure development aligns with business objectives, the following core logic must be accurately implemented:
 
 - **Trading Volume Calculation**: Qualification for NFT tiers is based on a user's total trading volume. This data is aggregated from the `Trades` model, not stored directly on the `User` model. The aggregation logic must be efficient and consistent.
-- **NFT Upgrade Requirements**: A user can only upgrade their NFT if they meet both the trading volume threshold AND possess the required badges for the next level.
+- **NFT Upgrade Requirements**: A user can only upgrade their NFT if they meet both the trading volume threshold AND possess the required number of badges for the next level.
 - **Badge Uniqueness**: Badges are unique and can only be claimed once per user.
 - **Special NFT Tier**: The "Special" NFT tier is not attainable through the standard upgrade path and must be assigned manually or through special conditions defined by the business.
 - **Benefit Application**: NFT benefits (e.g., fee reductions, `aiagentUses`) must be applied in real-time to relevant user actions.
