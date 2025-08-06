@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-This document provides an analysis of the AIW3 NFT system integration and strategies to align it with the `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). It includes architecture reviews, modification needs, strategic plans, risk assessments, and a phased implementation road map.
+This document provides an analysis of the AIW3 NFT system integration and strategies to align it with the `lastmemefi-api` backend (located at `$HOME/aiw3/lastmemefi-api`). It includes architecture reviews, modification needs, strategic plans, risk assessments, and a phased implementation road map.
 
 --- 
 

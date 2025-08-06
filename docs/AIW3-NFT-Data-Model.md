@@ -10,7 +10,7 @@
 
 **Data Model Scope**: This document provides comprehensive specifications for data structures supporting all NFT business flows documented in **AIW3 NFT Business Flows and Processes**, ensuring complete prototype alignment.
 
-This document provides comprehensive specifications for data structures in the AIW3 NFT system, designed for seamless integration with the existing `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). It covers database extensions, API response formats, and data relationships optimized for the Sails.js/MySQL infrastructure.
+This document provides comprehensive specifications for data structures in the AIW3 NFT system, designed for seamless integration with the existing `lastmemefi-api` backend (located at `$HOME/aiw3/lastmemefi-api`). It covers database extensions, API response formats, and data relationships optimized for the Sails.js/MySQL infrastructure.
 
 ---
 

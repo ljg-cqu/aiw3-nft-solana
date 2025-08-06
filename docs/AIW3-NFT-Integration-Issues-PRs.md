@@ -12,7 +12,7 @@
 
 ## Overview
 
-This document provides a detailed breakdown of issues and pull requests for integrating the AIW3 NFT system with the existing `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). Each issue is designed to be small, controllable, and testable with appropriate granularity for team collaboration.
+This document provides a detailed breakdown of issues and pull requests for integrating the AIW3 NFT system with the existing `lastmemefi-api` backend (located at `$HOME/aiw3/lastmemefi-api`). Each issue is designed to be small, controllable, and testable with appropriate granularity for team collaboration.
 
 ---
 
@@ -132,7 +132,7 @@ Issue Branches → agent_dev_nft → agent_dev → agent
 
 ### Issue Numbering Strategy
 
-**Important**: This document uses **NFT-XXX** issue IDs for planning and documentation purposes. However, when creating actual development branches in the AIW3 backend repository (`/home/zealy/aiw3/gitlab.com/lastmemefi-api`), developers should:
+**Important**: This document uses **NFT-XXX** issue IDs for planning and documentation purposes. However, when creating actual development branches in the AIW3 backend repository (`$HOME/aiw3/lastmemefi-api`), developers should:
 
 1. **Create actual issues** in the backend repository's issue tracking system
 2. **Use the backend's issue ID** for branch naming

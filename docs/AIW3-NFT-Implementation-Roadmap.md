@@ -30,7 +30,7 @@ This document provides a realistic, phase-by-phase implementation roadmap for th
 
 #### Package Dependencies Installation
 ```bash
-cd /home/zealy/aiw3/gitlab.com/lastmemefi-api
+cd $HOME/aiw3/lastmemefi-api
 npm install @solana/web3.js@^1.98.0
 npm install @solana/spl-token@^0.3.8  
 npm install @metaplex-foundation/mpl-token-metadata@^2.13.0

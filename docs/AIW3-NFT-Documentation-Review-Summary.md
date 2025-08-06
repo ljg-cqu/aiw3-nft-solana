@@ -69,7 +69,7 @@ The review was conducted using a systematic approach covering:
    - Service integration patterns
 
 2. **Business Alignment Verification**
-   - Backend codebase alignment (`/home/zealy/aiw3/gitlab.com/lastmemefi-api`)
+   - Backend codebase alignment (`$HOME/aiw3/lastmemefi-api`)
    - Business prototype alignment (`/home/zealy/github.com/ljg-cqu/aiw3-nft-solana/aiw3-prototypes`)
    - User experience flow validation
 
@@ -140,7 +140,7 @@ The review was conducted using a systematic approach covering:
 ### 4. Accuracy Corrections
 
 **Technical Corrections Made**:
-- ✅ **Backend Path**: All references corrected to `/home/zealy/aiw3/gitlab.com/lastmemefi-api`
+- ✅ **Backend Path**: All references corrected to `$HOME/aiw3/lastmemefi-api`
 - ✅ **Service Integration**: Accurate service method names and patterns
 - ✅ **Database Fields**: Corrected field references based on actual backend models
 - ✅ **Diagram Syntax**: Fixed broken mermaid diagrams and removed orphaned code
@@ -151,7 +151,7 @@ The review was conducted using a systematic approach covering:
 
 ### Backend Integration Alignment
 
-**Verified Against**: `/home/zealy/aiw3/gitlab.com/lastmemefi-api`
+**Verified Against**: `$HOME/aiw3/lastmemefi-api`
 
 ✅ **Service Integration Patterns**
 - NFTService orchestration with existing services

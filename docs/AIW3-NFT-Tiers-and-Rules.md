@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-This document defines the official tiers, benefits, and operational policies for the AIW3 NFT collection. It serves as the single source of truth for business rules governing NFT qualification, synthesis (upgrading), and the associated user benefits. All system components, from the `lastmemefi-api` backend (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`) to the frontend UI, must adhere to these policies.
+This document defines the official tiers, benefits, and operational policies for the AIW3 NFT collection. It serves as the single source of truth for business rules governing NFT qualification, synthesis (upgrading), and the associated user benefits. All system components, from the `lastmemefi-api` backend (located at `$HOME/aiw3/lastmemefi-api`) to the frontend UI, must adhere to these policies.
 
 ---
 

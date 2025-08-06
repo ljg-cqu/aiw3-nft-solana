@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-This report validates the alignment between the AIW3 NFT system documentation and the actual codebase located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api` (branch: `agent_dev_nft`) and business logic prototypes at `/home/zealy/github.com/ljg-cqu/aiw3-nft-solana/aiw3-prototypes`.
+This report validates the alignment between the AIW3 NFT system documentation and the actual codebase located at `$HOME/aiw3/lastmemefi-api` (branch: `agent_dev_nft`) and business logic prototypes at `/home/zealy/github.com/ljg-cqu/aiw3-nft-solana/aiw3-prototypes`.
 
 ## Codebase Analysis Results
 
@@ -101,16 +101,16 @@ This report validates the alignment between the AIW3 NFT system documentation an
 **1. NFT Service Creation**
 ```bash
 # Required file creation
-touch /home/zealy/aiw3/gitlab.com/lastmemefi-api/api/services/NFTService.js
+touch $HOME/aiw3/lastmemefi-api/api/services/NFTService.js
 ```
 
 **2. Database Model Implementation**
 ```bash
 # Required model files
-touch /home/zealy/aiw3/gitlab.com/lastmemefi-api/api/models/UserNFT.js
-touch /home/zealy/aiw3/gitlab.com/lastmemefi-api/api/models/UserNFTQualification.js
-touch /home/zealy/aiw3/gitlab.com/lastmemefi-api/api/models/NFTBadge.js
-touch /home/zealy/aiw3/gitlab.com/lastmemefi-api/api/models/NFTUpgradeRequest.js
+touch $HOME/aiw3/lastmemefi-api/api/models/UserNFT.js
+touch $HOME/aiw3/lastmemefi-api/api/models/UserNFTQualification.js
+touch $HOME/aiw3/lastmemefi-api/api/models/NFTBadge.js
+touch $HOME/aiw3/lastmemefi-api/api/models/NFTUpgradeRequest.js
 ```
 
 **3. Web3Service Extensions**
@@ -126,7 +126,7 @@ touch /home/zealy/aiw3/gitlab.com/lastmemefi-api/api/models/NFTUpgradeRequest.js
 **4. API Controller Creation**
 ```bash
 # Required controller files
-touch /home/zealy/aiw3/gitlab.com/lastmemefi-api/api/controllers/NFTController.js
+touch $HOME/aiw3/lastmemefi-api/api/controllers/NFTController.js
 ```
 
 ### Configuration Alignment

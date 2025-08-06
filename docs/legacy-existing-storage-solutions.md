@@ -39,7 +39,7 @@
 
 ## Executive Summary
 
-This document provides a comprehensive analysis of storage solutions currently implemented in the `lastmemefi-api` project (located at `/home/zealy/aiw3/gitlab.com/lastmemefi-api`). The analysis categorizes each solution as centralized or decentralized, explains their purposes, and documents their usage patterns to inform future storage decisions for the `aiw3-nft-solana` project.
+This document provides a comprehensive analysis of storage solutions currently implemented in the `lastmemefi-api` project (located at `$HOME/aiw3/lastmemefi-api`). The analysis categorizes each solution as centralized or decentralized, explains their purposes, and documents their usage patterns to inform future storage decisions for the `aiw3-nft-solana` project.
 
 ## Storage Solutions Overview
 
