@@ -133,22 +133,32 @@ The NFT and Badge lifecycle involves multiple distinct types of states that must
 ### NFT Status Transition Diagram
 
 ```mermaid
-flowchart LR
-    A[Locked] -->|User meets qualification criteria| B[Unlockable]
-    B -->|User clicks 'Unlock'| C((Unlocking...))
-    C -->|Tiered NFT mint successful| D[Active Tiered NFT Level 1]
-    D -->|User activates required badges| E((Upgrading...))
-    E -->|Upgrade successful| F[Active Tiered NFT Higher Level]
-    F -->|Can upgrade again with more badges| D
-    F -->|Level 5 reached| M[Level 5 - Cannot be burned]
+flowchart TD
+    subgraph "Tiered NFT Lifecycle"
+        A[Level 1<br/>Locked] -->|Volume ≥100K| B[Level 1<br/>Unlockable]
+        B -->|Click Unlock| C((Unlocking))
+        C -->|Success| D[Level 1<br/>Active]
+        
+        D -->|Badges + Volume| E((Upgrading))
+        E -->|Success| F[Level 2-4<br/>Active]
+        E -->|Burn OK<br/>Mint Fail| O[NFT<br/>Burned]
+        O -->|Retry| P((Retry))
+        P -->|Success| F
+        
+        F -->|More Badges| E
+        F -->|To Level 5| Q[Level 5<br/>Final]
+    end
     
-    G[Task Completed] -->|Automatic| H[Badge Owned]
-    H -->|User activates| I[Badge Activated]
-    I -->|Used in upgrade| J[Badge Consumed]
-    I -->|Multiple badges| E
+    subgraph "Badge System"
+        G[Task<br/>Complete] -->|Auto| H[Badge<br/>Owned]
+        H -->|User Action| I[Badge<br/>Activated]
+        I -->|Upgrade Success| J[Badge<br/>Consumed]
+        I -.->|Feed Into| E
+    end
     
-    K[Competition Event] -->|Top 3 winners| L[Competition NFT Directly Minted]
-    L -->|Automatic| N[Competition NFT Active & Usable]
+    subgraph "Competition NFTs"
+        K[Competition<br/>Top 3] -->|Direct| L[Competition<br/>NFT Active]
+    end
     
     style A fill:#ff6b6b,color:#fff
     style B fill:#51cf66,color:#fff
@@ -162,8 +172,9 @@ flowchart LR
     style J fill:#6c757d,color:#fff
     style K fill:#845ef7,color:#fff
     style L fill:#ff8cc8,color:#000
-    style M fill:#fd7e14,color:#fff
-    style N fill:#51cf66,color:#fff
+    style O fill:#dc3545,color:#fff
+    style P fill:#fd7e14,color:#fff,stroke-dasharray: 5 5
+    style Q fill:#28a745,color:#fff
 ```
 
 ### State Definitions
