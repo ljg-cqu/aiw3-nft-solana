@@ -324,11 +324,29 @@ This business document focuses on the core business logic and rules. The key bus
 10. **Level Progression**: Users can upgrade from Level 1 to Level 5, with Level 5 being the final tier that cannot be burned
 
 ### 4.4 Competition NFT Distribution Process
+
+#### 4.4.1 Automatic Competition Winners
 1. **Automatic Eligibility**: Top 3 users in trading competitions automatically qualify
 2. **Direct Minting**: Competition NFTs are minted directly to winners' wallets
 3. **Immediate Activation**: NFTs are active and usable immediately upon minting
 4. **Multiple Awards**: Users can receive multiple Competition NFTs from different competitions
 5. **No Prerequisites**: No volume requirements, badges, or unlocking process needed
+
+#### 4.4.2 Competition Manager Airdrop Process (Manual Distribution)
+1. **Competition Manager Authorization**: Only users with `COMPETITION_MANAGER` role can initiate NFT airdrops
+2. **Batch Processing**: Competition managers can airdrop NFTs to multiple winners simultaneously
+3. **Winner Validation**: System validates recipient wallet addresses and competition eligibility
+4. **Direct Blockchain Minting**: Backend mints NFTs directly to winners' Solana wallets
+5. **Audit Trail**: All airdrop operations are logged with manager identity, timestamp, and recipients
+6. **Real-time Notification**: Winners receive immediate notifications of NFT receipt
+7. **Competition Linking**: Airdrops must be linked to specific competition IDs for tracking and validation
+
+#### 4.4.3 Airdrop Technical Requirements
+- **Wallet Validation**: Recipient wallets must be valid Solana addresses
+- **Competition Tracking**: Each airdrop must specify the associated competition/event ID
+- **Duplicate Prevention**: System prevents duplicate NFT airdrops for the same competition and user
+- **Gas Fee Management**: Backend handles all Solana transaction fees for airdrops
+- **Failure Recovery**: Failed airdrops are automatically retried with exponential backoff
 
 ### 4.5 Community Display
 1. **Social Proof**: Active NFTs are displayed in community profiles
@@ -349,6 +367,11 @@ This business document focuses on the core business logic and rules. The key bus
 - **Max Level Protection**: Level 5 (Quantum Alchemist) NFT cannot be burned - it's the highest achievable tier
 - **Irreversible Badge Consumption**: Activated badges are consumed permanently during upgrades
 - **Real-time Assessment**: Qualification status is checked in real-time
+- **Competition Manager Authorization**: Only users with `COMPETITION_MANAGER` role can execute NFT airdrops
+- **Airdrop Scope Limitation**: Competition managers can only airdrop NFTs for competitions within their authority
+- **Airdrop Audit Requirements**: All airdrop operations must be logged with full audit trail including manager identity, timestamp, and recipients
+- **Bulk Airdrop Limits**: Maximum 50 recipients per airdrop operation for system performance and control
+- **Airdrop Duplicate Prevention**: System prevents duplicate NFT airdrops for the same competition and user
 
 
 

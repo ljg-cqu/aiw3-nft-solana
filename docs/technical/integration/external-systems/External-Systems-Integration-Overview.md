@@ -94,28 +94,53 @@ The AIW3 NFT system integrates with multiple external systems to provide compreh
 
 ## Integration Architecture
 
+### System Integration Flow
+
 ```mermaid
 graph TB
-    subgraph "AIW3 NFT System"
-        API[API Layer]
+    subgraph "Frontend Layer"
+        UI[React UI]
+        WS[WebSocket Client]
+    end
+    
+    subgraph "AIW3 NFT System (lastmemefi-api)"
+        API[API Controllers]
         SERV[Service Layer]
-        DB[(Database)]
+        DB[(MySQL Database)]
+        CACHE[(Redis Cache)]
+        QUEUE[Kafka Queue]
     end
     
     subgraph "External Systems"
         SOL[Solana Blockchain]
         IPFS[IPFS/Pinata]
-        EXT[External APIs]
+        VOL[Trading Volume APIs]
+        MONITOR[Monitoring]
     end
     
+    UI --> API
+    WS --> QUEUE
     API --> SERV
     SERV --> DB
+    SERV --> CACHE
     SERV --> SOL
     SERV --> IPFS
-    SERV --> EXT
+    SERV --> VOL
+    QUEUE --> WS
     
     SOL --> IPFS
+    SERV --> MONITOR
 ```
+
+### Integration Layers
+
+| Layer | Components | Purpose |
+|-------|------------|----------|
+| **Frontend** | React UI, WebSocket | User interface and real-time updates |
+| **API** | Controllers, Routes | Request handling and validation |
+| **Service** | NFTService, Web3Service | Business logic orchestration |
+| **Data** | MySQL, Redis | Persistent and cached data storage |
+| **External** | Solana, IPFS, APIs | Blockchain and external services |
 
 ### Integration Patterns
 

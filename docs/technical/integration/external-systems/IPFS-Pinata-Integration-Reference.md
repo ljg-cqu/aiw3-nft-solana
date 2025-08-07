@@ -25,13 +25,42 @@ This document provides the authoritative reference for IPFS integration via Pina
 ## Configuration
 
 ### Environment Variables
-```env
-PINATA_API_KEY=your_api_key
-PINATA_SECRET_API_KEY=your_secret_key  
-PINATA_JWT=your_jwt_token
+
+```bash
+# /config/env/production.js - Pinata Configuration
+PINATA_API_KEY=your_pinata_api_key
+PINATA_SECRET_API_KEY=your_pinata_secret_key
+PINATA_JWT=your_pinata_jwt_token
+
+# IPFS Gateway Configuration
+IPFS_GATEWAY_URL=https://gateway.pinata.cloud
+IPFS_TIMEOUT=30000
+IPFS_MAX_FILE_SIZE=10485760  # 10MB
+```
+
+### Sails.js Configuration
+
+```javascript
+// config/ipfs.js - IPFS Service Configuration
+module.exports.ipfs = {
+  pinata: {
+    apiKey: process.env.PINATA_API_KEY,
+    secretApiKey: process.env.PINATA_SECRET_API_KEY,
+    jwt: process.env.PINATA_JWT
+  },
+  gateway: {
+    url: process.env.IPFS_GATEWAY_URL || 'https://gateway.pinata.cloud',
+    timeout: parseInt(process.env.IPFS_TIMEOUT) || 30000
+  },
+  upload: {
+    maxFileSize: parseInt(process.env.IPFS_MAX_FILE_SIZE) || 10485760,
+    allowedTypes: ['image/png', 'image/jpeg', 'image/gif', 'application/json']
+  }
+};
 ```
 
 ### SDK Integration
+
 ```javascript
 const pinataSDK = require('@pinata/sdk');
 const pinata = pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_SECRET_API_KEY);
