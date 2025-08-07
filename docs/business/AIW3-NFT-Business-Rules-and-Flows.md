@@ -36,39 +36,50 @@ Qualification for each NFT tier is based on a user's total trading volume (in US
 
 ## 2. NFT Lifecycle and Status
 
-The NFT lifecycle is managed through a series of statuses. It is critical to distinguish between **dynamic business statuses** (determined by business logic in `NFTService`) and **persistent database statuses** (stored in the `UserNft` table).
+The NFT lifecycle involves three distinct types of states that must be clearly distinguished:
 
-- **Business Statuses (`Locked`, `Unlockable`, `Claiming`):** Represent a user's eligibility *before* an NFT is minted. They are calculated on-the-fly and are not stored in the database.
-- **Database Statuses (`active`, `burned`):** Represent the state of an NFT *after* it has been minted and recorded in the database.
+- **Business Logic States (`Locked`, `Unlockable`):** Represent a user's eligibility *before* an NFT is minted. These are calculated on-the-fly by `NFTService` and are not stored in the database.
+- **Process/UI States (`Claiming`, `Synthesizing`):** Represent temporary processing states during user actions. These are UI indicators, not NFT statuses.
+- **Database NFT Statuses (`active`, `burned`):** Represent the actual state of NFTs *after* they have been minted and recorded in the `UserNft` table.
 
 ### NFT Status Transition Diagram
 
 ```mermaid
 flowchart LR
     A[Locked] -->|User meets qualification criteria| B[Unlockable]
-    B -->|User clicks 'Claim'| C[Claiming...]
+    B -->|User clicks 'Claim'| C((Claiming...))
     C -->|NFT mint successful| D[Active]
-    D -->|User initiates synthesis| E[Burned]
-    E -->|Higher-tier NFT minted| F[New Active NFT]
+    D -->|User initiates synthesis| E((Synthesizing...))
+    E -->|Old NFT burned, new NFT minted| F[Active Higher-Tier NFT]
     F -->|Can upgrade again| D
     
     style A fill:#ff6b6b,color:#fff
     style B fill:#51cf66,color:#fff
-    style C fill:#ffd43b,color:#000
+    style C fill:#ffd43b,color:#000,stroke-dasharray: 5 5
     style D fill:#339af0,color:#fff
-    style E fill:#e599f7,color:#fff
+    style E fill:#ff9800,color:#fff,stroke-dasharray: 5 5
     style F fill:#20c997,color:#fff
 ```
 
-### Status Definitions
+### State Definitions
 
+#### Business Logic States
+| State        | Description                                                                                             | UI/User Action                                        |
+|:-------------|:--------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
+| **Locked**     | User has not yet met the requirements for this NFT tier.                                               | UI shows the requirements to unlock.                  |
+| **Unlockable** | User has met all requirements and can claim the NFT.                                                   | UI displays a prominent "Claim" button.               |
+
+#### Process/UI States
+| State        | Description                                                                                             | UI/User Action                                        |
+|:-------------|:--------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
+| **Claiming**   | User has clicked "Claim", backend is processing the mint transaction.                                 | UI shows a pending or processing indicator.           |
+| **Synthesizing** | User has initiated synthesis, backend is processing burn and mint transactions.                       | UI shows synthesis progress indicator.                |
+
+#### Database NFT Statuses
 | Status       | Description                                                                                             | UI/User Action                                        |
 |:-------------|:--------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
-| **Locked**     | (Business Status) The user has not yet met the requirements for this NFT tier.                          | UI shows the requirements to unlock.                  |
-| **Unlockable** | (Business Status) The user has met all requirements and can now claim the NFT.                          | UI displays a prominent "Claim" button.               |
-| **Claiming**   | (Transient State) The user has clicked "Claim", and the backend is processing the mint.               | UI shows a pending or processing indicator.           |
-| **`active`**   | (Database Status) The NFT has been successfully minted and is owned by the user.                        | NFT is visible in the Personal Center.                |
-| **`burned`**   | (Database Status) The NFT was consumed during Synthesis to mint a higher-tier NFT.                      | NFT is removed from active view.                      |
+| **`active`**   | NFT has been successfully minted and is owned by the user.                                             | NFT is visible in the Personal Center.                |
+| **`burned`**   | NFT was consumed during Synthesis to mint a higher-tier NFT.                                           | NFT is removed from active view.                      |
 
 ---
 
