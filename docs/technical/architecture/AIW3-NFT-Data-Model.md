@@ -1,10 +1,10 @@
 # AIW3 NFT Data Model
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
-**Last Updated:** 2025-08-06  
+**Version:** v2.0.0  
+**Last Updated:** 2025-08-07  
 **Status:** Active  
-**Purpose:** Defines the data structures and relationships for the AIW3 NFT system.
+**Purpose:** Defines the data structures and relationships for the AIW3 NFT system, aligned with prototype-driven business requirements and lastmemefi-api backend implementation.
 
 ---
 
@@ -42,62 +42,111 @@ This section defines the new database models and extensions to existing models r
 
 ### New Models
 
-#### UserNFT Model (api/models/UserNFT.js)
+## Backend Data Models (lastmemefi-api)
+
+These models reflect the exact implementation in the `lastmemefi-api` backend, aligned with prototype-driven business requirements.
+
+### UserNft Model (api/models/UserNft.js)
+
+**Purpose**: Represents a specific NFT instance owned by a user.
 
 ```javascript
 module.exports = {
   attributes: {
-    // Primary key
-    id: { type: 'number', autoIncrement: true },
-    
-    // User relationship
-    user_id: { 
-      model: 'user',
-      required: true,
-      description: 'Reference to the User who owns this NFT'
+    owner: { 
+      model: 'user', 
+      required: true, 
+      description: 'The user who owns this NFT.' 
     },
     
-    // NFT identification
-    nft_mint_address: { 
+    nftDefinition: { 
+      model: 'nftdefinition', 
+      required: true, 
+      description: 'The definition of the NFT that was minted.' 
+    },
+    
+    mintAddress: { 
       type: 'string', 
-      required: true,
-      unique: true,
-      maxLength: 44,
-      description: 'Solana mint address of the NFT'
+      required: true, 
+      unique: true, 
+      description: 'The unique on-chain mint address of the NFT instance.' 
     },
     
-    nft_level: { 
+    status: { 
+      type: 'string', 
+      isIn: ['active', 'burned'], 
+      defaultsTo: 'active', 
+      description: 'The current status of the NFT.' 
+    },
+    
+    level: { 
       type: 'number', 
-      required: true,
-      min: 1,
-      max: 5,
-      description: 'NFT tier level (1-5)'
+      defaultsTo: 1, 
+      description: 'The upgrade level of the NFT, used in synthesis flows.' 
+    }
+  }
+};
+```
+
+**Key Fields**:
+- `owner`: Association to User model
+- `nftDefinition`: Association to NftDefinition model  
+- `mintAddress`: Unique Solana mint address
+- `status`: Only `active` or `burned` (database statuses)
+- `level`: Upgrade level for synthesis
+
+### NftDefinition Model (api/models/NftDefinition.js)
+
+**Purpose**: Represents a type of NFT that can be minted.
+
+```javascript
+module.exports = {
+  attributes: {
+    name: { 
+      type: 'string', 
+      required: true, 
+      description: 'The on-chain name of the NFT.' 
     },
     
-    nft_name: { 
-      type: 'string',
-      required: true,
-      maxLength: 100,
-      description: 'Human-readable NFT name (Tech Chicken, Quant Ape, etc.)'
+    symbol: { 
+      type: 'string', 
+      required: true, 
+      description: 'The on-chain symbol of the NFT.' 
     },
     
-    // Metadata
-    metadata_uri: { 
-      type: 'string',
-      maxLength: 500,
-      description: 'IPFS URI for NFT metadata JSON'
+    metadataUri: { 
+      type: 'string', 
+      required: true, 
+      description: 'The IPFS URI for the NFT\'s metadata JSON file.' 
     },
     
-    image_uri: {
-      type: 'string',
-      maxLength: 500,
-      description: 'IPFS URI for NFT image'
-    },
-    
-    // Status tracking
-    status: {
-      type: 'string',
-      isIn: ['unlocked', 'active', 'inactive', 'burned'],
+    description: { 
+      type: 'string', 
+      description: 'A brief description of the NFT and its purpose or tier.', 
+      maxLength: 1000 
+    }
+  }
+};
+```
+
+**Key Fields**:
+- `name`: On-chain NFT name (e.g., "Tech Chicken")
+- `symbol`: On-chain symbol (e.g., "TECH")
+- `metadataUri`: IPFS URI for metadata JSON
+- `description`: Human-readable description
+
+## NFT Tier Definitions (Prototype-Driven)
+
+Based on prototype analysis, the system supports these NFT tiers:
+
+| Level | NFT Name | Required Volume (USDT) | Fee Reduction | AI Agent Benefits |
+|:------|:---------|:----------------------|:--------------|:------------------|
+| 1 | Tech Chicken | ≥ 100,000 | 10% | 10 free uses/week |
+| 2 | Quant Ape | ≥ 500,000 | 20% | 20 free uses/week |
+| 3 | On-chain Hunter | ≥ 5,000,000 | 30% | 30 free uses/week |
+| 4 | Alpha Alchemist | ≥ 10,000,000 | 40% | 40 free uses/week |
+| 5 | Quantum Alchemist | ≥ 50,000,000 | 55% | 50 free uses/week |
+| Special | Trophy Breeder | Top 3 in competition | 25% | Special privileges |
       defaultsTo: 'unlocked',
       description: 'Current status of the NFT'
     },

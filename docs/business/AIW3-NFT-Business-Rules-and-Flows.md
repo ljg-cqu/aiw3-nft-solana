@@ -83,450 +83,84 @@ flowchart LR
 
 ---
 
-## 3. UI Data Requirements and API Payloads
+## 3. Technical Implementation References
 
-This section details the data required for each primary UI screen, aligning with the backend API endpoints.
+The technical implementation details for the AIW3 NFT system have been moved to dedicated technical documentation for better separation of concerns:
 
-### 3.1. Personal Center (VIP Level Plan)
+### API & Frontend Integration
+- **Document**: `/docs/technical/implementation/api-frontend/API-Frontend-Integration-Specification.md`
+- **Contains**: Complete API endpoint specifications, frontend integration patterns, real-time events
+- **Covers**: All 6 NFT-related endpoints, WebSocket events, UI component integration
 
-*Prototypes: `1. Entrance.png`, `2. NFT_Not_Unlocked.png`, `2.1. NFT_Unlockable.png`, `4. Personal_Center_NFT.png`*
+### Detailed API Reference
+- **Document**: `/docs/technical/implementation/api-frontend/AIW3-NFT-API-Reference.md`
+- **Contains**: Comprehensive API documentation with examples and error handling
+- **Covers**: Request/response schemas, authentication patterns, integration examples
 
-**Business Flow**: The Personal Center is the primary dashboard where users view their NFT status, track progress, and initiate claims or upgrades.
+### System Architecture
+- **Document**: `/docs/technical/architecture/AIW3-NFT-System-Design.md`
+- **Contains**: NFT state transition diagrams, system architecture, lifecycle management
+- **Covers**: Technical state management, integration patterns, infrastructure topology
 
-**UI States from Prototypes**:
-1. **Entrance State**: First-time user with no NFTs
-2. **Not Unlocked State**: User hasn't met requirements for any tier
-3. **Unlockable State**: User has met requirements and can claim
-4. **Active NFT State**: User has claimed and owns an active NFT
-
-#### 3.1.1 Complete Data Requirements
-
-**Field Specifications** (Required unless marked Optional):
-
-| Field Name | Data Type | Required | Description | Example |
-|:-----------|:----------|:---------|:------------|:--------|
-| `userProfile.walletAddress` | String | Yes | User's Solana wallet address | `"So1a..."` |
-| `userProfile.username` | String | Optional | Display name | `"CryptoHunter"` |
-| `userProfile.avatarUrl` | String | Optional | Profile image URL | `"/path/to/avatar.png"` |
-| `userProfile.totalTradingVolume` | Number | Yes | Current trading volume in USDT | `550000.00` |
-| `userProfile.currentTierLevel` | Number | Optional | Current active NFT tier (0 if none) | `2` |
-| `nftTiers[].tierId` | Number | Yes | Unique tier identifier | `1` |
-| `nftTiers[].tierName` | String | Yes | Display name of NFT tier | `"Tech Chicken"` |
-| `nftTiers[].status` | String | Yes | Current status (Locked/Unlockable/Active) | `"Active"` |
-| `nftTiers[].nftImageUrl` | String | Yes | NFT image URL | `"/ipfs/tech_chicken.png"` |
-| `nftTiers[].mintAddress` | String | Optional | Solana mint address (if Active) | `"Mint...abc"` |
-| `nftTiers[].unlockRequirements.requiredVolume` | Number | Yes | Volume needed to unlock | `10000` |
-| `nftTiers[].progressPercentage` | Number | Yes | Progress toward unlock (0-100) | `75.5` |
-| `nftTiers[].canUpgrade` | Boolean | Optional | Whether upgrade is available | `true` |
-| `nftTiers[].benefits.tradingFeeReduction` | String | Yes | Fee reduction percentage | `"10%"` |
-| `nftTiers[].benefits.aiAgentUses` | String | Yes | AI agent usage allowance | `"10 free uses per week"` |
-
-#### 3.1.2 Data Payload Structure
-
-```json
-{
-  "userProfile": {
-    "walletAddress": "So1a...",
-    "username": "CryptoHunter",
-    "avatarUrl": "/path/to/avatar.png",
-    "totalTradingVolume": 550000.00,
-    "currentTierLevel": 1
-  },
-  "nftTiers": [
-    {
-      "tierId": 1,
-      "tierName": "Tech Chicken",
-      "status": "Active",
-      "nftImageUrl": "/ipfs/tech_chicken.png",
-      "mintAddress": "Mint...abc",
-      "unlockRequirements": {
-        "requiredVolume": 100000
-      },
-      "progressPercentage": 100,
-      "canUpgrade": true,
-      "benefits": {
-        "tradingFeeReduction": "10%",
-        "aiAgentUses": "10 free uses per week"
-      }
-    },
-    {
-      "tierId": 2,
-      "tierName": "Quant Ape",
-      "status": "Unlockable",
-      "nftImageUrl": "/ipfs/quant_ape.png",
-      "mintAddress": null,
-      "unlockRequirements": {
-        "requiredVolume": 500000
-      },
-      "progressPercentage": 110,
-      "canUpgrade": false,
-      "benefits": {
-        "tradingFeeReduction": "20%",
-        "aiAgentUses": "20 free uses per week"
-      }
-    }
-    // ... other tiers
-  ]
-}
-```
-
-### 3.2. NFT Synthesis (Upgrade) Page
-
-*Prototypes: `2.3. NFT_Synthesis.png`, `2.3. NFT_Synthesis_Conditions.png`, `2.4 VIP2_Synthesis_Success.png`*
-
-**Business Flow**: Users can upgrade their current NFT to the next tier through a "burn-and-mint" process. The old NFT is burned and a new higher-tier NFT is minted.
-
-**UI States from Prototypes**:
-1. **Synthesis Conditions**: Shows requirements and current NFT details
-2. **Synthesis Confirmation**: User confirms the upgrade action
-3. **Synthesis Success**: Confirmation screen with new NFT details
-
-#### 3.2.1 Complete Data Requirements
-
-**Field Specifications** (Required unless marked Optional):
-
-| Field Name | Data Type | Required | Description | Example |
-|:-----------|:----------|:---------|:------------|:--------|
-| `currentNft.tierName` | String | Yes | Current NFT name | `"Quant Ape"` |
-| `currentNft.level` | Number | Yes | Current tier level | `2` |
-| `currentNft.nftImageUrl` | String | Yes | Current NFT image | `"/ipfs/quant_ape.png"` |
-| `currentNft.mintAddress` | String | Yes | Current NFT mint address | `"Mint...def"` |
-| `currentNft.benefits` | Object | Yes | Current benefits | `{"tradingFeeReduction": "20%"}` |
-| `nextTierNft.tierName` | String | Yes | Target NFT name | `"On-chain Hunter"` |
-| `nextTierNft.level` | Number | Yes | Target tier level | `3` |
-| `nextTierNft.nftImageUrl` | String | Yes | Target NFT image | `"/ipfs/onchain_hunter.png"` |
-| `nextTierNft.unlockRequirements.requiredVolume` | Number | Yes | Volume needed for target | `5000000` |
-| `nextTierNft.benefits` | Object | Yes | Target benefits | `{"tradingFeeReduction": "30%"}` |
-| `canSynthesize` | Boolean | Yes | Whether synthesis is allowed | `true` |
-| `synthesisConditions.volumeMet` | Boolean | Yes | Whether volume requirement is met | `true` |
-| `synthesisConditions.currentVolume` | Number | Yes | User's current volume | `5500000` |
-| `synthesisConditions.estimatedGasFee` | Number | Optional | Estimated transaction cost | `0.001` |
-| `synthesisConditions.nextTierBenefits` | Object | Yes | Benefits of next tier | `{"tradingFeeReduction": "30%"}` |
-| `synthesisConditions.nextTierRequirements` | Object | Yes | Requirements for next tier | `{"requiredVolume": 5000000}` |
-
-#### 3.2.2 Data Payload Structure
-
-```json
-{
-  "currentNft": {
-    "tierName": "Quant Ape",
-    "level": 2,
-    "nftImageUrl": "/ipfs/quant_ape.png",
-    "mintAddress": "Mint...def",
-    "benefits": {
-      "tradingFeeReduction": "20%",
-      "aiAgentUses": "20 free uses per week"
-    }
-  },
-  "nextTierNft": {
-    "tierName": "On-chain Hunter",
-    "level": 3,
-    "nftImageUrl": "/ipfs/onchain_hunter.png",
-    "unlockRequirements": {
-      "requiredVolume": 5000000
-    },
-    "benefits": {
-      "tradingFeeReduction": "30%",
-      "aiAgentUses": "30 free uses per week"
-    }
-  },
-  "canSynthesize": true,
-  "synthesisConditions": {
-    "volumeMet": true,
-    "currentVolume": 5500000,
-    "estimatedGasFee": 0.001
-  }
-}
-```
-
-### 3.3. Badge Gallery Page
-
-*Prototype: `3. Badge.png`*
-
-**Business Flow**: Users can view all available badges and their ownership status. Badges serve as achievements and social proof elements.
-
-**UI States from Prototypes**:
-1. **Badge Grid**: Shows all available badges with ownership indicators
-2. **Badge Details**: Individual badge information and earning criteria
-
-#### 3.3.1 Complete Data Requirements
-
-**Field Specifications** (Required unless marked Optional):
-
-| Field Name | Data Type | Required | Description | Example |
-|:-----------|:----------|:---------|:------------|:--------|
-| `badges[].badgeId` | String | Yes | Unique badge identifier | `"BadgeA"` |
-| `badges[].badgeName` | String | Yes | Display name | `"Early Adopter"` |
-| `badges[].badgeImageUrl` | String | Yes | Badge image URL | `"/ipfs/badge_a.png"` |
-| `badges[].description` | String | Yes | How to earn the badge | `"Awarded to users who joined in the first month."` |
-| `badges[].isOwned` | Boolean | Yes | Whether user owns this badge | `true` |
-| `badges[].category` | String | Optional | Badge category | `"Achievement"` |
-| `badges[].rarity` | String | Optional | Badge rarity level | `"Common"` |
-| `badges[].earnedDate` | String | Optional | When badge was earned (ISO date) | `"2025-01-15T10:30:00Z"` |
-| `totalBadges` | Number | Yes | Total number of badges | `12` |
-| `ownedBadges` | Number | Yes | Number of badges owned | `5` |
-
-#### 3.3.2 Data Payload Structure
-
-```json
-{
-  "badges": [
-    {
-      "badgeId": "BadgeA",
-      "badgeName": "Early Adopter",
-      "badgeImageUrl": "/ipfs/badge_a.png",
-      "description": "Awarded to users who joined in the first month.",
-      "isOwned": true,
-      "category": "Achievement",
-      "rarity": "Common",
-      "earnedDate": "2025-01-15T10:30:00Z"
-    },
-    {
-      "badgeId": "BadgeB",
-      "badgeName": "Top Trader",
-      "badgeImageUrl": "/ipfs/badge_b.png",
-      "description": "Awarded for being in the top 10% of traders.",
-      "isOwned": false,
-      "category": "Trading",
-      "rarity": "Rare",
-      "earnedDate": null
-    }
-  ],
-  "totalBadges": 12,
-  "ownedBadges": 5
-}
-```
-
-### 3.4. Community Profile Page (Public View)
-
-*Prototypes: `6. Community_Mini_Homepage.png`, `7. Other Users View Homepage.png`*
-
-**Business Flow**: Public-facing profile pages where users can showcase their NFT achievements and badges to the community.
-
-**UI States from Prototypes**:
-1. **Community Mini Homepage**: Compact profile view with key achievements
-2. **Full Profile View**: Detailed view of user's NFT and badge collection
-
-#### 3.4.1 Complete Data Requirements
-
-**Field Specifications** (Required unless marked Optional):
-
-| Field Name | Data Type | Required | Description | Example |
-|:-----------|:----------|:---------|:------------|:--------|
-| `userProfile.walletAddress` | String | Yes | Public wallet address | `"So1a..."` |
-| `userProfile.username` | String | Optional | Display name | `"CryptoHunter"` |
-| `userProfile.avatarUrl` | String | Optional | Profile image | `"/path/to/avatar.png"` |
-| `userProfile.joinDate` | String | Optional | When user joined | `"2025-01-01"` |
-| `activeNfts[].tierName` | String | Yes | NFT name | `"Tech Chicken"` |
-| `activeNfts[].level` | Number | Yes | NFT tier level | `1` |
-| `activeNfts[].nftImageUrl` | String | Yes | NFT image | `"/ipfs/tech_chicken.png"` |
-| `activeNfts[].mintAddress` | String | Yes | Solana mint address | `"Mint...abc"` |
-| `earnedBadges[].badgeName` | String | Yes | Badge name | `"Early Adopter"` |
-| `earnedBadges[].badgeImageUrl` | String | Yes | Badge image | `"/ipfs/badge_a.png"` |
-| `earnedBadges[].earnedDate` | String | Optional | When earned | `"2025-01-15"` |
-| `stats.totalBadges` | Number | Yes | Total badges earned | `5` |
-| `stats.currentTierLevel` | Number | Yes | Highest NFT tier | `2` |
-| `stats.publicTradingVolume` | Number | Optional | Public volume display | `1000000` |
-
-#### 3.4.2 Data Payload Structure
-
-```json
-{
-  "userProfile": {
-    "walletAddress": "So1a...",
-    "username": "CryptoHunter",
-    "avatarUrl": "/path/to/avatar.png",
-    "joinDate": "2025-01-01"
-  },
-  "activeNfts": [
-    {
-      "tierName": "Tech Chicken",
-      "level": 1,
-      "nftImageUrl": "/ipfs/tech_chicken.png",
-      "mintAddress": "Mint...abc"
-    }
-  ],
-  "earnedBadges": [
-    {
-      "badgeName": "Early Adopter",
-      "badgeImageUrl": "/ipfs/badge_a.png",
-      "earnedDate": "2025-01-15"
-    }
-  ],
-  "stats": {
-    "totalBadges": 5,
-    "currentTierLevel": 1,
-    "publicTradingVolume": 1000000
-  }
-}
-```
+### Data Models
+- **Document**: `/docs/technical/architecture/AIW3-NFT-Data-Model.md`
+- **Contains**: Backend data models, database schemas, field specifications
+- **Covers**: UserNft and NftDefinition models, tier definitions, data relationships
 
 ---
 
-## 4. Backend API Endpoints & Notifications
+## 4. Business Process Summary
 
-### 4.1. RESTful API Endpoints
+This business document focuses on the core business logic and rules. The key business processes are:
 
-#### 4.1.1 Get Personal Center Data
+### 4.1 NFT Qualification Process
+1. **Volume Tracking**: User trading volume is tracked in real-time
+2. **Tier Assessment**: System determines which NFT tiers user qualifies for
+3. **Status Computation**: Business logic states (Locked/Unlockable) are calculated
+4. **User Notification**: UI displays qualification status and progress
 
-- **Endpoint**: `GET /api/v1/nft/personal-center`
-- **Controller Action**: `NFTController.getPersonalCenterData`
-- **Authentication**: Required (JWT)
-- **Description**: Retrieves all data needed for the Personal Center view.
-- **Query Parameters**: None
-- **Success Response**: `200 OK` with JSON object containing `userProfile` and `nftTiers` keys, as defined in section 3.1.2
-- **Error Responses**: 
-  - `401 Unauthorized`: Invalid or missing JWT token
-  - `500 Internal Server Error`: Server processing error
+### 4.2 NFT Claiming Process
+1. **Eligibility Check**: User must meet volume requirements
+2. **Single NFT Rule**: Users can only hold one active NFT at a time
+3. **Minting Process**: Backend initiates NFT minting on Solana
+4. **Status Update**: NFT becomes active upon successful minting
 
-#### 4.1.2 Get Synthesis Details
+### 4.3 NFT Synthesis (Upgrade) Process
+1. **Upgrade Eligibility**: User must qualify for higher tier
+2. **Burn-and-Mint**: Old NFT is burned, new higher-tier NFT is minted
+3. **Benefit Enhancement**: User receives improved trading fee reductions and AI agent benefits
+4. **Continuous Progression**: Users can continue upgrading through all tiers
 
-- **Endpoint**: `GET /api/v1/nft/synthesis-details`
-- **Controller Action**: `NFTController.getSynthesisDetails`
-- **Authentication**: Required (JWT)
-- **Description**: Provides the data needed to render the synthesis page for a specific upgrade path.
-- **Query Parameters**: 
-  - `currentTierId` (optional): Current NFT tier ID
-- **Success Response**: `200 OK` with JSON object containing `currentNft`, `nextTierNft`, `canSynthesize`, and `synthesisConditions` keys, as defined in section 3.2.2
-- **Error Responses**:
-  - `400 Bad Request`: User has no NFT to synthesize
-  - `401 Unauthorized`: Invalid or missing JWT token
-  - `404 Not Found`: NFT tier not found
-
-#### 4.1.3 Get Badge Gallery
-
-- **Endpoint**: `GET /api/v1/nft/badge-gallery`
-- **Controller Action**: `NFTController.getBadgeGallery`
-- **Authentication**: Required (JWT)
-- **Description**: Fetches the complete list of badges and the user's ownership status.
-- **Query Parameters**: None
-- **Success Response**: `200 OK` with JSON object containing `badges`, `totalBadges`, and `ownedBadges` keys, as defined in section 3.3.2
-- **Error Responses**:
-  - `401 Unauthorized`: Invalid or missing JWT token
-  - `500 Internal Server Error`: Server processing error
-
-#### 4.1.4 Get Community Profile
-
-- **Endpoint**: `GET /api/v1/nft/community-profile/:walletAddress`
-- **Controller Action**: `NFTController.getCommunityProfile`
-- **Authentication**: Not Required (Public endpoint)
-- **Description**: Retrieves the public profile data for a given Solana wallet address.
-- **Path Parameters**:
-  - `walletAddress` (required): Solana wallet address
-- **Success Response**: `200 OK` with JSON object containing `userProfile`, `activeNfts`, `earnedBadges`, and `stats` keys, as defined in section 3.4.2
-- **Error Responses**:
-  - `404 Not Found`: Wallet address not found or user has no public profile
-  - `400 Bad Request`: Invalid wallet address format
-
-#### 4.1.5 Claim NFT
-
-- **Endpoint**: `POST /api/v1/nft/claim`
-- **Controller Action**: `NFTController.claim`
-- **Authentication**: Required (JWT)
-- **Description**: Initiates the minting of an NFT that the user has qualified for.
-- **Request Body**:
-  ```json
-  {
-    "tierId": 2
-  }
-  ```
-- **Success Response**: `200 OK`
-  ```json
-  {
-    "status": "success",
-    "message": "NFT claim processing started.",
-    "mintAddress": "newly-minted-solana-address",
-    "transactionId": "tx...123"
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: User does not meet requirements
-    ```json
-    {
-      "status": "error",
-      "message": "User does not meet the requirements for this NFT tier.",
-      "requiredVolume": 500000,
-      "currentVolume": 300000
-    }
-    ```
-  - `409 Conflict`: User already has an active NFT
-  - `401 Unauthorized`: Invalid or missing JWT token
-
-#### 4.1.6 Synthesize NFT
-
-- **Endpoint**: `POST /api/v1/nft/synthesize`
-- **Controller Action**: `NFTController.synthesize`
-- **Authentication**: Required (JWT)
-- **Description**: Initiates the upgrade process, burning the current NFT and minting the next-tier NFT.
-- **Request Body**:
-  ```json
-  {
-    "targetTierId": 3
-  }
-  ```
-- **Success Response**: `200 OK`
-  ```json
-  {
-    "status": "success",
-    "message": "NFT synthesis initiated successfully.",
-    "newNftMintAddress": "mint...xyz",
-    "burnTransactionId": "tx...burn456",
-    "mintTransactionId": "tx...mint789"
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: Synthesis requirements not met
-    ```json
-    {
-      "status": "error",
-      "message": "Synthesis requirements not met.",
-      "requiredVolume": 5000000,
-      "currentVolume": 3000000
-    }
-    ```
-  - `404 Not Found`: User has no NFT to synthesize
-  - `401 Unauthorized`: Invalid or missing JWT token
-
-### 4.2. Real-time Notifications (Kafka -> WebSocket)
-
-*Prototype: `8. System_Messages.png`*
-
-When an NFT is successfully claimed, the backend will publish an event with the following payload:
-
-```json
-{
-  "event": "nftStatusUpdate",
-  "walletAddress": "So1a...",
-  "nft": {
-    "tierName": "Quant Ape",
-    "status": "Active",
-    "nftImageUrl": "/ipfs/quant_ape.png",
-    "mintAddress": "Mint...def"
-  }
-}
-```
+### 4.4 Community Display
+1. **Social Proof**: Active NFTs are displayed in community profiles
+2. **Achievement Showcase**: Users can showcase their NFT achievements and badges
+3. **Public Visibility**: Community profiles are publicly accessible
+4. **Engagement Driver**: NFT ownership encourages community participation
 
 ---
 
-## 5.0 Appendix: Backend Data Models
+## 5. Business Rules Enforcement
 
-These definitions reflect the exact attributes in the `lastmemefi-api` Sails.js models.
+### 5.1 Core Constraints
+- **One Active NFT**: Users can only hold one active NFT at any time
+- **Volume-Based Qualification**: All tier access is based on trading volume thresholds
+- **Irreversible Upgrades**: NFT synthesis permanently burns the lower-tier NFT
+- **Real-time Assessment**: Qualification status is checked in real-time
 
-### 5.1 `UserNft` Model (from `api/models/UserNft.js`)
+### 5.2 Business Logic States
+- **Locked**: User has not met volume requirements
+- **Unlockable**: User meets requirements and can claim NFT
+- **Process States**: Claiming and Synthesizing are temporary UI indicators
+- **Database States**: Only Active and Burned NFTs are persisted
 
-Represents a specific NFT instance owned by a user.
+### 5.3 Benefits and Incentives
+- **Trading Fee Reduction**: Ranges from 10% to 55% based on NFT tier
+- **AI Agent Access**: Free usage allowances increase with tier level
+- **Social Status**: Higher-tier NFTs provide greater community recognition
+- **Exclusive Features**: Special privileges for Trophy Breeder tier
 
-- `owner`: Association to `user` model.
-- `nftDefinition`: Association to `nftdefinition` model.
-- `mintAddress`: String (Unique, Required)
-- `status`: String (Enum: `['active', 'burned']`, Default: `'active'`)
-- `level`: Number (Default: `1`)
+For detailed technical implementation, API specifications, and integration patterns, refer to the technical documentation listed in Section 3.
 
-### 5.2 `NftDefinition` Model (from `api/models/NftDefinition.js`)
+---
 
-Represents a type of NFT that can be minted.
-
-- `name`: String (Required)
-- `symbol`: String (Required)
-- `metadataUri`: String (Required, IPFS URI)
-- `description`: String
+*This completes the business rules and flows documentation. All technical implementation details, API specifications, data models, and integration patterns have been moved to the appropriate technical documentation for better separation of concerns and maintainability.*

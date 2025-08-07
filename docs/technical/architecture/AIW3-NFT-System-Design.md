@@ -1,10 +1,10 @@
 # AIW3 NFT System Design
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
-**Last Updated:** 2025-08-06  
+**Version:** v2.0.0  
+**Last Updated:** 2025-08-07  
 **Status:** Active  
-**Purpose:** High-level technical architecture and lifecycle management
+**Purpose:** High-level technical architecture and lifecycle management, aligned with prototype-driven business requirements
 
 ---
 
@@ -92,6 +92,32 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 - Token supply reduced to zero
 - Associated Token Account closed
 - SOL rent returned to user
+
+### NFT State Transition Diagram
+
+The following diagram illustrates the complete NFT lifecycle with all state transitions:
+
+```mermaid
+flowchart LR
+    A[Locked] -->|User meets qualification criteria| B[Unlockable]
+    B -->|User clicks 'Claim'| C((Claiming...))
+    C -->|NFT mint successful| D[Active]
+    D -->|User initiates synthesis| E((Synthesizing...))
+    E -->|Old NFT burned, new NFT minted| F[Active Higher-Tier NFT]
+    F -->|Can upgrade again| D
+    
+    style A fill:#ff6b6b,color:#fff
+    style B fill:#51cf66,color:#fff
+    style C fill:#ffd43b,color:#000,stroke-dasharray: 5 5
+    style D fill:#339af0,color:#fff
+    style E fill:#ff9800,color:#fff,stroke-dasharray: 5 5
+    style F fill:#20c997,color:#fff
+```
+
+**State Categories**:
+- **Business Logic States** (Red/Green): `Locked`, `Unlockable` - computed by NFTService
+- **Process States** (Dashed): `Claiming`, `Synthesizing` - temporary UI indicators
+- **Database NFT Statuses** (Blue/Teal): `Active` - persistent in UserNft table
 
 ---
 

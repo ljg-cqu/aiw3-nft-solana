@@ -1,10 +1,10 @@
 # API-Frontend Integration Specification
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
+**Version:** v2.0.0  
 **Last Updated:** 2025-08-07  
 **Status:** Active  
-**Purpose:** Comprehensive specification for API endpoints and frontend integration patterns for the AIW3 NFT system.
+**Purpose:** Comprehensive specification for API endpoints and frontend integration patterns for the AIW3 NFT system, aligned with prototype-driven business requirements and lastmemefi-api backend implementation.
 
 ---
 
@@ -105,88 +105,213 @@ POST /api/auth/wallet-verify
 
 ## REST API Endpoints
 
-### NFT Status and Information
+*These endpoints are implemented in the `lastmemefi-api` backend and align with prototype-driven business requirements.*
 
-#### Get User NFT Status
+### 1. Personal Center Data
+
+#### Get Personal Center Data
 ```http
-GET /api/nft/status
+GET /api/v1/nft/personal-center
 Authorization: Bearer {token}
 ```
+
+**Purpose**: Retrieves all data needed for the Personal Center view, including NFT tiers, user progress, and unlock status.
 
 **Response:**
 ```json
 {
-  "success": true,
-  "data": {
-    "userId": "user_123",
-    "nftStatus": "minted",
-    "currentLevel": 2,
-    "progressPoints": 150,
-    "nextLevelRequirement": 200,
-    "walletAddress": "DemoWallet...",
-    "mintAddress": "NFTMint...",
-    "metadata": {
-      "name": "AIW3 Equity NFT #123",
-      "image": "https://ipfs.io/ipfs/QmHash...",
-      "attributes": []
+  "userProfile": {
+    "walletAddress": "So1a...",
+    "username": "CryptoHunter",
+    "avatarUrl": "/path/to/avatar.png",
+    "totalTradingVolume": 550000.00,
+    "currentTierLevel": 1
+  },
+  "nftTiers": [
+    {
+      "tierId": 1,
+      "tierName": "Tech Chicken",
+      "level": 1,
+      "nftImageUrl": "/ipfs/tech_chicken.png",
+      "mintAddress": "Mint...abc",
+      "status": "Active",
+      "unlockRequirements": {
+        "requiredVolume": 100000
+      },
+      "progressPercentage": 110,
+      "canUpgrade": true,
+      "benefits": {
+        "tradingFeeReduction": "10%",
+        "aiAgentUses": "10 free uses per week"
+      }
     }
-  }
+  ]
 }
 ```
 
-#### Get NFT Collection
+### 2. NFT Synthesis (Upgrade) Operations
+
+#### Get Synthesis Details
 ```http
-GET /api/nft/collection?limit=20&offset=0
+GET /api/v1/nft/synthesis-details
 Authorization: Bearer {token}
 ```
 
-### NFT Operations
-
-#### Claim Initial NFT
-```http
-POST /api/nft/claim
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "walletAddress": "DemoWallet..."
-}
-```
+**Purpose**: Retrieves data needed for the NFT synthesis/upgrade page.
 
 **Response:**
 ```json
 {
-  "success": true,
-  "data": {
-    "transactionId": "tx_123456",
-    "mintAddress": "NFTMint...",
-    "status": "pending",
-    "estimatedConfirmation": "2025-08-07T10:35:00Z"
+  "currentNft": {
+    "tierName": "Quant Ape",
+    "level": 2,
+    "nftImageUrl": "/ipfs/quant_ape.png",
+    "mintAddress": "Mint...def",
+    "benefits": {
+      "tradingFeeReduction": "20%",
+      "aiAgentUses": "20 free uses per week"
+    }
+  },
+  "nextTierNft": {
+    "tierName": "On-chain Hunter",
+    "level": 3,
+    "nftImageUrl": "/ipfs/onchain_hunter.png",
+    "unlockRequirements": {
+      "requiredVolume": 5000000
+    },
+    "benefits": {
+      "tradingFeeReduction": "30%",
+      "aiAgentUses": "30 free uses per week"
+    }
+  },
+  "canSynthesize": true,
+  "synthesisConditions": {
+    "volumeMet": true,
+    "currentVolume": 5500000,
+    "estimatedGasFee": 0.001
   }
 }
 ```
 
-#### Upgrade NFT
+#### Synthesize NFT
 ```http
-POST /api/nft/upgrade
+POST /api/v1/nft/synthesize
 Authorization: Bearer {token}
 Content-Type: application/json
 
 {
-  "mintAddress": "NFTMint...",
-  "upgradeType": "level_increase"
+  "targetTierId": 3
 }
 ```
 
-#### Burn NFT
+**Purpose**: Initiates the upgrade process, burning the current NFT and minting the next-tier NFT.
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "NFT synthesis initiated successfully.",
+  "newNftMintAddress": "mint...xyz",
+  "burnTransactionId": "tx...burn456",
+  "mintTransactionId": "tx...mint789"
+}
+```
+
+### 3. NFT Claiming Operations
+
+#### Claim NFT
 ```http
-POST /api/nft/burn
+POST /api/v1/nft/claim
 Authorization: Bearer {token}
 Content-Type: application/json
 
 {
-  "mintAddress": "NFTMint...",
-  "reason": "user_request"
+  "tierId": 2
+}
+```
+
+**Purpose**: Initiates the minting of an NFT that the user has qualified for.
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "NFT claim processing started.",
+  "mintAddress": "newly-minted-solana-address",
+  "transactionId": "tx...123"
+}
+```
+
+### 4. Badge System
+
+#### Get Badges
+```http
+GET /api/v1/nft/badges
+Authorization: Bearer {token}
+```
+
+**Purpose**: Fetches the complete list of badges and the user's ownership status.
+
+**Response:**
+```json
+{
+  "badges": [
+    {
+      "badgeId": "BadgeA",
+      "badgeName": "Early Adopter",
+      "badgeImageUrl": "/ipfs/badge_a.png",
+      "description": "Awarded to users who joined in the first month.",
+      "isOwned": true,
+      "category": "Achievement",
+      "rarity": "Common",
+      "earnedDate": "2025-01-15"
+    }
+  ],
+  "totalBadges": 12,
+  "ownedBadges": 5
+}
+```
+
+### 5. Community Profile (Public)
+
+#### Get Community Profile
+```http
+GET /api/v1/nft/community-profile/:walletAddress
+```
+
+**Purpose**: Retrieves the public profile data for a given Solana wallet address.
+
+**Authentication**: Not Required (Public endpoint)
+
+**Response:**
+```json
+{
+  "userProfile": {
+    "walletAddress": "So1a...",
+    "username": "CryptoHunter",
+    "avatarUrl": "/path/to/avatar.png",
+    "joinDate": "2025-01-01"
+  },
+  "activeNfts": [
+    {
+      "tierName": "Tech Chicken",
+      "level": 1,
+      "nftImageUrl": "/ipfs/tech_chicken.png",
+      "mintAddress": "Mint...abc"
+    }
+  ],
+  "earnedBadges": [
+    {
+      "badgeName": "Early Adopter",
+      "badgeImageUrl": "/ipfs/badge_a.png",
+      "earnedDate": "2025-01-15"
+    }
+  ],
+  "stats": {
+    "totalBadges": 5,
+    "currentTierLevel": 1,
+    "publicTradingVolume": 1000000
+  }
 }
 ```
 
@@ -214,6 +339,8 @@ Content-Type: application/json
 
 ## WebSocket Events
 
+*Real-time events are published via Kafka and streamed to frontend via WebSocket connections.*
+
 ### Connection Setup
 
 ```javascript
@@ -228,29 +355,65 @@ ws.onopen = () => {
 };
 ```
 
-### Event Types
+### NFT-Specific Real-time Events
 
-#### NFT Status Updates
+#### NFT Status Update Event
+*Triggered when NFT claiming or synthesis operations complete*
+
 ```json
 {
-  "type": "nft.status.updated",
-  "userId": "user_123",
-  "data": {
-    "mintAddress": "NFTMint...",
-    "status": "minted",
-    "transactionId": "tx_123456"
-  },
-  "timestamp": "2025-08-07T10:30:00Z"
+  "event": "nftStatusUpdate",
+  "walletAddress": "So1a...",
+  "nft": {
+    "tierName": "Quant Ape",
+    "status": "Active",
+    "nftImageUrl": "/ipfs/quant_ape.png",
+    "mintAddress": "Mint...def"
+  }
 }
 ```
 
-#### Transaction Confirmations
+#### NFT Synthesis Complete Event
+*Triggered when NFT upgrade/synthesis process completes*
+
 ```json
 {
-  "type": "transaction.confirmed",
-  "userId": "user_123",
+  "event": "nftSynthesisComplete",
+  "walletAddress": "So1a...",
+  "oldNft": {
+    "tierName": "Quant Ape",
+    "status": "Burned",
+    "mintAddress": "Mint...old"
+  },
+  "newNft": {
+    "tierName": "On-chain Hunter",
+    "status": "Active",
+    "nftImageUrl": "/ipfs/onchain_hunter.png",
+    "mintAddress": "Mint...new"
+  }
+}
+```
+
+#### Progress Update Event
+*Triggered when user's trading volume or qualification status changes*
+
+```json
+{
+  "event": "progressUpdate",
+  "walletAddress": "So1a...",
   "data": {
-    "transactionId": "tx_123456",
+    "totalTradingVolume": 750000,
+    "tierUpdates": [
+      {
+        "tierId": 2,
+        "tierName": "Quant Ape",
+        "status": "Unlockable",
+        "progressPercentage": 150
+      }
+    ]
+  }
+}
+```
     "type": "mint",
     "status": "confirmed",
     "blockHash": "block_hash"
