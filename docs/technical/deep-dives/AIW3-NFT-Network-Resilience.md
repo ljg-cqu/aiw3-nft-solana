@@ -453,7 +453,7 @@ While the Kafka-based architecture provides the primary layer of resilience, tra
 Instead, our resilience and recovery strategy is based on the **event-driven, state-machine model** detailed in the [Data Consistency](./AIW3-NFT-Data-Consistency.md) document.
 
 **Recovery Through Idempotent Retries**:
--   **Discrete, Idempotent Steps**: Each NFT operation (claim, upgrade) is broken down into a series of small, idempotent steps, each triggered by a Kafka event (e.g., `UPLOAD_IMAGE_TO_IPFS`, `SUBMIT_MINT_TRANSACTION`).
+-   **Discrete, Idempotent Steps**: Each NFT operation (unlock, upgrade) is broken down into a series of small, idempotent steps, each triggered by a Kafka event (e.g., `UPLOAD_IMAGE_TO_IPFS`, `SUBMIT_MINT_TRANSACTION`).
 -   **State Persistence**: The state of the operation is persisted in the database (e.g., in the `minting_operations` table). For example, after the image is uploaded, the state is updated to `IMAGE_UPLOADED`.
 -   **Failure and Retry**: If a worker fails to complete a step (e.g., a network error during IPFS upload), the message is not acknowledged and will be redelivered by Kafka. Because the database state has not been updated, the next worker to process the message will retry the exact same idempotent step.
 -   **No Compensation Needed**: Since a failed step doesn't alter the state, there is nothing to 'undo'. The system simply retries the step until it succeeds. If it ultimately fails after all retries, the state is marked as `FAILED`, and the process stops, awaiting manual intervention. This model ensures that the system either moves forward to the next state or remains in the current state, but never gets stuck in an inconsistent, partially-completed state.

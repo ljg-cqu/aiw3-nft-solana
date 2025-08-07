@@ -224,12 +224,12 @@ export const useNFTStatus = () => {
 };
 ```
 
-### 2. NFT Claiming Function
+### 2. NFT Unlocking Function
 
 ```jsx
 export const claimNFT = async () => {
   try {
-    const response = await fetch('/api/nft/claim', {
+    const response = await fetch('/api/nft/unlock', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -242,7 +242,7 @@ export const claimNFT = async () => {
     if (data.success) {
       return { success: true, data: data };
     } else {
-      throw new Error(data.error?.message || 'Failed to claim NFT');
+      throw new Error(data.error?.message || 'Failed to unlock NFT');
     }
   } catch (error) {
     return { success: false, error: error.message };
@@ -342,7 +342,7 @@ const OnboardingFlow = () => {
   const steps = [
     { title: 'Connect Wallet', component: WalletConnection },
     { title: 'Check Eligibility', component: EligibilityCheck },
-    { title: 'Claim NFT', component: NFTClaiming }
+    { title: 'Unlock NFT', component: NFTClaiming }
   ];
 
   return (

@@ -388,7 +388,7 @@ module.exports = {
     },
     
     claimInitialNFT: async function(req, res) {
-        // POST /api/nft/claim
+        // POST /api/nft/unlock
         // Mint Level 1 NFT for new users
     },
     
@@ -411,7 +411,7 @@ module.exports = {
 {
     // NFT-specific routes
     'GET /api/nft/status': 'NFTController.getUserNFTStatus',
-    'POST /api/nft/claim': 'NFTController.claimInitialNFT',
+    'POST /api/nft/unlock': 'NFTController.claimInitialNFT',
     'POST /api/nft/upgrade': 'NFTController.initiateUpgrade',
     'GET /api/nft/benefits': 'NFTController.getNFTBenefits',
     'GET /api/nft/badges': 'NFTController.getUserBadges',
@@ -567,7 +567,7 @@ const logData = {
 module.exports = {
   nftFeatures: {
     enabled: false,  // Start with disabled
-    claiming: false,
+    unlocking: false,
     upgrading: false,
     badges: false
   }
@@ -810,12 +810,12 @@ To ensure consistent communication, all API responses must follow the formats be
 ### Core API Endpoints
 
 - **`GET /api/nft/status`**: Returns the user's current NFT level, tier name, and progress toward the next tier, including trading volume and required badges.
-- **`POST /api/nft/claim`**: Initiates the process to claim a new NFT once qualification criteria are met. The backend orchestrates metadata upload to IPFS and minting on Solana.
+- **`POST /api/nft/unlock`**: Initiates the process to unlock a new NFT once qualification criteria are met. The backend orchestrates metadata upload to IPFS and minting on Solana.
 - **`POST /api/nft/upgrade`**: Handles the burn-and-mint upgrade process. The backend verifies qualifications, coordinates the burning of the old NFT, and mints the new one.
 - **`GET /api/nft/history`**: Provides a paginated history of the user's NFT activities, including claims, upgrades, and badge achievements.
 - **`GET /api/nft/benefits`**: Fetches the current benefits associated with the user's NFT tier, such as fee reductions and increased `aiagentUses`.
 - **`GET /api/nft/badges`**: Returns the user's full collection of badges, indicating which are unlocked and which are still required for the next upgrade.
-- **`POST /api/nft/badges/claim`**: Allows the user to claim a badge they have earned through specific achievements.
+- **`POST /api/nft/badges/unlock`**: Allows the user to unlock a badge they have earned through specific achievements.
 
 ### Technical Implementation Plan & Dependencies
 

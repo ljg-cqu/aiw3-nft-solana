@@ -795,7 +795,7 @@ nft_qual:{user_id} -> {
 ### NFT Operation Locks (using RedisService distributed locking)
 ```
 nft_lock:upgrade:{user_id} -> "locked" (TTL: 600s)
-nft_lock:claim:{user_id} -> "locked" (TTL: 300s)
+nft_lock:unlock:{user_id} -> "locked" (TTL: 300s)
 nft_lock:burn:{user_id} -> "locked" (TTL: 180s)
 
 // Acquire lock: RedisService.setCache(lockKey, "locked", ttl, {lockMode: true})

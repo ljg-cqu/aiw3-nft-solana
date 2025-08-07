@@ -290,7 +290,7 @@ try {
 
 **Key Lock Identifiers**:
 -   **Upgrade Lock**: `nft_lock:upgrade:{user_id}`
--   **Claim Lock**: `nft_lock:claim:{user_id}`
+-   **Unlock Lock**: `nft_lock:unlock:{user_id}`
 
 ---
 

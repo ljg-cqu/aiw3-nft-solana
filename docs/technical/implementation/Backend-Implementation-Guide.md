@@ -212,12 +212,12 @@ npm install @metaplex-foundation/js@^0.19.4
          // TODO: Implement actual minting in Phase 2
          return res.json({
            success: true,
-           message: 'NFT claiming will be implemented in Phase 2',
+           message: 'NFT unlocking will be implemented in Phase 2',
            qualification: qualification
          });
        } catch (error) {
-         sails.log.error('Failed to claim NFT:', error);
-         return res.serverError('Failed to claim NFT');
+         sails.log.error('Failed to unlock NFT:', error);
+         return res.serverError('Failed to unlock NFT');
        }
      }
    };
@@ -227,7 +227,7 @@ npm install @metaplex-foundation/js@^0.19.4
    ```javascript
    // Add to config/routes.js
    'GET /api/nft/status': 'NFTController.getUserNFTStatus',
-   'POST /api/nft/claim': 'NFTController.claimInitialNFT',
+   'POST /api/nft/unlock': 'NFTController.claimInitialNFT',
    ```
 
 ---
@@ -256,7 +256,7 @@ Create migration files in `config/db/migrations/` for the required tables.
 module.exports = {
   nftFeatures: {
     enabled: true,
-    claiming: true,
+    unlocking: true,
     upgrading: false,
     debug: true
   }
@@ -291,8 +291,8 @@ await NFTService.getRequiredVolumeForLevel(2)
 curl -X GET http://localhost:1337/api/nft/status \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 
-# Test NFT claiming endpoint  
-curl -X POST http://localhost:1337/api/nft/claim \
+# Test NFT unlocking endpoint  
+curl -X POST http://localhost:1337/api/nft/unlock \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```

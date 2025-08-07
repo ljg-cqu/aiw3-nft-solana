@@ -112,7 +112,7 @@ This POC validates the core on-chain logic using standard Solana and Metaplex SD
 
 1.  **Service-Oriented Architecture**: The functions demonstrated in `nft-manager.js` will not be run as a standalone script. Instead, the logic will be encapsulated within the existing **`Web3Service`**. This service is responsible for all direct interactions with the Solana blockchain.
 
-2.  **Business Logic Orchestration**: The end-to-end business flows, such as NFT claiming or synthesis (burn-and-mint), will be orchestrated by the **`NFTService`**. The `NFTService` will call methods on the `Web3Service` to execute the required on-chain transactions.
+2.  **Business Logic Orchestration**: The end-to-end business flows, such as NFT unlocking or synthesis (burn-and-mint), will be orchestrated by the **`NFTService`**. The `NFTService` will call methods on the `Web3Service` to execute the required on-chain transactions.
 
 3.  **Secure Key Management**: In the production environment, secret keys for the system wallet will **not** be stored in `.env` files. They will be managed by a secure vault or secrets manager, which the `Web3Service` will access through a secure API.
 
@@ -293,7 +293,7 @@ To use the Solana Explorer, make sure your `.env` file is configured to use eith
 
 ## 12. Third-Party Solana Explorers (Localnet - Use with Caution)
 
-Some third-party Solana explorers claim to support localnet connections. However, their reliability can vary. Use these tools with caution and verify the information they provide.
+Some third-party Solana explorers unlock to support localnet connections. However, their reliability can vary. Use these tools with caution and verify the information they provide.
 
 ## 13. Implementing the Minting
 

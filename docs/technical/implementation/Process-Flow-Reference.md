@@ -51,9 +51,9 @@ sequenceDiagram
     alt User Qualifies for Level 1
         Frontend->>User: Show "Unlock NFT" button
         User->>Frontend: Clicks "Unlock NFT"
-        Frontend->>Backend: POST /api/nft/claim
+        Frontend->>Backend: POST /api/nft/unlock
         Backend->>MySQL: Verify qualification again
-        Backend->>MySQL: Create NFT claim record
+        Backend->>MySQL: Create NFT unlock record
         Backend->>Backend: Prepare mint transaction
         Backend->>Frontend: Return transaction for approval
         Frontend->>User: Show transaction details

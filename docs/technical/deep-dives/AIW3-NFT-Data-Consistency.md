@@ -164,14 +164,14 @@ AIW3 NFT minting involves **four distinct data layers** that must remain consist
 To ensure data consistency in a distributed environment, the AIW3 NFT system adopts a robust, event-driven architecture centered around Kafka. Instead of a single, monolithic function, each NFT operation is broken down into a series of small, independent, and idempotent steps orchestrated by messages on a Kafka topic. This approach is inherently more resilient and scalable.
 
 **Core Principles**:
--   **State Machine**: Every NFT operation (claim, upgrade) is treated as a state machine. The current state is tracked in the database (e.g., in the `NFTUpgradeRequest` model).
+-   **State Machine**: Every NFT operation (unlock, upgrade) is treated as a state machine. The current state is tracked in the database (e.g., in the `NFTUpgradeRequest` model).
 -   **Idempotent Workers**: The `NFTService` acts as a worker that consumes events from Kafka. Each worker is designed to be idempotent, meaning it can safely re-process the same message without causing duplicate actions. It achieves this by first checking the current state of the operation in the database before proceeding.
 -   **Single Responsibility**: Each worker is responsible for executing only one step of the process and then publishing a new event to trigger the next step.
 -   **Dead-Letter Queue (DLQ)**: If a step repeatedly fails, the message is moved to a DLQ. This prevents a single failed operation from blocking the entire queue and allows for manual inspection and intervention.
 
-**Event-Driven Workflow for NFT Claiming**:
+**Event-Driven Workflow for NFT Unlocking**:
 
-1.  **API Request**: A user initiates a claim. The API controller performs initial validation (e.g., `validateMintingReadiness`) and, if successful, creates an `NFTUpgradeRequest` record with a `pending` status and publishes a `nft_claim_requested` event to Kafka using `KafkaService.sendMessage`.
+1.  **API Request**: A user initiates a unlock. The API controller performs initial validation (e.g., `validateMintingReadiness`) and, if successful, creates an `NFTUpgradeRequest` record with a `pending` status and publishes a `nft_claim_requested` event to Kafka using `KafkaService.sendMessage`.
 
     ```javascript
     // API Controller (Simplified)
@@ -189,7 +189,7 @@ To ensure data consistency in a distributed environment, the AIW3 NFT system ado
             level
         });
 
-        return res.ok({ message: 'NFT claim process initiated.', requestId: request.id });
+        return res.ok({ message: 'NFT unlock process initiated.', requestId: request.id });
     }
     ```
 

@@ -214,14 +214,14 @@ describe('Solana Blockchain Integration', () => {
 ```javascript
 // Example: Service integration test
 describe('NFT Service Integration', () => {
-  it('should complete full NFT claim workflow', async () => {
+  it('should complete full NFT unlock workflow', async () => {
     const userId = 123;
     const targetLevel = 1;
     
     // Mock sufficient trading volume
     sinon.stub(NFTService, 'calculateTradingVolume').resolves(150000);
     
-    // Execute claim workflow
+    // Execute unlock workflow
     const result = await NFTService.claimNFT(userId, targetLevel);
     
     expect(result.success).to.be.true;
@@ -249,7 +249,7 @@ describe('NFT Service Integration', () => {
 const { test, expect } = require('@playwright/test');
 
 test.describe('NFT User Journey', () => {
-  test('Complete NFT claim flow', async ({ page }) => {
+  test('Complete NFT unlock flow', async ({ page }) => {
     // 1. User connects wallet
     await page.goto('/personal-center');
     await page.click('[data-testid="connect-wallet"]');
@@ -259,8 +259,8 @@ test.describe('NFT User Journey', () => {
     await expect(page.locator('[data-testid="nft-status"]')).toContainText('Qualified for Tech Chicken');
     
     // 3. User claims NFT
-    await page.click('[data-testid="claim-nft-button"]');
-    await page.click('[data-testid="confirm-claim"]');
+    await page.click('[data-testid="unlock-nft-button"]');
+    await page.click('[data-testid="confirm-unlock"]');
     
     // 4. Wait for transaction confirmation
     await expect(page.locator('[data-testid="transaction-status"]')).toContainText('Confirmed');
@@ -327,12 +327,12 @@ module.exports = {
       ]
     },
     {
-      name: 'NFT Claim',
+      name: 'NFT Unlock',
       weight: 20,
       flow: [
         {
           post: {
-            url: '/api/nft/claim',
+            url: '/api/nft/unlock',
             json: {
               level: 1
             }
@@ -364,7 +364,7 @@ module.exports = {
 | Operation | Target Response Time | Throughput | Error Rate |
 |-----------|---------------------|------------|------------|
 | GET /api/nft/status | < 200ms | 100 req/s | < 1% |
-| POST /api/nft/claim | < 5s | 10 req/s | < 2% |
+| POST /api/nft/unlock | < 5s | 10 req/s | < 2% |
 | POST /api/nft/upgrade | < 10s | 5 req/s | < 2% |
 | Solana RPC calls | < 2s | 50 req/s | < 5% |
 | IPFS uploads | < 3s | 20 req/s | < 3% |
@@ -387,7 +387,7 @@ describe('NFT API Security', () => {
   
   it('should reject requests with invalid wallet signature', async () => {
     const response = await request(app)
-      .post('/api/nft/claim')
+      .post('/api/nft/unlock')
       .set('Authorization', 'Bearer invalid_token')
       .expect(401);
   });
@@ -400,7 +400,7 @@ describe('NFT API Security', () => {
 describe('Input Validation', () => {
   it('should reject invalid NFT level', async () => {
     const response = await request(app)
-      .post('/api/nft/claim')
+      .post('/api/nft/unlock')
       .set('Authorization', `Bearer ${validToken}`)
       .send({ level: 99 })
       .expect(400);
@@ -652,9 +652,9 @@ describe('NFT Upgrade Logic (TDD)', () => {
 
 **BDD (Behavior-Driven Development) Scenarios**:
 ```gherkin
-Feature: NFT Claim and Upgrade Process
+Feature: NFT Unlock and Upgrade Process
   As a qualified user
-  I want to claim and upgrade NFTs based on my trading activity
+  I want to unlock and upgrade NFTs based on my trading activity
   So that I can access enhanced platform benefits
 
   Background:
@@ -662,10 +662,10 @@ Feature: NFT Claim and Upgrade Process
     And I have completed KYC verification
     And the system wallet has sufficient balance
 
-  Scenario: Successful NFT Claim for Qualified User
+  Scenario: Successful NFT Unlock for Qualified User
     Given I have trading volume of $150,000 in the last 30 days
     And I have collected 3 out of 3 required badges
-    When I request to claim a Level 1 NFT
+    When I request to unlock a Level 1 NFT
     Then the system should verify my qualification
     And upload metadata to IPFS
     And mint the NFT to my wallet
@@ -794,7 +794,7 @@ const SecurityTests = {
     
     for (const attempt of bypassAttempts) {
       const response = await request(app)
-        .post('/api/nft/claim')
+        .post('/api/nft/unlock')
         .set(attempt.headers || {})
         .send(attempt.body || {});
       
@@ -832,7 +832,7 @@ const SecurityTests = {
     for (let i = 0; i < 100; i++) {
       requests.push(
         request(app)
-          .post('/api/nft/claim')
+          .post('/api/nft/unlock')
           .set('Authorization', `Bearer ${validToken}`)
           .set('X-Forwarded-For', `192.168.1.${i % 255}`) // IP rotation attempt
       );
