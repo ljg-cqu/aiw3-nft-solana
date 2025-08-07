@@ -288,12 +288,7 @@ This business document focuses on the core business logic and rules. The key bus
 - **Irreversible Badge Consumption**: Activated badges are consumed permanently during upgrades
 - **Real-time Assessment**: Qualification status is checked in real-time
 
-### 5.2 Benefits and Incentives
-- **Trading Fee Reduction**: System uses the MAXIMUM reduction between Tiered NFT (10%-55%) and Competition NFT (25%)
-- **Additional Rights**: ACCUMULATED from both NFT types - users receive ALL rights from Tiered NFT AND Competition NFT
-- **Social Status**: Both NFT types provide community recognition, with Tiered NFTs showing progression
-- **Rights Stacking**: Competition NFT privileges stack with Tiered NFT privileges for enhanced benefits
-- **Independent Processes**: Tiered NFT upgrades and Competition NFT acquisition operate separately
+
 
 For detailed technical implementation, API specifications, and integration patterns, refer to the technical documentation listed in Section 3.
 
