@@ -93,31 +93,15 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 - Associated Token Account closed
 - SOL rent returned to user
 
-### NFT State Transition Diagram
+### NFT Business State Flow
 
-The following diagram illustrates the complete NFT lifecycle with all state transitions:
+*For the complete NFT Status Transition Diagram and state definitions, see:*  
+**📋 [Business Rules and Flows - NFT Status Transition Diagram](/docs/business/AIW3-NFT-Business-Rules-and-Flows.md#nft-status-transition-diagram)**
 
-```mermaid
-flowchart LR
-    A[Locked] -->|User meets qualification criteria| B[Unlockable]
-    B -->|User clicks 'Claim'| C((Claiming...))
-    C -->|NFT mint successful| D[Active]
-    D -->|User initiates synthesis| E((Synthesizing...))
-    E -->|Old NFT burned, new NFT minted| F[Active Higher-Tier NFT]
-    F -->|Can upgrade again| D
-    
-    style A fill:#ff6b6b,color:#fff
-    style B fill:#51cf66,color:#fff
-    style C fill:#ffd43b,color:#000,stroke-dasharray: 5 5
-    style D fill:#339af0,color:#fff
-    style E fill:#ff9800,color:#fff,stroke-dasharray: 5 5
-    style F fill:#20c997,color:#fff
-```
-
-**State Categories**:
-- **Business Logic States** (Red/Green): `Locked`, `Unlockable` - computed by NFTService
-- **Process States** (Dashed): `Claiming`, `Synthesizing` - temporary UI indicators
-- **Database NFT Statuses** (Blue/Teal): `Active` - persistent in UserNft table
+**Key Technical State Categories**:
+- **Business Logic States**: `Locked`, `Unlockable` - computed by NFTService based on user qualification
+- **Process States**: `Claiming`, `Synthesizing` - temporary UI indicators during async operations  
+- **Database NFT Statuses**: `Active`, `Burned` - persistent records in UserNft table
 
 ---
 
