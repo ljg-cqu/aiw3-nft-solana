@@ -146,7 +146,7 @@ Based on prototype analysis, the system supports these NFT tiers:
 | 3 | On-chain Hunter | ≥ 5,000,000 | 30% | 30 free uses/week |
 | 4 | Alpha Alchemist | ≥ 10,000,000 | 40% | 40 free uses/week |
 | 5 | Quantum Alchemist | ≥ 50,000,000 | 55% | 50 free uses/week |
-| Special | Trophy Breeder | Top 3 in competition | 25% | Special privileges |
+| Competition | Trophy Breeder | Top 3 in competition | 25% | Competition exclusive privileges |
       defaultsTo: 'unlocked',
       description: 'Current status of the NFT'
     },
