@@ -23,7 +23,7 @@ The AIW3 NFT implementation has been organized into focused, single-responsibili
 
 ### 🎨 [Frontend Implementation Guide](./Frontend-Implementation-Guide.md)  
 **Focus:** User interface and frontend application development
-- Personal Center implementation
+- Personal Center implementation with badge activation
 - Wallet integration patterns
 - API connectivity and state management
 - Component development and user flows
@@ -38,6 +38,7 @@ The AIW3 NFT implementation has been organized into focused, single-responsibili
 ### 📋 [Process Flow Reference](./Process-Flow-Reference.md)
 **Focus:** Complete system workflows and user interaction flows
 - New user onboarding procedures
+- Badge activation and consumption workflows
 - NFT upgrade and burn-and-mint workflows  
 - Error handling and recovery procedures
 - System state management flows

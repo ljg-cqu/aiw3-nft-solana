@@ -103,6 +103,16 @@ const PersonalCenter = () => {
     }
   };
 
+  const handleBadgeActivate = async (badgeId) => {
+    const result = await activateBadge(badgeId);
+    if (result.success) {
+      // Refresh NFT status to update badge states
+      fetchNFTStatus();
+    } else {
+      console.error('Failed to activate badge:', result.error);
+    }
+  };
+
   if (!connected) {
     return <WalletConnectionPrompt />;
   }
@@ -115,7 +125,10 @@ const PersonalCenter = () => {
     <div className="personal-center">
       <NFTStatusDisplay status={nftStatus} />
       <UpgradeInterface qualification={nftStatus?.qualification} />
-      <BadgeCollection badges={nftStatus?.badges} />
+      <BadgeCollection 
+        badges={nftStatus?.badges} 
+        onBadgeActivate={handleBadgeActivate}
+      />
       <CommunityHub userProfile={nftStatus?.profile} />
     </div>
   );
@@ -224,7 +237,33 @@ export const useNFTStatus = () => {
 };
 ```
 
-### 2. NFT Unlocking Function
+### 2. Badge Activation Function
+
+```jsx
+export const activateBadge = async (badgeId) => {
+  try {
+    const response = await fetch(`/api/nft/badges/${badgeId}/activate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      return { success: true, data: data.data };
+    } else {
+      throw new Error(data.error?.message || 'Failed to activate badge');
+    }
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+```
+
+### 3. NFT Unlocking Function
 
 ```jsx
 export const claimNFT = async () => {
@@ -285,7 +324,88 @@ const NFTStatusDisplay = ({ status }) => {
 };
 ```
 
-### 2. Upgrade Interface Component
+### 2. Badge Collection Component
+
+```jsx
+const BadgeCollection = ({ badges, onBadgeActivate }) => {
+  if (!badges || badges.length === 0) {
+    return (
+      <div className="badge-collection empty">
+        <h3>Badge Collection</h3>
+        <p>Complete tasks to earn badges for NFT upgrades</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="badge-collection">
+      <h3>Badge Collection</h3>
+      <div className="badge-grid">
+        {badges.map(badge => (
+          <BadgeCard 
+            key={badge.badgeId}
+            badge={badge}
+            onActivate={onBadgeActivate}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const BadgeCard = ({ badge, onActivate }) => {
+  const [isActivating, setIsActivating] = useState(false);
+
+  const handleActivate = async () => {
+    if (badge.status !== 'owned') return;
+    
+    setIsActivating(true);
+    try {
+      await onActivate(badge.badgeId);
+    } catch (error) {
+      console.error('Badge activation failed:', error);
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch(status) {
+      case 'owned': return '#4CAF50';
+      case 'activated': return '#FF9800';
+      case 'consumed': return '#9E9E9E';
+      default: return '#E0E0E0';
+    }
+  };
+
+  return (
+    <div className={`badge-card ${badge.status || 'not-owned'}`}>
+      <img src={badge.badgeImageUrl} alt={badge.badgeName} />
+      <h4>{badge.badgeName}</h4>
+      <p>{badge.description}</p>
+      
+      <div className="badge-status" style={{ color: getStatusColor(badge.status) }}>
+        {badge.status === 'owned' && 'Ready to Activate'}
+        {badge.status === 'activated' && 'Activated'}
+        {badge.status === 'consumed' && 'Used in Upgrade'}
+        {!badge.status && 'Not Earned'}
+      </div>
+
+      {badge.status === 'owned' && (
+        <button 
+          onClick={handleActivate}
+          disabled={isActivating}
+          className="activate-button"
+        >
+          {isActivating ? 'Activating...' : 'Activate Badge'}
+        </button>
+      )}
+    </div>
+  );
+};
+```
+
+### 3. Upgrade Interface Component
 
 ```jsx
 const UpgradeInterface = ({ qualification }) => {
@@ -321,6 +441,7 @@ const UpgradeInterface = ({ qualification }) => {
         <div className="requirements-not-met">
           <p>Requirements not met for upgrade</p>
           <RequirementsList qualification={qualification} />
+          <p>Make sure you have activated the required badges before upgrading.</p>
         </div>
       )}
     </div>

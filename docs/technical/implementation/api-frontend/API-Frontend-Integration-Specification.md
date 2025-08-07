@@ -177,7 +177,9 @@ Authorization: Bearer {token}
     "level": 3,
     "nftImageUrl": "/ipfs/onchain_hunter.png",
     "unlockRequirements": {
-      "requiredVolume": 5000000
+      "requiredVolume": 5000000,
+      "requiredBadges": 4,
+      "activatedBadges": 2
     },
     "benefits": {
       "tradingFeeReduction": "30%",
@@ -188,6 +190,9 @@ Authorization: Bearer {token}
   "upgradeConditions": {
     "volumeMet": true,
     "currentVolume": 5500000,
+    "badgesMet": false,
+    "requiredBadges": 4,
+    "activatedBadges": 2,
     "estimatedGasFee": 0.001
   }
 }
@@ -316,6 +321,29 @@ GET /api/v1/nft/community-profile/:walletAddress
 ```
 
 ### Badge and Achievement System
+
+**Important**: Badges must be manually activated by users before they can be used for NFT upgrades. The activation process transitions badges from `owned` to `activated` status, preparing them for consumption during upgrades.
+
+#### Activate Badge
+```http
+POST /api/v1/nft/badges/:badgeId/activate
+Authorization: Bearer {token}
+```
+
+**Purpose**: Activates an owned badge to prepare it for NFT upgrade use.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "badgeId": "BadgeA",
+    "badgeName": "Early Adopter", 
+    "status": "activated",
+    "activatedAt": "2025-08-08T10:30:00Z"
+  }
+}
+```
 
 #### Get User Badges
 ```http

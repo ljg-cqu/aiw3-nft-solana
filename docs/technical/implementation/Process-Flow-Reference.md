@@ -90,6 +90,43 @@ sequenceDiagram
 
 ---
 
+## Badge Activation Flow
+
+### Badge Lifecycle Management
+
+Users must activate owned badges before they can be used for NFT upgrades. This process ensures that badges are intentionally committed to the upgrade process.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant MySQL
+    participant Redis
+
+    User->>Frontend: Views badge collection
+    Frontend->>Backend: GET /api/nft/badges
+    Backend->>MySQL: Query user badges
+    Backend->>Frontend: Return badges with status (owned/activated/consumed)
+    Frontend->>User: Display badge collection with activation options
+    
+    User->>Frontend: Clicks "Activate" on owned badge
+    Frontend->>Backend: POST /api/nft/badges/:badgeId/activate
+    Backend->>MySQL: UPDATE badge SET status='activated'
+    Backend->>Redis: Clear cached qualification data
+    Backend->>Frontend: Return success
+    Frontend->>User: Show badge as activated
+    
+    Note over User,Redis: Badge is now ready for NFT upgrade
+```
+
+**Badge Status Definitions:**
+- **Owned**: Badge earned from task completion, can be activated
+- **Activated**: Badge prepared for NFT upgrade use, cannot be reverted
+- **Consumed**: Badge used in successful NFT upgrade, permanently consumed
+
+---
+
 ## NFT Upgrade Flow
 
 ### 2. NFT Upgrade Flow
@@ -109,9 +146,9 @@ sequenceDiagram
 
     User->>Frontend: Clicks "Upgrade NFT" in Personal Center
     Frontend->>Backend: POST /api/nft/upgrade
-    Backend->>MySQL: Query user trading volume and badges
+    Backend->>MySQL: Query user trading volume and activated badges
     Backend->>Redis: Check cached NFT status
-    Backend->>Backend: Verify qualification requirements
+    Backend->>Backend: Verify qualification requirements (volume + activated badges)
     
     alt Requirements Met
         Backend->>MySQL: Create NFTUpgradeRequest record
@@ -125,6 +162,7 @@ sequenceDiagram
         Web3Service->>SolanaRPC: Submit mint transaction
         SolanaRPC-->>Backend: Mint confirmation
         Backend->>MySQL: Update user NFT level and status
+        Backend->>MySQL: UPDATE badges SET status='consumed' WHERE activated
         Backend->>Redis: Invalidate cached NFT data
         Backend->>Kafka: Publish upgrade success event
         Backend->>Frontend: WebSocket: nft:upgrade_complete
@@ -141,7 +179,7 @@ sequenceDiagram
 **Prerequisites:**
 - User owns an active NFT at current level
 - User has sufficient trading volume for target level
-- User has required badges (if applicable)
+- User has required number of activated badges for target level
 
 **Volume Requirements:**
 - Level 1: $100K USD
@@ -153,7 +191,11 @@ sequenceDiagram
 **Process Validation:**
 1. **Current NFT Check:** Verify user owns NFT at current level
 2. **Volume Verification:** Calculate total trading volume meets target requirement
-3. **Badge Requirements:** Check any required badges are collected
+3. **Badge Requirements:** Check required number of activated badges for target level
+   - Level 2: 2 activated badges required
+   - Level 3: 4 activated badges required  
+   - Level 4: 5 activated badges required
+   - Level 5: 6 activated badges required
 4. **Upgrade Eligibility:** Confirm user can upgrade to next level
 
 ---
@@ -200,6 +242,7 @@ sequenceDiagram
         Web3Service->>SolanaRPC: Submit mint transaction
         SolanaRPC-->>Backend: Mint confirmation
         Backend->>MySQL: Update user NFT level and status
+        Backend->>MySQL: UPDATE badges SET status='consumed' WHERE activated
         Backend->>Redis: Invalidate cached NFT data
         Backend->>Kafka: Publish upgrade success event
         Backend->>Frontend: WebSocket: nft:upgrade_complete
