@@ -55,11 +55,11 @@ The Personal Center is the primary interface for users to manage their NFTs, tra
 
 **NFT Status Display:**
 Clearly visualizes the user's currently held NFT, its tier, and associated benefits. Must handle two primary states based on the prototypes:
-- **Unlocked:** Displays the NFT the user owns, along with options for synthesis
+- **Unlocked:** Displays the NFT the user owns, along with options for upgrade
 - **Unlockable:** Shows the next available NFT tier and the requirements to obtain it
 
-**Synthesis (Upgrade) Interface:**
-A dedicated module where users can initiate the burn-and-mint upgrade process. The UI must clearly communicate the requirements and outcomes, as seen in `4. Synthesis.png` and `5. VIP2 Synthesis Success.png`.
+**Upgrade Interface:**
+A dedicated module where users can initiate the burn-and-mint upgrade process. The UI must clearly communicate the requirements and outcomes, as seen in `4. Upgrade.png` and `5. VIP2 Upgrade Success.png`.
 
 **Badge Display:**
 A section to display collected badges (`6. Micro Badge.png`), which are prerequisites for certain NFT tier upgrades.
@@ -114,7 +114,7 @@ const PersonalCenter = () => {
   return (
     <div className="personal-center">
       <NFTStatusDisplay status={nftStatus} />
-      <SynthesisInterface qualification={nftStatus?.qualification} />
+      <UpgradeInterface qualification={nftStatus?.qualification} />
       <BadgeCollection badges={nftStatus?.badges} />
       <CommunityHub userProfile={nftStatus?.profile} />
     </div>
@@ -285,10 +285,10 @@ const NFTStatusDisplay = ({ status }) => {
 };
 ```
 
-### 2. Synthesis Interface Component
+### 2. Upgrade Interface Component
 
 ```jsx
-const SynthesisInterface = ({ qualification }) => {
+const UpgradeInterface = ({ qualification }) => {
   const [isUpgrading, setIsUpgrading] = useState(false);
 
   const handleUpgrade = async () => {
@@ -306,8 +306,8 @@ const SynthesisInterface = ({ qualification }) => {
   };
 
   return (
-    <div className="synthesis-interface">
-      <h3>NFT Synthesis</h3>
+    <div className="upgrade-interface">
+      <h3>NFT Upgrade</h3>
       
       {qualification?.qualified ? (
         <button 

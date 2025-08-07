@@ -472,7 +472,7 @@ const APISecurityMiddleware = {
     perUser: { windowMs: 60000, max: 60 }, // 60 requests per minute per user
     perIP: { windowMs: 60000, max: 100 },   // 100 requests per minute per IP
     perEndpoint: {
-      '/api/nft/claim': { windowMs: 300000, max: 5 },   // 5 claims per 5 minutes
+      '/api/nft/unlock': { windowMs: 300000, max: 5 },   // 5 unlocks per 5 minutes
       '/api/nft/upgrade': { windowMs: 600000, max: 3 }  // 3 upgrades per 10 minutes
     }
   },
@@ -514,13 +514,13 @@ const ThreatDetection = {
       action: 'TEMP_ACCOUNT_LOCK'
     },
     {
-      name: 'AUTOMATED_CLAIMING',
+      name: 'AUTOMATED_UNLOCKING',
       condition: (events) => {
-        const claims = events.filter(e => e.type === 'nft_claim');
-        const timeBetweenClaims = claims.map((c, i) => 
-          i > 0 ? c.timestamp - claims[i-1].timestamp : 0
+        const unlocks = events.filter(e => e.type === 'nft_unlock');
+        const timeBetweenUnlocks = unlocks.map((u, i) => 
+          i > 0 ? u.timestamp - unlocks[i-1].timestamp : 0
         );
-        return timeBetweenClaims.every(t => t > 0 && t < 5000); // Claims every <5 seconds
+        return timeBetweenUnlocks.every(t => t > 0 && t < 5000); // Unlocks every <5 seconds
       },
       severity: 'high',
       action: 'IMMEDIATE_ACCOUNT_LOCK'

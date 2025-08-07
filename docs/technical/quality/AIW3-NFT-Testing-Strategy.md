@@ -275,8 +275,8 @@ test.describe('NFT User Journey', () => {
     
     await page.goto('/personal-center');
     
-    // 1. Navigate to synthesis page
-    await page.click('[data-testid="synthesis-button"]');
+    // 1. Navigate to upgrade page
+    await page.click('[data-testid="upgrade-button"]');
     
     // 2. Confirm upgrade requirements
     await expect(page.locator('[data-testid="upgrade-requirements"]')).toBeVisible();

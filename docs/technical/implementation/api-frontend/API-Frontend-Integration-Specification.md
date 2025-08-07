@@ -149,15 +149,15 @@ Authorization: Bearer {token}
 }
 ```
 
-### 2. NFT Synthesis (Upgrade) Operations
+### 2. NFT Upgrade Operations
 
-#### Get Synthesis Details
+#### Get Upgrade Details
 ```http
-GET /api/v1/nft/synthesis-details
+GET /api/v1/nft/upgrade-details
 Authorization: Bearer {token}
 ```
 
-**Purpose**: Retrieves data needed for the NFT synthesis/upgrade page.
+**Purpose**: Retrieves data needed for the NFT upgrade page.
 
 **Response:**
 ```json
@@ -185,7 +185,7 @@ Authorization: Bearer {token}
     }
   },
   "canSynthesize": true,
-  "synthesisConditions": {
+  "upgradeConditions": {
     "volumeMet": true,
     "currentVolume": 5500000,
     "estimatedGasFee": 0.001
@@ -210,18 +210,18 @@ Content-Type: application/json
 ```json
 {
   "status": "success",
-  "message": "NFT synthesis initiated successfully.",
+  "message": "NFT upgrade initiated successfully.",
   "newNftMintAddress": "mint...xyz",
   "burnTransactionId": "tx...burn456",
   "mintTransactionId": "tx...mint789"
 }
 ```
 
-### 3. NFT Claiming Operations
+### 3. NFT Unlocking Operations
 
-#### Claim NFT
+#### Unlock NFT
 ```http
-POST /api/v1/nft/claim
+POST /api/v1/nft/unlock
 Authorization: Bearer {token}
 Content-Type: application/json
 
@@ -236,7 +236,7 @@ Content-Type: application/json
 ```json
 {
   "status": "success",
-  "message": "NFT claim processing started.",
+  "message": "NFT unlock processing started.",
   "mintAddress": "newly-minted-solana-address",
   "transactionId": "tx...123"
 }
@@ -323,9 +323,9 @@ GET /api/nft/badges
 Authorization: Bearer {token}
 ```
 
-#### Claim Achievement Badge
+#### Unlock Achievement Badge
 ```http
-POST /api/nft/badges/claim
+POST /api/nft/badges/unlock
 Authorization: Bearer {token}
 Content-Type: application/json
 
@@ -358,7 +358,7 @@ ws.onopen = () => {
 ### NFT-Specific Real-time Events
 
 #### NFT Status Update Event
-*Triggered when NFT claiming or synthesis operations complete*
+*Triggered when NFT unlocking or upgrade operations complete*
 
 ```json
 {
@@ -373,12 +373,12 @@ ws.onopen = () => {
 }
 ```
 
-#### NFT Synthesis Complete Event
-*Triggered when NFT upgrade/synthesis process completes*
+#### NFT Upgrade Complete Event
+*Triggered when NFT upgrade process completes*
 
 ```json
 {
-  "event": "nftSynthesisComplete",
+  "event": "nftUpgradeComplete",
   "walletAddress": "So1a...",
   "oldNft": {
     "tierName": "Quant Ape",

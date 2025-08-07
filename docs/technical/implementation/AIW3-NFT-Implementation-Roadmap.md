@@ -53,7 +53,7 @@ module.exports = {
   // ... existing config ...
   nftFeatures: {
     enabled: false,        // Master switch
-    claiming: false,       // NFT claiming functionality
+    unlocking: false,      // NFT unlocking functionality
     upgrading: false,      // NFT upgrade functionality  
     badges: false,         // Badge system
     qualification: false   // Qualification checking
@@ -65,7 +65,7 @@ module.exports = {
   // ... existing config ...
   nftFeatures: {
     enabled: true,         // Enable in staging
-    claiming: true,
+    unlocking: true,
     upgrading: false,      // Gradual rollout
     badges: false,
     qualification: true
@@ -77,7 +77,7 @@ module.exports = {
   // ... existing config ...
   nftFeatures: {
     enabled: false,        // Start disabled in production
-    claiming: false,
+    unlocking: false,
     upgrading: false,
     badges: false,
     qualification: false
@@ -107,7 +107,7 @@ module.exports = {
     nft_mint_address: { type: 'string', required: true, unique: true },
     nft_level: { type: 'number', required: true },
     nft_name: { type: 'string' },
-    claimed_at: { type: 'ref', columnType: 'datetime' },
+    unlocked_at: { type: 'ref', columnType: 'datetime' },
     last_upgraded_at: { type: 'ref', columnType: 'datetime' },
     metadata_uri: { type: 'string' },
     is_active: { type: 'boolean', defaultsTo: true }
@@ -208,7 +208,7 @@ module.exports = {
 
 **Key endpoints to implement:**
 - `GET /api/nft/status` - Get user NFT status and qualification info
-- `POST /api/nft/claim` - Initial NFT claiming with qualification validation
+- `POST /api/nft/unlock` - Initial NFT unlocking with qualification validation
 
 #### Validation Checkpoints
 - [ ] Models can be accessed via sails console
@@ -395,16 +395,16 @@ healthCheck: async function(req, res) {
 // Week 10: Enable qualification checking only
 nftFeatures: {
   enabled: true,
-  claiming: false,
+  unlocking: false,
   upgrading: false,
   badges: false,
   qualification: true
 }
 
-// Week 11: Enable claiming for limited users
+// Week 11: Enable unlocking for limited users
 nftFeatures: {
   enabled: true,
-  claiming: true,
+  unlocking: true,
   upgrading: false,
   badges: false,
   qualification: true
@@ -413,7 +413,7 @@ nftFeatures: {
 // Week 12: Full rollout
 nftFeatures: {
   enabled: true,
-  claiming: true,
+  unlocking: true,
   upgrading: true,
   badges: true,
   qualification: true

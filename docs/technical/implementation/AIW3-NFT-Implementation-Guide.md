@@ -89,14 +89,14 @@ This document defines the acceptance criteria and testing standards that serve a
     -   [3. Monitoring Service](#3-monitoring-service)
 3.  [Frontend Application Development](#frontend-application-development)
     -   [Personal Center Dashboard](#personal-center-dashboard)
-    -   [Synthesis (Upgrade) Interface](#synthesis-upgrade-interface)
+    -   [Upgrade Interface](#upgrade-interface)
 4.  [NFT Upgrade and Burn Strategy](#nft-upgrade-and-burn-strategy)
     -   [Recommended Model: Burn-and-Mint](#recommended-model-burn-and-mint)
     -   [Burn-and-Mint Workflow](#burn-and-mint-workflow)
 5.  [Error Handling and Resilience](#error-handling-and-resilience)
 6.  [Integration Process Flows](#integration-process-flows)
-    -   [New User Onboarding and First NFT Claim](#1-new-user-onboarding-and-first-nft-claim)
-    -   [NFT Synthesis (Upgrade) Flow](#2-nft-synthesis-upgrade-flow)
+    -   [New User Onboarding and First NFT Unlock](#1-new-user-onboarding-and-first-nft-unlock)
+    -   [NFT Upgrade Flow](#2-nft-upgrade-flow)
 
 ---
 
@@ -279,7 +279,7 @@ The backend is the intermediary between the user-facing frontend and the standar
        }
      },
 
-     claimInitialNFT: async function(req, res) {
+     unlockInitialNFT: async function(req, res) {
        try {
          // Feature flag check
          if (!sails.config.nftFeatures?.enabled) {
@@ -311,12 +311,12 @@ The backend is the intermediary between the user-facing frontend and the standar
          // TODO: Implement actual minting in Phase 2
          return res.json({
            success: true,
-           message: 'NFT claiming will be implemented in Phase 2',
+           message: 'NFT unlocking will be implemented in Phase 2',
            qualification: qualification
          });
        } catch (error) {
-         sails.log.error('Failed to claim NFT:', error);
-         return res.serverError('Failed to claim NFT');
+         sails.log.error('Failed to unlock NFT:', error);
+         return res.serverError('Failed to unlock NFT');
        }
      }
    };
@@ -326,7 +326,7 @@ The backend is the intermediary between the user-facing frontend and the standar
    ```javascript
    // Add to config/routes.js
    'GET /api/nft/status': 'NFTController.getUserNFTStatus',
-   'POST /api/nft/claim': 'NFTController.claimInitialNFT',
+   'POST /api/nft/unlock': 'NFTController.unlockInitialNFT',
    ```
 
 **Key Integration Features:**
@@ -362,9 +362,9 @@ The Personal Center is the primary interface for users to manage their NFTs, tra
 
 **Key Features:**
 - **NFT Status Display:** Clearly visualizes the user's currently held NFT, its tier, and associated benefits. It must handle two primary states based on the prototypes:
-  - **Unlocked:** Displays the NFT the user owns, along with options for synthesis.
+  - **Unlocked:** Displays the NFT the user owns, along with options for upgrade.
   - **Unlockable:** Shows the next available NFT tier and the requirements to obtain it.
-- **Synthesis (Upgrade) Interface:** A dedicated module where users can initiate the burn-and-mint upgrade process. The UI must clearly communicate the requirements and outcomes, as seen in `4. Synthesis.png` and `5. VIP2 Synthesis Success.png`.
+- **Upgrade Interface:** A dedicated module where users can initiate the burn-and-mint upgrade process. The UI must clearly communicate the requirements and outcomes, as seen in `4. Upgrade.png` and `5. VIP2 Upgrade Success.png`.
 - **Badge Display:** A section to display collected badges (`6. Micro Badge.png`), which are prerequisites for certain NFT tier upgrades.
 - **Community Hub Integration:** Features a link to the user's public-facing "Mini Homepage" (`9. Community-Mini Homepage.png`) to foster social interaction and display achievements to others.
 
@@ -394,7 +394,7 @@ The frontend is the user's primary interface for interacting with the AIW3 NFT s
 ### 1. **UI/UX Mockup Translation**
 - **Action:** Convert the static prototype images into interactive UI components using a framework like React or Vue.
   - **Personal Center:** A dashboard displaying the user's current NFT, benefits, and progress.
-  - **Synthesis Flow:** A step-by-step modal or page that guides the user through the process of unlocking a new tier.
+  - **Upgrade Flow:** A step-by-step modal or page that guides the user through the process of unlocking a new tier.
 - **Rationale:** A clean and intuitive UI is essential for a positive user experience, especially for complex processes like NFT upgrades.
 
 ### 2. **Wallet Integration**
@@ -427,7 +427,7 @@ This section outlines the recommended strategy for handling NFT upgrades, focusi
 The most secure and straightforward approach is to require the user to **burn** their lower-level NFT before the system **mints** the new, higher-level NFT.
 
 **Key Advantages:**
-- **Prevents Double-Dipping:** It is impossible for a user to hold two different levels of Equity NFTs simultaneously, ensuring they cannot claim benefits from both.
+- **Prevents Double-Dipping:** It is impossible for a user to hold two different levels of Equity NFTs simultaneously, ensuring they cannot unlock benefits from both.
 - **Atomic State Transition:** The state change is clear and unambiguous. The user either has the old NFT or the new one, never both.
 - **Simplified Auditing:** It is easy to verify on-chain that the old NFT was destroyed before the new one was created.
 
@@ -621,9 +621,9 @@ For complete implementation details and additional error handling patterns, refe
 
 This section provides detailed, step-by-step flows for the key processes in the NFT system.
 
-### 1. New User Onboarding and First NFT Claim
+### 1. New User Onboarding and First NFT Unlock
 
-**Goal:** A new user joins the platform, claims their initial Lv.1 Equity NFT to an `unlocked` state, and then activates it.
+**Goal:** A new user joins the platform, unlocks their initial Lv.1 Equity NFT to an `unlocked` state, and then activates it.
 
 ```mermaid
 flowchart TD
@@ -636,8 +636,8 @@ flowchart TD
     F --> G{Meets 100,000 USDT volume requirement?}
     G -->|Yes| H[Mark Lv.1 NFT as unlockable in UserNFTQualification table]
     G -->|No| I[Display volume requirement progress]
-    H --> J[Frontend: Display Claim Your Lv.1 NFT button]
-    J --> K[User clicks Claim]
+    H --> J[Frontend: Display Unlock Your Lv.1 NFT button]
+    J --> K[User clicks Unlock]
     K --> L[Backend: Upload image to IPFS via Pinata]
     L --> M[Backend: Create and upload metadata JSON to IPFS]
     M --> N[Web3Service: Prepare mint transaction with metadata URI]
@@ -657,14 +657,14 @@ flowchart TD
     AA --> BB[Frontend: WebSocket notification and updated NFT display]
 ```
 
-### 2. NFT Synthesis (Upgrade) Flow
+### 2. NFT Upgrade Flow
 
 **Goal:** An existing user with a Lv.1 NFT upgrades to a Lv.2 NFT.
 
 ```mermaid
 flowchart TD
     subgraph LegacyIntegration ["Integration with lastmemefi-api"]
-        A[User with Lv.1 NFT navigates to Synthesis page] --> B[Frontend: GET /api/nft/status]
+        A[User with Lv.1 NFT navigates to Upgrade page] --> B[Frontend: GET /api/nft/status]
         B --> C[Backend: Query MySQL for user trading volume]
         C --> D[Backend: Query Badge table for bound badges]
         D --> E{Check Lv.2 requirements: 500,000 USDT + 2 badges}

@@ -29,7 +29,7 @@ This document serves as the **authoritative reference** for system validation an
     -   [Lifecycle Characteristics](#lifecycle-characteristics)
 3.  [Core Technical Architecture](#core-technical-architecture)
     -   [3.1 NFT Operation Data Flows](#31-nft-operation-data-flows)
-        -   [3.1.1 NFT Claiming Flow](#311-nft-claiming-flow)
+        -   [3.1.1 NFT Unlocking Flow](#311-nft-unlocking-flow)
         -   [3.1.2 NFT Upgrade Flow](#312-nft-upgrade-flow)
     -   [3.2 Transaction Volume Qualification](#32-transaction-volume-qualification)
     -   [3.3 Metadata and Storage Flow](#33-metadata-and-storage-flow)
@@ -100,7 +100,7 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 
 **Key Technical State Categories**:
 - **Business Logic States**: `Locked`, `Unlockable` - computed by NFTService based on user qualification
-- **Process States**: `Claiming`, `Synthesizing` - temporary UI indicators during async operations  
+- **Process States**: `Unlocking`, `Upgrading` - temporary UI indicators during async operations  
 - **Database NFT Statuses**: `Active`, `Burned` - persistent records in UserNft table
 
 ---
@@ -193,10 +193,10 @@ The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a 
 
 ### 3.1 NFT Operation Data Flows
 
-#### 3.1.1 NFT Claiming and Activation Flow
-This flow is now separated into two distinct stages: Claiming (transitioning the NFT to an `unlocked` state) and Activating (making the NFT fully active and its benefits available).
+#### 3.1.1 NFT Unlocking and Activation Flow
+This flow is now separated into two distinct stages: Unlocking (transitioning the NFT to an `unlocked` state) and Activating (making the NFT fully active and its benefits available).
 
-**Claiming Flow (`unlocked` state):**
+**Unlocking Flow (`unlocked` state):**
 
 ```mermaid
 sequenceDiagram
@@ -211,8 +211,8 @@ sequenceDiagram
     participant KAFKA as KafkaService
     participant WS as WebSocket
 
-    UI->>API: POST /api/nft/claim
-    API->>NFT: claimNFT(userId, level)
+    UI->>API: POST /api/nft/unlock
+    API->>NFT: unlockNFT(userId, level)
 
     %% Check qualification from cache first
     NFT->>REDIS: get("nft_qual:" + userId)
@@ -360,7 +360,7 @@ The system architecture is designed to align with SOLID principles, promoting a 
 
 - **Liskov Substitution Principle (LSP)**: The system's service-oriented architecture and use of well-defined interfaces ensure that different implementations of a service can be used interchangeably. For example, a new implementation of the `Web3Service` that connects to a different Solana cluster could replace the existing one without affecting the `NFTService`.
 
-- **Interface Segregation Principle (ISP)**: The API endpoints are segregated by functionality, ensuring that clients only need to interact with the parts of the system they are concerned with. For example, a client application that only needs to display NFT data would use the `GET /api/nft/status` endpoint, without needing to know about the endpoints for claiming or upgrading NFTs.
+- **Interface Segregation Principle (ISP)**: The API endpoints are segregated by functionality, ensuring that clients only need to interact with the parts of the system they are concerned with. For example, a client application that only needs to display NFT data would use the `GET /api/nft/status` endpoint, without needing to know about the endpoints for unlocking or upgrading NFTs.
 
 - **Dependency Inversion Principle (DIP)**: High-level modules like `NFTService` depend on abstractions, not on concrete implementations. For example, `NFTService` uses the `Web3Service` and `RedisService` through their defined interfaces, not by depending on their specific implementations. This decoupling makes the system more flexible and easier to test, as dependencies can be mocked or replaced.
 
@@ -612,15 +612,15 @@ const logger = {
 
 **Key Logging Points**:
 ```javascript
-// NFT Claiming Process Logging
-const claimNFT = async (userId, level) => {
+// NFT Unlocking Process Logging
+const unlockNFT = async (userId, level) => {
   const traceId = generateTraceId();
   
-  logger.info('NFT claim initiated', {
+  logger.info('NFT unlock initiated', {
     userId,
     targetLevel: level,
     traceId,
-    operation: 'nft_claim_start'
+    operation: 'nft_unlock_start'
   });
   
   try {
@@ -636,11 +636,11 @@ const claimNFT = async (userId, level) => {
     });
     
     if (!qualification.qualified) {
-      logger.warn('NFT claim rejected - insufficient qualification', {
+      logger.warn('NFT unlock rejected - insufficient qualification', {
         userId,
         shortfall: qualification.requiredVolume - qualification.currentVolume,
         traceId,
-        operation: 'claim_rejected'
+        operation: 'unlock_rejected'
       });
       throw new Error('Insufficient qualification');
     }
@@ -674,11 +674,11 @@ const claimNFT = async (userId, level) => {
     return mintResult;
     
   } catch (error) {
-    logger.error('NFT claim failed', error, {
+    logger.error('NFT unlock failed', error, {
       userId,
       targetLevel: level,
       traceId,
-      operation: 'nft_claim_error'
+      operation: 'nft_unlock_error'
     });
     throw error;
   }
@@ -691,15 +691,15 @@ const claimNFT = async (userId, level) => {
 ```javascript
 const businessMetrics = {
   // NFT Operations
-  nftClaimsTotal: new Counter({
-    name: 'nft_claims_total',
-    help: 'Total number of NFT claims attempted',
+  nftUnlocksTotal: new Counter({
+    name: 'nft_unlocks_total',
+    help: 'Total number of NFT unlocks attempted',
     labelNames: ['level', 'status', 'user_tier']
   }),
   
-  nftClaimDuration: new Histogram({
-    name: 'nft_claim_duration_seconds',
-    help: 'Time taken to complete NFT claim process',
+  nftUnlockDuration: new Histogram({
+    name: 'nft_unlock_duration_seconds',
+    help: 'Time taken to complete NFT unlock process',
     labelNames: ['level', 'status'],
     buckets: [1, 5, 10, 30, 60, 120, 300]
   }),
@@ -874,16 +874,16 @@ const consumeWithTrace = async (message, handler) => {
 dashboard:
   title: "AIW3 NFT System Overview"
   panels:
-    - title: "NFT Claims Rate"
+    - title: "NFT Unlocks Rate"
       type: "graph"
       targets:
-        - expr: "rate(nft_claims_total[5m])"
-          legendFormat: "Claims/sec - Level {{level}}"
+        - expr: "rate(nft_unlocks_total[5m])"
+          legendFormat: "Unlocks/sec - Level {{level}}"
     
-    - title: "Claim Success Rate"
+    - title: "Unlock Success Rate"
       type: "stat"
       targets:
-        - expr: "rate(nft_claims_total{status='success'}[5m]) / rate(nft_claims_total[5m]) * 100"
+        - expr: "rate(nft_unlocks_total{status='success'}[5m]) / rate(nft_unlocks_total[5m]) * 100"
           legendFormat: "Success Rate %"
     
     - title: "API Response Times"
@@ -914,14 +914,14 @@ dashboard:
 groups:
   - name: nft_system_alerts
     rules:
-      - alert: HighNFTClaimFailureRate
-        expr: rate(nft_claims_total{status="failed"}[5m]) / rate(nft_claims_total[5m]) > 0.1
+      - alert: HighNFTUnlockFailureRate
+        expr: rate(nft_unlocks_total{status="failed"}[5m]) / rate(nft_unlocks_total[5m]) > 0.1
         for: 2m
         labels:
           severity: warning
         annotations:
-          summary: "High NFT claim failure rate detected"
-          description: "NFT claim failure rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+          summary: "High NFT unlock failure rate detected"
+          description: "NFT unlock failure rate is {{ $value | humanizePercentage }} over the last 5 minutes"
       
       - alert: SolanaRPCDown
         expr: up{job="solana-rpc"} == 0
@@ -1001,7 +1001,7 @@ output {
     "bool": {
       "must": [
         { "term": { "service": "nft-service" } },
-        { "term": { "operation": "nft_claim_error" } },
+        { "term": { "operation": "nft_unlock_error" } },
         { "range": { "timestamp": { "gte": "now-1h" } } }
       ]
     }

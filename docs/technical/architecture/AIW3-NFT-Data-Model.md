@@ -82,7 +82,7 @@ module.exports = {
     level: { 
       type: 'number', 
       defaultsTo: 1, 
-      description: 'The upgrade level of the NFT, used in synthesis flows.' 
+      description: 'The upgrade level of the NFT, used in upgrade flows.' 
     }
   }
 };
@@ -93,7 +93,7 @@ module.exports = {
 - `nftDefinition`: Association to NftDefinition model  
 - `mintAddress`: Unique Solana mint address
 - `status`: Only `active` or `burned` (database statuses)
-- `level`: Upgrade level for synthesis
+- `level`: Upgrade level for upgrade flows
 
 ### NftDefinition Model (api/models/NftDefinition.js)
 
@@ -737,7 +737,7 @@ The AIW3 system interacts with the Solana blockchain using **only standard Solan
 | **Upgrading an Equity NFT**     | `burn(...)` + `mintTo(...)`     | **Standard SPL Token Program**  | The upgrade process uses standard token operations: user burns their current NFT, then the system mints the new tier NFT. The AIW3 backend verifies all off-chain criteria (trading volume, badge requirements) before authorizing the upgrade. |
 | **Managing Badges**             | Off-chain operations            | **Backend Database Only**       | Badges are managed entirely off-chain in the backend database. They are not NFTs and do not require blockchain operations. The backend tracks badge ownership and enforces binding requirements through database queries and business logic. |
 | **Selling/Transferring an NFT** | `transfer(...)`                 | **Standard SPL Token Program**  | This is a standard token transfer. The AIW3 system does not need a custom function for this. Users can freely trade their NFTs on any marketplace that supports Solana NFTs. |
-| **Burning an NFT**              | `burn(...)`                     | **Standard SPL Token Program**  | This is a standard token burn. It is used in the **Synthesis** process to destroy the lower-level NFT before the higher-level one is minted. |
+| **Burning an NFT**              | `burn(...)`                     | **Standard SPL Token Program**  | This is a standard token burn. It is used in the **Upgrade** process to destroy the lower-level NFT before the higher-level one is minted. |
 
 ---
 

@@ -25,7 +25,7 @@ Qualification for each NFT tier is based on a user's total trading volume (in US
 | 5       | Quantum Alchemist   | ≥ 50,000,000                   | 55%                   | 50 free uses per week     | "Unlocked" when qualified |
 | Special | Trophy Breeder      | Top 3 in trading competition   | 25%                   | Special privileges        | Airdrop notification      |
 
-### 1.2 Critical Business Logic: Claiming vs Synthesis
+### 1.2 Critical Business Logic: Unlocking vs Upgrade
 
 **🔑 Key Distinction:**
 
@@ -45,7 +45,7 @@ Qualification for each NFT tier is based on a user's total trading volume (in US
 
 1. **Progress Tracking**: Users can see their progress toward the next tier with visual progress bars
 2. **Activation Popup**: When users unlock a new tier, they see a "Trigger Activation Popup" (Prototype 5)
-3. **Success Messaging**: After successful synthesis, users see confirmation with new NFT details (Prototype 2.4)
+3. **Success Messaging**: After successful upgrade, users see confirmation with new NFT details (Prototype 2.4)
 4. **Community Display**: Active NFTs are displayed in community profiles for social proof (Prototypes 6, 7)
 
 ---
@@ -55,7 +55,7 @@ Qualification for each NFT tier is based on a user's total trading volume (in US
 The NFT lifecycle involves three distinct types of states that must be clearly distinguished:
 
 - **Business Logic States (`Locked`, `Unlockable`):** Represent a user's eligibility *before* an NFT is minted. These are calculated on-the-fly by `NFTService` and are not stored in the database.
-- **Process/UI States (`Claiming`, `Synthesizing`):** Represent temporary processing states during user actions. These are UI indicators, not NFT statuses.
+- **Process/UI States (`Unlocking`, `Upgrading`):** Represent temporary processing states during user actions. These are UI indicators, not NFT statuses.
 - **Database NFT Statuses (`active`, `burned`):** Represent the actual state of NFTs *after* they have been minted and recorded in the `UserNft` table.
 
 ### NFT Status Transition Diagram
@@ -83,7 +83,7 @@ flowchart LR
 | State        | Description                                                                                             | UI/User Action                                        |
 |:-------------|:--------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
 | **Locked**     | User has not yet met the requirements for this NFT tier.                                               | UI shows the requirements to unlock.                  |
-| **Unlockable** | User has met all requirements and can claim the NFT.                                                   | UI displays a prominent "Claim" button.               |
+| **Unlockable** | User has met all requirements and can unlock the NFT.                                                   | UI displays a prominent "Unlock" button.               |
 
 #### Process/UI States
 | State        | Description                                                                                             | UI/User Action                                        |
@@ -95,7 +95,7 @@ flowchart LR
 | Status       | Description                                                                                             | UI/User Action                                        |
 |:-------------|:--------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
 | **`active`**   | NFT has been successfully minted and is owned by the user.                                             | NFT is visible in the Personal Center.                |
-| **`burned`**   | NFT was consumed during Synthesis to mint a higher-tier NFT.                                           | NFT is removed from active view.                      |
+| **`burned`**   | NFT was consumed during Upgrade to mint a higher-tier NFT.                                           | NFT is removed from active view.                      |
 
 ---
 

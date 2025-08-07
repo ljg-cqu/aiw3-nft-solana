@@ -406,7 +406,7 @@ module.exports = {
     REAL_TIME_EVENTS_ENABLED: true,
     
     // Gradual rollout flags
-    NFT_SYNTHESIS_V2_ENABLED: false,
+    NFT_UPGRADE_V2_ENABLED: false,
     ADVANCED_BENEFITS_ENABLED: false,
     
     // Emergency flags
@@ -419,7 +419,7 @@ module.exports = {
     NFT_UPGRADE_ENABLED: true,
     BADGE_SYSTEM_ENABLED: true,
     REAL_TIME_EVENTS_ENABLED: true,
-    NFT_SYNTHESIS_V2_ENABLED: true,
+    NFT_UPGRADE_V2_ENABLED: true,
     ADVANCED_BENEFITS_ENABLED: true,
     EMERGENCY_READONLY_MODE: false,
     MAINTENANCE_MODE: false

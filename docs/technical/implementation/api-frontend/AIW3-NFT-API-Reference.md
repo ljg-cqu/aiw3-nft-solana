@@ -88,12 +88,12 @@ Public endpoints (marked as such) do not require authentication.
 
 ---
 
-### 2. Get Synthesis Details
+### 2. Get Upgrade Details
 
-- **Endpoint**: `GET /api/v1/nft/synthesis-details`
-- **Controller Action**: `NFTController.getSynthesisDetails`
+- **Endpoint**: `GET /api/v1/nft/upgrade-details`
+- **Controller Action**: `NFTController.getUpgradeDetails`
 - **Authentication**: Required (JWT)
-- **Description**: Retrieves data needed for the NFT synthesis/upgrade page.
+- **Description**: Retrieves data needed for the NFT upgrade page.
 - **Query Parameters**: None
 
 #### Success Response: `200 OK`
@@ -122,7 +122,7 @@ Public endpoints (marked as such) do not require authentication.
     }
   },
   "canSynthesize": true,
-  "synthesisConditions": {
+  "upgradeConditions": {
     "volumeMet": true,
     "currentVolume": 5500000,
     "estimatedGasFee": 0.001
@@ -228,10 +228,10 @@ Public endpoints (marked as such) do not require authentication.
 
 ---
 
-### 5. Claim NFT
+### 5. Unlock NFT
 
-- **Endpoint**: `POST /api/v1/nft/claim`
-- **Controller Action**: `NFTController.claimNFT`
+- **Endpoint**: `POST /api/v1/nft/unlock`
+- **Controller Action**: `NFTController.unlockNFT`
 - **Authentication**: Required (JWT)
 - **Description**: Initiates the minting of an NFT that the user has qualified for.
 
@@ -246,7 +246,7 @@ Public endpoints (marked as such) do not require authentication.
 ```json
 {
   "status": "success",
-  "message": "NFT claim processing started.",
+  "message": "NFT unlock processing started.",
   "mintAddress": "newly-minted-solana-address",
   "transactionId": "tx...123"
 }
@@ -285,7 +285,7 @@ Public endpoints (marked as such) do not require authentication.
 ```json
 {
   "status": "success",
-  "message": "NFT synthesis initiated successfully.",
+  "message": "NFT upgrade initiated successfully.",
   "newNftMintAddress": "mint...xyz",
   "burnTransactionId": "tx...burn456",
   "mintTransactionId": "tx...mint789"
@@ -293,11 +293,11 @@ Public endpoints (marked as such) do not require authentication.
 ```
 
 #### Error Responses
-- `400 Bad Request`: Synthesis requirements not met
+- `400 Bad Request`: Upgrade requirements not met
   ```json
   {
     "status": "error",
-    "message": "Synthesis requirements not met.",
+    "message": "Upgrade requirements not met.",
     "requiredVolume": 5000000,
     "currentVolume": 3000000
   }
@@ -327,10 +327,10 @@ When NFT operations complete, the backend publishes events via Kafka that are st
 }
 ```
 
-#### NFT Synthesis Complete Event
+#### NFT Upgrade Complete Event
 ```json
 {
-  "event": "nftSynthesisComplete",
+  "event": "nftUpgradeComplete",
   "walletAddress": "So1a...",
   "oldNft": {
     "tierName": "Quant Ape",
@@ -413,7 +413,7 @@ All endpoints follow consistent error response patterns:
 ### Frontend Integration
 - All endpoints return JSON responses
 - Use appropriate HTTP methods (GET for data retrieval, POST for actions)
-- Handle loading states during `Claiming` and `Synthesizing` processes
+- Handle loading states during `Unlocking` and `Upgrading` processes
 - Implement real-time updates via WebSocket for NFT status changes
 
 ### Backend Integration

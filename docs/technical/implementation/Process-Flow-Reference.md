@@ -17,7 +17,7 @@ This document provides comprehensive documentation of all NFT-related process fl
 ## Table of Contents
 
 1. [New User Onboarding Flow](#new-user-onboarding-flow)
-2. [NFT Synthesis (Upgrade) Flow](#nft-synthesis-upgrade-flow)
+2. [NFT Upgrade Flow](#nft-upgrade-flow)
 3. [Burn-and-Mint Workflow](#burn-and-mint-workflow)
 4. [Error Handling Procedures](#error-handling-procedures)
 5. [System Recovery Flows](#system-recovery-flows)
@@ -26,9 +26,9 @@ This document provides comprehensive documentation of all NFT-related process fl
 
 ## New User Onboarding Flow
 
-### 1. New User Onboarding and First NFT Claim
+### 1. New User Onboarding and First NFT Unlock
 
-This flow guides new users through their first interaction with the AIW3 NFT system, from wallet connection to claiming their initial NFT.
+This flow guides new users through their first interaction with the AIW3 NFT system, from wallet connection to unlocking their initial NFT.
 
 ```mermaid
 sequenceDiagram
@@ -49,8 +49,8 @@ sequenceDiagram
     Backend->>Frontend: Return status and qualification
     
     alt User Qualifies for Level 1
-        Frontend->>User: Show "Claim NFT" button
-        User->>Frontend: Clicks "Claim NFT"
+        Frontend->>User: Show "Unlock NFT" button
+        User->>Frontend: Clicks "Unlock NFT"
         Frontend->>Backend: POST /api/nft/claim
         Backend->>MySQL: Verify qualification again
         Backend->>MySQL: Create NFT claim record
@@ -90,9 +90,9 @@ sequenceDiagram
 
 ---
 
-## NFT Synthesis (Upgrade) Flow
+## NFT Upgrade Flow
 
-### 2. NFT Synthesis (Upgrade) Flow
+### 2. NFT Upgrade Flow
 
 This flow handles the process of upgrading an existing NFT to a higher level through the burn-and-mint mechanism.
 

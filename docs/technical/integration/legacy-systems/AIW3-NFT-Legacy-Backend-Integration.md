@@ -686,7 +686,7 @@ This section provides a detailed specification for the API contracts, data forma
   - [Real-time Communication (WebSockets)](#real-time-communication-websockets)
 - [Frontend Integration Points](#frontend-integration-points)
   - [Personal Center Dashboard](#personal-center-dashboard)
-  - [Synthesis (Upgrade) Flow](#synthesis-upgrade-flow)
+  - [Upgrade Flow](#upgrade-flow)
   - [Badge System Integration](#badge-system-integration)
 - [Technical Implementation Plan & Dependencies](#technical-implementation-plan--dependencies)
 - [Testing & Development Support](#testing--development-support)
@@ -829,7 +829,7 @@ This section outlines the specific technical components required, distinguishing
 | **Real-time (WebSockets)** | `sails-hook-sockets: ^3.0.0` | `socket.io-client: ^4.x` (Frontend, version to match server) |
 | **Transaction Tracking** | `Web3Service`, `WebSocketService` | `@solana/web3.js: ^1.98.0` |
 | **Personal Center** | `NFTService` (new), `UserService`, `RedisService` | N/A (Backend logic) |
-| **Synthesis (Upgrade) Flow**| `NFTService`, `Web3Service`, `RedisService` (for locking) | `@solana/web3.js: ^1.98.0`, `@metaplex-foundation/mpl-token-metadata: ^2.13.0` |
+| **Upgrade Flow**| `NFTService`, `Web3Service`, `RedisService` (for locking) | `@solana/web3.js: ^1.98.0`, `@metaplex-foundation/mpl-token-metadata: ^2.13.0` |
 | **Badge System** | `NFTService`, `UserService`, `Database` (new models) | N/A (Backend logic) |
 | **Mock Data & Sandbox** | Sails.js seeders, new `SandboxController` | N/A (Internal tooling) |
 | **API Documentation** | Existing Swagger/OpenAPI setup | `swagger-ui-express: (To be added, if needed)` |
