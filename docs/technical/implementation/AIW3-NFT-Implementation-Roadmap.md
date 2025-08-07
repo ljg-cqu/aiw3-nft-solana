@@ -152,7 +152,7 @@ module.exports = {
 **Implementation**: Complete NFTService code and step-by-step creation process are documented in the [Implementation Guide](./AIW3-NFT-Implementation-Guide.md#1-nft-service-nftservicejs).
 
 **Key methods to implement:**
-- `calculateTradingVolume()` - Aggregate user trading volume from Trades model (includes perpetual contract and strategy trading volume)
+- `calculateTradingVolume()` - Aggregate user trading volume from Trades model (includes perpetual contract and strategy trading volume, must include complete historical data from system inception)
 - `checkNFTQualification()` - Validate user eligibility for NFT levels
 - `getRequiredVolumeForLevel()` - Return volume requirements per level
 

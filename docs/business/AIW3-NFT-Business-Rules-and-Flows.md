@@ -25,6 +25,11 @@ AIW3's NFT system consists of **Equity NFTs** with two distinct subtypes:
 - **Perpetual contract trading volume**
 - **Trading volume generated from strategy trading**
 
+**Historical Volume Requirement**: Since the AIW3 system has been in production before NFT feature launch, trading volume for NFT qualification must include:
+- **Historical trading volume**: All trading activity before NFT feature launch
+- **New trading volume**: All trading activity after NFT feature launch
+- **Total calculation**: Complete trading history from system inception to current date
+
 **Tiered NFT Requirements**:
 
 **First NFT Unlock (Level 1)**: Only requires **trading volume** (≥ 100,000 USDT) - no badges needed

@@ -404,6 +404,11 @@ module.exports = {
 - **Perpetual contract trading volume**
 - **Trading volume generated from strategy trading**
 
+**Historical Volume Requirement**: Since the AIW3 system has been in production before NFT feature launch, the calculation must include:
+- **Historical trading volume**: All trading activity before NFT feature launch
+- **New trading volume**: All trading activity after NFT feature launch
+- **Implementation**: Query the entire `trades` table without date restrictions to capture complete trading history
+
 The User model does not contain a `total_trading_volume` field. The extensions below are for tracking NFT-specific state and relationships.
 
 #### User Model Extensions (api/models/User.js)

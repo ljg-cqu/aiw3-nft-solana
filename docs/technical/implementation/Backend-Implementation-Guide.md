@@ -63,6 +63,7 @@ npm install @metaplex-foundation/js@^0.19.4
      
      // Calculate user's total trading volume from Trades model
      // Trading volume includes: perpetual contract trading volume + strategy trading volume
+     // Historical requirement: Include ALL trading history (pre-NFT and post-NFT launch)
      calculateTradingVolume: async function(userId) {
        try {
          const query = `
