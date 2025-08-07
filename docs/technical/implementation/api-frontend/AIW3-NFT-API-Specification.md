@@ -1,13 +1,15 @@
-# AIW3 NFT Frontend-Backend API Specification
+# AIW3 NFT API Specification
 
 ## Overview
 
-This document provides a production-ready API specification for the AIW3 NFT system frontend-backend integration, strictly aligned with existing lastmemefi-api backend conventions. All endpoints follow established patterns for route naming, controller structure, response formats, and authentication mechanisms.
+This document provides a comprehensive, production-ready API specification for the AIW3 NFT system, fully aligned with business rules, existing lastmemefi-api backend implementation, and external integrations (Solana, IPFS). All endpoints are designed to support the complete NFT business logic including tiered NFT progression, competition NFTs, badge system, and benefit calculations.
 
 **Backend Framework**: Sails.js with existing controller patterns  
-**Route Convention**: `/api/` prefix with RESTful resource naming  
+**Route Convention**: `/api/v1/nft/` prefix following existing patterns  
 **Response Format**: Standardized `sendResponse()` with `code`, `data`, `message` structure  
 **Authentication**: JWT via `AccessTokenService` + Solana wallet signatures  
+**Business Alignment**: Fully compliant with AIW3-NFT-Business-Rules-and-Flows.md v1.0.0  
+**External Integrations**: Solana Web3.js, IPFS via Pinata, Trading Volume Service  
 
 ## Table of Contents
 
@@ -104,99 +106,261 @@ const user = req.user; // Can be null for public access
 
 ## NFT API Endpoints
 
-### 1. Get NFT List
-**Route**: `GET /api/nft/list`  
-**Controller**: `NFTController.listNFTs`  
-**Description**: Retrieve paginated list of available NFTs with filtering  
-**Authentication**: Optional (public NFTs visible to all)  
-**Business Alignment**: Core NFT discovery feature  
+### 1. Get Personal Center Data
+**Route**: `GET /api/v1/nft/personal-center`  
+**Controller**: `NFTController.getPersonalCenterData`  
+**Description**: Retrieve complete Personal Center data including tiered NFT status, competition NFTs, badges, and effective benefits  
+**Authentication**: Required (JWT)  
+**Business Alignment**: Primary user interface supporting both tiered and competition NFT display  
 
-**Request Parameters** (Query String):
-```javascript
-// GET /api/nft/list?page=1&limit=20&tier=Tech%20Chicken&status=available
-{
-  page: 1,              // Default: 1
-  limit: 20,            // Default: 20, Max: 100
-  tier: 'Tech Chicken', // Optional: filter by tier name
-  status: 'available'   // Optional: available, minted, locked
-}
-```
+**Request Parameters**: None (user-specific data based on JWT)
+
+**Business Logic**:
+- Returns user's current tiered NFT status (locked/unlockable/active)
+- Lists all owned competition NFTs
+- Shows badge collection with status (owned/activated/consumed)
+- Calculates effective benefits (max fee reduction + accumulated rights)
+- Includes trading volume and qualification status
 
 **Response** (Standard `sendResponse` format):
 ```json
 {
   "code": 200,
   "data": {
-    "nfts": [
-      {
-        "id": "nft_001",
-        "name": "Tech Chicken #001",
-        "tier": "Tech Chicken",
-        "level": 1,
+    "userProfile": {
+      "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+      "username": "CryptoTrader",
+      "avatar_url": "/path/to/avatar.png",
+      "total_trading_volume": 750000.00,
+      "current_tier_level": 2
+    },
+    "tiered_nft": {
+      "current_nft": {
+        "tier_id": 2,
+        "tier_name": "Quant Ape",
+        "level": 2,
         "image_url": "https://ipfs.io/ipfs/QmHash...",
-        "metadata_url": "https://ipfs.io/ipfs/QmHash...",
-        "status": "available",
-        "mint_price": 0.1,
-        "trading_volume_required": 100000,
-        "created_at": "2024-01-01T00:00:00Z"
+        "mint_address": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+        "status": "active",
+        "benefits": {
+          "trading_fee_reduction": 0.20,
+          "ai_agent_uses": 20,
+          "additional_rights": ["Activate Exclusive Background"]
+        }
+      },
+      "available_upgrades": [
+        {
+          "tier_id": 3,
+          "tier_name": "On-chain Hunter",
+          "level": 3,
+          "image_url": "https://ipfs.io/ipfs/QmHash...",
+          "status": "locked",
+          "unlock_requirements": {
+            "required_volume": 5000000,
+            "required_badges": 4,
+            "activated_badges": 2
+          },
+          "progress_percentage": 15.0,
+          "can_upgrade": false
+        }
+      ]
+    },
+    "competition_nfts": [
+      {
+        "nft_id": "comp_001",
+        "name": "Trophy Breeder",
+        "image_url": "https://ipfs.io/ipfs/QmHash...",
+        "mint_address": "CompMintAddress123",
+        "status": "active",
+        "source": "Top 3 in trading competition",
+        "benefits": {
+          "trading_fee_reduction": 0.25,
+          "additional_rights": ["Avatar Crown or Community Top Pin"]
+        },
+        "earned_date": "2024-07-15T00:00:00Z"
       }
     ],
-    "pagination": {
-      "current_page": 1,
-      "total_pages": 5,
-      "total_count": 100,
-      "has_next": true
+    "effective_benefits": {
+      "trading_fee_reduction": 0.25,
+      "ai_agent_uses": 20,
+      "additional_rights": [
+        "Activate Exclusive Background",
+        "Avatar Crown or Community Top Pin"
+      ]
+    },
+    "badges": {
+      "owned_count": 8,
+      "activated_count": 2,
+      "consumed_count": 2
     }
   },
-  "message": "NFT list retrieved successfully"
+  "message": "Personal center data retrieved successfully"
 }
 ```
 
-### 2. Get NFT Detail
-**Route**: `GET /api/nft/:nftId`  
-**Controller**: `NFTController.getNFTDetail`  
-**Description**: Get detailed information about a specific NFT  
-**Authentication**: Optional  
-**Business Alignment**: NFT detail viewing  
+### 2. Unlock NFT (First Tiered NFT Only)
+**Route**: `POST /api/v1/nft/unlock`  
+**Controller**: `NFTController.unlockNFT`  
+**Description**: Unlock first tiered NFT (Tech Chicken) when user meets volume requirements  
+**Authentication**: Required (JWT + Solana wallet signature)  
+**Business Alignment**: First NFT unlock process (≥100,000 USDT volume requirement)  
 
-**Request Parameters**:
-```javascript
-// GET /api/nft/nft_001
+**Request Body**:
+```json
 {
-  nftId: 'nft_001' // URL parameter
+  "tier_id": 1,
+  "wallet_signature": "base58_encoded_signature",
+  "message": "unlock_nft_tech_chicken_timestamp"
 }
 ```
+
+**Business Logic**:
+- Only available for users with NO active tiered NFT
+- Requires ≥100,000 USDT trading volume (perpetual + strategy only)
+- Mints Tech Chicken (Level 1) directly to user's wallet
+- Validates Solana wallet signature for security
+- Updates user's NFT status to "active"
 
 **Response**:
 ```json
 {
   "code": 200,
   "data": {
+    "status": "success",
+    "message": "NFT unlock processing started",
     "nft": {
-      "id": "nft_001",
-      "name": "Tech Chicken #001",
-      "tier": "Tech Chicken",
+      "tier_id": 1,
+      "tier_name": "Tech Chicken",
       "level": 1,
-      "description": "Entry-level NFT for tech enthusiasts",
-      "image_url": "https://ipfs.io/ipfs/QmHash...",
-      "metadata_url": "https://ipfs.io/ipfs/QmHash...",
-      "mint_address": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
-      "owner_wallet": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
-      "status": "minted",
-      "minted_at": "2024-01-15T10:30:00Z",
+      "image_url": "https://ipfs.io/ipfs/QmTechChickenHash...",
+      "mint_address": "NewlyMintedSolanaAddress123",
+      "status": "unlocking",
       "benefits": {
-        "fee_reduction": 0.05,
+        "trading_fee_reduction": 0.10,
         "ai_agent_uses": 10
-      },
-      "metadata": {
-        "attributes": [
-          {"trait_type": "Background", "value": "Blue"},
-          {"trait_type": "Eyes", "value": "Laser"}
-        ]
       }
+    },
+    "transaction_id": "solana_tx_hash_123",
+    "estimated_confirmation_time": "30-60 seconds"
+  },
+  "message": "Tech Chicken NFT unlock initiated successfully"
+}
+```
+
+**Error Responses**:
+```json
+// Insufficient trading volume
+{
+  "code": 400,
+  "data": {
+    "error_code": "INSUFFICIENT_TRADING_VOLUME",
+    "required_volume": 100000,
+    "current_volume": 75000,
+    "shortfall": 25000
+  },
+  "message": "Insufficient trading volume for NFT unlock"
+}
+
+// Already owns tiered NFT
+{
+  "code": 409,
+  "data": {
+    "error_code": "TIERED_NFT_ALREADY_OWNED",
+    "current_nft": {
+      "tier_name": "Quant Ape",
+      "level": 2
     }
   },
-  "message": "NFT detail retrieved successfully"
+  "message": "User already owns a tiered NFT"
+}
+```
+
+### 3. Upgrade Tiered NFT
+**Route**: `POST /api/v1/nft/upgrade`  
+**Controller**: `NFTController.upgradeNFT`  
+**Description**: Upgrade tiered NFT to next level using activated badges  
+**Authentication**: Required (JWT + Solana wallet signature)  
+**Business Alignment**: Core tiered NFT progression through badge consumption  
+
+**Request Body**:
+```json
+{
+  "target_tier_id": 3,
+  "badge_ids": ["badge_001", "badge_002", "badge_003", "badge_004"],
+  "wallet_signature": "base58_encoded_signature",
+  "message": "upgrade_nft_level3_timestamp"
+}
+```
+
+**Business Logic**:
+- Burns current tiered NFT and mints new higher-level NFT
+- Validates user has required activated badges (2/4/5/6 for levels 2/3/4/5)
+- Consumes activated badges (status changes to "consumed")
+- Requires sufficient trading volume for target level
+- Validates Solana wallet signature for burn/mint operations
+
+**Response**:
+```json
+{
+  "code": 200,
+  "data": {
+    "status": "success",
+    "message": "NFT upgrade initiated successfully",
+    "old_nft": {
+      "tier_id": 2,
+      "tier_name": "Quant Ape",
+      "status": "burned",
+      "burn_transaction_id": "solana_burn_tx_123"
+    },
+    "new_nft": {
+      "tier_id": 3,
+      "tier_name": "On-chain Hunter",
+      "level": 3,
+      "image_url": "https://ipfs.io/ipfs/QmOnChainHunterHash...",
+      "mint_address": "NewUpgradedMintAddress456",
+      "status": "upgrading",
+      "benefits": {
+        "trading_fee_reduction": 0.30,
+        "ai_agent_uses": 30,
+        "additional_rights": ["Strategy Priority", "Activate Exclusive Background"]
+      }
+    },
+    "consumed_badges": [
+      {"badge_id": "badge_001", "name": "Strategic Enlighteners"},
+      {"badge_id": "badge_002", "name": "Newcomers"},
+      {"badge_id": "badge_003", "name": "Strategy creator"},
+      {"badge_id": "badge_004", "name": "Transaction Facilitator"}
+    ],
+    "mint_transaction_id": "solana_mint_tx_456",
+    "estimated_confirmation_time": "30-60 seconds"
+  },
+  "message": "NFT upgrade to On-chain Hunter initiated successfully"
+}
+```
+
+**Error Responses**:
+```json
+// Insufficient activated badges
+{
+  "code": 400,
+  "data": {
+    "error_code": "INSUFFICIENT_ACTIVATED_BADGES",
+    "required_badges": 4,
+    "activated_badges": 2,
+    "missing_badges": 2
+  },
+  "message": "Insufficient activated badges for upgrade"
+}
+
+// Invalid badge selection
+{
+  "code": 400,
+  "data": {
+    "error_code": "INVALID_BADGE_SELECTION",
+    "invalid_badges": ["badge_003"],
+    "reason": "Badge not owned or already consumed"
+  },
+  "message": "Invalid badge selection for upgrade"
 }
 ```
 
@@ -204,66 +368,123 @@ const user = req.user; // Can be null for public access
 
 ## Badge API Endpoints
 
-### 1. Get Badge List
-**Route**: `GET /api/badges/list`  
-**Controller**: `BadgeController.listBadges`  
-**Description**: Retrieve available badges for tier progression  
-**Authentication**: Optional  
-**Business Alignment**: Badge system for NFT qualification  
+### 1. Get User Badges
+**Route**: `GET /api/v1/nft/badges`  
+**Controller**: `NFTController.getUserBadges`  
+**Description**: Retrieve user's badge collection with status and progress  
+**Authentication**: Required (JWT)  
+**Business Alignment**: Badge management for tiered NFT progression  
 
-**Request Parameters** (Query String):
-```javascript
-// GET /api/badges/list?page=1&limit=20&category=trading
-{
-  page: 1,           // Default: 1
-  limit: 20,         // Default: 20, Max: 100
-  category: 'trading' // Optional: trading, social, achievement
-}
-```
+**Request Parameters**: None (user-specific data based on JWT)
+
+**Business Logic**:
+- Returns all badges with user's ownership status
+- Shows badge lifecycle: owned → activated → consumed
+- Groups badges by NFT level requirements
+- Includes task completion status for unowned badges
 
 **Response**:
 ```json
 {
   "code": 200,
   "data": {
-    "badges": [
-      {
-        "id": "badge_001",
-        "name": "Volume Trader",
-        "description": "Complete $10,000 in trading volume (perpetual contract and strategy trading)",
-        "category": "trading",
-        "image_url": "https://ipfs.io/ipfs/QmHash...",
-        "requirements": {
-          "trading_volume": 10000,
-          "timeframe": "30_days"
-        },
-        "tier_unlock": "Quant Ape",
-        "status": "available"
+    "badge_summary": {
+      "total_badges": 17,
+      "owned_count": 8,
+      "activated_count": 2,
+      "consumed_count": 2,
+      "available_for_activation": 6
+    },
+    "badges_by_level": {
+      "level_2": {
+        "required_count": 2,
+        "badges": [
+          {
+            "badge_id": "badge_contract_enlightener",
+            "name": "The Contract Enlightener",
+            "description": "Complete the contract novice guidance",
+            "image_url": "https://ipfs.io/ipfs/QmBadgeHash1...",
+            "obtain_condition": "Complete the contract novice guidance",
+            "status": "consumed",
+            "earned_at": "2024-01-10T15:20:00Z",
+            "activated_at": "2024-01-12T09:15:00Z",
+            "consumed_at": "2024-01-15T14:30:00Z"
+          },
+          {
+            "badge_id": "badge_platform_enlightener",
+            "name": "Platform Enlighteners",
+            "description": "Improve personal data",
+            "image_url": "https://ipfs.io/ipfs/QmBadgeHash2...",
+            "obtain_condition": "Improve personal data",
+            "status": "consumed",
+            "earned_at": "2024-01-11T10:00:00Z",
+            "activated_at": "2024-01-12T09:16:00Z",
+            "consumed_at": "2024-01-15T14:30:00Z"
+          }
+        ]
+      },
+      "level_3": {
+        "required_count": 4,
+        "badges": [
+          {
+            "badge_id": "badge_strategic_enlightener",
+            "name": "Strategic Enlighteners",
+            "description": "Complete the strategy novice guidance",
+            "image_url": "https://ipfs.io/ipfs/QmBadgeHash3...",
+            "obtain_condition": "Complete the strategy novice guidance",
+            "status": "activated",
+            "earned_at": "2024-01-20T12:00:00Z",
+            "activated_at": "2024-01-22T16:45:00Z"
+          },
+          {
+            "badge_id": "badge_newcomer",
+            "name": "Newcomers",
+            "description": "Invite one friend to register",
+            "image_url": "https://ipfs.io/ipfs/QmBadgeHash4...",
+            "obtain_condition": "Invite one friend to register",
+            "status": "owned",
+            "earned_at": "2024-01-25T08:30:00Z"
+          },
+          {
+            "badge_id": "badge_strategy_creator",
+            "name": "Strategy creator",
+            "description": "Complete the creation of 1 strategy",
+            "image_url": "https://ipfs.io/ipfs/QmBadgeHash5...",
+            "obtain_condition": "Complete the creation of 1 strategy",
+            "status": "not_owned",
+            "task_progress": {
+              "current": 0,
+              "required": 1,
+              "percentage": 0
+            }
+          }
+        ]
       }
-    ],
-    "pagination": {
-      "current_page": 1,
-      "total_pages": 3,
-      "total_count": 50
     }
   },
-  "message": "Badge list retrieved successfully"
+  "message": "User badges retrieved successfully"
 }
 ```
 
 ### 2. Activate Badge
-**Route**: `POST /api/badges/activate`  
-**Controller**: `BadgeController.activateBadge`  
-**Description**: Activate an earned badge for NFT tier qualification  
+**Route**: `POST /api/v1/nft/badges/activate`  
+**Controller**: `NFTController.activateBadge`  
+**Description**: Activate owned badge for NFT upgrade preparation  
 **Authentication**: Required (JWT)  
-**Business Alignment**: Badge activation for tier progression  
+**Business Alignment**: Badge activation for tiered NFT progression  
 
 **Request Body**:
 ```json
 {
-  "badge_id": "badge_001"
+  "badge_id": "badge_newcomer"
 }
 ```
+
+**Business Logic**:
+- Changes badge status from "owned" to "activated"
+- Validates user owns the badge and it's not already consumed
+- Badge becomes available for use in NFT upgrade process
+- Cannot be reversed once activated
 
 **Response**:
 ```json
@@ -271,15 +492,45 @@ const user = req.user; // Can be null for public access
   "code": 200,
   "data": {
     "badge": {
-      "id": "badge_001",
-      "name": "Volume Trader",
+      "badge_id": "badge_newcomer",
+      "name": "Newcomers",
       "status": "activated",
-      "activated_at": "2024-01-20T14:30:00Z"
+      "activated_at": "2024-01-28T14:30:00Z"
     },
-    "tier_qualification_updated": true,
-    "new_unlockable_tiers": ["Quant Ape"]
+    "upgrade_status": {
+      "current_tier": 2,
+      "next_tier": 3,
+      "required_badges": 4,
+      "activated_badges": 3,
+      "can_upgrade": false,
+      "missing_badges": 1
+    }
   },
   "message": "Badge activated successfully"
+}
+```
+
+**Error Responses**:
+```json
+// Badge not owned
+{
+  "code": 404,
+  "data": {
+    "error_code": "BADGE_NOT_OWNED",
+    "badge_id": "badge_newcomer"
+  },
+  "message": "Badge not owned by user"
+}
+
+// Badge already consumed
+{
+  "code": 409,
+  "data": {
+    "error_code": "BADGE_ALREADY_CONSUMED",
+    "badge_id": "badge_newcomer",
+    "consumed_at": "2024-01-15T14:30:00Z"
+  },
+  "message": "Badge already consumed in previous upgrade"
 }
 ```
 
@@ -976,48 +1227,88 @@ const kafkaEvents = {
 ```javascript
 // Real-time events published via Kafka and streamed to frontend
 const webSocketEvents = {
-  // NFT Status Update Event
-  'nft.status.updated': {
-    event: 'nftStatusUpdate',
-    walletAddress: 'So1a...',
+  // NFT Unlock Complete Event
+  'nft.unlock.complete': {
+    event: 'nftUnlockComplete',
+    wallet_address: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
     nft: {
-      tierName: 'Quant Ape',
-      status: 'Active',
-      nftImageUrl: '/ipfs/quant_ape.png',
-      mintAddress: 'Mint...def'
-    }
+      tier_name: 'Tech Chicken',
+      level: 1,
+      status: 'active',
+      image_url: 'https://ipfs.io/ipfs/QmTechChickenHash...',
+      mint_address: 'NewlyMintedSolanaAddress123'
+    },
+    transaction_id: 'solana_tx_hash_123'
   },
   
   // NFT Upgrade Complete Event
   'nft.upgrade.complete': {
     event: 'nftUpgradeComplete',
-    walletAddress: 'So1a...',
-    oldNft: {
-      tierName: 'Quant Ape',
-      status: 'Burned',
-      mintAddress: 'Mint...old'
+    wallet_address: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+    old_nft: {
+      tier_name: 'Quant Ape',
+      level: 2,
+      status: 'burned',
+      mint_address: 'OldMintAddress123'
     },
-    newNft: {
-      tierName: 'On-chain Hunter',
-      status: 'Active',
-      nftImageUrl: '/ipfs/onchain_hunter.png',
-      mintAddress: 'Mint...new'
+    new_nft: {
+      tier_name: 'On-chain Hunter',
+      level: 3,
+      status: 'active',
+      image_url: 'https://ipfs.io/ipfs/QmOnChainHunterHash...',
+      mint_address: 'NewUpgradedMintAddress456'
+    },
+    consumed_badges: ['badge_001', 'badge_002', 'badge_003', 'badge_004'],
+    burn_transaction_id: 'solana_burn_tx_123',
+    mint_transaction_id: 'solana_mint_tx_456'
+  },
+  
+  // Trading Volume Update Event
+  'trading.volume.updated': {
+    event: 'tradingVolumeUpdate',
+    wallet_address: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+    data: {
+      total_trading_volume: 850000,
+      volume_sources: {
+        perpetual_contracts: 650000,
+        strategy_trading: 200000
+      },
+      tier_updates: [{
+        tier_id: 3,
+        tier_name: 'On-chain Hunter',
+        status: 'unlockable',
+        progress_percentage: 17.0
+      }]
     }
   },
   
-  // Progress Update Event
-  'progress.updated': {
-    event: 'progressUpdate',
-    walletAddress: 'So1a...',
-    data: {
-      totalTradingVolume: 750000,
-      tierUpdates: [{
-        tierId: 2,
-        tierName: 'Quant Ape',
-        status: 'Unlockable',
-        progressPercentage: 150
-      }]
-    }
+  // Badge Earned Event
+  'badge.earned': {
+    event: 'badgeEarned',
+    wallet_address: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+    badge: {
+      badge_id: 'badge_strategy_creator',
+      name: 'Strategy creator',
+      status: 'owned',
+      earned_at: '2024-01-28T16:00:00Z'
+    },
+    task_completed: 'Complete the creation of 1 strategy'
+  },
+  
+  // Competition NFT Awarded Event
+  'competition.nft.awarded': {
+    event: 'competitionNftAwarded',
+    wallet_address: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+    nft: {
+      nft_id: 'comp_002',
+      name: 'Trophy Breeder',
+      image_url: 'https://ipfs.io/ipfs/QmTrophyBreederHash...',
+      mint_address: 'CompetitionMintAddress789',
+      status: 'active',
+      source: 'Top 3 in trading competition',
+      competition_id: 'trading_comp_2024_01'
+    },
+    transaction_id: 'solana_comp_tx_789'
   }
 };
 ```
@@ -1118,6 +1409,215 @@ const nftErrors = {
 
 ---
 
+## External Integrations
+
+### 1. Solana Blockchain Integration
+
+#### Web3 Connection Management
+```javascript
+// Solana Web3.js integration for NFT operations
+const solanaConfig = {
+  cluster: process.env.SOLANA_CLUSTER || 'mainnet-beta',
+  rpcEndpoint: process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com',
+  commitment: 'confirmed'
+};
+
+// NFT Program Integration
+const nftProgramConfig = {
+  programId: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', // Token Program
+  metaplexProgramId: 'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s', // Metaplex
+  associatedTokenProgramId: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+};
+```
+
+#### NFT Minting Process
+```javascript
+// Backend NFT minting workflow
+const mintNFTWorkflow = {
+  1: 'Validate user qualification (trading volume + badges)',
+  2: 'Generate NFT metadata and upload to IPFS',
+  3: 'Create Solana mint account',
+  4: 'Mint NFT to user wallet using Metaplex',
+  5: 'Update database with mint address and status',
+  6: 'Publish Kafka event for real-time frontend update'
+};
+
+// NFT Upgrade (Burn + Mint) Process
+const upgradeNFTWorkflow = {
+  1: 'Validate badge requirements and trading volume',
+  2: 'Burn current NFT (transfer to burn address)',
+  3: 'Generate new tier metadata and upload to IPFS',
+  4: 'Mint new tier NFT to user wallet',
+  5: 'Update database: old NFT status = burned, new NFT = active',
+  6: 'Update badge status to consumed',
+  7: 'Publish upgrade complete event via Kafka'
+};
+```
+
+### 2. IPFS Metadata Storage
+
+#### Pinata SDK Integration
+```javascript
+// IPFS metadata structure for NFTs
+const nftMetadataSchema = {
+  name: 'Tech Chicken #001',
+  description: 'Entry-level NFT for tech enthusiasts in the AIW3 ecosystem',
+  image: 'https://ipfs.io/ipfs/QmImageHash...',
+  external_url: 'https://aiw3.com/nft/tech-chicken-001',
+  attributes: [
+    {
+      trait_type: 'Tier',
+      value: 'Tech Chicken'
+    },
+    {
+      trait_type: 'Level',
+      value: 1
+    },
+    {
+      trait_type: 'Trading Fee Reduction',
+      value: '10%'
+    },
+    {
+      trait_type: 'AI Agent Uses',
+      value: '10 per week'
+    },
+    {
+      trait_type: 'Minted Date',
+      value: '2024-01-15'
+    }
+  ],
+  properties: {
+    category: 'image',
+    creators: [
+      {
+        address: 'AIW3CreatorWalletAddress',
+        share: 100
+      }
+    ]
+  }
+};
+
+// IPFS Upload Process
+const ipfsUploadProcess = {
+  1: 'Generate NFT metadata based on tier and user data',
+  2: 'Upload image assets to IPFS via Pinata',
+  3: 'Upload metadata JSON to IPFS via Pinata',
+  4: 'Store IPFS hashes in database for reference',
+  5: 'Use metadata URI in Solana NFT minting'
+};
+```
+
+### 3. Trading Volume Service Integration
+
+#### TradingVolumeService Interface
+```javascript
+// Integration with existing trading volume calculation
+const tradingVolumeIntegration = {
+  // Service method for NFT qualification
+  async calculateNFTQualifyingVolume(userId) {
+    const volumeData = await TradingVolumeService.aggregateUserVolume(userId, {
+      sources: ['perpetual_contracts', 'strategy_trading'], // NFT-qualifying only
+      excludeSources: ['solana_token_trading'], // Explicitly excluded
+      includeHistorical: true, // Pre-NFT launch data
+      includeNew: true // Post-NFT launch data
+    });
+    
+    return {
+      total_volume: volumeData.perpetual_contracts + volumeData.strategy_trading,
+      breakdown: {
+        perpetual_contracts: volumeData.perpetual_contracts,
+        strategy_trading: volumeData.strategy_trading
+      },
+      last_updated: volumeData.last_updated
+    };
+  },
+  
+  // Real-time volume tracking for tier qualification
+  async checkTierQualification(userId, targetTierId) {
+    const userVolume = await this.calculateNFTQualifyingVolume(userId);
+    const tierRequirements = await NFTService.getTierRequirements(targetTierId);
+    
+    return {
+      qualified: userVolume.total_volume >= tierRequirements.required_volume,
+      current_volume: userVolume.total_volume,
+      required_volume: tierRequirements.required_volume,
+      progress_percentage: (userVolume.total_volume / tierRequirements.required_volume) * 100
+    };
+  }
+};
+```
+
+#### External API Integration
+```javascript
+// Integration with existing trading services
+const externalAPIIntegration = {
+  // OKX Trading Volume (via existing OkxTradingService)
+  okx: {
+    service: 'OkxTradingService',
+    method: 'getUserTradingVolume',
+    dataSource: 'perpetual_contracts',
+    caching: 'Redis with 5-minute TTL'
+  },
+  
+  // Hyperliquid Trading Volume (via existing UserHyperliquidService)
+  hyperliquid: {
+    service: 'UserHyperliquidService',
+    method: 'getUserTradingVolume',
+    dataSource: 'perpetual_contracts',
+    caching: 'Database with real-time updates'
+  },
+  
+  // Strategy Trading Volume (via existing StrategyService)
+  strategy: {
+    service: 'StrategyService',
+    method: 'getUserStrategyVolume',
+    dataSource: 'strategy_trading',
+    caching: 'Redis with 10-minute TTL'
+  }
+};
+```
+
+### 4. Database Integration
+
+#### Model Relationships
+```javascript
+// Database models for NFT system
+const databaseModels = {
+  // User NFT ownership tracking
+  UserNFT: {
+    user_id: 'string (FK to User)',
+    nft_id: 'string (PK)',
+    tier_id: 'number',
+    mint_address: 'string (Solana)',
+    status: 'active|burned|locked',
+    minted_at: 'datetime',
+    burned_at: 'datetime (nullable)'
+  },
+  
+  // Badge ownership and lifecycle
+  UserBadge: {
+    user_id: 'string (FK to User)',
+    badge_id: 'string (FK to Badge)',
+    status: 'owned|activated|consumed',
+    earned_at: 'datetime',
+    activated_at: 'datetime (nullable)',
+    consumed_at: 'datetime (nullable)'
+  },
+  
+  // Trading volume cache for performance
+  UserTradingVolumeCache: {
+    user_id: 'string (FK to User)',
+    total_volume: 'decimal(30,10)',
+    perpetual_volume: 'decimal(30,10)',
+    strategy_volume: 'decimal(30,10)',
+    last_updated: 'datetime',
+    cache_expires_at: 'datetime'
+  }
+};
+```
+
+---
+
 ## Business Alignment Notes
 
 ### Trading Volume Definition
@@ -1143,6 +1643,14 @@ The following are explicitly **excluded** from NFT qualification:
 3. Subsequent API calls use JWT authentication
 4. Blockchain operations require additional wallet signatures
 
+### External Dependencies
+- **Solana Web3.js**: Blockchain operations and NFT minting
+- **Metaplex SDK**: NFT metadata and minting standards
+- **Pinata SDK**: IPFS storage for NFT metadata and images
+- **TradingVolumeService**: Volume calculation and qualification
+- **Kafka**: Real-time event streaming for frontend updates
+- **Redis**: Caching and performance optimization
+
 ---
 
-This specification provides a complete, production-ready API framework aligned with existing lastmemefi-api backend conventions and NFT business requirements.
+This specification provides a complete, production-ready API framework aligned with existing lastmemefi-api backend conventions, NFT business requirements, and external integration patterns.
