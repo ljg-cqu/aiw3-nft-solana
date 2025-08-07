@@ -1,8 +1,8 @@
 # AIW3 NFT Business Rules and Flows
 
 <!-- Document Metadata -->
-**Version:** v7.0.0  
-**Last Updated:** 2025-08-07  
+**Version:** v8.0.0  
+**Last Updated:** 2025-08-08  
 **Status:** Active  
 **Purpose:** To provide a definitive, implementation-aligned specification of all NFT-related business flows, rules, statuses, UI data requirements, and backend API endpoints. This document is strictly aligned with the `lastmemefi-api` backend models and routes to serve as a ground-truth reference for developers.
 
@@ -99,12 +99,12 @@ If a user has Level 2 Tiered NFT (20% fee reduction) + multiple Competition NFTs
 | **Consumed** | Badge was used in successful Tiered NFT upgrade                           | No actions available               |
 
 **Upgrade Requirements by Level**:
-| From Level | To Level | Required Badges | Badge Sources                    | Cumulative Badges Consumed |
-|:-----------|:---------|:---------------|:---------------------------------|:---------------------------|
-| 1          | 2        | 2 badges       | Complete 2 designated tasks      | 2 total                    |
-| 2          | 3        | 2 more badges  | Complete 2 additional tasks      | 4 total                    |
-| 3          | 4        | 1 more badge   | Complete 1 additional task       | 5 total                    |
-| 4          | 5        | 1 more badge   | Complete 1 additional task       | 6 total                    |
+| From Level | To Level | Required Badges for This Upgrade | Badge Sources                    | Cumulative Badges Consumed |
+|:-----------|:---------|:--------------------------------|:---------------------------------|:---------------------------|
+| 1          | 2        | 2 badges                        | Complete 2 designated tasks      | 2 total                    |
+| 2          | 3        | 4 badges                        | Complete 4 designated tasks      | 4 total                    |
+| 3          | 4        | 5 badges                        | Complete 5 designated tasks      | 5 total                    |
+| 4          | 5        | 6 badges                        | Complete 6 designated tasks      | 6 total                    |
 
 **Important**: Once badges are used for an upgrade, they are permanently consumed and cannot be reused for future upgrades. Users at higher level NFTs have already consumed all badges from previous upgrades.
 
