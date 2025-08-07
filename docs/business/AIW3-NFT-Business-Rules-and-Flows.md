@@ -49,12 +49,15 @@ flowchart LR
     B -->|User clicks 'Claim'| C[Claiming...]
     C -->|NFT mint successful| D[Active]
     D -->|User initiates synthesis| E[Burned]
+    E -->|Higher-tier NFT minted| F[New Active NFT]
+    F -->|Can upgrade again| D
     
     style A fill:#ff6b6b,color:#fff
     style B fill:#51cf66,color:#fff
     style C fill:#ffd43b,color:#000
     style D fill:#339af0,color:#fff
     style E fill:#e599f7,color:#fff
+    style F fill:#20c997,color:#fff
 ```
 
 ### Status Definitions
