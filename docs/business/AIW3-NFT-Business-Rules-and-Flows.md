@@ -124,7 +124,7 @@ Based on the medal system design, badges are categorized by NFT levels with spec
 | Strategic Enlighteners | Complete the strategy novice guidance |
 | Newcomers | Invite one friend to register |
 | Strategy creator | Complete the creation of 1 strategy |
-| Transform into a master | Invite one of the users to complete the first transaction |
+| Transaction Facilitator | Invite one of the users to complete the first transaction |
 
 **Level 4 Badges (5 badges required for upgrade):**
 | Medal Name | Obtain Conditions |
@@ -132,7 +132,7 @@ Based on the medal system design, badges are categorized by NFT levels with spec
 | Referral Master | Invite 2 friends to register |
 | Strategic experts | Create two strategies |
 | The Enlightenment of the Trading Group | Complete the guidance for beginners in the group |
-| Transform the guide | Invite one of the users to complete the first transaction |
+| Transaction Mentor | Invite one of the users to complete the first transaction |
 | Ambassador of the trading group | Join a trading group |
 
 **Level 5 Badges (6 badges required for upgrade):**
@@ -141,7 +141,7 @@ Based on the medal system design, badges are categorized by NFT levels with spec
 | Large General Rahren | Accumulated invitation ≥ 10 people |
 | Strategic Messenger | Create 5 strategies |
 | Fission Messenger | Invite 10 friends to register |
-| Transform the Iron Army | Invite 5 of the users to complete the first transaction |
+| Transaction Commander | Invite 5 of the users to complete the first transaction |
 | Trading regiment Iron Army | Join a group for 3 months |
 | Influence Talent | The number of fans in the station is greater than or equal to 25 |
 
