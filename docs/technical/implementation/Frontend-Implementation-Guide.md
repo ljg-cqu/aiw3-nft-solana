@@ -28,7 +28,7 @@ This document provides comprehensive frontend implementation guidelines for the 
 ## Development Prerequisites
 
 ### Framework Setup
-The design must align with the user experience flows detailed in the `aiw3-prototypes`.
+The design must align with the user experience flows detailed in the `aiw3-distribution-system`.
 
 ### Required Dependencies
 ```bash

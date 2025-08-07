@@ -27,7 +27,7 @@
 - **Core POC**: `/poc/solana-nft-burn-mint/` - functional NFT mint/burn proof of concept (NOT connected to backend)
 - **Implementation Status**: Documentation complete, backend services NOT YET IMPLEMENTED
 - **Documentation**: `/docs/` - comprehensive system design and implementation guides
-- **Prototypes**: `/aiw3-prototypes/` - UI/UX mockups and design assets
+- **Prototypes**: `/aiw3-distribution-system/` - UI/UX mockups and design assets
 
 ## Code Style & Conventions
 - **JavaScript**: ES6+ with require() imports (Node.js style)
