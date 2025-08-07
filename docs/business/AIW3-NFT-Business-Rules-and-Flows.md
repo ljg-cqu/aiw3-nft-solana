@@ -99,16 +99,16 @@ If a user has Level 2 Tiered NFT (20% fee reduction) + multiple Competition NFTs
 | **Consumed** | Badge was used in successful Tiered NFT upgrade                           | No actions available               |
 
 **Upgrade Requirements by Level**:
-| From Level | To Level | Required Badges for This Upgrade | Badge Sources                    | Cumulative Badges Consumed |
-|:-----------|:---------|:--------------------------------|:---------------------------------|:---------------------------|
-| 1          | 2        | 2 badges                        | Complete 2 designated tasks      | 2 total                    |
-| 2          | 3        | 4 badges                        | Complete 4 designated tasks      | 4 total                    |
-| 3          | 4        | 5 badges                        | Complete 5 designated tasks      | 5 total                    |
-| 4          | 5        | 6 badges                        | Complete 6 designated tasks      | 6 total                    |
+| From Level | To Level | Required Badges for This Upgrade | Badge Sources                    |
+|:-----------|:---------|:--------------------------------|:---------------------------------|
+| 1          | 2        | 2 badges                        | Complete 2 designated tasks      |
+| 2          | 3        | 4 badges                        | Complete 4 designated tasks      |
+| 3          | 4        | 5 badges                        | Complete 5 designated tasks      |
+| 4          | 5        | 6 badges                        | Complete 6 designated tasks      |
 
 **Important**: Once badges are used for an upgrade, they are permanently consumed and cannot be reused for future upgrades. Users at higher level NFTs have already consumed all badges from previous upgrades.
 
-### 1.4.1 Badge Types and Obtain Conditions
+### 1.5 Badge Types and Obtain Conditions
 
 Based on the medal system design, badges are categorized by NFT levels with specific tasks required for each medal:
 
@@ -150,7 +150,7 @@ Based on the medal system design, badges are categorized by NFT levels with spec
 - Users must complete designated tasks to earn badges before they can activate them
 - Badge names reflect achievement levels and community engagement themes
 
-### 1.5 Additional Business Rules from Prototypes
+### 1.6 Additional Business Rules from Prototypes
 
 1. **Progress Tracking**: Users can see their progress toward the next tier with visual progress bars
 2. **Level 1 NFT Activation**: When users unlock their first Level 1 NFT, they see a "Trigger Activation Popup" (Prototype 5)
