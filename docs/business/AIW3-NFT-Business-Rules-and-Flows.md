@@ -44,17 +44,17 @@ The NFT lifecycle is managed through a series of statuses. It is critical to dis
 ### NFT Status Transition Diagram
 
 ```mermaid
-graph TD
-        subgraph "Pre-Minting Business Logic (NFTService)"
-        A[Locked] -->|User meets qualification criteria| B(Unlockable)
-        B -->|User clicks 'Claim'| C(Claiming...)
-    end
-
-        subgraph "Post-Minting Database State (UserNft Table)"
-        D[Active] -->|User initiates synthesis| E(Burned)
-    end
-
-    C -->|NFT mint successful| D
+flowchart LR
+    A[Locked] -->|User meets qualification criteria| B[Unlockable]
+    B -->|User clicks 'Claim'| C[Claiming...]
+    C -->|NFT mint successful| D[Active]
+    D -->|User initiates synthesis| E[Burned]
+    
+    style A fill:#ff6b6b,color:#fff
+    style B fill:#51cf66,color:#fff
+    style C fill:#ffd43b,color:#000
+    style D fill:#339af0,color:#fff
+    style E fill:#e599f7,color:#fff
 ```
 
 ### Status Definitions
