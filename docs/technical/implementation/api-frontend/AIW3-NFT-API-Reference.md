@@ -415,7 +415,7 @@ When NFT operations complete, the backend publishes events via Kafka that are st
 | `nftImageUrl` | String | Yes | IPFS image URL | `"/ipfs/quant_ape.png"` |
 | `mintAddress` | String | Optional | Solana mint address | `"Mint...abc"` |
 | `status` | String | Yes | NFT status | `"Active"`, `"Unlockable"`, `"Locked"` |
-| `totalTradingVolume` | Number | Yes | User's total trading volume (USDT) | `550000.00` |
+| `totalTradingVolume` | Number | Yes | User's total trading volume (USDT) - includes perpetual contract and strategy trading volume | `550000.00` |
 | `progressPercentage` | Number | Yes | Progress toward unlock (0-100+) | `75.5` |
 | `canUpgrade` | Boolean | Optional | Whether upgrade is available | `true` |
 

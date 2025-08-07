@@ -400,7 +400,11 @@ module.exports = {
 
 ### Extended User Model
 
-**Note**: The NFT qualification logic will calculate trading volume by aggregating `total_usd_price` from the existing `trades` table. The User model does not contain a `total_trading_volume` field. The extensions below are for tracking NFT-specific state and relationships.
+**Note**: The NFT qualification logic will calculate trading volume by aggregating `total_usd_price` from the existing `trades` table. Trading volume includes:
+- **Perpetual contract trading volume**
+- **Trading volume generated from strategy trading**
+
+The User model does not contain a `total_trading_volume` field. The extensions below are for tracking NFT-specific state and relationships.
 
 #### User Model Extensions (api/models/User.js)
 

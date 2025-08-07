@@ -21,6 +21,10 @@ AIW3's NFT system consists of **Equity NFTs** with two distinct subtypes:
 
 ### 1.2 Tiered NFT Qualification and Upgrade Rules
 
+**Trading Volume Definition**: Trading volume includes:
+- **Perpetual contract trading volume**
+- **Trading volume generated from strategy trading**
+
 **Tiered NFT Requirements**:
 
 **First NFT Unlock (Level 1)**: Only requires **trading volume** (≥ 100,000 USDT) - no badges needed

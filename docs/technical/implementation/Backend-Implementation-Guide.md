@@ -62,6 +62,7 @@ npm install @metaplex-foundation/js@^0.19.4
    module.exports = {
      
      // Calculate user's total trading volume from Trades model
+     // Trading volume includes: perpetual contract trading volume + strategy trading volume
      calculateTradingVolume: async function(userId) {
        try {
          const query = `

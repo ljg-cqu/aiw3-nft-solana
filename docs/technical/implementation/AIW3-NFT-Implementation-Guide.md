@@ -157,6 +157,7 @@ The backend is the intermediary between the user-facing frontend and the standar
    module.exports = {
      
      // Calculate user's total trading volume from Trades model
+     // Trading volume includes: perpetual contract trading volume + strategy trading volume
      calculateTradingVolume: async function(userId) {
        try {
          const query = `
@@ -178,8 +179,9 @@ The backend is the intermediary between the user-facing frontend and the standar
          // Get volume requirement for level
          const requiredVolume = this.getRequiredVolumeForLevel(targetLevel);
          
-         // Calculate actual trading volume
-         const tradingVolume = await this.calculateTradingVolume(userId);
+         // Calculate user's total trading volume from Trades model
+     // Trading volume includes: perpetual contract trading volume + strategy trading volume
+     const tradingVolume = await sails.helpers.calculateTradingVolume(userId);
          
          // Check existing NFTs
          const existingNFT = await UserNFT.findOne({
