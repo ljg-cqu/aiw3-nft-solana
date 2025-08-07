@@ -108,6 +108,48 @@ If a user has Level 2 Tiered NFT (20% fee reduction) + multiple Competition NFTs
 
 **Important**: Once badges are used for an upgrade, they are permanently consumed and cannot be reused for future upgrades. Users at higher level NFTs have already consumed all badges from previous upgrades.
 
+### 1.4.1 Badge Types and Obtain Conditions
+
+Based on the medal system design, badges are categorized by NFT levels with specific tasks required for each medal:
+
+**Level 2 Badges (2 badges required for upgrade):**
+| Medal Name | Obtain Conditions |
+|:-----------|:------------------|
+| The Contract Enlightener | Complete the contract novice guidance |
+| Platform Enlighteners | Improve personal data |
+
+**Level 3 Badges (4 badges required for upgrade):**
+| Medal Name | Obtain Conditions |
+|:-----------|:------------------|
+| Strategic Enlighteners | Complete the strategy novice guidance |
+| Newcomers | Invite one friend to register |
+| Strategy creator | Complete the creation of 1 strategy |
+| Transform into a master | Invite one of the users to complete the first transaction |
+
+**Level 4 Badges (5 badges required for upgrade):**
+| Medal Name | Obtain Conditions |
+|:-----------|:------------------|
+| Referral Master | Invite 2 friends to register |
+| Strategic experts | Create two strategies |
+| The Enlightenment of the Trading Group | Complete the guidance for beginners in the group |
+| Transform the guide | Invite one of the users to complete the first transaction |
+| Ambassador of the trading group | Join a trading group |
+
+**Level 5 Badges (6 badges required for upgrade):**
+| Medal Name | Obtain Conditions |
+|:-----------|:------------------|
+| Large General Rahren | Accumulated invitation ≥ 10 people |
+| Strategic Messenger | Create 5 strategies |
+| Fission Messenger | Invite 10 friends to register |
+| Transform the Iron Army | Invite 5 of the users to complete the first transaction |
+| Trading regiment Iron Army | Join a group for 3 months |
+| Influence Talent | The number of fans in the station is greater than or equal to 25 |
+
+**Badge System Notes:**
+- Each badge corresponds to specific task completion requirements
+- Users must complete designated tasks to earn badges before they can activate them
+- Badge names reflect achievement levels and community engagement themes
+
 ### 1.5 Additional Business Rules from Prototypes
 
 1. **Progress Tracking**: Users can see their progress toward the next tier with visual progress bars
