@@ -204,10 +204,16 @@ module.exports = {
     },
     
     // Badge tracking
-    badges_collected: { 
+    badges_owned: { 
       type: 'number', 
       defaultsTo: 0,
-      description: 'Number of badges user has collected'
+      description: 'Number of badges user has earned/owned'
+    },
+    
+    badges_activated: { 
+      type: 'number', 
+      defaultsTo: 0,
+      description: 'Number of badges user has activated for upgrade'
     },
     
     badges_required: { 
@@ -278,10 +284,11 @@ module.exports = {
       description: 'URI for badge metadata'
     },
     
-    is_bound: {
-      type: 'boolean',
-      defaultsTo: false,
-      description: 'Whether badge is bound for NFT qualification'
+    status: {
+      type: 'string',
+      isIn: ['owned', 'activated', 'consumed'],
+      defaultsTo: 'owned',
+      description: 'Badge lifecycle status: owned (earned), activated (ready for upgrade), consumed (used in upgrade)'
     },
     
     earned_at: {
@@ -290,11 +297,18 @@ module.exports = {
       description: 'When the badge was earned'
     },
     
-    bound_at: {
+    activated_at: {
       type: 'ref',
       columnType: 'datetime',
       allowNull: true,
-      description: 'When the badge was bound'
+      description: 'When the badge was activated for NFT upgrade use'
+    },
+    
+    consumed_at: {
+      type: 'ref',
+      columnType: 'datetime',
+      allowNull: true,
+      description: 'When the badge was consumed during NFT upgrade'
     },
     
     // Standard timestamps
@@ -480,7 +494,8 @@ CREATE TABLE usernftqualification (
   target_level TINYINT NOT NULL CHECK (target_level BETWEEN 1 AND 5),
   current_volume DECIMAL(30,10) DEFAULT 0,
   required_volume DECIMAL(30,10) NOT NULL,
-  badges_collected INT DEFAULT 0,
+  badges_owned INT DEFAULT 0,
+  badges_activated INT DEFAULT 0,
   badges_required INT DEFAULT 0,
   is_qualified BOOLEAN DEFAULT FALSE,
   last_checked_at DATETIME,
@@ -501,16 +516,17 @@ CREATE TABLE badge (
   badge_name VARCHAR(100) NOT NULL,
   badge_identifier VARCHAR(100) NOT NULL UNIQUE,
   metadata_uri VARCHAR(500),
-  is_bound BOOLEAN DEFAULT FALSE,
+  status ENUM('owned', 'activated', 'consumed') DEFAULT 'owned',
   earned_at DATETIME,
-  bound_at DATETIME NULL,
+  activated_at DATETIME NULL,
+  consumed_at DATETIME NULL,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   
   FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
   INDEX idx_user_id (user_id),
   INDEX idx_badge_type (badge_type),
-  INDEX idx_is_bound (is_bound)
+  INDEX idx_status (status)
 );
 
 -- Create NFTUpgradeRequest table
@@ -662,7 +678,8 @@ erDiagram
         int target_level
         decimal current_volume
         decimal required_volume
-        int badges_collected
+        int badges_owned
+        int badges_activated
         int badges_required
         boolean is_qualified
         datetime last_checked_at
@@ -677,9 +694,10 @@ erDiagram
         string badge_name
         string badge_identifier UK
         string metadata_uri
-        boolean is_bound
+        string status
         datetime earned_at
-        datetime bound_at
+        datetime activated_at
+        datetime consumed_at
         datetime createdAt
         datetime updatedAt
     }
@@ -773,8 +791,10 @@ This section defines the standardized API response formats for frontend-backend 
 ```json
 nft_qual:{user_id} -> {
     "trading_volume": 50000,
-    "badges_collected": ["tech_chicken", "quant_ape"],
-    "eligible_levels": [1, 2, 3],
+    "badges_owned": 4,
+    "badges_activated": 2,
+    "badges_consumed": 0,
+    "eligible_levels": [1, 2],
     "last_calculated": "2024-01-15T10:30:00Z",
     "ttl": 300
 }
@@ -837,6 +857,30 @@ nft_benefits:{user_id} -> {
   }
 }
 
+// Badge Activated Event
+{
+  "eventType": "badge_activated",
+  "timestamp": "2024-01-15T10:40:00Z",
+  "data": {
+    "userId": "user123",
+    "badgeId": "badge_early_adopter",
+    "badgeName": "Early Adopter",
+    "activatedAt": "2024-01-15T10:40:00Z"
+  }
+}
+
+// Badges Consumed Event (during NFT upgrade)
+{
+  "eventType": "badges_consumed",
+  "timestamp": "2024-01-15T10:45:00Z",
+  "data": {
+    "userId": "user123",
+    "consumedBadges": ["badge_early_adopter", "badge_trader"],
+    "upgradeLevel": 2,
+    "consumedAt": "2024-01-15T10:45:00Z"
+  }
+}
+
 // Published using: KafkaService.sendMessage("nft-events", eventData)
 ```
 
@@ -867,6 +911,32 @@ nft_benefits:{user_id} -> {
     "status": "confirmed",
     "step": "mint_completed",
     "progress": 100
+  },
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+
+// Badge Activated Event
+{
+  "event": "badge:activated",
+  "userId": "user123",
+  "data": {
+    "badgeId": "badge_early_adopter",
+    "badgeName": "Early Adopter",
+    "status": "activated"
+  },
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+
+// Badge Status Update Event
+{
+  "event": "badge:status_changed",
+  "userId": "user123",
+  "data": {
+    "badgeId": "badge_trader",
+    "badgeName": "High Volume Trader",
+    "oldStatus": "activated",
+    "newStatus": "consumed",
+    "usedInUpgrade": 2
   },
   "timestamp": "2024-01-01T00:00:00Z"
 }

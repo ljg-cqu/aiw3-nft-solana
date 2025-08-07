@@ -182,7 +182,7 @@ graph TB
 
 | Component | Implementation Status | NFT-Related Responsibilities | Data Flow |
 |-----------|---------------------|----------------------------|----------|
-| **NFTService** | 🚨 **TO BE CREATED** | Orchestrates all NFT business logic, qualification checks, minting/burning coordination | Reads from MySQL, writes to Kafka, calls Web3Service |
+| **NFTService** | 🚨 **TO BE CREATED** | Orchestrates all NFT business logic, qualification checks, badge activation/consumption, minting/burning coordination | Reads from MySQL, writes to Kafka, calls Web3Service |
 | **Web3Service** | ✅ **EXISTS** - NFT extensions needed | Solana blockchain interactions, mint/burn operations, balance queries | Communicates with Solana RPC, returns transaction signatures |
 | **UserService** | ✅ **EXISTS** | User data management, trading volume tracking, wallet address validation | CRUD operations on MySQL User table |
 | **RedisService** | ✅ **EXISTS** | Caches NFT qualification status, pending operations, rate limiting | Read/write to Redis with TTL for performance |
@@ -252,9 +252,44 @@ sequenceDiagram
     API-->>UI: NFT unlocked successfully
 ```
 
+#### 3.1.2 Badge Activation Flow
 
+Users must activate earned badges before they can be used for NFT upgrades. This ensures intentional commitment to the upgrade process.
 
-#### 3.1.2 NFT Upgrade Flow
+```mermaid
+sequenceDiagram
+    participant UI as Personal Center UI
+    participant API as Sails.js API
+    participant NFT as NFTService
+    participant MYSQL as MySQL DB
+    participant REDIS as RedisService
+    participant KAFKA as KafkaService
+    participant WS as WebSocket
+
+    UI->>API: POST /api/nft/badges/:badgeId/activate
+    API->>NFT: activateBadge(userId, badgeId)
+
+    %% Verify badge ownership and status
+    NFT->>MYSQL: SELECT * FROM badge WHERE user_id = ? AND badge_identifier = ?
+    MYSQL-->>NFT: badge record with status='owned'
+
+    %% Activate the badge
+    NFT->>MYSQL: UPDATE badge SET status='activated', activated_at=NOW()
+    MYSQL-->>NFT: badge updated successfully
+
+    %% Clear cached qualification data
+    NFT->>REDIS: RedisService.delCache("nft_qual:" + userId)
+    
+    %% Publish activation event
+    NFT->>KAFKA: KafkaService.sendMessage("nft-events", {eventType: "badge_activated"})
+    KAFKA->>WS: broadcast to user
+    WS-->>UI: real-time badge status update
+
+    NFT-->>API: activation success
+    API-->>UI: Badge activated successfully
+```
+
+#### 3.1.3 NFT Upgrade Flow
 ```mermaid
 sequenceDiagram
     participant UI as Personal Center UI
@@ -274,7 +309,7 @@ sequenceDiagram
     NFT->>REDIS: RedisService.getCache("nft_lock:upgrade:" + userId)
     REDIS-->>NFT: check for pending upgrades
     
-    NFT->>MYSQL: SELECT COUNT(*) FROM badge WHERE user_id = ? AND is_bound = true
+    NFT->>MYSQL: SELECT COUNT(*) FROM badge WHERE user_id = ? AND status = 'activated'
     MYSQL-->>NFT: qualification status
     
     %% Set upgrade lock using RedisService with lock mode
@@ -302,6 +337,7 @@ sequenceDiagram
     %% Update database records
     NFT->>MYSQL: UPDATE user_nfts SET status='burned' WHERE mint_address=?
     NFT->>MYSQL: INSERT INTO user_nfts (new NFT record)
+    NFT->>MYSQL: UPDATE badge SET status='consumed', consumed_at=NOW() WHERE user_id=? AND status='activated'
     NFT->>MYSQL: UPDATE nft_upgrade_requests SET status='completed'
     
     %% Clear cache and publish event using actual service methods
