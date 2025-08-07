@@ -25,7 +25,23 @@ Qualification for each NFT tier is based on a user's total trading volume (in US
 | 5       | Quantum Alchemist   | ≥ 50,000,000                   | 55%                   | 50 free uses per week     | "Unlocked" when qualified |
 | Special | Trophy Breeder      | Top 3 in trading competition   | 25%                   | Special privileges        | Airdrop notification      |
 
-### 1.2 Additional Business Rules from Prototypes
+### 1.2 Critical Business Logic: Claiming vs Synthesis
+
+**🔑 Key Distinction:**
+
+- **"Unlocking"** = First NFT acquisition ONLY
+  - Applies when user has NO active NFT
+  - Only for Tech Chicken (Level 1) when user reaches 100,000 USDT volume
+  - Process: User clicks "Unlock" → NFT is minted → User has first active NFT
+
+- **"Upgrade"** = All subsequent NFT upgrades
+  - Applies when user already has an active NFT and qualifies for higher tier
+  - For all upgrades: Tech Chicken → Quant Ape → On-chain Hunter → etc.
+  - Process: User clicks "Upgrade" → Old NFT burned + New NFT minted → User has higher-tier active NFT
+
+**Business Rule**: Users progress from "no NFT" → "unlock first NFT" → "upgrade to higher tiers"
+
+### 1.3 Additional Business Rules from Prototypes
 
 1. **Progress Tracking**: Users can see their progress toward the next tier with visual progress bars
 2. **Activation Popup**: When users unlock a new tier, they see a "Trigger Activation Popup" (Prototype 5)
@@ -47,9 +63,9 @@ The NFT lifecycle involves three distinct types of states that must be clearly d
 ```mermaid
 flowchart LR
     A[Locked] -->|User meets qualification criteria| B[Unlockable]
-    B -->|User clicks 'Claim'| C((Claiming...))
+    B -->|User clicks 'Unlock'| C((Unlocking...))
     C -->|NFT mint successful| D[Active]
-    D -->|User initiates synthesis| E((Synthesizing...))
+    D -->|User initiates upgrade| E((Upgrading...))
     E -->|Old NFT burned, new NFT minted| F[Active Higher-Tier NFT]
     F -->|Can upgrade again| D
     
@@ -72,8 +88,8 @@ flowchart LR
 #### Process/UI States
 | State        | Description                                                                                             | UI/User Action                                        |
 |:-------------|:--------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
-| **Claiming**   | User has clicked "Claim", backend is processing the mint transaction.                                 | UI shows a pending or processing indicator.           |
-| **Synthesizing** | User has initiated synthesis, backend is processing burn and mint transactions.                       | UI shows synthesis progress indicator.                |
+| **Unlocking**   | User has clicked "Unlock" for their FIRST NFT (Tech Chicken only), backend is processing the mint transaction. | UI shows "Unlocking..." with processing indicator.    |
+| **Upgrading** | User has clicked "Upgrade" for NFT upgrade, backend is processing burn-and-mint transactions for higher tier. | UI shows "Upgrading..." with progress indicator.  |
 
 #### Database NFT Statuses
 | Status       | Description                                                                                             | UI/User Action                                        |
@@ -119,13 +135,13 @@ This business document focuses on the core business logic and rules. The key bus
 3. **Status Computation**: Business logic states (Locked/Unlockable) are calculated
 4. **User Notification**: UI displays qualification status and progress
 
-### 4.2 NFT Claiming Process
+### 4.2 NFT Unlocking Process
 1. **Eligibility Check**: User must meet volume requirements
 2. **Single NFT Rule**: Users can only hold one active NFT at a time
 3. **Minting Process**: Backend initiates NFT minting on Solana
 4. **Status Update**: NFT becomes active upon successful minting
 
-### 4.3 NFT Synthesis (Upgrade) Process
+### 4.3 NFT Upgrade Process
 1. **Upgrade Eligibility**: User must qualify for higher tier
 2. **Burn-and-Mint**: Old NFT is burned, new higher-tier NFT is minted
 3. **Benefit Enhancement**: User receives improved trading fee reductions and AI agent benefits
@@ -144,13 +160,13 @@ This business document focuses on the core business logic and rules. The key bus
 ### 5.1 Core Constraints
 - **One Active NFT**: Users can only hold one active NFT at any time
 - **Volume-Based Qualification**: All tier access is based on trading volume thresholds
-- **Irreversible Upgrades**: NFT synthesis permanently burns the lower-tier NFT
+- **Irreversible Upgrades**: NFT upgrade permanently burns the lower-tier NFT
 - **Real-time Assessment**: Qualification status is checked in real-time
 
 ### 5.2 Business Logic States
 - **Locked**: User has not met volume requirements
-- **Unlockable**: User meets requirements and can claim NFT
-- **Process States**: Claiming and Synthesizing are temporary UI indicators
+- **Unlockable**: User meets requirements and can unlock NFT
+- **Process States**: Unlocking and Upgrading are temporary UI indicators
 - **Database States**: Only Active and Burned NFTs are persisted
 
 ### 5.3 Benefits and Incentives
