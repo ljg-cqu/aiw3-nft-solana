@@ -156,18 +156,15 @@ The backend is the intermediary between the user-facing frontend and the standar
    // api/services/NFTService.js
    module.exports = {
      
-     // Calculate user's total trading volume from Trades model
-     // Trading volume includes: perpetual contract trading volume + strategy trading volume
-     // Historical requirement: Include ALL trading history (pre-NFT and post-NFT launch)
-     calculateTradingVolume: async function(userId) {
-       try {
-         const query = `
-           SELECT SUM(total_usd_price) as trading_volume 
-           FROM trades 
-           WHERE user_id = ? AND total_usd_price IS NOT NULL
-         `;
-         const result = await sails.sendNativeQuery(query, [userId]);
-         return parseFloat(result.rows[0]?.trading_volume) || 0;
+     // Calculate user's total NFT-qualifying trading volume using TradingVolumeService
+      // CRITICAL: Only perpetual contract and strategy trading volumes qualify for NFT
+      // EXCLUDES: Solana token trading (not eligible for NFT qualification)
+      // Historical requirement: Include ALL qualifying trading history (pre-NFT and post-NFT launch)
+      calculateTradingVolume: async function(userId) {
+        try {
+          // Use new TradingVolumeService for unified volume calculation
+          const volumeData = await TradingVolumeService.calculateUserTotalTradingVolume(userId);
+          return volumeData.total_volume || 0;
        } catch (error) {
          sails.log.error('Trading volume calculation failed:', error);
          return 0;

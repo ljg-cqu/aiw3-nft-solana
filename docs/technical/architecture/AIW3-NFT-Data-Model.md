@@ -400,14 +400,27 @@ module.exports = {
 
 ### Extended User Model
 
-**Note**: The NFT qualification logic will calculate trading volume by aggregating `total_usd_price` from the existing `trades` table. Trading volume includes:
-- **Perpetual contract trading volume**
-- **Trading volume generated from strategy trading**
+**CRITICAL UPDATE**: Based on comprehensive backend analysis, the NFT qualification logic requires a new unified trading volume system. The existing `trades` table only contains Solana token trades, which are **NOT eligible** for NFT qualification.
+
+**NFT Business Rule - Qualifying Trading Volume**:
+- ✅ **Perpetual contract trading volume** (OKX + Hyperliquid platforms)
+- ✅ **Trading volume generated from strategy trading**
+- ❌ **Solana token trading** (excluded from NFT qualification)
+
+**Critical Integration Gaps Identified**:
+1. **OKX Volume Gap**: No historical perpetual contract volume stored locally (CRITICAL)
+2. **Strategy Volume Gap**: Individual strategy trade volumes not tracked (HIGH)
+3. **Unified Service Gap**: No consolidated NFT volume calculation system
+
+**New Data Models Required**:
+- `TradingVolumeRecord` - Unified storage for all NFT-qualifying trading volumes
+- `UserTradingVolumeCache` - Performance cache for NFT qualification checks
+- `TradingVolumeService` - Orchestration service for volume aggregation
 
 **Historical Volume Requirement**: Since the AIW3 system has been in production before NFT feature launch, the calculation must include:
-- **Historical trading volume**: All trading activity before NFT feature launch
-- **New trading volume**: All trading activity after NFT feature launch
-- **Implementation**: Query the entire `trades` table without date restrictions to capture complete trading history
+- **Historical trading volume**: All qualifying trading activity before NFT feature launch
+- **New trading volume**: All qualifying trading activity after NFT feature launch
+- **Implementation**: Aggregate from multiple sources (Hyperliquid DB + OKX API + Strategy API)
 
 The User model does not contain a `total_trading_volume` field. The extensions below are for tracking NFT-specific state and relationships.
 
@@ -434,12 +447,12 @@ module.exports = {
       description: 'The mint address of the current highest active NFT'
     },
     
-    // Cached trading volume for performance (calculated from Trades model)
+    // Cached trading volume for performance (calculated from TradingVolumeService)
     cached_trading_volume: {
       type: 'number',
       columnType: 'DECIMAL(30,10)',
       defaultsTo: 0,
-      description: 'Cached total trading volume for quick NFT qualification checks (calculated from trades table)'
+      description: 'Cached total NFT-qualifying trading volume (perpetual contracts + strategy trading only)'
     },
     
     last_volume_update: {
@@ -469,6 +482,194 @@ module.exports = {
       collection: 'nftupgraderequest',
       via: 'user_id'
     }
+  }
+};
+```
+
+### New Trading Volume Data Models
+
+#### TradingVolumeRecord Model (api/models/TradingVolumeRecord.js)
+
+```javascript
+module.exports = {
+  tableName: 'trading_volume_records',
+  attributes: {
+    user_id: {
+      model: 'user',
+      required: true,
+      description: 'User ID'
+    },
+    
+    platform: {
+      type: 'string',
+      isIn: ['okx', 'hyperliquid', 'strategy', 'orderly'],
+      required: true,
+      description: 'Trading platform identifier'
+    },
+    
+    trade_type: {
+      type: 'string',
+      isIn: ['perpetual_contract', 'strategy_trading'],
+      required: true,
+      description: 'Type of NFT-qualifying trading activity'
+    },
+    
+    volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      required: true,
+      description: 'Trading volume in USD'
+    },
+    
+    external_order_id: {
+      type: 'string',
+      allowNull: true,
+      description: 'External platform order ID for reference'
+    },
+    
+    external_trade_id: {
+      type: 'string',
+      allowNull: true,
+      description: 'External platform trade ID for reference'
+    },
+    
+    trade_timestamp: {
+      type: 'ref',
+      columnType: 'datetime',
+      required: true,
+      description: 'Actual trade execution time'
+    },
+    
+    nft_era: {
+      type: 'string',
+      isIn: ['pre_nft', 'post_nft'],
+      required: true,
+      description: 'Whether trade occurred before or after NFT feature launch'
+    },
+    
+    data_source: {
+      type: 'string',
+      isIn: ['real_time', 'historical_migration', 'api_sync'],
+      defaultsTo: 'real_time',
+      description: 'How this record was created'
+    },
+    
+    // Metadata for debugging and auditing
+    raw_data: {
+      type: 'json',
+      allowNull: true,
+      description: 'Raw trading data from external platform'
+    },
+    
+    // Standard timestamps
+    createdAt: { type: 'ref', columnType: 'datetime' },
+    updatedAt: { type: 'ref', columnType: 'datetime' }
+  },
+  
+  indexes: [
+    {
+      attributes: ['user_id', 'platform', 'trade_type'],
+      type: 'index'
+    },
+    {
+      attributes: ['user_id', 'nft_era'],
+      type: 'index'
+    },
+    {
+      attributes: ['trade_timestamp'],
+      type: 'index'
+    }
+  ]
+};
+```
+
+#### UserTradingVolumeCache Model (api/models/UserTradingVolumeCache.js)
+
+```javascript
+module.exports = {
+  tableName: 'user_trading_volume_cache',
+  attributes: {
+    user_id: {
+      model: 'user',
+      required: true,
+      unique: true,
+      description: 'User ID'
+    },
+    
+    total_volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'Total NFT-qualifying trading volume across all platforms'
+    },
+    
+    perpetual_volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'Perpetual contract trading volume (OKX + Hyperliquid)'
+    },
+    
+    strategy_volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'Strategy trading volume'
+    },
+    
+    pre_nft_volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'Trading volume before NFT feature launch'
+    },
+    
+    post_nft_volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'Trading volume after NFT feature launch'
+    },
+    
+    last_updated: {
+      type: 'ref',
+      columnType: 'datetime',
+      required: true,
+      description: 'Last cache update timestamp'
+    },
+    
+    // Platform-specific volumes for debugging and analytics
+    okx_volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'OKX platform trading volume'
+    },
+    
+    hyperliquid_volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'Hyperliquid platform trading volume'
+    },
+    
+    strategy_platform_volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'Strategy platform trading volume'
+    },
+    
+    orderly_volume_usd: {
+      type: 'number',
+      columnType: 'DECIMAL(30,10)',
+      defaultsTo: 0,
+      description: 'Orderly platform trading volume (future)'
+    },
+    
+    // Standard timestamps
+    createdAt: { type: 'ref', columnType: 'datetime' },
+    updatedAt: { type: 'ref', columnType: 'datetime' }
   }
 };
 ```
