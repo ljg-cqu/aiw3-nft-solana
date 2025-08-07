@@ -350,9 +350,8 @@ module.exports = {
         };
       }
       
-      // Calculate from all sources
+      // Calculate from NFT-qualifying sources ONLY
       const volumes = await Promise.all([
-        this.calculateSolanaTokenVolume(userId),
         this.calculateHyperliquidVolume(userId),
         this.calculateOkxVolume(userId),
         this.calculateStrategyVolume(userId)
@@ -370,24 +369,8 @@ module.exports = {
     }
   },
   
-  // Calculate volume from existing Trades table (Solana tokens)
-  async calculateSolanaTokenVolume(userId) {
-    const query = `
-      SELECT 
-        SUM(total_usd_price) as volume_usd,
-        COUNT(*) as trade_count
-      FROM trades 
-      WHERE user_id = ? AND total_usd_price IS NOT NULL
-    `;
-    
-    const result = await sails.getDatastore().sendNativeQuery(query, [userId]);
-    return {
-      platform: 'solana_token',
-      trade_type: 'token_trading',
-      volume_usd: result.rows[0]?.volume_usd || 0,
-      trade_count: result.rows[0]?.trade_count || 0
-    };
-  },
+  // NOTE: Solana token trading is EXCLUDED from NFT qualification
+  // The existing 'trades' table contains only Solana token trades which do NOT qualify for NFT
   
   // Calculate volume from existing TradingOrder table (Hyperliquid)
   async calculateHyperliquidVolume(userId) {

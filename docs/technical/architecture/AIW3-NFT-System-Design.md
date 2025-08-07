@@ -138,6 +138,7 @@ graph TB
     
     subgraph "Service Layer"
         NFT["NFTService"]
+        TRADING["TradingVolumeService"]
         WEB3["Web3Service"]
         USER["UserService"]
         REDIS["RedisService"]
@@ -155,6 +156,9 @@ graph TB
         SOLANA["Solana Blockchain"]
         IPFS["IPFS via Pinata"]
         ELASTIC["Elasticsearch"]
+        OKX["OKX Trading API"]
+        HYPERLIQUID["Hyperliquid API"]
+        STRATEGY["Strategy Component API"]
     end
     
     %% Frontend to API
@@ -166,11 +170,14 @@ graph TB
     AUTH --> NFT
     
     %% Service Interactions
+    NFT --> TRADING
     NFT --> WEB3
     NFT --> USER
     NFT --> REDIS
     NFT --> KAFKA
     NFT --> ACCESS
+    TRADING --> USER
+    TRADING --> REDIS
     
     %% Data Layer Connections
     USER --> MYSQL
@@ -181,6 +188,9 @@ graph TB
     WEB3 --> SOLANA
     NFT --> IPFS
     NFT --> ELASTIC
+    TRADING --> OKX
+    TRADING --> HYPERLIQUID
+    TRADING --> STRATEGY
     
     %% WebSocket Events
     KAFKA --> WS
@@ -194,10 +204,11 @@ graph TB
 
 | Component | Implementation Status | NFT-Related Responsibilities | Data Flow |
 |-----------|---------------------|----------------------------|----------|
-| **NFTService** | 🚨 **TO BE CREATED** | Orchestrates all NFT business logic, qualification checks, badge activation/consumption, minting/burning coordination | Reads from MySQL, writes to Kafka, calls Web3Service |
+| **NFTService** | 🚨 **TO BE CREATED** | Orchestrates all NFT business logic, qualification checks, badge activation/consumption, minting/burning coordination | Calls TradingVolumeService, reads from MySQL, writes to Kafka, calls Web3Service |
+| **TradingVolumeService** | 🚨 **TO BE CREATED** | Aggregates NFT-qualifying trading volume from OKX, Hyperliquid, and Strategy platforms. Manages volume caching and historical data migration | Calls external APIs, writes to TradingVolumeRecord, caches in Redis |
 | **Web3Service** | ✅ **EXISTS** - NFT extensions needed | Solana blockchain interactions, mint/burn operations, balance queries | Communicates with Solana RPC, returns transaction signatures |
-| **UserService** | ✅ **EXISTS** | User data management, trading volume tracking, wallet address validation | CRUD operations on MySQL User table |
-| **RedisService** | ✅ **EXISTS** | Caches NFT qualification status, pending operations, rate limiting | Read/write to Redis with TTL for performance |
+| **UserService** | ✅ **EXISTS** | User data management, wallet address validation (NO LONGER handles trading volume) | CRUD operations on MySQL User table |
+| **RedisService** | ✅ **EXISTS** | Caches NFT qualification status, trading volume cache, pending operations, rate limiting | Read/write to Redis with TTL for performance |
 | **KafkaService** | ✅ **EXISTS** | Publishes NFT events, processes async operations, handles retries | Produces/consumes messages for real-time updates |
 | **AccessTokenService** | ✅ **EXISTS** | JWT validation for NFT endpoints, wallet-based authentication | Validates tokens, manages user sessions |
 
@@ -205,7 +216,62 @@ The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a 
 
 ### 3.1 NFT Operation Data Flows
 
-#### 3.1.1 NFT Unlocking Flow (Level 1 Only)
+#### 3.1.1 NFT Trading Volume Qualification Flow
+
+This flow shows how the system calculates NFT-qualifying trading volume using the new TradingVolumeService architecture:
+
+```mermaid
+sequenceDiagram
+    participant UI as Personal Center UI
+    participant API as Sails.js API
+    participant NFT as NFTService
+    participant TRADING as TradingVolumeService
+    participant REDIS as RedisService
+    participant MYSQL as MySQL DB
+    participant OKX as OKX Trading API
+    participant HYPERLIQUID as Hyperliquid API
+    participant STRATEGY as Strategy Component API
+
+    UI->>API: GET /api/nft/qualification
+    API->>NFT: checkNFTQualification(userId, targetLevel)
+    
+    %% Check cache first
+    NFT->>REDIS: RedisService.getCache("nft_vol:" + userId)
+    REDIS-->>NFT: cached volume data (if valid)
+    
+    alt Cache Miss or Expired
+        NFT->>TRADING: calculateUserTotalTradingVolume(userId)
+        
+        %% Aggregate from all NFT-qualifying sources
+        TRADING->>MYSQL: Query Hyperliquid volume from trading_orders
+        MYSQL-->>TRADING: Hyperliquid perpetual contract volume
+        
+        TRADING->>OKX: API call for user trading history
+        OKX-->>TRADING: OKX perpetual contract volume (if available)
+        
+        TRADING->>STRATEGY: API call for strategy trading volume
+        STRATEGY-->>TRADING: Strategy trading volume (if available)
+        
+        %% Cache the calculated volume
+        TRADING->>REDIS: RedisService.setCache("nft_vol:" + userId, volumeData, 3600)
+        TRADING-->>NFT: total NFT-qualifying volume
+    end
+    
+    %% Check qualification against requirements
+    NFT->>NFT: Compare volume vs level requirements
+    NFT-->>API: qualification result
+    API-->>UI: {qualified: true/false, currentVolume, requiredVolume}
+```
+
+**Key Points:**
+- ✅ **ONLY** perpetual contract and strategy trading volumes are aggregated
+- ❌ **EXCLUDES** Solana token trading (not eligible for NFT qualification)
+- 🔄 **Historical Data**: Includes complete trading history (pre-NFT and post-NFT launch)
+- ⚡ **Performance**: Uses Redis caching to avoid expensive API calls
+- 🔗 **Integration**: Seamlessly integrates with existing lastmemefi-api infrastructure
+
+#### 3.1.2 NFT Unlocking Flow
+
 This flow applies only to Level 1 "Tech Chicken" NFT when users have no active Tiered NFT and meet volume requirements.
 
 **Level 1 NFT Unlocking Flow:**
