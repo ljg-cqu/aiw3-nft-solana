@@ -1,10 +1,10 @@
 # Implementation Guide Index
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
-**Last Updated:** 2025-08-07  
+**Version:** v2.0.0  
+**Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** Navigation index for all AIW3 NFT implementation guides.
+**Purpose:** Navigation index for all AIW3 NFT implementation guides aligned with business rules v8.0.0.
 
 ---
 
@@ -203,15 +203,39 @@ The backend is the intermediary between the user-facing frontend and the standar
 
      // Get required trading volume for NFT level
      getRequiredVolumeForLevel: function(level) {
-       const requirements = {
-         1: 100000,    // $100K for Level 1
-         2: 500000,    // $500K for Level 2  
-         3: 5000000,   // $5M for Level 3
-         4: 10000000,   // $10M for Level 4
-         5: 50000000   // $50M for Level 5
-       };
-       return requirements[level] || 0;
-     }
+     const requirements = {
+     1: 100000,    // $100K for Level 1 (Tech Chicken)
+     2: 500000,    // $500K for Level 2 (Quant Ape)
+     3: 5000000,   // $5M for Level 3 (On-chain Hunter)
+     4: 10000000,  // $10M for Level 4 (Alpha Alchemist)
+     5: 50000000   // $50M for Level 5 (Quantum Alchemist)
+     };
+     return requirements[level] || 0;
+     },
+
+      // Get required badges for NFT level (v8.0.0 business rules)
+      getRequiredBadgesForLevel: function(level) {
+        const requirements = {
+          1: 0,  // Level 1: Only volume requirement, no badges
+          2: 2,  // Level 2: 2 badges required
+          3: 4,  // Level 3: 4 badges required  
+          4: 5,  // Level 4: 5 badges required
+          5: 6   // Level 5: 6 badges required
+        };
+        return requirements[level] || 0;
+      },
+
+      // Get NFT name for level (v8.0.0 specifications)
+      getNFTNameForLevel: function(level) {
+        const names = {
+          1: 'Tech Chicken',
+          2: 'Quant Ape', 
+          3: 'On-chain Hunter',
+          4: 'Alpha Alchemist',
+          5: 'Quantum Alchemist'
+        };
+        return names[level] || `Level ${level} NFT`;
+      }
    };
    ```
 

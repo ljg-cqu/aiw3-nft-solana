@@ -1,10 +1,10 @@
 # AIW3 NFT System Design
 
 <!-- Document Metadata -->
-**Version:** v2.0.0  
-**Last Updated:** 2025-08-07  
+**Version:** v8.0.0  
+**Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** High-level technical architecture and lifecycle management, aligned with prototype-driven business requirements
+**Purpose:** High-level technical architecture and lifecycle management, aligned with v8.0.0 business rules and prototype-driven requirements
 
 ---
 
@@ -65,13 +65,22 @@ The optimal implementation uses **standard Solana programs only** with a **hybri
 
 ## NFT Lifecycle Overview
 
-The AIW3 NFT ecosystem operates through three distinct phases:
+AIW3's NFT system consists of **two distinct NFT types** with different operation patterns:
+
+### NFT Type Classification (v8.0.0 Business Rules)
+
+| NFT Type | Holdings Rule | Progression | Lifecycle Control |
+|----------|---------------|-------------|------------------|
+| **Tiered NFT** | Single (one active) | Sequential progression (Level 1→5) | System-controlled minting + User-controlled burning |
+| **Competition NFT** | Multiple | Direct minting (no prerequisites) | System-controlled minting only |
+
+### Core Operation Phases
 
 | Phase | Description | Control | Key Technology |
 |-------|-------------|---------|----------------|
-| **🏗️ MINT** | NFT creation with metadata URI linking to level data | AIW3 System Wallet | Solana Token Program + Metaplex |
+| **🏗️ MINT** | NFT creation with metadata URI linking to tier data | AIW3 System Wallet | Solana Token Program + Metaplex |
 | **🔍 USE** | Verification and data access by partners | Ecosystem Partners | Metadata queries + IPFS via Pinata |
-| **🔥 BURN** | NFT destruction for upgrades/exits | User Wallet | User-initiated transactions |
+| **🔥 BURN** | NFT destruction for upgrades (Tiered NFTs only) | User Wallet | User-initiated transactions |
 
 ### Lifecycle Characteristics
 
@@ -93,15 +102,18 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 - Associated Token Account closed
 - SOL rent returned to user
 
-### NFT Business State Flow
+### NFT Business State Flow (v8.0.0 Alignment)
 
 *For the complete NFT Status Transition Diagram and state definitions, see:*  
 **📋 [Business Rules and Flows - NFT Status Transition Diagram](/docs/business/AIW3-NFT-Business-Rules-and-Flows.md#nft-status-transition-diagram)**
 
 **Key Technical State Categories**:
-- **Level 1 NFT States**: `Locked`, `Unlockable`, `Active` - computed by NFTService based on trading volume for first NFT
-- **Process States**: `Unlocking`, `Upgrading` - temporary UI indicators during async operations  
-- **Database NFT Statuses**: `active`, `burned` - persistent records in UserNft table for Level 2-5 NFTs
+- **Level 1 Tiered NFT States**: `Locked`, `Unlockable`, `Active` - computed by NFTService based on trading volume (≥100K USDT, no badges required)
+- **Level 2-4 Tiered NFT Statuses**: `active`, `burned` - can be active (owned) or burned (destroyed during upgrade)
+- **Level 5 Tiered NFT Status**: `active` only - cannot be burned (highest tier)
+- **Competition NFT Status**: `active` only - minted directly, multiple holdings allowed
+- **Process States**: `Unlocking`, `Upgrading` - temporary UI indicators during async operations
+- **Badge States**: `owned`, `activated`, `consumed` - lifecycle from task completion to upgrade consumption
 
 ---
 

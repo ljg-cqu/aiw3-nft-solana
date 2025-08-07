@@ -1,16 +1,19 @@
 # AIW3 NFT API Reference
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
-**Last Updated:** 2025-08-07  
+**Version:** v2.0.0  
+**Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** Comprehensive API reference for all NFT-related endpoints, aligned with lastmemefi-api backend implementation and prototype-driven business requirements.
+**Purpose:** Comprehensive API reference for all NFT-related endpoints, aligned with v8.0.0 business rules, lastmemefi-api backend implementation and two-tier NFT system (Tiered + Competition).
 
 ---
 
 ## Overview
 
-This document provides detailed specifications for all NFT-related API endpoints in the AIW3 system. All endpoints are implemented in the `lastmemefi-api` backend using Sails.js framework and are aligned with the business requirements defined in the prototype analysis.
+This document provides detailed specifications for all NFT-related API endpoints in the AIW3 system. All endpoints are implemented in the `lastmemefi-api` backend using Sails.js framework and are aligned with v8.0.0 business rules supporting the two-tier NFT system:
+
+- **Tiered NFT**: Single progression-based NFT (Tech Chicken → Quantum Alchemist) requiring sequential levels and badge consumption
+- **Competition NFT**: Multiple Trophy Breeder NFTs from trading competitions with direct minting
 
 ## Authentication
 
@@ -43,42 +46,61 @@ Public endpoints (marked as such) do not require authentication.
     "totalTradingVolume": 550000.00,
     "currentTierLevel": 1
   },
-  "nftTiers": [
-    {
+  "tieredNft": {
+    "currentNft": {
       "tierId": 1,
       "tierName": "Tech Chicken",
       "level": 1,
       "nftImageUrl": "/ipfs/tech_chicken.png",
       "mintAddress": "Mint...abc",
-      "status": "Active",
-      "unlockRequirements": {
-        "requiredVolume": 100000
-      },
-      "progressPercentage": 110,
-      "canUpgrade": true,
+      "status": "active",
       "benefits": {
         "tradingFeeReduction": "10%",
-        "aiAgentUses": "10 free uses per week"
+        "aiAgentUses": "10 AI agent uses per week"
       }
     },
-    {
-      "tierId": 2,
-      "tierName": "Quant Ape",
-      "level": 2,
-      "nftImageUrl": "/ipfs/quant_ape.png",
-      "mintAddress": null,
-      "status": "Unlockable",
-      "unlockRequirements": {
-        "requiredVolume": 500000
-      },
-      "progressPercentage": 110,
-      "canUpgrade": false,
-      "benefits": {
-        "tradingFeeReduction": "20%",
-        "aiAgentUses": "20 free uses per week"
+    "availableUpgrades": [
+      {
+        "tierId": 2,
+        "tierName": "Quant Ape",
+        "level": 2,
+        "nftImageUrl": "/ipfs/quant_ape.png",
+        "status": "unlockable",
+        "unlockRequirements": {
+          "requiredVolume": 500000,
+          "requiredBadges": 2,
+          "activatedBadges": 0
+        },
+        "progressPercentage": 110,
+        "canUpgrade": false,
+        "benefits": {
+          "tradingFeeReduction": "20%",
+          "aiAgentUses": "20 AI agent uses per week",
+          "additionalRights": "Activate Exclusive Background"
+        }
       }
+    ]
+  },
+  "competitionNfts": [
+    {
+      "nftId": "comp_001",
+      "nftName": "Trophy Breeder",
+      "nftImageUrl": "/ipfs/trophy_breeder.png",
+      "mintAddress": "Comp...abc",
+      "status": "active",
+      "source": "Top 3 in trading competition",
+      "benefits": {
+        "tradingFeeReduction": "25%",
+        "additionalRights": "Avatar Crown or Community Top Pin"
+      },
+      "earnedDate": "2025-07-15"
     }
-  ]
+  ],
+  "effectiveBenefits": {
+    "tradingFeeReduction": "25%",
+    "aiAgentUses": "10 AI agent uses per week",
+    "additionalRights": ["Activate Exclusive Background", "Avatar Crown or Community Top Pin"]
+  }
 }
 ```
 
