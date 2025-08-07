@@ -10,11 +10,11 @@
 
 ## Project Overview
 
-The AIW3 NFT System is a Solana-based equity NFT **proof of concept and design specification**. This system is **designed to provide** tiered user benefits, trading fee reductions, and enhanced AI agent access based on user trading volume and engagement metrics.
+The AIW3 NFT System is a Solana-based equity NFT **proof of concept and design specification**. This system is **designed to provide** tiered user benefits, trading fee reductions, and enhanced AI agent access based on user trading volume and badge activation requirements.
 
 **🚧 Backend Integration Status: NOT YET IMPLEMENTED**
 - **Current State**: Contains comprehensive documentation and functional POC (`/poc/solana-nft-burn-mint`)
-- **Missing Components**: NFTService, NFTController, database models, and API endpoints not yet implemented
+- **Missing Components**: NFTService, NFTController, Badge model, badge activation system, database models, and API endpoints not yet implemented
 - **Architecture**: All documentation aligned with `$HOME/aiw3/lastmemefi-api` backend for future integration
 - **Implementation Required**: Database migrations, Redis caching integration, Kafka event publishing
 - **Estimated Timeline**: 10-12 weeks for full backend integration implementation
