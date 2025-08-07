@@ -424,8 +424,7 @@ module.exports = {
     }
   },
   
-  // NOTE: Solana token trading is EXCLUDED from NFT qualification
-  // The existing 'trades' table contains only Solana token trades which do NOT qualify for NFT
+  // NFT-qualifying trading volume calculation methods
   
   // Calculate volume from existing TradingOrder table (Hyperliquid)
   async calculateHyperliquidVolume(userId) {
@@ -530,8 +529,7 @@ module.exports = {
     }, {
       total_volume: 0,
       perpetual_volume: 0,
-      strategy_volume: 0,
-      token_volume: 0
+      strategy_volume: 0
     });
     
     return total;

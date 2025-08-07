@@ -399,16 +399,14 @@ module.exports = {
     updatedAt: { type: 'ref', columnType: 'datetime' }
   }
 };
-```
 
 ### Extended User Model
 
-**CRITICAL UPDATE**: Based on comprehensive backend analysis, the NFT qualification logic requires a new unified trading volume system. The existing `trades` table only contains Solana token trades, which are **NOT eligible** for NFT qualification.
+**NFT Trading Volume Integration**: The NFT qualification system uses a unified trading volume calculation that aggregates data from multiple NFT-qualifying sources.
 
-**NFT Business Rule - Qualifying Trading Volume**:
-- ✅ **Perpetual contract trading volume** (OKX + Hyperliquid platforms)
-- ✅ **Trading volume generated from strategy trading**
-- ❌ **Solana token trading** (excluded from NFT qualification)
+**NFT-Qualifying Trading Volume Sources**:
+- ✅ **Perpetual contract trading** (OKX, Hyperliquid platforms)
+- ✅ **Strategy trading** (external strategy component)
 
 **Critical Integration Gaps Identified**:
 1. **OKX Volume Gap**: No historical perpetual contract volume stored locally (CRITICAL)
