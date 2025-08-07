@@ -153,29 +153,27 @@ The existing `SolanaChainAuthController` provides the foundation for secure, wal
 
 **Sails.js Model Structures (To Be Created):**
 ```javascript
-// api/models/UserNFT.js - TO BE CREATED
+// api/models/UserNft.js - TO BE CREATED
 module.exports = {
   attributes: {
-    user_id: { model: 'user' },
-    nft_mint_address: { type: 'string', required: true },
-    nft_level: { type: 'number', required: true }, // 1-5 + special
-    nft_name: { type: 'string' }, // Tech Chicken, Quant Ape, etc.
-    claimed_at: { type: 'ref', columnType: 'datetime' },
-    last_upgraded_at: { type: 'ref', columnType: 'datetime' },
-    metadata_uri: { type: 'string' },
-    is_active: { type: 'boolean', defaultsTo: true }
+    owner: { model: 'user', required: true },
+    nftDefinition: { model: 'nftdefinition', required: true },
+    mintAddress: { type: 'string', required: true, unique: true },
+    status: { type: 'string', isIn: ['active', 'burned'], defaultsTo: 'active' },
+    level: { type: 'number', defaultsTo: 1 }
   }
 };
 
-// api/models/UserNFTQualification.js - TO BE CREATED
+// api/models/UserNftQualification.js - TO BE CREATED
 module.exports = {
   attributes: {
-    user_id: { model: 'user' },
-    target_level: { type: 'number' },
-    current_volume: { type: 'number', columnType: 'DECIMAL(30,10)' },
-    required_volume: { type: 'number', columnType: 'DECIMAL(30,10)' },
-    badges_collected: { type: 'number', defaultsTo: 0 },
-    badges_required: { type: 'number' },
+    user_id: { model: 'user', required: true },
+    target_level: { type: 'number', required: true, min: 1, max: 5 },
+    current_volume: { type: 'number', columnType: 'DECIMAL(30,10)', defaultsTo: 0 },
+    required_volume: { type: 'number', columnType: 'DECIMAL(30,10)', required: true },
+    badges_owned: { type: 'number', defaultsTo: 0 },
+    badges_activated: { type: 'number', defaultsTo: 0 },
+    badges_required: { type: 'number', defaultsTo: 0 },
     is_qualified: { type: 'boolean', defaultsTo: false },
     last_checked_at: { type: 'ref', columnType: 'datetime' }
   }
@@ -184,12 +182,25 @@ module.exports = {
 // api/models/Badge.js - TO BE CREATED
 module.exports = {
   attributes: {
-    user_id: { model: 'user' },
-    badge_type: { type: 'string' }, // micro_badge, achievement_badge, etc.
-    badge_name: { type: 'string' },
-    badge_identifier: { type: 'string' },
+    user_id: { model: 'user', required: true },
+    badge_type: { type: 'string', required: true, isIn: ['micro_badge', 'achievement_badge', 'event_badge', 'special_badge'] },
+    badge_name: { type: 'string', required: true, maxLength: 100 },
+    badge_identifier: { type: 'string', required: true, unique: true, maxLength: 100 },
+    status: { type: 'string', isIn: ['owned', 'activated', 'consumed'], defaultsTo: 'owned' },
+    metadata_uri: { type: 'string', maxLength: 500 },
     earned_at: { type: 'ref', columnType: 'datetime' },
-    metadata_uri: { type: 'string' }
+    activated_at: { type: 'ref', columnType: 'datetime', allowNull: true },
+    consumed_at: { type: 'ref', columnType: 'datetime', allowNull: true }
+  }
+};
+
+// api/models/NftDefinition.js - TO BE CREATED
+module.exports = {
+  attributes: {
+    name: { type: 'string', required: true },
+    symbol: { type: 'string', required: true },
+    metadataUri: { type: 'string', required: true },
+    description: { type: 'string', maxLength: 1000 }
   }
 };
 ```
@@ -237,24 +248,37 @@ The `NFTService` will need to be created to act as an orchestrator, coordinating
 ```javascript
 // api/services/NFTService.js - TO BE CREATED
 module.exports = {
-    // Check if user qualifies for NFT level based on trading volume from Trades model
+    // Check if user qualifies for NFT level based on trading volume and activated badges
     checkNFTQualification: async function(userId, targetLevel) {
         try {
             // Calculate user's total trading volume from Trades model
             const tradingVolume = await this.calculateTradingVolume(userId);
             const requiredVolume = this.getRequiredVolumeForLevel(targetLevel);
             
-            // Check if user already has NFT of this level or higher
-            const existingNFT = await UserNFT.findOne({
+            // Check activated badges for levels 2+
+            const requiredBadges = this.getRequiredBadgesForLevel(targetLevel);
+            const activatedBadges = await Badge.count({
                 user_id: userId,
-                nft_level: { '>=': targetLevel },
+                status: 'activated'
+            });
+            
+            // Check if user already has NFT of this level or higher
+            const existingNFT = await UserNft.findOne({
+                owner: userId,
+                level: { '>=': targetLevel },
                 status: 'active'
             });
             
+            const volumeQualified = tradingVolume >= requiredVolume;
+            const badgesQualified = activatedBadges >= requiredBadges;
+            const noExistingNFT = !existingNFT;
+            
             return {
-                qualified: tradingVolume >= requiredVolume && !existingNFT,
+                qualified: volumeQualified && badgesQualified && noExistingNFT,
                 currentVolume: tradingVolume,
                 requiredVolume: requiredVolume,
+                activatedBadges: activatedBadges,
+                requiredBadges: requiredBadges,
                 targetLevel: targetLevel,
                 hasExistingNFT: !!existingNFT
             };
@@ -280,13 +304,110 @@ module.exports = {
         }
     },
     
+    // Get required trading volume for NFT level
+    getRequiredVolumeForLevel: function(level) {
+        const requirements = {
+            1: 100000,    // $100K for Level 1
+            2: 500000,    // $500K for Level 2  
+            3: 5000000,   // $5M for Level 3
+            4: 10000000,   // $10M for Level 4
+            5: 50000000   // $50M for Level 5
+        };
+        return requirements[level] || 0;
+    },
+    
+    // Get required badges for NFT level
+    getRequiredBadgesForLevel: function(level) {
+        const requirements = {
+            1: 0,    // Level 1 requires no badges
+            2: 2,    // Level 2 requires 2 badges
+            3: 4,    // Level 3 requires 4 badges
+            4: 5,    // Level 4 requires 5 badges
+            5: 6     // Level 5 requires 6 badges
+        };
+        return requirements[level] || 0;
+    },
+    
+    // Activate a badge for NFT upgrade use
+    activateBadge: async function(userId, badgeId) {
+        try {
+            const badge = await Badge.findOne({
+                user_id: userId,
+                badge_identifier: badgeId,
+                status: 'owned'
+            });
+            
+            if (!badge) {
+                throw new Error('Badge not found or not owned');
+            }
+            
+            await Badge.updateOne({ id: badge.id })
+                .set({ 
+                    status: 'activated', 
+                    activated_at: new Date() 
+                });
+            
+            // Clear cached qualification data
+            await RedisService.delCache(`nft_qual:${userId}`);
+            
+            // Publish badge activation event
+            await KafkaService.sendMessage('nft-events', {
+                eventType: 'badge_activated',
+                userId: userId,
+                data: {
+                    badgeId: badgeId,
+                    badgeName: badge.badge_name,
+                    activatedAt: new Date().toISOString()
+                }
+            });
+            
+            return { success: true, badge: badge };
+        } catch (error) {
+            sails.log.error('Badge activation failed:', error);
+            throw error;
+        }
+    },
+    
     processNFTUpgrade: async function(userId, fromLevel, toLevel) {
         // Handle burn-and-mint upgrade process
-        // 1. Verify qualification
+        // 1. Verify qualification (volume + activated badges)
         // 2. Burn old NFT
         // 3. Mint new NFT
         // 4. Update database records
-        // 5. Send Kafka notification
+        // 5. Consume activated badges
+        // 6. Send Kafka notification
+        
+        try {
+            // Verify user has required activated badges
+            const qualification = await this.checkNFTQualification(userId, toLevel);
+            if (!qualification.qualified) {
+                throw new Error('User not qualified for upgrade');
+            }
+            
+            // Consume activated badges after successful NFT minting
+            await Badge.update({
+                user_id: userId,
+                status: 'activated'
+            }).set({
+                status: 'consumed',
+                consumed_at: new Date()
+            });
+            
+            // Publish badge consumption event
+            await KafkaService.sendMessage('nft-events', {
+                eventType: 'badges_consumed',
+                userId: userId,
+                data: {
+                    consumedBadges: qualification.activatedBadges,
+                    upgradeLevel: toLevel,
+                    consumedAt: new Date().toISOString()
+                }
+            });
+            
+        } catch (error) {
+            sails.log.error('NFT upgrade failed:', error);
+            throw error;
+        }
     },
     
     // Redis caching integration using actual RedisService methods
