@@ -1,7 +1,7 @@
 # API-Frontend Integration Specification
 
 <!-- Document Metadata -->
-**Version:** v2.0.0  
+**Version:** v1.0.0  
 **Last Updated:** 2025-08-07  
 **Status:** Active  
 **Purpose:** Comprehensive specification for API endpoints and frontend integration patterns for the AIW3 NFT system, aligned with prototype-driven business requirements and lastmemefi-api backend implementation.

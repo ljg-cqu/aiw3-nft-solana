@@ -2,9 +2,9 @@
 
 <!-- Document Metadata -->
 **Version:** v1.0.0  
-**Last Updated:** 2025-08-06  
+**Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** Backend integration strategy and service architecture
+**Purpose:** Backend integration strategy and service architecture aligned with v1.0.0 business rules
 
 ---
 
@@ -307,11 +307,11 @@ module.exports = {
     // Get required trading volume for NFT level
     getRequiredVolumeForLevel: function(level) {
         const requirements = {
-            1: 100000,    // $100K for Level 1
-            2: 500000,    // $500K for Level 2  
-            3: 5000000,   // $5M for Level 3
-            4: 10000000,   // $10M for Level 4
-            5: 50000000   // $50M for Level 5
+            1: 100000,    // $100K for Level 1 (Tech Chicken)
+            2: 500000,    // $500K for Level 2 (Quant Ape)
+            3: 5000000,   // $5M for Level 3 (On-chain Hunter)
+            4: 10000000,  // $10M for Level 4 (Alpha Alchemist)
+            5: 50000000   // $50M for Level 5 (Quantum Alchemist)
         };
         return requirements[level] || 0;
     },
@@ -319,11 +319,11 @@ module.exports = {
     // Get required badges for NFT level
     getRequiredBadgesForLevel: function(level) {
         const requirements = {
-            1: 0,    // Level 1 requires no badges
-            2: 2,    // Level 2 requires 2 badges
-            3: 4,    // Level 3 requires 4 badges
-            4: 5,    // Level 4 requires 5 badges
-            5: 6     // Level 5 requires 6 badges
+            1: 0,    // Level 1 (Tech Chicken) requires no badges
+            2: 2,    // Level 2 (Quant Ape) requires 2 badges
+            3: 4,    // Level 3 (On-chain Hunter) requires 4 badges
+            4: 5,    // Level 4 (Alpha Alchemist) requires 5 badges
+            5: 6     // Level 5 (Quantum Alchemist) requires 6 badges
         };
         return requirements[level] || 0;
     },

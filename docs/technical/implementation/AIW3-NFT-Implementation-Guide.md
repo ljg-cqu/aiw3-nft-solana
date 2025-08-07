@@ -1,10 +1,10 @@
 # Implementation Guide Index
 
 <!-- Document Metadata -->
-**Version:** v2.0.0  
+**Version:** v1.0.0  
 **Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** Navigation index for all AIW3 NFT implementation guides aligned with business rules v8.0.0.
+**Purpose:** Navigation index for all AIW3 NFT implementation guides aligned with business rules v1.0.0.
 
 ---
 
@@ -213,7 +213,7 @@ The backend is the intermediary between the user-facing frontend and the standar
      return requirements[level] || 0;
      },
 
-      // Get required badges for NFT level (v8.0.0 business rules)
+      // Get required badges for NFT level (v1.0.0 business rules)
       getRequiredBadgesForLevel: function(level) {
         const requirements = {
           1: 0,  // Level 1: Only volume requirement, no badges
@@ -225,7 +225,7 @@ The backend is the intermediary between the user-facing frontend and the standar
         return requirements[level] || 0;
       },
 
-      // Get NFT name for level (v8.0.0 specifications)
+      // Get NFT name for level (v1.0.0 specifications)
       getNFTNameForLevel: function(level) {
         const names = {
           1: 'Tech Chicken',

@@ -1,10 +1,10 @@
 # AIW3 NFT System Design
 
 <!-- Document Metadata -->
-**Version:** v8.0.0  
+**Version:** v1.0.0  
 **Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** High-level technical architecture and lifecycle management, aligned with v8.0.0 business rules and prototype-driven requirements
+**Purpose:** High-level technical architecture and lifecycle management, aligned with v1.0.0 business rules and prototype-driven requirements
 
 ---
 
@@ -67,7 +67,7 @@ The optimal implementation uses **standard Solana programs only** with a **hybri
 
 AIW3's NFT system consists of **two distinct NFT types** with different operation patterns:
 
-### NFT Type Classification (v8.0.0 Business Rules)
+### NFT Type Classification (v1.0.0 Business Rules)
 
 | NFT Type | Holdings Rule | Progression | Lifecycle Control |
 |----------|---------------|-------------|------------------|
@@ -102,7 +102,7 @@ AIW3's NFT system consists of **two distinct NFT types** with different operatio
 - Associated Token Account closed
 - SOL rent returned to user
 
-### NFT Business State Flow (v8.0.0 Alignment)
+### NFT Business State Flow (v1.0.0 Alignment)
 
 *For the complete NFT Status Transition Diagram and state definitions, see:*  
 **📋 [Business Rules and Flows - NFT Status Transition Diagram](/docs/business/AIW3-NFT-Business-Rules-and-Flows.md#nft-status-transition-diagram)**

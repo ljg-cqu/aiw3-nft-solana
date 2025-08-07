@@ -1,16 +1,16 @@
 # AIW3 NFT API Reference
 
 <!-- Document Metadata -->
-**Version:** v2.0.0  
+**Version:** v1.0.0  
 **Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** Comprehensive API reference for all NFT-related endpoints, aligned with v8.0.0 business rules, lastmemefi-api backend implementation and two-tier NFT system (Tiered + Competition).
+**Purpose:** Comprehensive API reference for all NFT-related endpoints, aligned with v1.0.0 business rules, lastmemefi-api backend implementation and two-tier NFT system (Tiered + Competition).
 
 ---
 
 ## Overview
 
-This document provides detailed specifications for all NFT-related API endpoints in the AIW3 system. All endpoints are implemented in the `lastmemefi-api` backend using Sails.js framework and are aligned with v8.0.0 business rules supporting the two-tier NFT system:
+This document provides detailed specifications for all NFT-related API endpoints in the AIW3 system. All endpoints are implemented in the `lastmemefi-api` backend using Sails.js framework and are aligned with v1.0.0 business rules supporting the two-tier NFT system:
 
 - **Tiered NFT**: Single progression-based NFT (Tech Chicken → Quantum Alchemist) requiring sequential levels and badge consumption
 - **Competition NFT**: Multiple Trophy Breeder NFTs from trading competitions with direct minting

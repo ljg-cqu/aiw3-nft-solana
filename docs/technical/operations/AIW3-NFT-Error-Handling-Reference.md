@@ -1,10 +1,10 @@
 # AIW3 NFT Error Handling Reference
 
 <!-- Document Metadata -->
-**Version:** v8.0.0  
+**Version:** v1.0.0  
 **Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** Consolidated error handling strategies and codes aligned with v8.0.0 business rules
+**Purpose:** Consolidated error handling strategies and codes aligned with v1.0.0 business rules
 
 ---
 

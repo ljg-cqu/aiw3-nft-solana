@@ -1,7 +1,7 @@
 # AIW3 NFT Business Rules and Flows
 
 <!-- Document Metadata -->
-**Version:** v8.0.0  
+**Version:** v1.0.0  
 **Last Updated:** 2025-08-08  
 **Status:** Active  
 **Purpose:** To provide a definitive, implementation-aligned specification of all NFT-related business flows, rules, statuses, UI data requirements, and backend API endpoints. This document is strictly aligned with the `lastmemefi-api` backend models and routes to serve as a ground-truth reference for developers.
