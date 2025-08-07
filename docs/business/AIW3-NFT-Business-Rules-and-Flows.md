@@ -138,11 +138,11 @@ Based on the medal system design, badges are categorized by NFT levels with spec
 **Level 5 Badges (6 badges required for upgrade):**
 | Medal Name | Obtain Conditions |
 |:-----------|:------------------|
-| Large General Rahren | Accumulated invitation ≥ 10 people |
+| Recruitment General | Accumulated invitation ≥ 10 people |
 | Strategic Messenger | Create 5 strategies |
 | Fission Messenger | Invite 10 friends to register |
 | Transaction Commander | Invite 5 of the users to complete the first transaction |
-| Trading regiment Iron Army | Join a group for 3 months |
+| Trading Group Veteran | Join a group for 3 months |
 | Influence Talent | The number of fans in the station is greater than or equal to 25 |
 
 **Badge System Notes:**
