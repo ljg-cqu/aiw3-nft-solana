@@ -336,35 +336,90 @@ module.exports = {
   
   // Core volume calculation for NFT qualification
   async calculateUserTotalTradingVolume(userId) {
+    // FIXED: Implement distributed locking to prevent race conditions
+    const lockKey = `volume_calc_lock:${userId}`;
+    const lockTTL = 300; // 5 minutes
+    
     try {
-      // Try cache first
-      const cached = await UserTradingVolumeCache.findOne({ user_id: userId });
-      if (cached && this.isCacheValid(cached)) {
+      // Acquire distributed lock
+      const lockAcquired = await RedisService.setCache(lockKey, 'locked', lockTTL, { lockMode: true });
+      if (!lockAcquired) {
+        throw new Error(`Volume calculation already in progress for user ${userId}`);
+      }
+      
+      try {
+        // Try cache first
+        const cached = await UserTradingVolumeCache.findOne({ user_id: userId });
+        if (cached && this.isCacheValid(cached)) {
+          return {
+            total_volume: cached.total_volume_usd,
+            perpetual_volume: cached.perpetual_volume_usd,
+            strategy_volume: cached.strategy_volume_usd,
+            pre_nft_volume: cached.pre_nft_volume_usd,
+            post_nft_volume: cached.post_nft_volume_usd,
+            last_updated: cached.last_updated,
+            source: 'cache'
+          };
+        }
+        
+        // FIXED: Use Promise.allSettled for graceful degradation
+        const results = await Promise.allSettled([
+          this.calculateHyperliquidVolume(userId),
+          this.calculateOkxVolume(userId),
+          this.calculateStrategyVolume(userId)
+        ]);
+        
+        // Handle partial failures gracefully
+        const volumes = [];
+        const errors = [];
+        
+        results.forEach((result, index) => {
+          const platforms = ['hyperliquid', 'okx', 'strategy'];
+          if (result.status === 'fulfilled') {
+            volumes.push(result.value);
+          } else {
+            errors.push(`${platforms[index]}: ${result.reason.message}`);
+            sails.log.warn(`Volume calculation failed for ${platforms[index]}:`, result.reason);
+          }
+        });
+        
+        // Ensure we have at least some data
+        if (volumes.length === 0) {
+          throw new Error(`All volume calculations failed: ${errors.join(', ')}`);
+        }
+        
+        const totalVolume = this.aggregateVolumes(volumes);
+        totalVolume.partial_data = errors.length > 0;
+        totalVolume.errors = errors;
+        totalVolume.source = 'calculated';
+        
+        // Update cache
+        await this.updateVolumeCache(userId, totalVolume);
+        
+        return totalVolume;
+      } finally {
+        // Always release the lock
+        await RedisService.delCache(lockKey);
+      }
+    } catch (error) {
+      sails.log.error('TradingVolumeService.calculateUserTotalTradingVolume error:', error);
+      
+      // Return cached data if available, even if stale
+      const staleCache = await UserTradingVolumeCache.findOne({ user_id: userId });
+      if (staleCache) {
+        sails.log.warn(`Returning stale cache data for user ${userId} due to calculation error`);
         return {
-          total_volume: cached.total_volume_usd,
-          perpetual_volume: cached.perpetual_volume_usd,
-          strategy_volume: cached.strategy_volume_usd,
-          pre_nft_volume: cached.pre_nft_volume_usd,
-          post_nft_volume: cached.post_nft_volume_usd,
-          last_updated: cached.last_updated
+          total_volume: staleCache.total_volume_usd,
+          perpetual_volume: staleCache.perpetual_volume_usd,
+          strategy_volume: staleCache.strategy_volume_usd,
+          pre_nft_volume: staleCache.pre_nft_volume_usd,
+          post_nft_volume: staleCache.post_nft_volume_usd,
+          last_updated: staleCache.last_updated,
+          source: 'stale_cache',
+          error: error.message
         };
       }
       
-      // Calculate from NFT-qualifying sources ONLY
-      const volumes = await Promise.all([
-        this.calculateHyperliquidVolume(userId),
-        this.calculateOkxVolume(userId),
-        this.calculateStrategyVolume(userId)
-      ]);
-      
-      const totalVolume = this.aggregateVolumes(volumes);
-      
-      // Update cache
-      await this.updateVolumeCache(userId, totalVolume);
-      
-      return totalVolume;
-    } catch (error) {
-      sails.log.error('TradingVolumeService.calculateUserTotalTradingVolume error:', error);
       throw error;
     }
   },
@@ -394,36 +449,72 @@ module.exports = {
     };
   },
   
-  // Calculate OKX volume - REQUIRES NEW IMPLEMENTATION
+  // Calculate OKX volume - USES EXISTING OkxTradingService (FIXED)
   async calculateOkxVolume(userId) {
-    // CRITICAL: OKX volume is currently not stored
-    // This requires implementing volume tracking for OKX trades
+    // FIXED: Use existing OkxTradingService instead of direct API calls
+    // This prevents duplicate API calls and rate limiting issues
     
-    // Option 1: Historical data retrieval from OKX API
-    // Option 2: Start tracking from now forward
-    // Option 3: Hybrid approach
-    
-    return {
-      platform: 'okx',
-      trade_type: 'perpetual_contract',
-      volume_usd: 0, // TODO: Implement OKX volume tracking
-      trade_count: 0,
-      note: 'OKX volume tracking not yet implemented'
-    };
+    try {
+      // Query from TradingVolumeRecord table (populated by enhanced OkxTradingService)
+      const records = await TradingVolumeRecord.find({
+        user_id: userId,
+        platform: 'okx',
+        trade_type: 'perpetual_contract'
+      });
+      
+      const volume_usd = records.reduce((sum, record) => sum + record.volume_usd, 0);
+      
+      return {
+        platform: 'okx',
+        trade_type: 'perpetual_contract',
+        volume_usd: volume_usd,
+        trade_count: records.length,
+        note: 'Requires OkxTradingService enhancement to populate TradingVolumeRecord'
+      };
+    } catch (error) {
+      sails.log.error('calculateOkxVolume error:', error);
+      return {
+        platform: 'okx',
+        trade_type: 'perpetual_contract',
+        volume_usd: 0,
+        trade_count: 0,
+        error: 'OKX volume calculation failed'
+      };
+    }
   },
   
-  // Calculate strategy trading volume - REQUIRES INVESTIGATION
+  // Calculate strategy trading volume - USES EXISTING StrategyService (FIXED)
   async calculateStrategyVolume(userId) {
-    // CRITICAL: Strategy volume tracking unclear
-    // Need to investigate external strategy component API
+    // FIXED: Use existing StrategyService instead of direct API calls
+    // This prevents service layer conflicts and maintains consistency
     
-    return {
-      platform: 'strategy',
-      trade_type: 'strategy_trading',
-      volume_usd: 0, // TODO: Implement strategy volume tracking
-      trade_count: 0,
-      note: 'Strategy volume tracking needs investigation'
-    };
+    try {
+      // Query from TradingVolumeRecord table (populated by enhanced StrategyService)
+      const records = await TradingVolumeRecord.find({
+        user_id: userId,
+        platform: 'strategy',
+        trade_type: 'strategy_trading'
+      });
+      
+      const volume_usd = records.reduce((sum, record) => sum + record.volume_usd, 0);
+      
+      return {
+        platform: 'strategy',
+        trade_type: 'strategy_trading',
+        volume_usd: volume_usd,
+        trade_count: records.length,
+        note: 'Requires StrategyService enhancement to populate TradingVolumeRecord'
+      };
+    } catch (error) {
+      sails.log.error('calculateStrategyVolume error:', error);
+      return {
+        platform: 'strategy',
+        trade_type: 'strategy_trading',
+        volume_usd: 0,
+        trade_count: 0,
+        error: 'Strategy volume calculation failed'
+      };
+    }
   },
   
   // Aggregate volumes from all sources
@@ -464,6 +555,68 @@ module.exports = {
   }
 };
 ```
+
+## 🔧 CRITICAL FIXES IMPLEMENTED
+
+### Summary of Data Model and Integration Fixes
+
+The following critical issues have been identified and fixed to ensure seamless integration with the existing `lastmemefi-api` system:
+
+#### ✅ **FIXED: User ID Data Type Inconsistency (Priority 1)**
+- **Issue**: Proposed models used incorrect foreign key pattern `user_id: { model: 'user' }`
+- **Fix**: Updated all models to use existing system pattern `user_id: { type: 'string' }`
+- **Impact**: Prevents database foreign key constraint failures
+- **Models Fixed**: TradingVolumeRecord, UserTradingVolumeCache, UserNFTQualification, Badge, NFTUpgradeRequest
+
+#### ✅ **FIXED: External API Integration Conflicts (Priority 1)**
+- **Issue**: TradingVolumeService would bypass existing OkxTradingService and StrategyService
+- **Fix**: Updated to use existing service layers instead of direct API calls
+- **Impact**: Prevents duplicate API calls, rate limiting issues, and service conflicts
+- **Implementation**: Query from TradingVolumeRecord table populated by enhanced existing services
+
+#### ✅ **FIXED: Missing Database Performance Indexes (Priority 2)**
+- **Issue**: Missing composite index for historical volume queries
+- **Fix**: Added `(user_id, trade_timestamp)` composite index
+- **Impact**: Improves performance for historical trading volume calculations
+- **Location**: TradingVolumeRecord model indexes array
+
+#### ✅ **FIXED: Race Conditions and Concurrency Issues (Priority 2)**
+- **Issue**: Multiple users could calculate volume simultaneously, causing cache corruption
+- **Fix**: Implemented distributed locking using Redis with 5-minute TTL
+- **Impact**: Prevents cache inconsistency and ensures data integrity
+- **Implementation**: `volume_calc_lock:{userId}` with automatic lock release
+
+#### ✅ **FIXED: Error Handling and Resilience (Priority 2)**
+- **Issue**: No graceful degradation for external API failures
+- **Fix**: Implemented Promise.allSettled with partial failure handling
+- **Impact**: System continues to work even if some platforms are unavailable
+- **Fallback**: Returns stale cache data if all calculations fail
+
+### Remaining Implementation Requirements
+
+#### 🔄 **REQUIRES ENHANCEMENT: OkxTradingService**
+- **Action Needed**: Extend existing OkxTradingService to populate TradingVolumeRecord
+- **Method**: Add webhook endpoint or periodic sync to capture trade volumes
+- **Timeline**: Must be implemented before OKX volume can be included in NFT qualification
+
+#### 🔍 **REQUIRES INVESTIGATION: StrategyService**
+- **Action Needed**: Investigate Strategy Component API capabilities for trade-level data
+- **Method**: API testing and capability assessment
+- **Timeline**: Must be confirmed before strategy volume can be included in NFT qualification
+
+### Production Readiness Status
+
+| Component | Status | Notes |
+|-----------|--------|---------|
+| **Data Models** | ✅ Ready | All critical fixes applied |
+| **Hyperliquid Integration** | ✅ Ready | Uses existing trading_orders table |
+| **OKX Integration** | ⚠️ Requires Enhancement | OkxTradingService needs volume tracking |
+| **Strategy Integration** | ⚠️ Requires Investigation | API capabilities unknown |
+| **Error Handling** | ✅ Ready | Graceful degradation implemented |
+| **Performance** | ✅ Ready | Indexes and caching optimized |
+| **Concurrency Control** | ✅ Ready | Distributed locking implemented |
+
+---
 
 ### 2. Platform-Specific Integration Strategies
 

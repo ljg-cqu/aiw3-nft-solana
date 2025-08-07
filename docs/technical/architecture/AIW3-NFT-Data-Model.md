@@ -181,8 +181,9 @@ module.exports = {
     id: { type: 'number', autoIncrement: true },
     
     user_id: { 
-      model: 'user',
-      required: true
+      type: 'string',
+      required: true,
+      description: 'User ID (matches existing lastmemefi-api pattern)'
     },
     
     target_level: { 
@@ -256,8 +257,9 @@ module.exports = {
     id: { type: 'number', autoIncrement: true },
     
     user_id: { 
-      model: 'user',
-      required: true
+      type: 'string',
+      required: true,
+      description: 'User ID (matches existing lastmemefi-api pattern)'
     },
     
     badge_type: {
@@ -330,8 +332,9 @@ module.exports = {
     id: { type: 'number', autoIncrement: true },
     
     user_id: {
-      model: 'user',
-      required: true
+      type: 'string',
+      required: true,
+      description: 'User ID (matches existing lastmemefi-api pattern)'
     },
     
     from_level: {
@@ -495,9 +498,9 @@ module.exports = {
   tableName: 'trading_volume_records',
   attributes: {
     user_id: {
-      model: 'user',
+      type: 'string',
       required: true,
-      description: 'User ID'
+      description: 'User ID (matches existing lastmemefi-api pattern)'
     },
     
     platform: {
@@ -578,6 +581,11 @@ module.exports = {
     {
       attributes: ['trade_timestamp'],
       type: 'index'
+    },
+    {
+      attributes: ['user_id', 'trade_timestamp'],
+      type: 'index',
+      description: 'Critical for historical volume queries and performance'
     }
   ]
 };
@@ -590,10 +598,10 @@ module.exports = {
   tableName: 'user_trading_volume_cache',
   attributes: {
     user_id: {
-      model: 'user',
+      type: 'string',
       required: true,
       unique: true,
-      description: 'User ID'
+      description: 'User ID (matches existing lastmemefi-api pattern)'
     },
     
     total_volume_usd: {
