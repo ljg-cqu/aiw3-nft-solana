@@ -135,18 +135,9 @@ module.exports = {
 - `metadataUri`: IPFS URI for metadata JSON
 - `description`: Human-readable description
 
-## NFT Tier Definitions (Prototype-Driven)
+## NFT Tier Definitions Reference
 
-Based on prototype analysis, the system supports these NFT tiers:
-
-| Level | NFT Name | Required Volume (USDT) | Fee Reduction | AI Agent Benefits |
-|:------|:---------|:----------------------|:--------------|:------------------|
-| 1 | Tech Chicken | ≥ 100,000 | 10% | 10 free uses/week |
-| 2 | Quant Ape | ≥ 500,000 | 20% | 20 free uses/week |
-| 3 | On-chain Hunter | ≥ 5,000,000 | 30% | 30 free uses/week |
-| 4 | Alpha Alchemist | ≥ 10,000,000 | 40% | 40 free uses/week |
-| 5 | Quantum Alchemist | ≥ 50,000,000 | 55% | 50 free uses/week |
-| Competition | Trophy Breeder | Top 3 in competition | 25% | Competition exclusive privileges |
+For complete NFT tier specifications including badge requirements, trading fee reductions, and additional rights, refer to the authoritative documentation in **AIW3-NFT-Business-Rules-and-Flows.md**.
       defaultsTo: 'unlocked',
       description: 'Current status of the NFT'
     },
