@@ -155,6 +155,7 @@ Public endpoints (marked as such) do not require authentication.
       "badgeImageUrl": "/ipfs/badge_a.png",
       "description": "Awarded to users who joined in the first month.",
       "isOwned": true,
+      "status": "owned",
       "category": "Achievement",
       "rarity": "Common",
       "earnedDate": "2025-01-15"
@@ -165,6 +166,7 @@ Public endpoints (marked as such) do not require authentication.
       "badgeImageUrl": "/ipfs/badge_b.png",
       "description": "Awarded for achieving $1M+ in trading volume.",
       "isOwned": false,
+      "status": null,
       "category": "Trading",
       "rarity": "Rare",
       "earnedDate": null
@@ -181,7 +183,37 @@ Public endpoints (marked as such) do not require authentication.
 
 ---
 
-### 4. Get Community Profile
+### 4. Activate Badge
+
+- **Endpoint**: `POST /api/v1/nft/badges/:badgeId/activate`
+- **Controller Action**: `NFTController.activateBadge`
+- **Authentication**: Required (JWT)
+- **Description**: Activates an owned badge to prepare it for NFT upgrade use.
+- **Path Parameters**:
+  - `badgeId` (required): Badge identifier
+
+#### Success Response: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "badgeId": "BadgeA",
+    "badgeName": "Early Adopter",
+    "status": "activated",
+    "activatedAt": "2025-08-08T10:30:00Z"
+  }
+}
+```
+
+#### Error Responses
+- `400 Bad Request`: Badge not owned or already activated/consumed
+- `401 Unauthorized`: Invalid or missing JWT token
+- `404 Not Found`: Badge not found
+- `500 Internal Server Error`: Server processing error
+
+---
+
+### 5. Get Community Profile
 
 - **Endpoint**: `GET /api/v1/nft/community-profile/:walletAddress`
 - **Controller Action**: `NFTController.getCommunityProfile`

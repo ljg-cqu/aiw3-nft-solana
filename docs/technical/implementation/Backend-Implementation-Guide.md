@@ -87,10 +87,10 @@ npm install @metaplex-foundation/js@^0.19.4
          const tradingVolume = await this.calculateTradingVolume(userId);
          
          // Check existing NFTs
-         const existingNFT = await UserNFT.findOne({
-           user_id: userId,
-           nft_level: { '>=': targetLevel },
-           is_active: true
+         const existingNFT = await UserNft.findOne({
+         owner: userId,
+         level: { '>=': targetLevel },
+         status: 'active'
          });
          
          return {
@@ -155,13 +155,13 @@ npm install @metaplex-foundation/js@^0.19.4
          const userId = req.user.id;
          
          // Get user's current NFTs
-         const userNFTs = await UserNFT.find({
-           user_id: userId,
-           is_active: true
+         const userNFTs = await UserNft.find({
+         owner: userId,
+         status: 'active'
          });
 
          // Check qualification for next level
-         const currentLevel = userNFTs.length > 0 ? Math.max(...userNFTs.map(nft => nft.nft_level)) : 0;
+         const currentLevel = userNFTs.length > 0 ? Math.max(...userNFTs.map(nft => nft.level)) : 0;
          const nextLevel = currentLevel + 1;
          const qualification = await NFTService.checkNFTQualification(userId, nextLevel);
 
@@ -190,9 +190,9 @@ npm install @metaplex-foundation/js@^0.19.4
          const userId = req.user.id;
 
          // Check if user already has an NFT
-         const existingNFT = await UserNFT.findOne({
-           user_id: userId,
-           is_active: true
+         const existingNFT = await UserNft.findOne({
+         owner: userId,
+         status: 'active'
          });
 
          if (existingNFT) {

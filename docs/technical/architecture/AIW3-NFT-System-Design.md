@@ -99,9 +99,9 @@ The AIW3 NFT ecosystem operates through three distinct phases:
 **📋 [Business Rules and Flows - NFT Status Transition Diagram](/docs/business/AIW3-NFT-Business-Rules-and-Flows.md#nft-status-transition-diagram)**
 
 **Key Technical State Categories**:
-- **Business Logic States**: `Locked`, `Unlockable` - computed by NFTService based on user qualification
+- **Level 1 NFT States**: `Locked`, `Unlockable`, `Active` - computed by NFTService based on trading volume for first NFT
 - **Process States**: `Unlocking`, `Upgrading` - temporary UI indicators during async operations  
-- **Database NFT Statuses**: `Active`, `Burned` - persistent records in UserNft table
+- **Database NFT Statuses**: `active`, `burned` - persistent records in UserNft table for Level 2-5 NFTs
 
 ---
 
@@ -193,10 +193,10 @@ The AIW3 NFT system uses a hybrid approach where the NFT itself contains only a 
 
 ### 3.1 NFT Operation Data Flows
 
-#### 3.1.1 NFT Unlocking and Activation Flow
-This flow is now separated into two distinct stages: Unlocking (transitioning the NFT to an `unlocked` state) and Activating (making the NFT fully active and its benefits available).
+#### 3.1.1 NFT Unlocking Flow (Level 1 Only)
+This flow applies only to Level 1 "Tech Chicken" NFT when users have no active Tiered NFT and meet volume requirements.
 
-**Unlocking Flow (`unlocked` state):**
+**Level 1 NFT Unlocking Flow:**
 
 ```mermaid
 sequenceDiagram
@@ -239,8 +239,8 @@ sequenceDiagram
     SOLANA-->>WEB3: transaction signature
     WEB3-->>NFT: mint result
 
-    %% Store in database with 'unlocked' status
-    NFT->>MYSQL: INSERT INTO user_nfts (..., status='unlocked')
+    %% Store in database with 'active' status
+    NFT->>MYSQL: INSERT INTO user_nfts (..., status='active')
     MYSQL-->>NFT: NFT record created
 
     %% Publish event
@@ -252,44 +252,7 @@ sequenceDiagram
     API-->>UI: NFT unlocked successfully
 ```
 
-**Activation Flow (`active` state):**
 
-```mermaid
-sequenceDiagram
-    participant UI as Personal Center UI
-    participant API as Sails.js API
-    participant NFT as NFTService
-    participant MYSQL as MySQL DB
-    participant WEB3 as Web3Service
-    participant SOLANA as Solana Blockchain
-    participant KAFKA as KafkaService
-    participant WS as WebSocket
-
-    UI->>API: POST /api/nft/activate
-    API->>NFT: activateNFT(userId, nftId)
-
-    %% Verify NFT ownership and status
-    NFT->>MYSQL: SELECT * FROM user_nfts WHERE user_id = ? AND id = ? AND status = 'unlocked'
-    MYSQL-->>NFT: unlocked NFT record
-
-    %% Perform on-chain activation (if necessary)
-    NFT->>WEB3: activateOnChain(userWallet, nftMintAddress)
-    WEB3->>SOLANA: on-chain activation transaction
-    SOLANA-->>WEB3: transaction signature
-    WEB3-->>NFT: activation result
-
-    %% Update database to 'active' status
-    NFT->>MYSQL: UPDATE user_nfts SET status='active' WHERE id = ?
-    MYSQL-->>NFT: NFT record updated
-
-    %% Publish event
-    NFT->>KAFKA: KafkaService.sendMessage("nft-events", {eventType: "activated", data: eventData})
-    KAFKA->>WS: broadcast to user
-    WS-->>UI: real-time update
-
-    NFT-->>API: success response
-    API-->>UI: NFT activated successfully
-```
 
 #### 3.1.2 NFT Upgrade Flow
 ```mermaid
