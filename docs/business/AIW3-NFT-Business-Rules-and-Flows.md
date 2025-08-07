@@ -45,12 +45,12 @@ The NFT lifecycle is managed through a series of statuses. It is critical to dis
 
 ```mermaid
 graph TD
-    subgraph Pre-Minting Business Logic (NFTService)
+        subgraph "Pre-Minting Business Logic (NFTService)"
         A[Locked] -->|User meets qualification criteria| B(Unlockable)
         B -->|User clicks 'Claim'| C(Claiming...)
     end
 
-    subgraph Post-Minting Database State (UserNft Table)
+        subgraph "Post-Minting Database State (UserNft Table)"
         D[Active] -->|User initiates synthesis| E(Burned)
     end
 
