@@ -136,6 +136,7 @@ const NFTDashboard = () => {
 'POST /api/v1/user/activate-badge': 'UserController.activateBadge',
 'GET /api/v1/user/nft-transactions': 'UserController.getNFTTransactionHistory',
 'GET /api/v1/user/available-badges': 'UserController.getAvailableBadges',
+'GET /api/v1/user/trading-volume': 'UserController.getTradingVolume',
 ```
 
 #### ✅ Administrative APIs (NFTManagementController)

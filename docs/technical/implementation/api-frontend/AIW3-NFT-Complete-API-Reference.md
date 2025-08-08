@@ -285,6 +285,66 @@ None (user identified via JWT token)
 **Controller:** `UserController.getAvailableBadges`  
 **Description:** Get available badges for user to earn
 
+### 1.8 Get User Trading Volume
+
+**Endpoint:** `GET /api/v1/user/trading-volume`  
+**Controller:** `UserController.getTradingVolume`  
+**Description:** Get user's total trading volume and breakdown for NFT qualification
+
+#### Authentication
+- **Required:** Yes (JWT Token)
+- **User Context:** Uses `req.user.id` from authenticated session
+
+#### Response Format
+```json
+{
+  "code": 200,
+  "message": "Trading volume retrieved successfully",
+  "data": {
+    "totalTradingVolume": 1000000,
+    "breakdown": {
+      "totalTradingVolume": 1000000,
+      "perpetualTradingVolume": 600000,
+      "strategyTradingVolume": 400000,
+      "lastUpdated": "2025-08-08T05:38:46.000Z"
+    }
+  }
+}
+```
+
+#### Response Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| `totalTradingVolume` | Number | Total trading volume in USD (perpetual + strategy) |
+| `breakdown.perpetualTradingVolume` | Number | Volume from perpetual contract trading |
+| `breakdown.strategyTradingVolume` | Number | Volume from strategy trading |
+| `breakdown.lastUpdated` | String | ISO timestamp of last volume update |
+
+#### Error Responses
+- **500:** Failed to get trading volume
+
+#### Frontend Integration
+```javascript
+// Get user's trading volume
+const getTradingVolume = async () => {
+  try {
+    const response = await apiClient.get('/api/v1/user/trading-volume', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    const { totalTradingVolume, breakdown } = response.data.data;
+    console.log(`Total Volume: $${totalTradingVolume.toLocaleString()}`);
+    console.log(`Perpetual: $${breakdown.perpetualTradingVolume.toLocaleString()}`);
+    console.log(`Strategy: $${breakdown.strategyTradingVolume.toLocaleString()}`);
+    
+    return response.data.data;
+  } catch (error) {
+    console.error('Failed to get trading volume:', error.response?.data?.message);
+    throw error;
+  }
+};
+```
+
 ---
 
 ## 2. Administrative NFT Management APIs

@@ -169,7 +169,46 @@ Content-Type: application/json
 }
 ```
 
-### 2.5 Badge Activation
+### 2.5 User Trading Volume
+
+```http
+GET /api/v1/user/trading-volume
+Authorization: Bearer {jwt_token}
+```
+
+#### Response
+```json
+{
+  "code": 200,
+  "message": "Trading volume retrieved successfully",
+  "data": {
+    "totalTradingVolume": 1000000,
+    "breakdown": {
+      "totalTradingVolume": 1000000,
+      "perpetualTradingVolume": 600000,
+      "strategyTradingVolume": 400000,
+      "lastUpdated": "2025-08-08T05:38:46.000Z"
+    }
+  }
+}
+```
+
+#### Frontend Integration
+```javascript
+const getTradingVolume = async () => {
+  const response = await fetch('/api/v1/user/trading-volume', {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  const data = await response.json();
+  return data.data;
+};
+```
+
+### 2.6 Badge Activation
 ```http
 POST /api/v1/user/badge-activate
 Authorization: Bearer {jwt_token}
