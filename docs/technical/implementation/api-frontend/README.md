@@ -1,10 +1,21 @@
 # AIW3 NFT Frontend API Documentation
 
+<!-- Document Metadata -->
+**Version:** v2.0.0  
+**Last Updated:** 2025-08-08  
+**Status:** Production Ready  
+**Purpose:** Navigation hub for AIW3 NFT frontend API integration with lastmemefi-api
+
+---
+
 ## Overview
 
-This **README serves as the unified entrance and navigation hub** for frontend developers working with the AIW3 NFT system. The comprehensive technical details, complete API contracts, request/response examples, and integration patterns are contained in the detailed reference document.
+This **README serves as the unified entrance and navigation hub** for frontend developers working with the AIW3 NFT system integrated with the existing lastmemefi-api backend. All endpoints are **production-ready and implemented** in the backend system.
 
-**For Complete Implementation Details**: See [AIW3-NFT-Frontend-API-Reference.md](./AIW3-NFT-Frontend-API-Reference.md)
+### 📋 Complete API Documentation
+
+- **[AIW3-NFT-Complete-API-Reference.md](./AIW3-NFT-Complete-API-Reference.md)** - **Complete production-ready API reference** with all implemented endpoints, request/response examples, and authentication patterns
+- **[AIW3-NFT-Data-Types-Reference.md](./AIW3-NFT-Data-Types-Reference.md)** - **Comprehensive data types and validation rules** with constraints, enums, and frontend validation examples
 
 ## Documentation Structure
 
@@ -28,84 +39,143 @@ This **README serves as the unified entrance and navigation hub** for frontend d
 
 ## Quick Start
 
-### 1. Frontend API Integration
+### 1. API Client Setup
 ```javascript
-// Basic NFT data fetching
-import { useNFTData } from './hooks/useNFTData';
+// apiClient.js
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: 'https://api.lastmemefi.com',
+  timeout: 10000,
+});
+
+// Add JWT token to all requests
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('jwt_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export { apiClient };
+```
+
+### 2. NFT Portfolio Hook
+```javascript
+// useNFTPortfolio.js
+import { useState, useEffect } from 'react';
+import { apiClient } from '../services/apiClient';
+
+export const useNFTPortfolio = () => {
+  const [portfolio, setPortfolio] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPortfolio = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get('/api/v1/user/nft-portfolio');
+        setPortfolio(response.data);
+        setError(null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to fetch portfolio');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPortfolio();
+  }, []);
+
+  return { portfolio, loading, error, refetch: fetchPortfolio };
+};
+```
+
+### 3. NFT Dashboard Component
+```javascript
+// NFTDashboard.jsx
+import React from 'react';
+import { useNFTPortfolio } from '../hooks/useNFTPortfolio';
 
 const NFTDashboard = () => {
-  const { nftData, loading, error } = useNFTData();
+  const { portfolio, loading, error } = useNFTPortfolio();
   
-  if (loading) return <div>Loading NFT data...</div>;
+  if (loading) return <div>Loading NFT portfolio...</div>;
   if (error) return <div>Error: {error}</div>;
   
   return (
     <div>
       <h1>Personal Center</h1>
-      {nftData.tiered_nfts.map(nft => (
-        <NFTCard key={nft.nft_id} nft={nft} />
-      ))}
+      <div className="nft-grid">
+        {portfolio.data.tieredNFTs.map(nft => (
+          <NFTCard key={nft.nft_id} nft={nft} />
+        ))}
+      </div>
+      <div className="badge-section">
+        <h2>Badges</h2>
+        {portfolio.data.badges.owned.map(badge => (
+          <BadgeCard key={badge.badge_id} badge={badge} />
+        ))}
+      </div>
     </div>
   );
 };
 ```
 
-### 2. WebSocket Integration
-```javascript
-// Real-time NFT updates
-import { NFTWebSocketManager } from './services/NFTWebSocketManager';
+### 3. Production-Ready API Endpoints
 
-const wsManager = new NFTWebSocketManager(jwtToken);
-wsManager.connect();
+#### ✅ User NFT Management APIs (UserController)
+```javascript
+// Personal Center & Portfolio Management
+'GET /api/v1/user/nft-portfolio': 'UserController.getNFTPortfolio',
+'GET /api/v1/user/nft-qualification/:nftDefinitionId': 'UserController.checkNFTQualification',
+'POST /api/v1/user/claim-nft': 'UserController.claimNFT',
+'POST /api/v1/user/upgrade-nft': 'UserController.upgradeNFT',
+'POST /api/v1/user/activate-badge': 'UserController.activateBadge',
+'GET /api/v1/user/nft-transactions': 'UserController.getNFTTransactionHistory',
+'GET /api/v1/user/available-badges': 'UserController.getAvailableBadges',
 ```
 
-### 3. MECE-Compliant API Endpoints (Codebase Aligned)
-
-#### 🟢 Existing Endpoints (REUSE - Already Implemented)
+#### ✅ Administrative APIs (NFTManagementController)
 ```javascript
-// EXISTING NFT endpoints (follow established patterns)
-'POST /api/v1/nft/claim': 'NFTController.claim',           // First NFT unlock
-'POST /api/v1/nft/activate': 'NFTController.activate',     // NFT benefit activation
+// Manager/Admin Operations
+'POST /api/v1/admin/award-badge': 'NFTManagementController.awardBadge',
+'GET /api/v1/admin/nft-definitions': 'NFTManagementController.getNFTDefinitions',
+'GET /api/v1/admin/badges': 'NFTManagementController.getAllBadges',
+'GET /api/v1/admin/user-nft-status/:userId': 'NFTManagementController.getUserNFTStatus',
+'POST /api/v1/admin/burn-nft': 'NFTManagementController.burnNFT',
+'GET /api/v1/admin/nft-statistics': 'NFTManagementController.getNFTStatistics',
+'POST /api/v1/admin/refresh-qualification': 'NFTManagementController.refreshUserQualification',
 ```
 
-**Existing Implementation Details**:
-- **`claim`**: `NFTService.claimNFT(userId, nftId)` - Use for Tech Chicken unlock
-- **`activate`**: `NFTService.activateNFT(userId, userNftId)` - Use for benefit activation
-
-#### 🔴 New Endpoints (EXTEND - Following Codebase Patterns)
-
-##### User-Centric NFT Management (extends existing `/api/v1/user/*` pattern)
+#### ✅ Legacy NFT APIs (NFTController)
 ```javascript
-// USER NFT DASHBOARD & DETAILS (follows UserController pattern)
-'GET /api/v1/user/nft-dashboard': 'UserController.getNFTDashboard',      // Personal center data
-'GET /api/v1/user/nft/:nftId': 'UserController.getNFTDetails',           // Individual NFT details
-'POST /api/v1/user/nft-upgrade': 'UserController.upgradeNFT',            // Tier progression
-
-// USER BADGE MANAGEMENT (extends UserController)
-'GET /api/v1/user/badges': 'UserController.getBadges',                   // User's badge collection
-'POST /api/v1/user/badge-activate': 'UserController.activateBadge',      // Badge activation
-'GET /api/v1/user/badge/:badgeId': 'UserController.getBadgeDetails',     // Badge details
+// Backward Compatibility
+'POST /api/v1/nft/claim': 'NFTController.claim',
+'POST /api/v1/nft/activate': 'NFTController.activate',
 ```
 
-##### System NFT Operations (extends existing NFTController)
+#### ✅ Competition Management APIs (CompetitionController)
 ```javascript
-// NFT SYSTEM STATUS (extends NFTController)
-'GET /api/v1/nft/qualification': 'NFTController.getQualificationStatus', // Real-time qualification
-'GET /api/v1/nft/trading-volume': 'NFTController.getTradingVolumeStatus', // Volume tracking
-'PUT /api/v1/nft/:nftId/metadata': 'NFTController.updateMetadata',       // Metadata updates
-'POST /api/v1/nft/transfer': 'NFTController.transferNFT',                // NFT transfers
+// Competition NFT Airdrops
+'POST /api/v1/competition/airdrop-create': 'CompetitionController.createAirdropOperation',
+'POST /api/v1/competition/airdrop-execute': 'CompetitionController.executeAirdropOperation',
+'GET /api/v1/competition/airdrop-status/:operationId': 'CompetitionController.getAirdropStatus',
+'GET /api/v1/competition/airdrop-list': 'CompetitionController.listAirdropOperations',
+'GET /api/v1/competition/nft-holders/:nftDefinitionId': 'CompetitionController.getCompetitionNFTHolders',
 ```
 
-##### Competition Integration (extends existing `/api/trading-contest/*` pattern)
+#### ✅ Monitoring APIs (NFTMonitoringController)
 ```javascript
-// COMPETITION NFT REWARDS (extends TradingWeeklyLeaderboardController)
-'GET /api/trading-contest/nft-rewards': 'TradingWeeklyLeaderboardController.getNFTRewards',
-'POST /api/trading-contest/claim-nft': 'TradingWeeklyLeaderboardController.claimNFTReward',
-```
-
-##### Competition Management Operations (extends existing admin patterns)
-```javascript
-// COMPETITION NFT AIRDROP (requires COMPETITION_MANAGER role)
+// Health Checks & Monitoring
+'GET /api/v1/monitoring/health': 'NFTMonitoringController.healthCheck',
+'GET /api/v1/monitoring/statistics': 'NFTMonitoringController.getStatistics',
+'GET /api/v1/monitoring/metrics': 'NFTMonitoringController.getMetrics',
+'GET /api/v1/monitoring/alive': 'NFTMonitoringController.livenessProbe',
+'GET /api/v1/monitoring/ready': 'NFTMonitoringController.readinessProbe',
+'GET /api/v1/monitoring/deployment-info': 'NFTMonitoringController.getDeploymentInfo',
 'POST /api/v1/competition/nft/airdrop': 'CompetitionController.airdropNFTs',              // Batch airdrop to winners
 'GET /api/v1/competition/nft/airdrop-history': 'CompetitionController.getAirdropHistory', // Audit trail
 'POST /api/v1/competition/nft/airdrop-retry': 'CompetitionController.retryFailedAirdrop', // Retry failed operations
