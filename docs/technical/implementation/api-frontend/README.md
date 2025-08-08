@@ -137,6 +137,12 @@ const NFTDashboard = () => {
 'GET /api/v1/user/nft-transactions': 'UserController.getNFTTransactionHistory',
 'GET /api/v1/user/available-badges': 'UserController.getAvailableBadges',
 'GET /api/v1/user/trading-volume': 'UserController.getTradingVolume',
+
+// 🔄 RESTful Polling APIs (Alternative to WebSocket)
+'GET /api/v1/user/nft-portfolio/changes': 'UserController.getNFTPortfolioChanges',
+'GET /api/v1/user/transaction-status/:transactionId': 'UserController.getTransactionStatus',
+'GET /api/v1/user/qualification-summary': 'UserController.getQualificationSummary',
+'GET /api/v1/user/notifications': 'UserController.getNFTNotifications',
 ```
 
 #### ✅ Administrative APIs (NFTManagementController)
