@@ -189,7 +189,49 @@ This document analyzes the AIW3 NFT prototype designs to identify:
 
 ---
 
-### 7. Popups and Modals
+### 7. Instant Messaging (`7. IM.png`)
+
+#### **Information to Present**
+| Data Element | Description | Data Source | Display Format |
+|--------------|-------------|-------------|----------------|
+| Chat Interface | Real-time messaging system | Messaging API | Chat bubbles, message threads |
+| User Contacts | Available users for messaging | User Directory API | Contact list, online status |
+| Message History | Previous conversations | Message History API | Chronological message list |
+| Online Status | User availability indicators | Presence API | Status indicators, last seen |
+| NFT Sharing | Share NFT achievements in chat | NFT API + Messaging | Rich media cards, NFT previews |
+| Group Channels | Community and team discussions | Channel API | Channel list, member counts |
+| Notification Badges | Unread message indicators | Notification API | Badge counts, priority indicators |
+
+#### **User Actions Required**
+| Action | Trigger | Frontend Requirement | Backend API Call |
+|--------|---------|---------------------|------------------|
+| Send Message | Type and send | Real-time delivery | `POST /api/v1/messages/send` |
+| Share NFT | Click share button | NFT selection modal | `POST /api/v1/messages/share-nft` |
+| Start New Chat | Click new chat | Contact selection | `POST /api/v1/messages/conversations` |
+| Join Channel | Click join button | Channel access | `POST /api/v1/channels/join` |
+| Set Status | Update availability | Status selection | `PUT /api/v1/user/presence` |
+| View Message History | Scroll/load more | Pagination | `GET /api/v1/messages/history` |
+
+#### **API Requirements**
+| Endpoint | Method | Purpose | Frontend Needs | Backend Provides |
+|----------|--------|---------|----------------|------------------|
+| `/api/v1/messages/conversations` | GET | User conversations | Chat list display | Active conversations, last messages |
+| `/api/v1/messages/send` | POST | Send message | Real-time delivery | Message delivery confirmation |
+| `/api/v1/messages/history/:conversationId` | GET | Message history | Chat display | Paginated message history |
+| `/api/v1/channels` | GET | Available channels | Channel list | Public channels, member counts |
+| `/api/v1/user/presence` | GET/PUT | User online status | Presence indicators | Online status, last seen |
+
+#### **Real-time Requirements**
+| Feature | Technology | Update Frequency | Priority |
+|---------|------------|------------------|----------|
+| Message Delivery | WebSocket | Immediate | High |
+| Typing Indicators | WebSocket | Real-time | Medium |
+| Online Status | WebSocket | Every 30 seconds | Medium |
+| NFT Share Notifications | WebSocket | Immediate | High |
+
+---
+
+### 8. Popups and Modals
 
 #### **Unlock NFT Popup (`6. Popup_Unlock_NFT.png`)**
 | Data Element | Description | Data Source | Display Format |
