@@ -1,28 +1,29 @@
 # AIW3 NFT Integration Issues & PRs Tracking
 
 <!-- Document Metadata -->
-**Version:** v2.0.0  
+**Version:** v3.0.0  
 **Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** API/endpoint-oriented tracking of AIW3 NFT system development with domain-based organization
+**Purpose:** MECE-compliant, production-ready tracking of AIW3 NFT system development with comprehensive business requirement coverage
 
 ---
 
 ## 🎯 Overview
 
-This document tracks development issues organized by **frontend API endpoints** and **domain functionality**. Each issue is correlated with specific API endpoints or marked as **support infrastructure**.
+This document provides **MECE-compliant** (Mutually Exclusive, Collectively Exhaustive) tracking of all NFT integration requirements. Each issue directly maps to business requirements from `AIW3-NFT-Business-Rules-and-Flows.md` and integrates with existing `lastmemefi-api` infrastructure.
 
 ### 📊 Project Status
-- **Total Issues**: 52 (reorganized and expanded)
-- **API-Correlated Issues**: 39 (75%)
-- **Support Infrastructure**: 13 (25%)
+- **Total Issues**: 64 (MECE-compliant and comprehensive)
+- **API-Correlated Issues**: 48 (75%)
+- **Support Infrastructure**: 16 (25%)
 - **Milestones**: 4 major milestones
-- **Completion**: 0% (development ready to start)
+- **Completion**: 0% (production-ready to start)
+- **Business Coverage**: 100% (all requirements mapped)
 
 ### 🏗️ Milestone Overview
-- **🚀 M1: Core Infrastructure** (Foundation & Database) - 13 issues
-- **🔧 M2: User NFT Management** (Personal Center APIs) - 15 issues  
-- **⚡ M3: Competition Management** (Admin/Manager APIs) - 12 issues
+- **🚀 M1: Core Infrastructure** (Foundation & Database) - 18 issues
+- **🔧 M2: User NFT Management** (Personal Center APIs) - 20 issues  
+- **⚡ M3: Competition Management** (Admin/Manager APIs) - 14 issues
 - **🎯 M4: Production & Operations** (Deployment & Monitoring) - 12 issues
 ---
 
@@ -77,100 +78,116 @@ This document tracks development issues organized by **frontend API endpoints** 
 
 ## 🚀 M1: Core Infrastructure
 
-**Milestone Goal**: Establish foundational database schema, core services, and blockchain integration  
+**Milestone Goal**: Establish foundational database schema, core services, and blockchain integration with full business requirement coverage  
 **Timeline**: Weeks 1-2  
 **Dependencies**: None (foundational)  
 **API Correlation**: Support infrastructure (no direct endpoints)
+**Business Coverage**: All 6 NFT tiers, 19 badges, competition system, trading volume integration
 
-### Database Schema & Models
-
-| Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
-|----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
-| **M1-001** | Create UserNft Model | 🔥 Core NFT ownership tracking | User.id (string), existing auth system | Waterline ORM model with mint_address, tier, status, benefits | 🔥 Critical - Foundation for all NFT operations | None | Must align with existing User model structure |
-| **M1-002** | Create NFTDefinition Model | 🔥 NFT tier configuration | Badge system integration, trading volume thresholds | Static configuration model with tier definitions, requirements | 🔥 Critical - Defines all NFT business rules | M1-003 (Badge Model) | Business rules must match AIW3-NFT-Business-Rules-and-Flows.md |
-| **M1-003** | Create Badge Model | ⭐ Badge-based upgrade system | Existing badge/achievement system if any | Badge tracking with activation status, consumption logic | 🔥 Critical - Required for NFT upgrades | None | May need integration with existing gamification |
-| **M1-004** | Create AirdropFailure Model | 🟡 Airdrop reliability | Competition system integration | Failure tracking with retry metadata, error codes | ⭐ High - Ensures airdrop reliability | M3 (Competition APIs) | Supports bulk airdrop operations |
-| **M1-005** | Database Migration Scripts | 🔥 Production deployment | lastmemefi-api database schema | Sails.js migration scripts with rollback procedures | 🔥 Critical - Production deployment blocker | M1-001 to M1-004 | Must include proper indexes and foreign keys |
-
-### Core Service Layer
+### Database Schema & Models (Existing Backend Integration)
 
 | Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
 |----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
-| **M1-006** | Create NFTService Foundation | 🔥 Central NFT orchestration | Existing service patterns, error handling | Sails.js service with claim, activate, upgrade methods | 🔥 Critical - Core business logic hub | M1-001 to M1-005 | Must follow existing service conventions |
-| **M1-007** | Extend Web3Service for NFTs | 🔥 Blockchain operations | Existing Web3Service if any, Solana RPC config | Extend/create Web3Service with Metaplex SDK integration | 🔥 Critical - All blockchain ops depend on this | M1-011 (Metaplex) | Requires circuit breakers for RPC failures |
-| **M1-008** | Create TradingVolumeService | 🔥 NFT qualification logic | Trades model, OKX/Hyperliquid APIs, strategy trading data | Service to calculate NFT-qualifying volume (perpetual + strategy only) | 🔥 Critical - Determines NFT eligibility | Existing Trades model | Must exclude non-NFT activities (token trading, etc.) |
-| **M1-009** | Implement Badge Management | ⭐ Upgrade prerequisite system | Existing badge/achievement system | BadgeService with activation, consumption, validation logic | ⭐ High - Required for tier upgrades | M1-003 (Badge Model) | Integration with existing gamification if any |
-| **M1-010** | Service Integration Testing | 🟡 Quality assurance | Existing test patterns, mock data | Comprehensive unit/integration tests with mocked blockchain | ⭐ High - Prevents production issues | M1-006 to M1-009 | Include performance and error scenario testing |
+| **M1-001** | Extend Existing UserNft Model | 🔥 Core NFT ownership tracking | Existing UserNft.js model, User.id relationships | Extend current UserNft model with tier, benefits, qualification_volume fields | 🔥 Critical - Foundation for all NFT operations | None | Leverage existing model structure, add NFT-specific fields |
+| **M1-002** | Extend Existing NftDefinition Model | 🔥 NFT tier configuration | Existing NftDefinition.js model, business tier requirements | Extend current NftDefinition with tier_level, volume_requirement, badge_requirement fields | 🔥 Critical - Defines all NFT business rules | M1-003 (Badge System) | Add 6 NFT tier definitions (Tech Chicken to Quantum Alchemist) |
+| **M1-003** | Create Badge System Models | ⭐ Badge-based upgrade system | User relationships, achievement tracking patterns | Create Badge and UserBadge models with 19 specific badge definitions | 🔥 Critical - Required for NFT upgrades | None | Implement all 19 badges from business requirements |
+| **M1-004** | Create UserNftQualification Model | 🔥 Real-time qualification tracking | User.id, trading volume calculation, badge status | Cached qualification model with volume, badge_count, next_tier fields | 🔥 Critical - Performance optimization | M1-008 (TradingVolumeService) | Cache qualification status for real-time display |
+| **M1-005** | Create AirdropOperation Model | 🟡 Airdrop tracking and audit | Competition system integration, manager roles | Airdrop operation tracking with manager_id, competition_id, recipients | ⭐ High - Audit compliance | M3 (Competition APIs) | Support bulk operations and failure recovery |
+| **M1-006** | Create NFTTransaction Model | ⭐ Transaction history tracking | Blockchain transaction records, user activity | Transaction log with type (mint/burn/upgrade), blockchain_tx_id, status | ⭐ High - User transparency | M1-001 (UserNft) | Complete audit trail for all NFT operations |
+| **M1-007** | Database Migration Scripts | 🔥 Production deployment | lastmemefi-api database schema, existing data preservation | Sails.js migration scripts with data preservation and rollback procedures | 🔥 Critical - Production deployment blocker | M1-001 to M1-006 | Must preserve existing UserNft and NftDefinition data |
 
-### Blockchain Integration
+### Core Service Layer (Existing Backend Integration)
 
 | Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
 |----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
-| **M1-011** | Solana Metaplex Integration | 🔥 NFT minting/burning operations | Solana RPC endpoints, wallet keypairs, IPFS config | Metaplex SDK with unified minting service, metadata upload | 🔥 Critical - Core blockchain functionality | IPFS/Pinata setup | See Solana-Blockchain-Integration-Unified.md |
-| **M1-012** | Blockchain Error Handling | ⭐ System resilience | Network failure patterns, RPC rate limits | Circuit breakers, exponential backoff, fallback RPCs | ⭐ High - Prevents system failures | M1-011 (Metaplex) | Must handle Solana network congestion |
-| **M1-013** | Wallet Signature Verification | ⭐ Authentication security | Existing JWT auth, user wallet addresses | Solana signature verification with message signing | ⭐ High - Prevents unauthorized access | User wallet integration | Dual auth: JWT + wallet signature |
+| **M1-008** | Create NFTService Foundation | 🔥 Central NFT orchestration | Existing service patterns, UserService, error handling | Sails.js service with claim, activate, upgrade, qualification methods | 🔥 Critical - Core business logic hub | M1-001 to M1-007 | Must follow existing service conventions, integrate with UserService |
+| **M1-009** | Extend Existing Web3Service | 🔥 Blockchain operations | Existing Web3Service.js with mintNFT/burnNFT methods | Extend current Web3Service with NFT tier minting, metadata management | 🔥 Critical - All blockchain ops depend on this | M1-012 (Metaplex Enhancement) | Leverage existing mintNFT/burnNFT, add tier-specific logic |
+| **M1-010** | Create TradingVolumeService | 🔥 NFT qualification logic | Existing Trades model, trading history data | Service to calculate NFT-qualifying volume (perpetual + strategy, complete history) | 🔥 Critical - Determines NFT eligibility | Existing Trades model | Must include ALL historical trading data from system inception |
+| **M1-011** | Create BadgeService | ⭐ Badge management system | User relationships, achievement tracking patterns | BadgeService with 19 badge definitions, activation, consumption logic | 🔥 Critical - Required for tier upgrades | M1-003 (Badge Models) | Implement all 19 specific badges from business requirements |
+| **M1-012** | Create QualificationService | 🔥 Real-time qualification logic | TradingVolumeService, BadgeService, UserNftQualification model | Service for real-time qualification checking, caching, status updates | 🔥 Critical - Performance optimization | M1-010, M1-011 | Cache qualification results, handle real-time updates |
+| **M1-013** | Create CompetitionNFTService | ⭐ Competition winner automation | Existing TradingWeeklyLeaderboardController, competition data | Service for automatic NFT minting to top 3 competition winners | ⭐ High - Competition integration | TradingWeeklyLeaderboardController | Automatic winner detection and NFT minting |
+| **M1-014** | Service Integration Testing | 🟡 Quality assurance | Existing test patterns, mock data, blockchain mocking | Comprehensive unit/integration tests with mocked blockchain operations | ⭐ High - Prevents production issues | M1-008 to M1-013 | Include performance, error scenarios, and edge cases |
+
+### Blockchain Integration (Existing Web3Service Enhancement)
+
+| Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
+|----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
+| **M1-015** | Enhance Existing Metaplex Integration | 🔥 NFT tier-specific minting | Existing Web3Service.mintNFT method, Metaplex SDK setup | Extend existing mintNFT with tier-specific metadata, batch operations | 🔥 Critical - Core blockchain functionality | Existing IPFS/Pinata setup | Leverage existing Metaplex foundation, add tier logic |
+| **M1-016** | NFT Tier Metadata Management | 🔥 Tier-specific NFT properties | Existing metadataUri handling, IPFS integration | Create tier-specific metadata templates, automated IPFS upload | 🔥 Critical - NFT tier differentiation | M1-015, existing Pinata integration | 6 tier-specific metadata templates (Tech Chicken to Quantum Alchemist) |
+| **M1-017** | Enhanced Blockchain Error Handling | ⭐ System resilience | Existing Web3Service error patterns, RPC configuration | Extend existing error handling with circuit breakers, retry logic | ⭐ High - Prevents system failures | M1-015 (Enhanced Metaplex) | Build on existing error handling patterns |
+| **M1-018** | Wallet Signature Verification | ⭐ Authentication security | Existing SolanaChainAuthController, JWT auth, user wallet addresses | Integrate with existing auth controller, add NFT operation verification | ⭐ High - Prevents unauthorized access | SolanaChainAuthController | Leverage existing Solana auth patterns |
 
 **M1 Success Criteria:**
-- ✅ All data models created and migrated
-- ✅ Core services implemented and tested
-- ✅ Blockchain integration functional
+- ✅ All data models created and migrated (6 new models)
+- ✅ Core services implemented and tested (6 new services)
+- ✅ Blockchain integration enhanced (existing Web3Service extended)
+- ✅ All 19 badges implemented with activation logic
+- ✅ All 6 NFT tiers configured with metadata
 - ✅ Foundation ready for API development
 
 ---
 
 ## 🔧 M2: User NFT Management APIs
 
-**Milestone Goal**: Implement all user-facing NFT endpoints for Personal Center integration  
+**Milestone Goal**: Implement all user-facing NFT endpoints for Personal Center integration with complete business requirement coverage  
 **Timeline**: Weeks 2-4  
 **Dependencies**: M1 (Core Infrastructure)  
 **API Correlation**: Direct frontend integration endpoints
+**Business Coverage**: All NFT states, qualification logic, upgrade flows, badge management, real-time status
 
-### Personal Center Dashboard APIs
-
-| Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
-|----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
-| **M2-001** | User NFT Dashboard Endpoint | 🔥 Main NFT user interface | UserController patterns, existing dashboard APIs | GET endpoint returning user NFT status, tier, benefits, qualification progress | 🔥 Critical - Primary user entry point | M1-006 (NFTService) | Must follow existing API response format |
-| **M2-002** | Dashboard Real-time Updates | ⭐ Live user experience | WebSocket infrastructure, event system | Kafka events for NFT status changes, qualification updates | ⭐ High - Enhances user engagement | WebSocket setup | Real-time qualification progress updates |
-| **M2-003** | NFT Details Endpoint | ⭐ NFT information display | NFT metadata, IPFS integration | GET endpoint with detailed NFT info, metadata, transaction history | ⭐ High - User information needs | M1-011 (Metaplex), IPFS | Include Solana explorer links |
-
-### Badge Management APIs
+### Personal Center Dashboard APIs (Existing UserController Integration)
 
 | Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
 |----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
-| **M2-004** | User Badges Collection | **Affects**: Badge display system<br>**Changes**: GET /api/v1/user/badges endpoint | **Needs**: Badge model access, user badge relationships, existing API patterns | **Solution**: Create endpoint returning user's badge collection with status (owned/activated/consumed), earned dates, metadata | ⭐ High - Badge showcase functionality | M1-003 (Badge model) | Badge collection display, activation buttons |
-| **M2-005** | Badge Activation Logic | **Affects**: Badge status management<br>**Changes**: POST /api/v1/user/badges/:badgeId/activate endpoint | **Needs**: Badge model updates, NFT qualification cache invalidation, real-time events | **Solution**: Implement badge activation endpoint transitioning badges from 'owned' to 'activated', clear qualification cache, publish events | 🔥 Critical - Required for NFT upgrades | M1-003 (Badge model), RedisService | Badge activation flow, upgrade preparation |
-| **M2-006** | Badge Status Validation | **Affects**: Badge activation integrity<br>**Changes**: Validation logic for badge operations | **Needs**: Badge model constraints, business rule validation | **Solution**: Prevent duplicate activation, validate badge requirements, ensure data consistency | ⭐ High - Data integrity | M2-005 | Prevent duplicate activation, validate requirements |
+| **M2-001** | User NFT Dashboard Endpoint | 🔥 Main NFT user interface | Existing UserController patterns, dashboard API structure | Extend UserController with GET /api/v1/user/nft/dashboard endpoint | 🔥 Critical - Primary user entry point | M1-008 (NFTService), M1-012 (QualificationService) | Follow existing UserController response patterns |
+| **M2-002** | NFT Status Real-time Updates | ⭐ Live user experience | Existing WebSocket infrastructure, KafkaService, event patterns | Integrate with existing event system for real-time NFT status updates | ⭐ High - Enhances user engagement | Existing WebSocket setup, KafkaService | Real-time qualification progress, tier changes |
+| **M2-003** | NFT Details Modal Endpoint | ⭐ NFT information display | NFT metadata access, existing IPFS integration | GET /api/v1/user/nft/:nftId endpoint with detailed NFT information | ⭐ High - User information needs | M1-015 (Enhanced Metaplex), existing Pinata | Include Solana explorer links, metadata display |
+| **M2-004** | Qualification Progress Endpoint | 🔥 Real-time qualification display | QualificationService, TradingVolumeService, badge status | GET /api/v1/user/nft/qualification endpoint with progress tracking | 🔥 Critical - User engagement | M1-012 (QualificationService) | Real-time volume progress, badge requirements |
+| **M2-005** | NFT Benefit Calculation Endpoint | ⭐ User value proposition | Fee calculation systems, existing trading fee structure | GET /api/v1/user/nft/benefits endpoint with current benefits and savings | ⭐ High - User value display | Fee calculation systems | Trading fee reduction calculations, benefit summaries |
 
-### NFT Status & Qualification APIs
-
-| Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
-|----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
-| **M2-007** | NFT Qualification Status | **Affects**: Real-time qualification display<br>**Changes**: GET /api/v1/nft/status endpoint | **Needs**: NFTService qualification methods, WebSocket integration, existing API patterns | **Solution**: Create endpoint returning current NFT status, qualification progress, next tier requirements, available upgrades | 🔥 Critical - Primary user entry point | M1-006 (NFTService), WebSocket setup | Real-time qualification display, progress bars |
-| **M2-008** | Trading Volume Integration | **Affects**: NFT qualification calculation<br>**Changes**: Trading volume aggregation logic | **Needs**: TradingVolumeService integration, Trades model access, historical data | **Solution**: Calculate NFT-qualifying volume from perpetual contract and strategy trading (complete history), exclude Solana token trading | 🔥 Critical - Core qualification logic | TradingVolumeService, M1-002 | Calculate NFT-qualifying volume from Trades model |
-
-### NFT Operations APIs
+### Badge Management APIs (19 Specific Badges Implementation)
 
 | Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
 |----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
-| **M2-009** | First NFT Unlock (Claim) | **Affects**: First NFT minting<br>**Changes**: POST /api/v1/nft/claim endpoint (reuses existing) | **Needs**: Existing NFTController.claim method, Web3Service mint methods, user authentication | **Solution**: Leverage existing claim endpoint for first NFT unlock, validate user eligibility, initiate mint transaction | 🔥 Critical - User onboarding | M1-006 (NFTService), Web3Service | "Unlock Your Lv.1 NFT" button, transaction tracking |
-| **M2-010** | NFT Benefit Activation | **Affects**: NFT benefit system<br>**Changes**: POST /api/v1/nft/activate endpoint (reuses existing) | **Needs**: Existing NFTController.activate method, benefit calculation logic, fee integration | **Solution**: Leverage existing activate endpoint for NFT benefit activation, integrate with trading fee systems | ⭐ High - Benefit utilization | M1-006 (NFTService), fee systems | Benefit activation flow, fee reduction application |
-| **M2-011** | NFT Tier Upgrade | **Affects**: NFT tier progression<br>**Changes**: POST /api/v1/nft/upgrade endpoint | **Needs**: NFTService upgrade methods, qualification validation, burn-and-mint workflow, transaction atomicity | **Solution**: Implement upgrade endpoint with qualification check, atomic burn-and-mint process, badge consumption, rollback handling | 🔥 Critical - Core NFT functionality | M1-006 (NFTService), M2-005, M2-008 | Upgrade workflow, burn-and-mint process |
-| **M2-012** | Upgrade Transaction Tracking | **Affects**: Real-time upgrade feedback<br>**Changes**: WebSocket event integration | **Needs**: Existing WebSocket infrastructure, Kafka event system, transaction status monitoring | **Solution**: Implement WebSocket events for upgrade progress tracking, transaction status updates, user notifications | ⭐ High - User experience | WebSocket setup, KafkaService | Real-time upgrade progress, transaction status |
+| **M2-006** | User Badge Collection Endpoint | **Affects**: Badge showcase system<br>**Changes**: GET /api/v1/user/badges endpoint | **Needs**: BadgeService, UserBadge relationships, existing UserController patterns | **Solution**: Extend UserController with badge collection endpoint showing all 19 badges with status (owned/activated/consumed) | ⭐ High - Badge showcase functionality | M1-011 (BadgeService) | Display all 19 badges: Contract Enlightener, Platform Enlighteners, Strategic Enlighteners, etc. |
+| **M2-007** | Badge Activation Endpoint | **Affects**: Badge activation for upgrades<br>**Changes**: POST /api/v1/user/badges/:badgeId/activate endpoint | **Needs**: BadgeService activation logic, QualificationService cache invalidation, real-time events | **Solution**: Implement badge activation with qualification cache clearing, event publishing for real-time updates | 🔥 Critical - Required for NFT upgrades | M1-011 (BadgeService), M1-012 (QualificationService) | Badge activation flow, upgrade preparation, real-time status updates |
+| **M2-008** | Badge Requirement Validation | **Affects**: Badge activation integrity<br>**Changes**: Badge activation validation logic | **Needs**: Badge completion requirements, task validation, business rule enforcement | **Solution**: Validate badge requirements before activation, prevent duplicate activation, ensure task completion | ⭐ High - Data integrity | M2-007 | Validate task completion: trading volume, referrals, group membership, etc. |
+| **M2-009** | Badge Progress Tracking | **Affects**: Badge completion progress<br>**Changes**: GET /api/v1/user/badges/:badgeId/progress endpoint | **Needs**: Task completion tracking, progress calculation, existing user activity data | **Solution**: Real-time badge progress tracking with completion percentage and requirements status | 🟡 Medium - User engagement | M1-011 (BadgeService) | Progress bars for badges: referral count, trading volume, group duration |
 
-### History & Benefits APIs
+### NFT Status & Qualification APIs (All Business States Coverage)
 
 | Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
 |----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
-| **M2-013** | NFT Transaction History | **Affects**: Transaction history display<br>**Changes**: GET /api/v1/nft/history endpoint | **Needs**: NFT transaction records, blockchain data integration, existing API patterns | **Solution**: Create endpoint returning user's NFT transaction history with timestamps, transaction types, Solana explorer links | ⭐ High - User transparency | M1-004 (UserNFT model), blockchain integration | History tab, transaction timeline |
-| **M2-014** | Current NFT Benefits | **Affects**: Benefit information display<br>**Changes**: GET /api/v1/nft/benefits endpoint | **Needs**: NFT benefit calculation logic, tier configuration, fee structure data | **Solution**: Create endpoint returning current NFT benefits, fee reductions, savings calculations, benefit details | ⭐ High - User value proposition | M1-006 (NFTService), fee systems | Benefits display, fee reduction info |
-| **M2-015** | API Error Handling | **Affects**: All NFT endpoints<br>**Changes**: Standardized error response system | **Needs**: Existing error handling patterns, user-friendly message standards | **Solution**: Implement consistent error handling across all NFT endpoints, standardized error codes, user-friendly messages | 🔥 Critical - User experience | All M2 endpoints | Standardized error responses, user-friendly messages |
+| **M2-010** | NFT Status Endpoint (All States) | **Affects**: Real-time NFT status display<br>**Changes**: GET /api/v1/nft/status endpoint | **Needs**: QualificationService, all NFT states (Locked/Unlockable/Active), existing API patterns | **Solution**: Comprehensive status endpoint covering all NFT states, qualification progress, next tier requirements | 🔥 Critical - Primary status interface | M1-012 (QualificationService) | Handle all states: Locked, Unlockable, Active, Unlocking, Upgrading |
+| **M2-011** | Trading Volume Qualification | **Affects**: NFT qualification calculation<br>**Changes**: Volume calculation integration | **Needs**: TradingVolumeService, complete historical data, perpetual + strategy trading | **Solution**: Real-time qualification based on complete trading history (perpetual contract + strategy trading) | 🔥 Critical - Core qualification logic | M1-010 (TradingVolumeService) | Include ALL historical data from system inception |
+| **M2-012** | Tier Progression Logic | **Affects**: Sequential tier progression<br>**Changes**: Tier upgrade validation | **Needs**: Business rule enforcement, sequential progression requirements | **Solution**: Enforce sequential progression (Level 1→2→3→4→5), prevent tier skipping regardless of volume | 🔥 Critical - Business rule compliance | M1-008 (NFTService) | Users must start with Level 1, progress sequentially |
+
+### NFT Operations APIs (Complete Lifecycle Coverage)
+
+| Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
+|----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
+| **M2-013** | First NFT Unlock (Tech Chicken) | **Affects**: Level 1 NFT claiming<br>**Changes**: POST /api/v1/nft/claim endpoint | **Needs**: Existing NFTController patterns, Web3Service.mintNFT, volume validation | **Solution**: First NFT unlock for Tech Chicken (Level 1) with 100K USDT volume requirement | 🔥 Critical - User onboarding | M1-008 (NFTService), M1-009 (Enhanced Web3Service) | "Unlock Your Lv.1 NFT" button, no badges required |
+| **M2-014** | NFT Benefit Activation | **Affects**: Trading fee reduction activation<br>**Changes**: POST /api/v1/nft/activate endpoint | **Needs**: Fee calculation systems, existing trading fee structure, NFT benefit logic | **Solution**: Activate NFT benefits (trading fee reduction, AI agent uses, exclusive features) | ⭐ High - Benefit utilization | Fee calculation systems | Apply tier-specific benefits: 10%-55% fee reduction |
+| **M2-015** | NFT Tier Upgrade (Burn-and-Mint) | **Affects**: NFT tier progression<br>**Changes**: POST /api/v1/nft/upgrade endpoint | **Needs**: Atomic transactions, burn-and-mint workflow, badge consumption, rollback handling | **Solution**: Complete upgrade flow: validate requirements → consume badges → burn old NFT → mint new NFT | 🔥 Critical - Core NFT functionality | M1-008 (NFTService), M2-007 (Badge Activation) | Atomic burn-and-mint, badge consumption, rollback on failure |
+| **M2-016** | Upgrade Transaction Monitoring | **Affects**: Real-time upgrade feedback<br>**Changes**: Transaction status tracking | **Needs**: Blockchain transaction monitoring, WebSocket events, status updates | **Solution**: Real-time upgrade progress with transaction status, success/failure notifications | ⭐ High - User experience | Existing WebSocket, KafkaService | Live progress: Validating → Burning → Minting → Complete |
+| **M2-017** | NFT Transaction History | **Affects**: Transaction audit trail<br>**Changes**: GET /api/v1/nft/history endpoint | **Needs**: NFTTransaction model, blockchain data, Solana explorer integration | **Solution**: Complete transaction history with types (claim/upgrade/activate), timestamps, explorer links | ⭐ High - User transparency | M1-006 (NFTTransaction model) | History tab with Solana explorer links, transaction details |
+
+### Community & Social Features APIs
+
+| Issue ID | Title | System Impact | Requirements from Existing System | Solution Approach | Risk/Importance | Dependencies | Comments |
+|----------|-------|---------------|-----------------------------------|-------------------|-----------------|--------------|----------|
+| **M2-018** | Community Profile Display | **Affects**: Social NFT showcase<br>**Changes**: GET /api/v1/user/:userId/nft/profile endpoint | **Needs**: Public profile system, NFT display logic, community features | **Solution**: Public endpoint for displaying user's NFT achievements in community profiles | 🟡 Medium - Social engagement | M1-008 (NFTService) | Community homepage, social proof, achievement showcase |
+| **M2-019** | NFT Achievement Sharing | **Affects**: Social sharing features<br>**Changes**: Social media integration endpoints | **Needs**: Social media APIs, achievement formatting, sharing templates | **Solution**: Generate shareable content for NFT achievements, tier upgrades, badge collections | 🟡 Medium - User engagement | Social media integrations | Share NFT achievements, tier upgrades, badge milestones |
+| **M2-020** | API Error Handling & Validation | **Affects**: All M2 endpoints<br>**Changes**: Standardized error response system | **Needs**: Existing error handling patterns, validation rules, user-friendly messages | **Solution**: Comprehensive error handling with standardized codes, validation, user-friendly messages | 🔥 Critical - User experience | All M2 endpoints | Consistent error responses, input validation, user guidance |
 
 **M2 Success Criteria:**
-- ✅ All user NFT endpoints implemented and tested
-- ✅ Personal Center fully integrated
-- ✅ Real-time updates functional
-- ✅ Error handling comprehensive
-- ✅ Frontend integration complete
+- ✅ All user NFT endpoints implemented and tested (20 endpoints)
+- ✅ Personal Center fully integrated with all business states
+- ✅ All 19 badges implemented with activation logic
+- ✅ Real-time updates functional for all status changes
+- ✅ Complete NFT lifecycle coverage (claim/upgrade/activate)
+- ✅ Community features integrated
+- ✅ Error handling comprehensive across all endpoints
 
 ---
 
