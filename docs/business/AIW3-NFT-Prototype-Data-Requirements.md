@@ -8,6 +8,62 @@
 
 ---
 
+## 🗺️ API Endpoint ↔ Webpage Mapping Table
+
+**For Frontend Developers:** This table maps each API endpoint to the specific web pages/prototypes where it should be used. Use this as your primary reference for understanding which endpoints to integrate with each page.
+
+| **Web Page/Prototype** | **Primary API Endpoints** | **Secondary/Supporting Endpoints** | **Real-time Updates** |
+|------------------------|---------------------------|-------------------------------------|----------------------|
+| **1. Home Page** <br>(`1. Home_Page.png`) | • `GET /api/v1/user/nft-portfolio` <br>• `GET /api/v1/user/trading-volume` | • `GET /api/v1/user/nft-qualification/:nftDefinitionId` <br>• `POST /api/v1/user/claim-nft` | WebSocket: Portfolio updates |
+| **2. Personal Center - Tiered NFT** <br>(`2. Personal_Center_Tiered_NFT.png`) | • `GET /api/v1/user/nft-portfolio` <br>• `GET /api/v1/user/nft-qualification/:nftDefinitionId` <br>• `POST /api/v1/user/upgrade-nft` | • `GET /api/v1/admin/nft-definitions` <br>• `POST /api/v1/user/activate-badge` <br>• `POST /api/v1/nft/activate` | WebSocket: Qualification progress |
+| **3. Personal Center - Badge** <br>(`2. Personal_Center_Badge.png`) | • `GET /api/v1/user/available-badges` <br>• `POST /api/v1/user/activate-badge` | • `GET /api/v1/admin/badges` <br>• `GET /api/v1/user/nft-transactions` | WebSocket: Badge status updates |
+| **4. Personal Settings** <br>(`3. Personal Setting_1.png`, `3. Personal Setting_2.png`) | • `GET /api/v1/user/nft-portfolio` (for profile data) <br>• `GET /api/v1/user/trading-volume` | • `GET /api/v1/user/nft-transactions` (for account history) | None (static settings) |
+| **5. User Information** <br>(`4. User_Information_1.png`, `4. User_Information_2.png`) | • `GET /api/v1/user/nft-portfolio` <br>• `GET /api/v1/user/nft-transactions` <br>• `GET /api/v1/user/trading-volume` | • `GET /api/v1/user/available-badges` <br>• `GET /api/v1/admin/nft-statistics` | WebSocket: Activity updates |
+| **6. Square/Social** <br>(`5. Square.png`) | • `GET /api/v1/user/nft-portfolio` (for showcasing) <br>• `GET /api/v1/admin/nft-statistics` (for leaderboards) | • `GET /api/v1/competition/nft-holders/:nftDefinitionId` <br>• `GET /api/v1/user/trading-volume` | WebSocket: Social interactions |
+| **7. Instant Messaging** <br>(`7. IM.png`) | • `GET /api/v1/user/nft-portfolio` (for NFT sharing) | • `GET /api/v1/user/available-badges` (for achievement sharing) | WebSocket: Real-time messaging |
+| **8. Unlock NFT Popup** <br>(`6. Popup_Unlock_NFT.png`) | • `GET /api/v1/user/nft-qualification/:nftDefinitionId` <br>• `POST /api/v1/user/claim-nft` | • `GET /api/v1/admin/nft-definitions` <br>• `GET /api/v1/user/trading-volume` | WebSocket: Qualification updates |
+| **9. Activate Badge Popup** <br>(`6. Popup_Activate_Badge.png`) | • `POST /api/v1/user/activate-badge` <br>• `GET /api/v1/user/available-badges` | • `GET /api/v1/admin/badges` | WebSocket: Badge activation |
+| **10. Competition Management** <br>(Admin/Manager Interface) | • `POST /api/v1/competition/airdrop-create` <br>• `POST /api/v1/competition/airdrop-execute` <br>• `GET /api/v1/competition/airdrop-status/:operationId` | • `GET /api/v1/competition/airdrop-list` <br>• `GET /api/v1/competition/nft-holders/:nftDefinitionId` <br>• `POST /api/v1/admin/award-badge` | WebSocket: Operation status |
+
+### 📋 Endpoint Usage Guidelines
+
+#### **Core User Endpoints (Most Frequently Used)**
+- `GET /api/v1/user/nft-portfolio` - **Used on 6+ pages** - Primary NFT data source
+- `GET /api/v1/user/nft-qualification/:nftDefinitionId` - **Used on 3+ pages** - Qualification checking
+- `GET /api/v1/user/trading-volume` - **Used on 4+ pages** - Volume display and progress
+- `GET /api/v1/user/available-badges` - **Used on 3+ pages** - Badge management
+
+#### **Action Endpoints (User Interactions)**
+- `POST /api/v1/user/claim-nft` - NFT claiming (Home, Popup)
+- `POST /api/v1/user/upgrade-nft` - NFT upgrades (Personal Center)
+- `POST /api/v1/user/activate-badge` - Badge activation (Personal Center, Popup)
+
+#### **Administrative Endpoints (Manager/Admin Only)**
+- `POST /api/v1/admin/award-badge` - Manual badge awarding
+- `GET /api/v1/admin/nft-statistics` - System statistics
+- `POST /api/v1/admin/refresh-qualification` - Force qualification refresh
+
+#### **Competition Endpoints (Competition Managers)**
+- `POST /api/v1/competition/airdrop-create` - Create airdrop operations
+- `POST /api/v1/competition/airdrop-execute` - Execute airdrops
+- `GET /api/v1/competition/airdrop-status/:operationId` - Monitor airdrop status
+
+#### **Legacy Endpoints (Backward Compatibility)**
+- `POST /api/v1/nft/claim` - Legacy NFT claiming
+- `POST /api/v1/nft/activate` - Legacy NFT activation
+
+### 🔄 Real-time Integration Patterns
+
+| **Page Type** | **WebSocket Events to Subscribe** | **Update Triggers** |
+|---------------|-----------------------------------|--------------------|
+| **Personal Center** | `nft-qualification-updated`, `badge-status-changed`, `nft-upgraded` | User actions, volume changes |
+| **Home Page** | `portfolio-updated`, `new-qualification-available` | NFT claims, upgrades |
+| **Social Pages** | `nft-showcase-updated`, `leaderboard-changed` | Community interactions |
+| **Messaging** | `nft-shared`, `achievement-unlocked` | Social sharing |
+| **Admin/Competition** | `airdrop-status-updated`, `operation-completed` | Background operations |
+
+---
+
 ## Overview
 
 This document analyzes the AIW3 NFT prototype designs to identify:
