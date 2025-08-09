@@ -4,20 +4,20 @@
 **Version:** v1.0.0  
 **Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** Event-driven architecture design for real-time NFT notifications and system integration via Kafka and WebSocket
+**Purpose:** Event-driven architecture design for NFT notifications and system integration via Kafka and RESTful HTTP polling
 
 ---
 
 ## Overview
 
-This document defines the event-driven architecture for the AIW3 NFT system, detailing how real-time notifications are delivered to frontend applications while maintaining service decoupling through Apache Kafka. The architecture provides **dual-path event delivery**: WebSocket connections for immediate user feedback and Kafka events for service-to-service communication and analytics.
+This document defines the event-driven architecture for the AIW3 NFT system, detailing how notifications are delivered to frontend applications while maintaining service decoupling through Apache Kafka. The architecture provides **dual-path event delivery**: RESTful HTTP polling for user feedback and Kafka events for service-to-service communication and analytics.
 
 ## Table of Contents
 
 1. [Architecture Principles](#architecture-principles)
 2. [Event Flow Patterns](#event-flow-patterns)
 3. [Kafka Integration](#kafka-integration)
-4. [WebSocket Implementation](#websocket-implementation)
+4. [RESTful HTTP Polling Implementation](#restful-http-polling-implementation)
 5. [Event Types and Schemas](#event-types-and-schemas)
 6. [Service Integration Patterns](#service-integration-patterns)
 7. [Implementation Guidelines](#implementation-guidelines)
@@ -31,7 +31,7 @@ This document defines the event-driven architecture for the AIW3 NFT system, det
 
 | Priority | Goal | Implementation |
 |----------|------|----------------|
-| P0 | **Immediate User Feedback** | HTTP/2 SSE for <100ms real-time updates |
+| P0 | **User Feedback** | RESTful HTTP polling for updates (1-5 second intervals) |
 | P1 | **Service Decoupling** | Kafka topics for async service communication |
 | P2 | **System Reliability** | Multiple fallback mechanisms and error recovery |
 | P3 | **Analytics Integration** | Event streaming for business intelligence |
@@ -46,14 +46,14 @@ graph TB
             MOBILE[Mobile App]
         end
         
-        subgraph "Real-time Communication"
-            SSE[HTTP/2 SSE Connections]
-            POLLING[RESTful Polling Fallback]
+        subgraph "HTTP Communication"
+            REST_API[RESTful HTTP APIs]
+            POLLING[Status Polling Endpoints]
         end
         
         subgraph "Sails.js API Server"
             USER_CTRL[UserController]
-            SSE_MGR[SSE Event Manager]
+            NFT_CTRL[NFTController]
             NFT_SVC[NFT Business Logic]
         end
         
@@ -78,20 +78,21 @@ graph TB
         end
     end
     
-    %% Direct User Communication
-    BROWSER --> SSE
-    MOBILE --> SSE
-    SSE --> USER_CTRL
-    USER_CTRL --> SSE_MGR
-    SSE_MGR --> SSE
+    %% RESTful HTTP Communication
+    BROWSER --> REST_API
+    MOBILE --> REST_API
+    REST_API --> USER_CTRL
+    REST_API --> NFT_CTRL
     
-    %% Fallback Communication
-    BROWSER -.-> POLLING
-    MOBILE -.-> POLLING
+    %% Status Polling
+    BROWSER --> POLLING
+    MOBILE --> POLLING
     POLLING --> USER_CTRL
+    POLLING --> NFT_CTRL
     
     %% Business Logic Flow
     USER_CTRL --> NFT_SVC
+    NFT_CTRL --> NFT_SVC
     NFT_SVC --> MYSQL
     NFT_SVC --> REDIS
     
@@ -113,7 +114,7 @@ graph TB
     NOTIFICATION --> REDIS
     ELASTICSEARCH --> ES
     
-    style SSE fill:#e1f5fe
+    style REST_API fill:#e1f5fe
     style KAFKA fill:#f3e5f5
     style NFT_SVC fill:#c8e6c9
 ```
@@ -139,11 +140,11 @@ const nftUpgradeFlow = {
   
   // 3. Dual event publishing
   eventPublishing: {
-    // Immediate user feedback via SSE
-    sse: {
-      target: "specific user connection",
-      latency: "~50ms",
-      payload: "nft_upgrade_completed event"
+    // User status updates via RESTful polling
+    statusUpdate: {
+      endpoint: "GET /api/v1/user/nft-operations/:operationId/status",
+      pollingInterval: "1-5 seconds",
+      payload: "nft_upgrade_completed status"
     },
     
     // System-wide event distribution via Kafka
@@ -158,12 +159,12 @@ const nftUpgradeFlow = {
 
 ### 📊 **Event Categories and Routing**
 
-| Event Category | SSE Target | Kafka Topics | Primary Consumers |
-|----------------|------------|--------------|-------------------|
-| **User NFT Actions** | Individual user | `user-nft-events-topic` | Notification, Analytics |
-| **System Operations** | Admin users only | `nft-operations-topic` | Audit, Monitoring |
-| **Analytics Events** | None | `nft-analytics-topic` | BI Dashboard, Reporting |
-| **Notification Events** | Relevant users | `nft-notifications-topic` | Push Service, Email Service |
+| Event Category | HTTP Polling Endpoint | Kafka Topics | Primary Consumers |
+|----------------|----------------------|--------------|-------------------|
+| **User NFT Actions** | `/api/v1/user/nft-status` | `user-nft-events-topic` | Notification, Analytics |
+| **System Operations** | `/api/v1/admin/nft-operations` | `nft-operations-topic` | Audit, Monitoring |
+| **Analytics Events** | No polling needed | `nft-analytics-topic` | BI Dashboard, Reporting |
+| **Notification Events** | `/api/v1/user/notifications` | `nft-notifications-topic` | Push Service, Email Service |
 
 ---
 
@@ -238,14 +239,14 @@ class NFTEventService {
    * Send real-time event to specific user via SSE
    */
   async sendSSEEvent(userId, eventPayload) {
-    const connections = this.sseManager.getUserConnections(userId);
+    const connections = this.wsManager.getUserConnections(userId);
     
     connections.forEach(connection => {
       try {
         connection.write(`data: ${JSON.stringify(eventPayload)}\n\n`);
       } catch (error) {
         sails.log.warn('SSE connection error:', { userId, error: error.message });
-        this.sseManager.removeConnection(userId, connection);
+        this.wsManager.removeConnection(userId, connection);
       }
     });
   }
@@ -376,198 +377,260 @@ module.exports = new NFTEventConsumer();
 
 ---
 
-## HTTP/2 SSE Implementation
+## RESTful HTTP Polling Implementation
 
-### 🔌 **SSE Connection Manager**
+### 📊 **Status Polling Manager**
 
 ```javascript
-// api/services/SSEManager.js
-class SSEManager {
+// api/services/StatusPollingManager.js
+class StatusPollingManager {
   constructor() {
-    this.connections = new Map(); // userId -> Set<connection>
-    this.connectionMetadata = new Map(); // connection -> metadata
+    this.operationStatus = new Map(); // operationId -> status
+    this.userNotifications = new Map(); // userId -> notifications[]
+    this.statusTTL = 300000; // 5 minutes
   }
 
   /**
-   * Register new SSE connection for user
+   * Store operation status for polling
    */
-  registerConnection(userId, response, metadata = {}) {
-    if (!this.connections.has(userId)) {
-      this.connections.set(userId, new Set());
+  setOperationStatus(operationId, status, userId) {
+    const statusData = {
+      operationId,
+      userId,
+      status,
+      timestamp: new Date(),
+      ttl: Date.now() + this.statusTTL
+    };
+    
+    this.operationStatus.set(operationId, statusData);
+    
+    // Store user notification if provided
+    if (status.notification) {
+      this.addUserNotification(userId, status.notification);
+    }
+
+    sails.log.info('Operation status stored:', { operationId, userId, status: status.status });
+  }
+
+  /**
+   * Get operation status for polling
+   */
+  getOperationStatus(operationId, userId) {
+    const statusData = this.operationStatus.get(operationId);
+    
+    if (!statusData) {
+      return null;
     }
     
-    this.connections.get(userId).add(response);
-    this.connectionMetadata.set(response, {
-      userId,
-      connectedAt: Date.now(),
-      userAgent: metadata.userAgent,
-      ipAddress: metadata.ipAddress
-    });
-
-    sails.log.info('SSE connection registered:', { userId, totalConnections: this.getTotalConnections() });
+    // Check if status has expired
+    if (Date.now() > statusData.ttl) {
+      this.operationStatus.delete(operationId);
+      return null;
+    }
+    
+    // Verify user ownership
+    if (statusData.userId !== userId) {
+      return null;
+    }
+    
+    return statusData;
   }
 
   /**
-   * Remove SSE connection
+   * Add notification for user polling
    */
-  removeConnection(userId, response) {
-    if (this.connections.has(userId)) {
-      this.connections.get(userId).delete(response);
-      
-      // Clean up empty sets
-      if (this.connections.get(userId).size === 0) {
-        this.connections.delete(userId);
+  addUserNotification(userId, notification) {
+    if (!this.userNotifications.has(userId)) {
+      this.userNotifications.set(userId, []);
+    }
+    
+    const notifications = this.userNotifications.get(userId);
+    notifications.push({
+      ...notification,
+      id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date(),
+      read: false
+    });
+    
+    // Keep only last 50 notifications per user
+    if (notifications.length > 50) {
+      notifications.splice(0, notifications.length - 50);
+    }
+  }
+
+  /**
+   * Get user notifications for polling
+   */
+  getUserNotifications(userId, markAsRead = false) {
+    const notifications = this.userNotifications.get(userId) || [];
+    
+    if (markAsRead) {
+      notifications.forEach(notif => notif.read = true);
+    }
+    
+    return notifications.filter(notif => !notif.read);
+  }
+
+  /**
+   * Clean up expired operations and old notifications
+   */
+  cleanup() {
+    const now = Date.now();
+    
+    // Clean up expired operation statuses
+    for (const [operationId, statusData] of this.operationStatus) {
+      if (now > statusData.ttl) {
+        this.operationStatus.delete(operationId);
       }
     }
     
-    this.connectionMetadata.delete(response);
-    
-    sails.log.info('SSE connection removed:', { userId, totalConnections: this.getTotalConnections() });
-  }
-
-  /**
-   * Get all connections for a specific user
-   */
-  getUserConnections(userId) {
-    return Array.from(this.connections.get(userId) || []);
-  }
-
-  /**
-   * Get total number of active connections
-   */
-  getTotalConnections() {
-    let total = 0;
-    for (const userConnections of this.connections.values()) {
-      total += userConnections.size;
-    }
-    return total;
-  }
-
-  /**
-   * Send heartbeat to all connections
-   */
-  sendHeartbeat() {
-    const heartbeatMessage = {
-      type: 'heartbeat',
-      timestamp: new Date().toISOString(),
-      serverTime: Date.now()
-    };
-
-    for (const [userId, connections] of this.connections) {
-      connections.forEach(connection => {
-        try {
-          connection.write(`data: ${JSON.stringify(heartbeatMessage)}\n\n`);
-        } catch (error) {
-          this.removeConnection(userId, connection);
-        }
-      });
+    // Clean up old notifications (older than 24 hours)
+    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    for (const [userId, notifications] of this.userNotifications) {
+      const filteredNotifications = notifications.filter(notif => notif.timestamp > dayAgo);
+      if (filteredNotifications.length !== notifications.length) {
+        this.userNotifications.set(userId, filteredNotifications);
+      }
     }
   }
 
   /**
-   * Get connection statistics
+   * Get polling statistics
    */
   getStats() {
     const stats = {
-      totalConnections: this.getTotalConnections(),
-      uniqueUsers: this.connections.size,
-      connectionsPerUser: {},
-      averageConnectionsPerUser: 0
+      activeOperations: this.operationStatus.size,
+      usersWithNotifications: this.userNotifications.size,
+      totalNotifications: 0,
+      averageNotificationsPerUser: 0
     };
 
-    for (const [userId, connections] of this.connections) {
-      stats.connectionsPerUser[userId] = connections.size;
+    for (const notifications of this.userNotifications.values()) {
+      stats.totalNotifications += notifications.length;
     }
 
-    if (stats.uniqueUsers > 0) {
-      stats.averageConnectionsPerUser = stats.totalConnections / stats.uniqueUsers;
+    if (stats.usersWithNotifications > 0) {
+      stats.averageNotificationsPerUser = stats.totalNotifications / stats.usersWithNotifications;
     }
 
     return stats;
   }
 }
 
-module.exports = new SSEManager();
+module.exports = new StatusPollingManager();
 ```
 
 ### 🎯 **Controller Implementation**
 
 ```javascript
-// api/controllers/UserController.js - SSE Endpoint
+// api/controllers/UserController.js - HTTP Polling Endpoints
 module.exports = {
   
   /**
-   * HTTP/2 Server-Sent Events endpoint for real-time NFT updates
-   * GET /api/v1/user/nft-events
+   * Get operation status via HTTP polling
+   * GET /api/v1/user/nft-operations/:operationId/status
    */
-  async getNFTEventStream(req, res) {
-    // Validate authentication
-    if (!req.user || !req.user.user_id) {
-      return res.status(401).json({
-        code: 401,
-        message: 'Authentication required for SSE connection',
-        error_code: 'UNAUTHORIZED'
+  async getNFTOperationStatus(req, res) {
+    try {
+      // Validate authentication
+      if (!req.user || !req.user.user_id) {
+        return res.status(401).json({
+          code: 401,
+          message: 'Authentication required',
+          error_code: 'UNAUTHORIZED'
+        });
+      }
+
+      const userId = req.user.user_id;
+      const operationId = req.params.operationId;
+
+      if (!operationId) {
+        return res.status(400).json({
+          code: 400,
+          message: 'Operation ID is required',
+          error_code: 'MISSING_OPERATION_ID'
+        });
+      }
+
+      // Get operation status from polling manager
+      const statusData = StatusPollingManager.getOperationStatus(operationId, userId);
+      
+      if (!statusData) {
+        return res.status(404).json({
+          code: 404,
+          message: 'Operation not found or expired',
+          error_code: 'OPERATION_NOT_FOUND'
+        });
+      }
+
+      return res.json({
+        code: 200,
+        message: 'Operation status retrieved successfully',
+        data: {
+          operationId: statusData.operationId,
+          status: statusData.status,
+          timestamp: statusData.timestamp,
+          progress: statusData.progress || null,
+          result: statusData.result || null,
+          error: statusData.error || null
+        }
+      });
+      
+    } catch (error) {
+      sails.log.error('Error getting NFT operation status:', error);
+      return res.status(500).json({
+        code: 500,
+        message: 'Internal server error',
+        error_code: 'INTERNAL_ERROR'
       });
     }
-
-    const userId = req.user.user_id;
-
-    // Set SSE headers
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Cache-Control',
-      'X-Accel-Buffering': 'no' // Disable nginx buffering
-    });
-
-    // Register this connection
-    const connectionMetadata = {
-      userAgent: req.get('User-Agent'),
-      ipAddress: req.ip
-    };
-    
-    SSEManager.registerConnection(userId, res, connectionMetadata);
-
-    // Send initial connection confirmation
-    const welcomeMessage = {
-      type: 'connection_established',
-      userId,
-      timestamp: new Date().toISOString(),
-      message: 'NFT event stream connected successfully'
-    };
-    
-    res.write(`data: ${JSON.stringify(welcomeMessage)}\n\n`);
-
-    // Set up heartbeat interval
-    const heartbeatInterval = setInterval(() => {
-      try {
-        res.write(`data: ${JSON.stringify({ type: 'heartbeat', timestamp: new Date().toISOString() })}\n\n`);
-      } catch (error) {
-        clearInterval(heartbeatInterval);
-        SSEManager.removeConnection(userId, res);
-      }
-    }, 30000); // 30 second heartbeat
-
-    // Handle client disconnect
-    req.on('close', () => {
-      clearInterval(heartbeatInterval);
-      SSEManager.removeConnection(userId, res);
-      sails.log.info('SSE client disconnected:', { userId });
-    });
-
-    req.on('error', (error) => {
-      clearInterval(heartbeatInterval);
-      SSEManager.removeConnection(userId, res);
-      sails.log.error('SSE connection error:', { userId, error: error.message });
-    });
   },
 
-  // Existing polling endpoints remain as fallback
+  /**
+   * Get user notifications via HTTP polling
+   * GET /api/v1/user/notifications
+   */
+  async getUserNotifications(req, res) {
+    try {
+      // Validate authentication
+      if (!req.user || !req.user.user_id) {
+        return res.status(401).json({
+          code: 401,
+          message: 'Authentication required',
+          error_code: 'UNAUTHORIZED'
+        });
+      }
+
+      const userId = req.user.user_id;
+      const markAsRead = req.query.markAsRead === 'true';
+
+      // Get notifications from polling manager
+      const notifications = StatusPollingManager.getUserNotifications(userId, markAsRead);
+      
+      return res.json({
+        code: 200,
+        message: 'Notifications retrieved successfully',
+        data: {
+          notifications,
+          count: notifications.length,
+          hasUnread: notifications.some(n => !n.read)
+        }
+      });
+      
+    } catch (error) {
+      sails.log.error('Error getting user notifications:', error);
+      return res.status(500).json({
+        code: 500,
+        message: 'Internal server error',
+        error_code: 'INTERNAL_ERROR'
+      });
+    }
+  },
+
+  // NFT Portfolio polling endpoint
   async getNFTPortfolioChanges(req, res) {
     // Implementation remains the same as previously defined
-    // This serves as fallback for clients that can't use SSE
+    // This serves as primary polling endpoint for portfolio updates
   }
 };
 ```
@@ -825,12 +888,12 @@ module.exports.bootstrap = function(done) {
   // Existing bootstrap code...
   
   // Initialize NFT event services
-  SSEManager.initialize();
+  WebSocketManager.initialize();
   NFTEventConsumer.initialize();
   
   // Start heartbeat for SSE connections
   setInterval(() => {
-    SSEManager.sendHeartbeat();
+    WebSocketManager.sendHeartbeat();
   }, 30000);
   
   done();
@@ -890,7 +953,7 @@ createNFTTopics().catch(console.error);
 module.exports = function(req, res, proceed) {
   // Rate limiting for SSE connections
   const userId = req.user?.user_id;
-  const currentConnections = SSEManager.getUserConnections(userId)?.length || 0;
+  const currentConnections = WebSocketManager.getUserConnections(userId)?.length || 0;
   
   if (currentConnections >= 3) { // Max 3 connections per user
     return res.status(429).json({
@@ -914,7 +977,7 @@ class NFTEventMonitoringService {
   }
 
   static async reportMetrics() {
-    const sseStats = SSEManager.getStats();
+    const wsStats = WebSocketManager.getStats();
     const kafkaStats = await this.getKafkaStats();
     
     const metrics = {
@@ -986,7 +1049,7 @@ const monitoringQueries = {
 // Alert thresholds and actions
 const alertConfig = {
   
-  sseConnectionErrors: {
+  wsConnectionErrors: {
     threshold: 'error_rate > 5%',
     action: 'Send alert to DevOps team',
     severity: 'warning'
@@ -1004,7 +1067,7 @@ const alertConfig = {
     severity: 'warning'
   },
 
-  sseConnectionLimit: {
+  wsConnectionLimit: {
     threshold: 'active_connections > 8000',
     action: 'Prepare to scale SSE servers',
     severity: 'info'

@@ -61,7 +61,7 @@ sequenceDiagram
         Solana-->>Backend: Transaction confirmation
         Backend->>MySQL: Update NFT status to 'minted'
         Backend->>Redis: Cache new NFT status
-        Backend->>Frontend: WebSocket: nft:claim_success
+        Backend->>Frontend: HTTP Response: nft_claim_completed
         Frontend->>User: Show success message with NFT
     else User Does Not Qualify
         Frontend->>User: Show requirements and progress
@@ -165,7 +165,7 @@ sequenceDiagram
         Backend->>MySQL: UPDATE badges SET status='consumed' WHERE activated
         Backend->>Redis: Invalidate cached NFT data
         Backend->>Kafka: Publish upgrade success event
-        Backend->>Frontend: WebSocket: nft:upgrade_complete
+        Backend->>Frontend: HTTP Response: nft_upgrade_completed
         Frontend->>User: Display upgraded NFT with new benefits
     else Requirements Not Met
         Backend->>Frontend: Return requirements not met error
@@ -245,7 +245,7 @@ sequenceDiagram
         Backend->>MySQL: UPDATE badges SET status='consumed' WHERE activated
         Backend->>Redis: Invalidate cached NFT data
         Backend->>Kafka: Publish upgrade success event
-        Backend->>Frontend: WebSocket: nft:upgrade_complete
+        Backend->>Frontend: HTTP Response: nft_upgrade_completed
         Frontend->>User: Display upgraded NFT with new benefits
     else Requirements Not Met
         Backend->>Frontend: Return qualification error

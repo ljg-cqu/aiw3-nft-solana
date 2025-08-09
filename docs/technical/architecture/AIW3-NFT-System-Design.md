@@ -127,7 +127,7 @@ The AIW3 NFT system integrates with the complete `lastmemefi-api` infrastructure
 graph TB
     subgraph "Frontend Layer"
         UI["Personal Center UI"]
-        WS["WebSocket Client"]
+        POLL["HTTP Polling Client"]
     end
     
     subgraph "API Gateway Layer"
@@ -163,7 +163,7 @@ graph TB
     
     %% Frontend to API
     UI --> API
-    WS --> API
+    POLL --> API
     
     %% API Layer Flow
     API --> AUTH
@@ -192,8 +192,8 @@ graph TB
     TRADING --> HYPERLIQUID
     TRADING --> STRATEGY
     
-    %% WebSocket Events
-    KAFKA --> WS
+    %% HTTP Polling Events
+    KAFKA --> POLL
 ```
 
 *Figure 1: High-level system architecture showing the main components and their interactions.*

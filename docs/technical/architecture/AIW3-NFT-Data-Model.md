@@ -35,7 +35,7 @@ This document provides comprehensive specifications for data structures in the A
 6.  [System Data Flow & Caching](#system-data-flow--caching)
     -   [Redis Cache Structure](#redis-cache-structure)
     -   [Kafka Event Patterns](#kafka-event-patterns-using-kafkaservicesendmessage)
-    -   [WebSocket Event Data Formats](#websocket-event-data-formats-frontend-integration)
+    -   [HTTP Polling Data Formats](#http-polling-data-formats-frontend-integration)
     -   [Error Response Format](#error-response-format)
 
 ---
@@ -1104,7 +1104,7 @@ nft_benefits:{user_id} -> {
 // Published using: KafkaService.sendMessage("nft-events", eventData)
 ```
 
-### WebSocket Event Data Formats (Frontend Integration)
+### HTTP Polling Data Formats (Frontend Integration)
 
 ```json
 // NFT Status Changed Event
@@ -1190,4 +1190,4 @@ nft_benefits:{user_id} -> {
 
 ### Integration & Implementation
 - **[AIW3 NFT Legacy Backend Integration](./AIW3-NFT-Legacy-Backend-Integration.md)**: Comprehensive analysis and strategy for integrating NFT services with existing `lastmemefi-api` backend, including service architecture and infrastructure reuse
-- **[AIW3 NFT Integration Issues & PRs](./AIW3-NFT-Integration-Issues-PRs.md)**: Detailed phased implementation plan with frontend-backend integration requirements, API contracts, WebSocket events, and collaborative development guidance
+- **[AIW3 NFT Integration Issues & PRs](./AIW3-NFT-Integration-Issues-PRs.md)**: Detailed phased implementation plan with frontend-backend integration requirements, API contracts, HTTP polling patterns, and collaborative development guidance

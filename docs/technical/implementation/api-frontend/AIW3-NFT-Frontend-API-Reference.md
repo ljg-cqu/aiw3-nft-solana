@@ -7,7 +7,7 @@ This document provides a clean, frontend-focused API reference for the AIW3 NFT 
 **API Base URL**: `/api/v1/nft/`  
 **Authentication**: JWT Bearer tokens  
 **Response Format**: JSON with standardized structure  
-**Real-time Updates**: WebSocket events via Kafka  
+**Real-time Updates**: HTTP polling endpoints with caching  
 
 ---
 
@@ -237,7 +237,7 @@ Content-Type: application/json
 
 ---
 
-## Real-Time Events (WebSocket)
+## Real-Time Updates (HTTP Polling)
 
 ### Event Types
 
@@ -302,7 +302,7 @@ Content-Type: application/json
 
 ### Overview
 
-For applications that prefer RESTful polling over WebSocket connections, the following endpoints provide efficient polling strategies with caching optimization and ETag support. These APIs are designed to minimize server load while providing near real-time updates through intelligent polling patterns.
+The following endpoints provide efficient polling strategies with caching optimization and ETag support. These APIs are designed to minimize server load while providing near real-time updates through intelligent polling patterns.
 
 ### 2.7 NFT Portfolio Changes
 ```http
@@ -522,9 +522,9 @@ export const useNFTData = () => {
 };
 ```
 
-### WebSocket Connection
+### HTTP Polling Manager
 ```javascript
-class NFTWebSocketManager {
+class NFTPollingManager {
   constructor(jwtToken) {
     this.token = jwtToken;
     this.ws = null;

@@ -83,7 +83,7 @@ CREATE TABLE upgrade_requests (
 #### Connection Pool Design
 
 ```typescript
-interface SSEConnection {
+interface WebSocketConnection {
   id: string;
   userId: string;
   upgradeRequestId: string;
@@ -93,8 +93,8 @@ interface SSEConnection {
   lastActivity: Date;
 }
 
-class SSEConnectionManager {
-  private connections = new Map<string, SSEConnection>();
+class WebSocketConnectionManager {
+  private connections = new Map<string, WebSocketConnection>();
   private maxConnections = 1000; // Configurable limit
   private connectionTimeout = 300000; // 5 minutes
   private cleanupInterval = 60000; // 1 minute
@@ -104,7 +104,7 @@ class SSEConnectionManager {
     setInterval(() => this.cleanupStaleConnections(), this.cleanupInterval);
   }
   
-  addConnection(connection: SSEConnection): boolean {
+  addConnection(connection: WebSocketConnection): boolean {
     // Check connection limit
     if (this.connections.size >= this.maxConnections) {
       this.evictOldestConnection();
@@ -132,7 +132,7 @@ class SSEConnectionManager {
   }
   
   private evictOldestConnection(): void {
-    let oldestConnection: [string, SSEConnection] | null = null;
+    let oldestConnection: [string, WebSocketConnection] | null = null;
     
     for (const entry of this.connections.entries()) {
       if (!oldestConnection || entry[1].createdAt < oldestConnection[1].createdAt) {
@@ -180,7 +180,7 @@ class SSEConnectionManager {
 
 ```typescript
 class NFTUpgradeService {
-  private sseManager = new SSEConnectionManager();
+  private wsManager = new WebSocketConnectionManager();
   private kafkaProducer: KafkaProducer;
   private solanaService: SolanaService;
   
@@ -339,7 +339,7 @@ class NFTUpgradeService {
     };
     
     // Send via SSE
-    this.sseManager.broadcastToUser(upgradeRequest.userId, update);
+    this.wsManager.broadcastToUser(upgradeRequest.userId, update);
     
     // Also store in database for polling fallback
     await this.storeStatusUpdate(upgradeRequest.id, update);
@@ -458,7 +458,7 @@ export async function upgradeEventStream(req: Request, res: Response) {
   const controller = new AbortController();
   const connectionId = `${userId}-${upgradeRequestId}-${Date.now()}`;
   
-  const connection: SSEConnection = {
+  const connection: WebSocketConnection = {
     id: connectionId,
     userId,
     upgradeRequestId,
@@ -469,7 +469,7 @@ export async function upgradeEventStream(req: Request, res: Response) {
   };
   
   // Add to connection manager
-  sseManager.addConnection(connection);
+  wsManager.addConnection(connection);
   
   // Send initial status
   const currentStatus = await nftUpgradeService.getUpgradeRequest(upgradeRequestId);
@@ -482,12 +482,12 @@ export async function upgradeEventStream(req: Request, res: Response) {
   
   // Handle client disconnect
   req.on('close', () => {
-    sseManager.removeConnection(connectionId);
+    wsManager.removeConnection(connectionId);
   });
   
   // Handle abort signal
   controller.signal.addEventListener('abort', () => {
-    sseManager.removeConnection(connectionId);
+    wsManager.removeConnection(connectionId);
   });
 }
 ```

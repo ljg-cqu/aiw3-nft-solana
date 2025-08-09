@@ -288,7 +288,7 @@ The technical implementation details for the AIW3 NFT system have been moved to 
 ### API & Frontend Integration
 - **Document**: `/docs/technical/implementation/api-frontend/API-Frontend-Integration-Specification.md`
 - **Contains**: Complete API endpoint specifications, frontend integration patterns, real-time events
-- **Covers**: All 6 NFT-related endpoints, WebSocket events, UI component integration
+- **Covers**: All 6 NFT-related endpoints, HTTP polling patterns, UI component integration
 
 ### Detailed API Reference
 - **Document**: `/docs/technical/implementation/api-frontend/AIW3-NFT-API-Reference.md`

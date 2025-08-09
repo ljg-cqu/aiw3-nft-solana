@@ -254,7 +254,7 @@ The backend is the intermediary between the user-facing frontend and the standar
 
 #### API Endpoints Overview
 
-**Reference**: Complete API specifications, endpoint documentation, request/response formats, WebSocket events, and frontend integration patterns are available in the [API Frontend Integration Specification](./api-frontend/API-Frontend-Integration-Specification.md).
+**Reference**: Complete API specifications, endpoint documentation, request/response formats, HTTP polling patterns, and frontend integration patterns are available in the [API Frontend Integration Specification](./api-frontend/API-Frontend-Integration-Specification.md).
 
 #### NFT Controller Implementation
 

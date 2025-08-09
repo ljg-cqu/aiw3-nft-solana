@@ -14,16 +14,16 @@
 
 | **Web Page/Prototype** | **Primary API Endpoints** | **Secondary/Supporting Endpoints** | **Real-time Updates** |
 |------------------------|---------------------------|-------------------------------------|----------------------|
-| **1. Home Page** <br>(`1. Home_Page.png`) | • `GET /api/v1/user/nft-portfolio` <br>• `GET /api/v1/user/trading-volume` | • `GET /api/v1/user/nft-qualification/:nftDefinitionId` <br>• `POST /api/v1/user/claim-nft` | WebSocket: Portfolio updates |
-| **2. Personal Center - Tiered NFT** <br>(`2. Personal_Center_Tiered_NFT.png`) | • `GET /api/v1/user/nft-portfolio` <br>• `GET /api/v1/user/nft-qualification/:nftDefinitionId` <br>• `POST /api/v1/user/upgrade-nft` | • `GET /api/v1/admin/nft-definitions` <br>• `POST /api/v1/user/activate-badge` <br>• `POST /api/v1/nft/activate` | WebSocket: Qualification progress |
-| **3. Personal Center - Badge** <br>(`2. Personal_Center_Badge.png`) | • `GET /api/v1/user/available-badges` <br>• `POST /api/v1/user/activate-badge` | • `GET /api/v1/admin/badges` <br>• `GET /api/v1/user/nft-transactions` | WebSocket: Badge status updates |
+| **1. Home Page** <br>(`1. Home_Page.png`) | • `GET /api/v1/user/nft-portfolio` <br>• `GET /api/v1/user/trading-volume` | • `GET /api/v1/user/nft-qualification/:nftDefinitionId` <br>• `POST /api/v1/user/claim-nft` | HTTP Polling: Portfolio updates |
+| **2. Personal Center - Tiered NFT** <br>(`2. Personal_Center_Tiered_NFT.png`) | • `GET /api/v1/user/nft-portfolio` <br>• `GET /api/v1/user/nft-qualification/:nftDefinitionId` <br>• `POST /api/v1/user/upgrade-nft` | • `GET /api/v1/admin/nft-definitions` <br>• `POST /api/v1/user/activate-badge` <br>• `POST /api/v1/nft/activate` | HTTP Polling: Qualification progress |
+| **3. Personal Center - Badge** <br>(`2. Personal_Center_Badge.png`) | • `GET /api/v1/user/available-badges` <br>• `POST /api/v1/user/activate-badge` | • `GET /api/v1/admin/badges` <br>• `GET /api/v1/user/nft-transactions` | HTTP Polling: Badge status updates |
 | **4. Personal Settings** <br>(`3. Personal Setting_1.png`, `3. Personal Setting_2.png`) | • `GET /api/v1/user/nft-portfolio` (for profile data) <br>• `GET /api/v1/user/trading-volume` | • `GET /api/v1/user/nft-transactions` (for account history) | None (static settings) |
-| **5. User Information** <br>(`4. User_Information_1.png`, `4. User_Information_2.png`) | • `GET /api/v1/user/nft-portfolio` <br>• `GET /api/v1/user/nft-transactions` <br>• `GET /api/v1/user/trading-volume` | • `GET /api/v1/user/available-badges` <br>• `GET /api/v1/admin/nft-statistics` | WebSocket: Activity updates |
-| **6. Square/Social** <br>(`5. Square.png`) | • `GET /api/v1/user/nft-portfolio` (for showcasing) <br>• `GET /api/v1/admin/nft-statistics` (for leaderboards) | • `GET /api/v1/competition/nft-holders/:nftDefinitionId` <br>• `GET /api/v1/user/trading-volume` | WebSocket: Social interactions |
-| **7. Instant Messaging** <br>(`7. IM.png`) | • `GET /api/v1/user/nft-portfolio` (for NFT sharing) | • `GET /api/v1/user/available-badges` (for achievement sharing) | WebSocket: Real-time messaging |
-| **8. Unlock NFT Popup** <br>(`6. Popup_Unlock_NFT.png`) | • `GET /api/v1/user/nft-qualification/:nftDefinitionId` <br>• `POST /api/v1/user/claim-nft` | • `GET /api/v1/admin/nft-definitions` <br>• `GET /api/v1/user/trading-volume` | WebSocket: Qualification updates |
-| **9. Activate Badge Popup** <br>(`6. Popup_Activate_Badge.png`) | • `POST /api/v1/user/activate-badge` <br>• `GET /api/v1/user/available-badges` | • `GET /api/v1/admin/badges` | WebSocket: Badge activation |
-| **10. Competition Management** <br>(Admin/Manager Interface) | • `POST /api/v1/competition/airdrop-create` <br>• `POST /api/v1/competition/airdrop-execute` <br>• `GET /api/v1/competition/airdrop-status/:operationId` | • `GET /api/v1/competition/airdrop-list` <br>• `GET /api/v1/competition/nft-holders/:nftDefinitionId` <br>• `POST /api/v1/admin/award-badge` | WebSocket: Operation status |
+| **5. User Information** <br>(`4. User_Information_1.png`, `4. User_Information_2.png`) | • `GET /api/v1/user/nft-portfolio` <br>• `GET /api/v1/user/nft-transactions` <br>• `GET /api/v1/user/trading-volume` | • `GET /api/v1/user/available-badges` <br>• `GET /api/v1/admin/nft-statistics` | HTTP Polling: Activity updates |
+| **6. Square/Social** <br>(`5. Square.png`) | • `GET /api/v1/user/nft-portfolio` (for showcasing) <br>• `GET /api/v1/admin/nft-statistics` (for leaderboards) | • `GET /api/v1/competition/nft-holders/:nftDefinitionId` <br>• `GET /api/v1/user/trading-volume` | HTTP Polling: Social interactions |
+| **7. Instant Messaging** <br>(`7. IM.png`) | • `GET /api/v1/user/nft-portfolio` (for NFT sharing) | • `GET /api/v1/user/available-badges` (for achievement sharing) | HTTP Polling: Message updates |
+| **8. Unlock NFT Popup** <br>(`6. Popup_Unlock_NFT.png`) | • `GET /api/v1/user/nft-qualification/:nftDefinitionId` <br>• `POST /api/v1/user/claim-nft` | • `GET /api/v1/admin/nft-definitions` <br>• `GET /api/v1/user/trading-volume` | HTTP Polling: Qualification updates |
+| **9. Activate Badge Popup** <br>(`6. Popup_Activate_Badge.png`) | • `POST /api/v1/user/activate-badge` <br>• `GET /api/v1/user/available-badges` | • `GET /api/v1/admin/badges` | HTTP Polling: Badge activation |
+| **10. Competition Management** <br>(Admin/Manager Interface) | • `POST /api/v1/competition/airdrop-create` <br>• `POST /api/v1/competition/airdrop-execute` <br>• `GET /api/v1/competition/airdrop-status/:operationId` | • `GET /api/v1/competition/airdrop-list` <br>• `GET /api/v1/competition/nft-holders/:nftDefinitionId` <br>• `POST /api/v1/admin/award-badge` | HTTP Polling: Operation status |
 
 ### 📋 Endpoint Usage Guidelines
 
@@ -54,7 +54,7 @@
 
 ### 🔄 Real-time Integration Patterns
 
-| **Page Type** | **WebSocket Events to Subscribe** | **Update Triggers** |
+| **Page Type** | **HTTP Polling Endpoints** | **Update Triggers** |
 |---------------|-----------------------------------|--------------------|
 | **Personal Center** | `nft-qualification-updated`, `badge-status-changed`, `nft-upgraded` | User actions, volume changes |
 | **Home Page** | `portfolio-updated`, `new-qualification-available` | NFT claims, upgrades |
@@ -280,10 +280,10 @@ This document analyzes the AIW3 NFT prototype designs to identify:
 #### **Real-time Requirements**
 | Feature | Technology | Update Frequency | Priority |
 |---------|------------|------------------|----------|
-| Message Delivery | WebSocket | Immediate | High |
-| Typing Indicators | WebSocket | Real-time | Medium |
-| Online Status | WebSocket | Every 30 seconds | Medium |
-| NFT Share Notifications | WebSocket | Immediate | High |
+| Message Delivery | HTTP Polling | 1-2 seconds | High |
+| Typing Indicators | HTTP Polling | 2-3 seconds | Medium |
+| Online Status | HTTP Polling | Every 30 seconds | Medium |
+| NFT Share Notifications | HTTP Polling | 1-2 seconds | High |
 
 ---
 
@@ -371,10 +371,10 @@ This document analyzes the AIW3 NFT prototype designs to identify:
 ### **Real-time Data Requirements**
 | Data Type | Update Method | Frequency | Critical Level |
 |-----------|---------------|-----------|----------------|
-| NFT Status Changes | WebSocket | Immediate | High |
-| Badge Activations | WebSocket | Immediate | High |
-| Trading Volume Updates | WebSocket | Every 5 minutes | Medium |
-| Social Interactions | WebSocket | Immediate | Low |
+| NFT Status Changes | HTTP Polling | 1-2 seconds | High |
+| Badge Activations | HTTP Polling | 1-2 seconds | High |
+| Trading Volume Updates | HTTP Polling | Every 5 minutes | Medium |
+| Social Interactions | HTTP Polling | 3-5 seconds | Low |
 
 ---
 
@@ -393,7 +393,7 @@ This document analyzes the AIW3 NFT prototype designs to identify:
 |-----------|---------------|------------|------------------|
 | Dashboard Load | < 500ms | 1000 req/min | Redis cache |
 | NFT Operations | < 1000ms | 100 req/min | Database + cache |
-| Real-time Updates | < 100ms | 10000 events/min | WebSocket + queue |
+| Real-time Updates | 1-5 seconds | 10000 requests/min | HTTP Polling + cache |
 
 ---
 
