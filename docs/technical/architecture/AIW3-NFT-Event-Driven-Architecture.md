@@ -4,20 +4,20 @@
 **Version:** v1.0.0  
 **Last Updated:** 2025-08-08  
 **Status:** Active  
-**Purpose:** Event-driven architecture design for real-time NFT notifications and system integration via Kafka and HTTP/2 SSE
+**Purpose:** Event-driven architecture design for real-time NFT notifications and system integration via Kafka and WebSocket
 
 ---
 
 ## Overview
 
-This document defines the event-driven architecture for the AIW3 NFT system, detailing how real-time notifications are delivered to frontend applications while maintaining service decoupling through Apache Kafka. The architecture provides **dual-path event delivery**: HTTP/2 Server-Sent Events for immediate user feedback and Kafka events for service-to-service communication and analytics.
+This document defines the event-driven architecture for the AIW3 NFT system, detailing how real-time notifications are delivered to frontend applications while maintaining service decoupling through Apache Kafka. The architecture provides **dual-path event delivery**: WebSocket connections for immediate user feedback and Kafka events for service-to-service communication and analytics.
 
 ## Table of Contents
 
 1. [Architecture Principles](#architecture-principles)
 2. [Event Flow Patterns](#event-flow-patterns)
 3. [Kafka Integration](#kafka-integration)
-4. [HTTP/2 SSE Implementation](#http2-sse-implementation)
+4. [WebSocket Implementation](#websocket-implementation)
 5. [Event Types and Schemas](#event-types-and-schemas)
 6. [Service Integration Patterns](#service-integration-patterns)
 7. [Implementation Guidelines](#implementation-guidelines)

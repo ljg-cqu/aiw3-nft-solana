@@ -1,10 +1,10 @@
 # AIW3 NFT Complete API Reference
 
 <!-- Document Metadata -->
-**Version:** v2.0.0  
-**Last Updated:** 2025-08-08  
+**Version:** v8.0.0  
+**Last Updated:** 2025-08-09  
 **Status:** Production Ready  
-**Purpose:** Comprehensive frontend API documentation for AIW3 NFT integration with lastmemefi-api
+**Purpose:** Comprehensive frontend API documentation for AIW3 NFT integration with lastmemefi-api, aligned with v8.0.0 business rules
 
 ---
 
@@ -420,7 +420,7 @@ const getTradingVolume = async () => {
 
 **Endpoint:** `POST /api/v1/nft/activate`  
 **Controller:** `NFTController.activate`  
-**Description:** Legacy NFT activation endpoint (maintained for backward compatibility)
+**Description:** Activate NFT benefits and rights for usage. **IMPORTANT**: Benefit activation is REQUIRED to use NFT benefits (trading fee reduction, AI agent uses, etc.) but does NOT affect NFT upgrade eligibility or qualification.
 
 ---
 

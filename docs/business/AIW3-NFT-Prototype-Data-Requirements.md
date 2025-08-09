@@ -121,7 +121,7 @@ This document analyzes the AIW3 NFT prototype designs to identify:
 | View NFT Details | Click NFT card | Modal/detail view | `GET /api/v1/user/nft/:nftId` |
 | Check Upgrade Eligibility | Page load/refresh | Progress calculation | `GET /api/v1/user/nft-qualification/:nftId` |
 | Initiate NFT Upgrade | Click "Upgrade" button | Confirmation modal | `POST /api/v1/user/upgrade-nft` |
-| Activate NFT Benefits | Click "Activate" button | Status update | `POST /api/v1/user/nft/activate` |
+| Activate NFT Benefits | Click "Activate" button (REQUIRED to use benefits, but does NOT affect upgrade eligibility) | Status update | `POST /api/v1/user/nft/activate` |
 
 #### **API Requirements**
 | Endpoint | Method | Purpose | Frontend Needs | Backend Provides |

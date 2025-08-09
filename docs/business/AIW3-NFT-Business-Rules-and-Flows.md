@@ -59,6 +59,22 @@ AIW3's NFT system consists of **Equity NFTs** with two distinct subtypes:
 - **Direct Minting**: NFTs are minted directly into winners' wallets automatically
 - **Immediate Usage**: No unlocking or activation process required - ready to use instantly
 - **Independent Process**: Competition NFT acquisition is completely separate from Tiered NFT upgrades
+
+### 1.3 NFT Benefits and Rights Activation
+
+**Critical Business Rule**: Users must **activate NFT benefits and rights** before they can use them. This is a separate process from NFT ownership and upgrade qualification.
+
+**Benefit Activation Requirements:**
+- **Tiered NFTs**: After claiming/upgrading an NFT, users must explicitly activate benefits (trading fee reduction, AI agent uses, exclusive features)
+- **Competition NFTs**: Benefits are automatically active upon NFT receipt - no manual activation required
+- **Activation Independence**: Benefit activation status does NOT affect NFT upgrade qualification or business logic
+- **Upgrade Eligibility**: Users can upgrade their NFTs regardless of whether they have activated benefits on their current NFT
+- **Benefit Persistence**: Once activated, benefits remain active until the NFT is burned (for Tiered NFTs) or permanently (for Competition NFTs)
+
+**Important Distinction:**
+- **NFT Ownership**: Having an NFT in your wallet
+- **Benefit Activation**: Explicitly enabling the NFT's benefits and rights for use
+- **Upgrade Qualification**: Meeting volume and badge requirements for next tier (independent of benefit activation)
 - **Non-Cumulative**: When user has multiple Competition NFTs, only the one with highest Trading Fee Reduction is used
 
 **Benefit Calculation System:**

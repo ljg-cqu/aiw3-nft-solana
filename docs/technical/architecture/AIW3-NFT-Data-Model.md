@@ -1,14 +1,14 @@
 # AIW3 NFT Data Model
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
-**Last Updated:** 2025-08-08  
+**Version:** v8.0.0  
+**Last Updated:** 2025-08-09  
 **Status:** Active  
-**Purpose:** Defines the data structures and relationships for the AIW3 NFT system, aligned with v1.0.0 business rules and lastmemefi-api backend implementation.
+**Purpose:** Defines the data structures and relationships for the AIW3 NFT system, aligned with v8.0.0 business rules and lastmemefi-api backend implementation.
 
 ---
 
-**Data Model Scope**: This document provides comprehensive specifications for data structures supporting all NFT business flows documented in **AIW3-NFT-Business-Rules-and-Flows.md** v1.0.0, including:
+**Data Model Scope**: This document provides comprehensive specifications for data structures supporting all NFT business flows documented in **AIW3-NFT-Business-Rules-and-Flows.md** v8.0.0, including:
 - **Tiered NFT System**: Single progression-based NFT with sequential upgrade requirements (Levels 1-5)
 - **Competition NFT System**: Multiple Trophy Breeder NFTs from trading competitions
 - **Badge System**: Task-based badge collection with owned → activated → consumed lifecycle

@@ -32,7 +32,7 @@ This document provides detailed data type specifications, validation constraints
 | `metadata_uri` | `String` | Required | Valid IPFS URL | IPFS location of NFT metadata (image, attributes) | `"https://ipfs.io/ipfs/QmXxX..."` |
 | `benefits` | `Object` | Required | See Benefits structure | Trading benefits and perks this NFT provides | `{ "trading_fee_reduction": 0.15 }` |
 | `claimed_at` | `DateTime` | Required | ISO 8601 format | When user first claimed/minted this NFT | `"2025-08-08T10:30:00Z"` |
-| `activated_at` | `DateTime` | Optional | ISO 8601 format | When user activated NFT benefits (optional step) | `"2025-08-08T10:35:00Z"` |
+| `activated_at` | `DateTime` | Optional | ISO 8601 format | When user activated NFT benefits (REQUIRED for benefit usage, but does NOT affect upgrade eligibility) | `"2025-08-08T10:35:00Z"` |
 | `burned_at` | `DateTime` | Optional | ISO 8601 format | When NFT was burned (for upgrades or admin action) | `null` |
 | `competition_id` | `Integer` | Optional | For competition NFTs | Which trading competition this NFT was awarded from | `null` |
 | `competition_rank` | `Integer` | Optional | 1-3 for winners | User's rank in competition (1st, 2nd, 3rd place) | `null` |

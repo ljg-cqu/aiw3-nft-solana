@@ -295,7 +295,7 @@ const wsConnection = {
 };
 ```
 
-#### Server-Sent Events (SSE)
+#### WebSocket Events
 ```javascript
 // Alternative to WebSocket for one-way updates
 const eventSource = new EventSource('/api/v1/nft/events?token=jwt_token');

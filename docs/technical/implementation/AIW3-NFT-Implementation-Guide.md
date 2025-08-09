@@ -1,10 +1,10 @@
 # Implementation Guide Index
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
-**Last Updated:** 2025-08-08  
+**Version:** v8.0.0  
+**Last Updated:** 2025-08-09  
 **Status:** Active  
-**Purpose:** Navigation index for all AIW3 NFT implementation guides aligned with business rules v1.0.0.
+**Purpose:** Navigation index for all AIW3 NFT implementation guides aligned with business rules v8.0.0.
 
 ---
 

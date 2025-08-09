@@ -14,7 +14,7 @@ If the burn succeeds but the mint fails, the user's NFT is permanently destroyed
 - Track the burn success persistently
 - Allow retry of mint without requiring wallet reconnection
 - Provide real-time status updates during retry
-- Manage HTTP/2 SSE connections efficiently
+- Manage WebSocket connections efficiently
 
 ## Architecture Components
 
@@ -78,7 +78,7 @@ CREATE TABLE upgrade_requests (
 );
 ```
 
-### 2. HTTP/2 SSE Connection Management
+### 2. WebSocket Connection Management
 
 #### Connection Pool Design
 

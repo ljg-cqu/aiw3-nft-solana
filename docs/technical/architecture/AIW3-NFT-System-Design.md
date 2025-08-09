@@ -1,10 +1,10 @@
 # AIW3 NFT System Design
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
-**Last Updated:** 2025-08-08  
+**Version:** v8.0.0  
+**Last Updated:** 2025-08-09  
 **Status:** Active  
-**Purpose:** High-level technical architecture and lifecycle management, aligned with v1.0.0 business rules and prototype-driven requirements
+**Purpose:** High-level technical architecture and lifecycle management, aligned with v8.0.0 business rules and prototype-driven requirements
 
 ---
 
