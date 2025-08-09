@@ -149,26 +149,26 @@ graph TB
     USER_SVC --> KAFKA
     KAFKA --> EVENTS
 
-    %% Styling - White text for dark theme IDE compatibility
-    style SOLANA_AUTH stroke:#28a745,stroke-width:3px,color:#fff
-    style WEB3_SVC stroke:#28a745,stroke-width:3px,color:#fff
-    style BET_CONTRACT stroke:#28a745,stroke-width:3px,color:#fff
-    style MYSQL stroke:#ff9800,stroke-width:3px,color:#fff
-    style REDIS stroke:#e91e63,stroke-width:3px,color:#fff
-    style ELASTICSEARCH stroke:#2196f3,stroke-width:3px,color:#fff
-    style SOLANA_RPC stroke:#4caf50,stroke-width:3px,color:#fff
-    style KAFKA stroke:#9c27b0,stroke-width:3px,color:#fff
-    style AUTH_MIDDLEWARE stroke:#f44336,stroke-width:3px,color:#fff
+    %% Styling - Dark text for compatibility with both light and dark themes
+    style SOLANA_AUTH stroke:#28a745,stroke-width:3px,color:#1a1a1a
+    style WEB3_SVC stroke:#28a745,stroke-width:3px,color:#1a1a1a
+    style BET_CONTRACT stroke:#28a745,stroke-width:3px,color:#1a1a1a
+    style MYSQL stroke:#ff9800,stroke-width:3px,color:#1a1a1a
+    style REDIS stroke:#e91e63,stroke-width:3px,color:#1a1a1a
+    style ELASTICSEARCH stroke:#2196f3,stroke-width:3px,color:#1a1a1a
+    style SOLANA_RPC stroke:#4caf50,stroke-width:3px,color:#1a1a1a
+    style KAFKA stroke:#9c27b0,stroke-width:3px,color:#1a1a1a
+    style AUTH_MIDDLEWARE stroke:#f44336,stroke-width:3px,color:#1a1a1a
     
-    %% Additional styling for better visibility - white text for dark themes
-    style WEB stroke:#1976d2,stroke-width:3px,color:#fff
-    style MOBILE stroke:#1976d2,stroke-width:3px,color:#fff
-    style WALLET stroke:#388e3c,stroke-width:3px,color:#fff
-    style API_CLIENTS stroke:#1976d2,stroke-width:3px,color:#fff
-    style LB stroke:#f57c00,stroke-width:3px,color:#fff
-    style GATEWAY stroke:#f57c00,stroke-width:3px,color:#fff
-    style CORS stroke:#f57c00,stroke-width:3px,color:#fff
-    style RATE_LIMIT stroke:#f57c00,stroke-width:3px,color:#fff
+    %% Additional styling for better visibility - dark text for universal compatibility
+    style WEB stroke:#1976d2,stroke-width:3px,color:#1a1a1a
+    style MOBILE stroke:#1976d2,stroke-width:3px,color:#1a1a1a
+    style WALLET stroke:#388e3c,stroke-width:3px,color:#1a1a1a
+    style API_CLIENTS stroke:#1976d2,stroke-width:3px,color:#1a1a1a
+    style LB stroke:#f57c00,stroke-width:3px,color:#1a1a1a
+    style GATEWAY stroke:#f57c00,stroke-width:3px,color:#1a1a1a
+    style CORS stroke:#f57c00,stroke-width:3px,color:#1a1a1a
+    style RATE_LIMIT stroke:#f57c00,stroke-width:3px,color:#1a1a1a
 ```
 
 ## Key Components Overview
