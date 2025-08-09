@@ -149,16 +149,26 @@ graph TB
     USER_SVC --> KAFKA
     KAFKA --> EVENTS
 
-    %% Styling
-    style SOLANA_AUTH fill:#e8f5e8
-    style WEB3_SVC fill:#e8f5e8
-    style BET_CONTRACT fill:#e8f5e8
-    style MYSQL fill:#fff3e0
-    style REDIS fill:#ffebee
-    style ELASTICSEARCH fill:#e1f5fe
-    style SOLANA_RPC fill:#c8e6c9
-    style KAFKA fill:#f3e5f5
-    style AUTH_MIDDLEWARE fill:#ffcdd2
+    %% Styling - White text for dark theme IDE compatibility
+    style SOLANA_AUTH stroke:#28a745,stroke-width:3px,color:#fff
+    style WEB3_SVC stroke:#28a745,stroke-width:3px,color:#fff
+    style BET_CONTRACT stroke:#28a745,stroke-width:3px,color:#fff
+    style MYSQL stroke:#ff9800,stroke-width:3px,color:#fff
+    style REDIS stroke:#e91e63,stroke-width:3px,color:#fff
+    style ELASTICSEARCH stroke:#2196f3,stroke-width:3px,color:#fff
+    style SOLANA_RPC stroke:#4caf50,stroke-width:3px,color:#fff
+    style KAFKA stroke:#9c27b0,stroke-width:3px,color:#fff
+    style AUTH_MIDDLEWARE stroke:#f44336,stroke-width:3px,color:#fff
+    
+    %% Additional styling for better visibility - white text for dark themes
+    style WEB stroke:#1976d2,stroke-width:3px,color:#fff
+    style MOBILE stroke:#1976d2,stroke-width:3px,color:#fff
+    style WALLET stroke:#388e3c,stroke-width:3px,color:#fff
+    style API_CLIENTS stroke:#1976d2,stroke-width:3px,color:#fff
+    style LB stroke:#f57c00,stroke-width:3px,color:#fff
+    style GATEWAY stroke:#f57c00,stroke-width:3px,color:#fff
+    style CORS stroke:#f57c00,stroke-width:3px,color:#fff
+    style RATE_LIMIT stroke:#f57c00,stroke-width:3px,color:#fff
 ```
 
 ## Key Components Overview
