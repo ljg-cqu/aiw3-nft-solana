@@ -1,53 +1,61 @@
-
-// ----------------1. Home Page--------------------
-
-// -------Data From Backend
-// Display of current save fee
-// How to calculate this❓
-type FeesWaived int
-
-// Display of user cumulative saved fees
-type UserSaveFeeList []CumulativeSavedFee
-type CumulativeSavedFee {
+//----------------0. User Info--------------------
+// Business Scenario 1: User basic info should be accessible to all pages when they keep logined in 
+type UserBasicInfo struct {
+    UserId int64
     WalletAddr string
-    Amount int64
-  }
-
-
-· NFT List Display
-Fields:
-
-- nft_levels: Array<Object> | Async | R
-  - level: Number (1-5) | Sync | R
-  - name: String ("Tech Chicken", "Quant Ape", "On-chain Hunter", "Alpha AIchemist", "Quantum Alchemist") | Sync | R
-  - nft_img: String (URL) | Sync | R
-  - nft_level_img: String (URL) | Sync | R // How to get it?
-  - status: String ("unlocked"/"locked") | Async | R
-  - trading_volume_current: Number | Async | R
-  - trading_volume_required: Number | Sync | R
-  - progress_percentage: Number (0-100) | Async | R
-  - benefits: Array<String> | // 
-- special_nft: Object (Trophy Breeder) | Async | R
-
-// Display of user info
-type UserInfo struct {
-    UserAvatarUri string
+    AvatarUri string
 }
 
-type BadgeStatus int
-const (
-    BadgeStatus = iota
-)
+//----------------1. Home Page--------------------
+// Business Scenario 1: Should display users cumulative saved fees
+type FeeWaivedInfoList []FeeWaivedInfo
+type FeeWaivedInfo struct {
+    UserId int64
+    WalletAddr string
+    Amount int64    // Cumulative saved fees
+}
+
+// Business Scenario 2: Should display users NFT portfolio
+type NftPortfolioInfoList []NftPortfolioInfo
+type NftPortfolioInfo struct {
+    UserId int64
+    WalletAddr string
+    NftLevels []TieredNftInfo
+}
+
+type TieredNftInfo struct {
+    Id string
+    Level int // 1-5
+    Name string // Tech Chicken, Quant Ape, On-chain Hunter, Alpha AIchemist, Quantum Alchemist
+    NftImgUrl string
+    NftLevelImgUrl string
+    Status string // Locked, Unlockable, Active, Burned
+    TradingVolumeCurrent int64
+    TradingVolumeRequired int64
+    ProgressPercentage int64 
+    Benefits map[string]any  
+    BenefitsActivated bool
+}
+
+type CompetitionNftInfo struct {
+    Name string // Trophy Breeder
+    NftImgUrl string
+    Benefits map[string]any  
+    BenefitsActivated bool
+}
+
+// Business Scenario 3: Should display users badges
 
 type BadgeList []BadgeInfo
 type BadgeInfo struct {
-    Id string
+    Id int
     Level int
     Name string
-    Badge
-    Status BadgeStatus
-    BadgeIconUri string
-    Progress int // what is it
+    Description string
+    Status string // Owned, Activated, Consumed
+    IconUri string
+    TaskId int
+    TaskProgress int //
 }
 
 
