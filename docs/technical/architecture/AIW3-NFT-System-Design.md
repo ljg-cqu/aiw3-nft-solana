@@ -198,6 +198,8 @@ graph TB
 
 *Figure 1: High-level system architecture showing the main components and their interactions.*
 
+**📋 For detailed event-driven architecture patterns and Kafka integration, see: [Event-Driven Architecture](./AIW3-NFT-Event-Driven-Architecture.md)**
+
 ---
 
 ## System Component Responsibilities
