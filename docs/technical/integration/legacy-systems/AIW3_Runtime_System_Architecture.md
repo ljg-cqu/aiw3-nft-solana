@@ -1088,41 +1088,41 @@ Based on my analysis of the codebase, I'll create two mermaid diagrams to clarif
 ```mermaid
 graph TB
     subgraph "Core Services"
-        RedisService["`api/services/RedisService.js`<br/>Caching & Data Management"]
-        BirdeyeAPIService["`api/services/BirdeyeAPIService.js`<br/>Token Analytics & Market Data"]
-        UserService["`api/services/UserService.js`<br/>User Management & IM Registration"]
-        Web3Service["`api/services/Web3Service.js`<br/>Solana Blockchain Interaction"]
+        RedisService["api/services/RedisService.js\nCaching & Data Management"]
+        BirdeyeAPIService["api/services/BirdeyeAPIService.js\nToken Analytics & Market Data"]
+        UserService["api/services/UserService.js\nUser Management & IM Registration"]
+        Web3Service["api/services/Web3Service.js\nSolana Blockchain Interaction"]
     end
     
     subgraph "Agent Services"
-        AgentService["`api/services/AgentService.js`<br/>Agent Data Management"]
-        AdminAgentService["`api/services/AdminAgentService.js`<br/>Admin Agent Operations"]
-        UserAgentsService["`api/services/UserAgentsService.js`<br/>User Agent Management & Payments"]
-        AgentMultiService["`api/services/AgentMultiService.js`<br/>Multi-Agent Management"]
-        AgentUserCollectService["`api/services/AgentUserCollectService.js`<br/>Agent Collection Management"]
-        AgentInvitationCodeService["`api/services/AgentInvitationCodeService.js`<br/>Invitation Code Management"]
+        AgentService["api/services/AgentService.js\nAgent Data Management"]
+        AdminAgentService["api/services/AdminAgentService.js\nAdmin Agent Operations"]
+        UserAgentsService["api/services/UserAgentsService.js\nUser Agent Management & Payments"]
+        AgentMultiService["api/services/AgentMultiService.js\nMulti-Agent Management"]
+        AgentUserCollectService["api/services/AgentUserCollectService.js\nAgent Collection Management"]
+        AgentInvitationCodeService["api/services/AgentInvitationCodeService.js\nInvitation Code Management"]
     end
     
     subgraph "Trading Services"
-        OKXService["`api/services/OKXService.js`<br/>OKX API Integration"]
-        OkxTradingService["`api/services/OkxTradingService.js`<br/>OKX Trading Operations"]
-        OkxTradingApiService["`api/services/OkxTradingApiService.js`<br/>OKX Account Management"]
-        TradingContestService["`api/services/TradingContestService.js`<br/>Contest Operations"]
-        TradingContestRewardService["`api/services/TradingContestRewardService.js`<br/>Reward Calculations"]
-        tradingContestJobsService["`api/services/tradingContestJobsService.js`<br/>Scheduled Jobs"]
-        OkxPriceWebSocketService["`api/services/OkxPriceWebSocketService.js`<br/>Real-time Price Updates"]
+        OKXService["api/services/OKXService.js\nOKX API Integration"]
+        OkxTradingService["api/services/OkxTradingService.js\nOKX Trading Operations"]
+        OkxTradingApiService["api/services/OkxTradingApiService.js\nOKX Account Management"]
+        TradingContestService["api/services/TradingContestService.js\nContest Operations"]
+        TradingContestRewardService["api/services/TradingContestRewardService.js\nReward Calculations"]
+        tradingContestJobsService["api/services/tradingContestJobsService.js\nScheduled Jobs"]
+        OkxPriceWebSocketService["api/services/OkxPriceWebSocketService.js\nReal-time Price Updates"]
     end
     
     subgraph "Data Services"
-        TradesService["`api/services/TradesService.js`<br/>Trade Analysis"]
-        DataStatisticsService["`api/services/DataStatisticsService.js`<br/>Statistics Operations"]
-        BirdeyeService["`api/services/BirdeyeService.js`<br/>Scheduled Token Updates"]
-        SystemMessageService["`api/services/SystemMessageService.js`<br/>System Messaging"]
+        TradesService["api/services/TradesService.js\nTrade Analysis"]
+        DataStatisticsService["api/services/DataStatisticsService.js\nStatistics Operations"]
+        BirdeyeService["api/services/BirdeyeService.js\nScheduled Token Updates"]
+        SystemMessageService["api/services/SystemMessageService.js\nSystem Messaging"]
     end
     
     subgraph "Admin Services"
-        AdminUserService["`api/services/AdminUserService.js`<br/>Admin User Management"]
-        AdminBlogService["`api/services/AdminBlogService.js`<br/>Blog Management"]
+        AdminUserService["api/services/AdminUserService.js\nAdmin User Management"]
+        AdminBlogService["api/services/AdminBlogService.js\nBlog Management"]
     end
     
     %% Service Dependencies
@@ -1140,6 +1140,7 @@ graph TB
     OKXService -.-> |"External API"| OKXAPI[OKX Trading API]
     Web3Service -.-> |"Blockchain"| Solana[Solana Network]
     RedisService -.-> |"Database"| Redis[(Redis Cache)]
+
 ```
 
 ## 2. Controller-Service Relationships Diagram
@@ -1147,39 +1148,39 @@ graph TB
 ```mermaid
 graph TB
     subgraph "API Controllers"
-        BirdeyeAPIController["`api/controllers/BirdeyeAPIController.js`<br/>Token & Listing Management"]
-        HealthController["`api/controllers/HealthController.js`<br/>Health Monitoring"]
-        SystemController["`api/controllers/SystemController.js`<br/>System Health Checks"]
-        OutController["`api/controllers/OutController.js`<br/>Token & Trade Interface"]
-        DataStatisticsController["`api/controllers/DataStatisticsController.js`<br/>Statistics Operations"]
+        BirdeyeAPIController["api/controllers/BirdeyeAPIController.js\nToken & Listing Management"]
+        HealthController["api/controllers/HealthController.js\nHealth Monitoring"]
+        SystemController["api/controllers/SystemController.js\nSystem Health Checks"]
+        OutController["api/controllers/OutController.js\nToken & Trade Interface"]
+        DataStatisticsController["api/controllers/DataStatisticsController.js\nStatistics Operations"]
     end
     
     subgraph "Agent Controllers"
-        AgentController["`api/controllers/AgentController.js`<br/>Agent Operations"]
-        AIAgentController["`api/controllers/AIAgentController.js`<br/>AI Agent Actions"]
-        UserAgentController["`api/controllers/UserAgentController.js`<br/>User Agent Management"]
-        AdminAgentController["`api/controllers/AdminAgentController.js`<br/>Admin Agent Operations"]
-        AgentPluginsController["`api/controllers/AgentPluginsController.js`<br/>Plugin Management"]
-        AgentTypeController["`api/controllers/AgentTypeController.js`<br/>Type & Category Management"]
+        AgentController["api/controllers/AgentController.js\nAgent Operations"]
+        AIAgentController["api/controllers/AIAgentController.js\nAI Agent Actions"]
+        UserAgentController["api/controllers/UserAgentController.js\nUser Agent Management"]
+        AdminAgentController["api/controllers/AdminAgentController.js\nAdmin Agent Operations"]
+        AgentPluginsController["api/controllers/AgentPluginsController.js\nPlugin Management"]
+        AgentTypeController["api/controllers/AgentTypeController.js\nType & Category Management"]
     end
     
     subgraph "Trading Controllers"
-        TradingContestTradeController["`api/controllers/TradingContestTradeController.js`<br/>Trading Operations"]
+        TradingContestTradeController["api/controllers/TradingContestTradeController.js\nTrading Operations"]
     end
     
     subgraph "Admin Controllers"
-        AdminBlogController["`api/controllers/AdminBlogController.js`<br/>Blog Administration"]
+        AdminBlogController["api/controllers/AdminBlogController.js\nBlog Administration"]
     end
     
     subgraph "Services Layer"
-        BirdeyeAPIService2["`api/services/BirdeyeAPIService.js`"]
-        RedisService2["`api/services/RedisService.js`"]
-        AgentService2["`api/services/AgentService.js`"]
-        AdminAgentService2["`api/services/AdminAgentService.js`"]
-        UserAgentsService2["`api/services/UserAgentsService.js`"]
-        TradingContestService2["`api/services/TradingContestService.js`"]
-        DataStatisticsService2["`api/services/DataStatisticsService.js`"]
-        AdminBlogService2["`api/services/AdminBlogService.js`"]
+        BirdeyeAPIService2["api/services/BirdeyeAPIService.js"]
+        RedisService2["api/services/RedisService.js"]
+        AgentService2["api/services/AgentService.js"]
+        AdminAgentService2["api/services/AdminAgentService.js"]
+        UserAgentsService2["api/services/UserAgentsService.js"]
+        TradingContestService2["api/services/TradingContestService.js"]
+        DataStatisticsService2["api/services/DataStatisticsService.js"]
+        AdminBlogService2["api/services/AdminBlogService.js"]
     end
     
     %% Controller-Service Relationships
@@ -1213,6 +1214,7 @@ graph TB
     TradingContestService2 --> TradingContestTradeController
     DataStatisticsService2 --> DataStatisticsController
     AdminBlogService2 --> AdminBlogController
+
 ```
 
 ## Key Architectural Patterns
