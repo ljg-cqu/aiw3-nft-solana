@@ -1,16 +1,30 @@
 # AIW3 NFT User Notification Events for IM Integration
 
 <!-- Document Metadata -->
-**Version:** v1.0.0  
-**Last Updated:** 2025-01-27  
+**Version:** v2.0.0  
+**Last Updated:** 2025-08-10  
 **Status:** Active  
-**Purpose:** Complete specification of NFT system events for third-party instant messaging (IM) service integration
+**Purpose:** Complete specification of NFT system passive asynchronous events that require active user notifications through third-party instant messaging (IM) services
 
 ---
 
 ## Overview
 
-This document provides a comprehensive specification of all NFT system events that should be sent as notifications to end users through third-party instant messaging (IM) services. These events ensure users receive timely and relevant updates about their NFT activities, achievements, and system status changes.
+This document provides a comprehensive specification of all **passive asynchronous events** that the AIW3 NFT system needs to actively notify users about through third-party instant messaging (IM) services. These are events that happen automatically based on system monitoring and user activity tracking, where users need to be informed but are not directly participating in the action.
+
+### Passive vs Active Events Classification
+
+**🔄 Passive Asynchronous Events (Covered in this document):**
+- Events that happen automatically based on system monitoring
+- Users are NOT actively participating when the event occurs
+- System needs to send notifications to inform users
+- Examples: NFT upgrade conditions met, trading volume milestones reached, badge eligibility achieved
+
+**⚡ Active Synchronous Events (NOT covered in this document):**
+- Events triggered by direct user actions
+- Users are actively participating and get immediate feedback
+- No additional notifications needed as users see results immediately
+- Examples: Minting NFT, activating badges, upgrading NFT, claiming rewards
 
 ### Integration Context
 - **Source System**: AIW3 NFT Backend (lastmemefi-api)
@@ -36,113 +50,43 @@ System events and analytics that can be delivered in batches.
 
 ---
 
-## NFT System Events Specification
+## Passive Asynchronous Events Specification
 
-### 1. NFT Lifecycle Events
+### 1. NFT Level 1 Unlock Qualification Events
 
-#### 1.1 NFT Unlocked (🎯 Critical)
-**Event Type:** `nft_unlocked`  
-**Trigger:** User successfully claims their first or new tier NFT  
-**Priority:** Critical - Immediate delivery required
+#### 1.1 Level 1 NFT Unlock Available (⭐ High Priority)
+**Event Type:** `level1_nft_unlock_available`  
+**Trigger:** User reaches 100,000 USDT trading volume threshold - PASSIVE volume monitoring  
+**Priority:** High - Real-time delivery
 
 ```json
 {
-  "event_type": "nft_unlocked",
+  "event_type": "level1_nft_unlock_available",
   "user_id": "user123",
   "timestamp": "2024-01-15T10:30:00Z",
   "data": {
-    "nft_id": "nft_001",
-    "tier_level": 1,
-    "tier_name": "Tech Chicken",
-    "mint_address": "8yKYtg3CX98e98UYJTEqcE6kCifeTrB94UaSvKpthBtV",
-    "benefits": [
-      "10% trading fee reduction",
-      "Basic AI agent access"
-    ],
-    "qualification_met": {
-      "trading_volume": 150000.00,
-      "badges_activated": 3
+    "volume_milestone": {
+      "required_volume": 100000.00,
+      "current_volume": 105000.00,
+      "milestone_reached_at": "2024-01-15T10:25:00Z"
+    },
+    "unlock_available": {
+      "nft_tier": 1,
+      "nft_name": "Tech Chicken",
+      "benefits": [
+        "10% trading fee reduction",
+        "10 AI agent uses per week"
+      ]
+    },
+    "user_status": {
+      "has_tiered_nft": false,
+      "state_transition": "Locked → Unlockable"
     }
   },
   "message_template": {
-    "title": "🎉 NFT Unlocked!",
-    "body": "Congratulations! You've unlocked your {tier_name} NFT with {benefits_count} exclusive benefits.",
-    "action_button": "View My NFT"
-  }
-}
-```
-
-#### 1.2 NFT Upgraded (⭐ High Priority)
-**Event Type:** `nft_upgraded`  
-**Trigger:** User successfully upgrades to higher tier NFT  
-**Priority:** High - Real-time delivery
-
-```json
-{
-  "event_type": "nft_upgraded",
-  "user_id": "user123",
-  "timestamp": "2024-01-20T14:45:30Z",
-  "data": {
-    "old_tier": {
-      "level": 1,
-      "name": "Tech Chicken",
-      "mint_address": "8yKYtg3CX98e98UYJTEqcE6kCifeTrB94UaSvKpthBtV"
-    },
-    "new_tier": {
-      "level": 2,
-      "name": "Quant Ape",
-      "nft_id": "nft_002",
-      "mint_address": "9VzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
-    },
-    "benefits_upgrade": {
-      "old_fee_reduction": "10%",
-      "new_fee_reduction": "20%",
-      "new_features": ["Advanced AI agent", "Priority support"]
-    },
-    "badges_consumed": [
-      {"badge_id": "badge_002", "name": "Volume Milestone 500K"},
-      {"badge_id": "badge_005", "name": "Consistent Trader"}
-    ]
-  },
-  "message_template": {
-    "title": "🚀 NFT Upgraded!",
-    "body": "Your {old_tier_name} has been upgraded to {new_tier_name}! Enjoy {new_fee_reduction} trading fee reduction.",
-    "action_button": "Explore Benefits"
-  }
-}
-```
-
-#### 1.3 NFT Benefits Activated (⭐ High Priority)
-**Event Type:** `nft_benefits_activated`  
-**Trigger:** User activates NFT benefits (trading fee reduction, etc.) - REQUIRED for benefit usage but does NOT affect upgrade eligibility  
-**Priority:** High - Real-time delivery
-
-```json
-{
-  "event_type": "nft_benefits_activated",
-  "user_id": "user123",
-  "timestamp": "2024-01-20T15:00:00Z",
-  "data": {
-    "nft_id": "nft_002",
-    "tier_name": "Quant Ape",
-    "activated_benefits": [
-      {
-        "type": "trading_fee_reduction",
-        "value": "20%",
-        "description": "20% reduction on all trading fees"
-      },
-      {
-        "type": "ai_agent_access",
-        "value": "advanced",
-        "description": "Access to advanced AI trading agent"
-      }
-    ],
-    "effective_date": "2024-01-20T15:00:00Z"
-  },
-  "message_template": {
-    "title": "✅ Benefits Activated!",
-    "body": "Your {tier_name} NFT benefits are now active. Enjoy {primary_benefit}!",
-    "action_button": "Start Trading"
+    "title": "🎉 NFT Unlock Available!",
+    "body": "Congratulations! You've reached ${required_volume} trading volume. Your {nft_name} NFT is ready to unlock!",
+    "action_button": "Unlock NFT"
   }
 }
 ```
@@ -151,7 +95,7 @@ System events and analytics that can be delivered in batches.
 
 #### 2.1 Badge Earned (⭐ High Priority)
 **Event Type:** `badge_earned`  
-**Trigger:** User meets criteria for a new badge  
+**Trigger:** System automatically awards badge when user meets specific task criteria - PASSIVE detection  
 **Priority:** High - Real-time delivery
 
 ```json
@@ -160,61 +104,77 @@ System events and analytics that can be delivered in batches.
   "user_id": "user123",
   "timestamp": "2024-02-01T09:15:00Z",
   "data": {
-    "badge_id": "badge_002",
-    "badge_name": "Volume Milestone 500K",
-    "badge_category": "trading_volume",
-    "achievement_criteria": "Reach $500,000 in trading volume",
-    "current_progress": {
-      "trading_volume": 500000.00,
-      "milestone_reached": 500000.00
+    "badge_details": {
+      "badge_id": "badge_002",
+      "badge_name": "The Contract Enlightener",
+      "badge_category": "education",
+      "achievement_criteria": "Complete the contract novice guidance",
+      "required_for_tier": 2,
+      "tier_name": "Quant Ape"
+    },
+    "task_completed": {
+      "task_id": "task_contract_guidance",
+      "task_name": "Contract Novice Guidance",
+      "completion_timestamp": "2024-02-01T09:10:00Z"
+    },
+    "nft_upgrade_impact": {
+      "can_contribute_to_upgrade": true,
+      "badges_needed_for_next_tier": 2,
+      "user_current_activated_badges": 0
     },
     "badge_benefits": [
-      "Can be used for NFT tier upgrades",
+      "Can be activated for NFT tier upgrades",
       "Social profile achievement display"
-    ],
-    "next_milestone": {
-      "badge_id": "badge_003",
-      "name": "Volume Milestone 1M",
-      "requirement": 1000000.00
-    }
+    ]
   },
   "message_template": {
     "title": "🏆 Badge Earned!",
-    "body": "Congratulations! You've earned the '{badge_name}' badge. Use it to upgrade your NFT!",
+    "body": "Great job! You've earned the '{badge_name}' badge by completing {task_name}. Ready to activate it for NFT upgrades?",
     "action_button": "Activate Badge"
   }
 }
 ```
 
-#### 2.2 Badge Activated (🟡 Medium Priority)
-**Event Type:** `badge_activated`  
-**Trigger:** User activates a badge for NFT qualification  
+#### 2.2 Badge Progress Near Completion (🟡 Medium Priority)
+**Event Type:** `badge_progress_near_completion`  
+**Trigger:** System detects user is close to completing badge requirements (80-95% progress) - PASSIVE monitoring  
 **Priority:** Medium - Near real-time delivery
 
 ```json
 {
-  "event_type": "badge_activated",
+  "event_type": "badge_progress_near_completion",
   "user_id": "user123",
-  "timestamp": "2024-02-01T10:30:00Z",
+  "timestamp": "2024-02-18T16:45:00Z",
   "data": {
-    "badge_id": "badge_002",
-    "badge_name": "Volume Milestone 500K",
-    "activation_purpose": "nft_tier_qualification",
-    "qualification_progress": {
-      "current_tier": 1,
-      "target_tier": 2,
-      "badges_required": 2,
-      "badges_activated": 1,
-      "remaining_requirements": [
-        "Activate 1 more badge",
-        "Maintain $300K+ trading volume"
-      ]
-    }
+    "badge_opportunity": {
+      "badge_id": "badge_004", 
+      "badge_name": "Referral Master",
+      "badge_category": "referral",
+      "required_for_tier": 4,
+      "tier_name": "Alpha Alchemist"
+    },
+    "current_progress": {
+      "requirement": "Invite 2 friends to register",
+      "current_count": 1,
+      "required_count": 2,
+      "progress_percentage": 50,
+      "recent_activity": "1 friend registered in last 7 days"
+    },
+    "completion_benefit": {
+      "immediate": "Badge added to collection",
+      "nft_impact": "Can be activated for Alpha Alchemist NFT upgrade",
+      "social_recognition": "Community profile badge display"
+    },
+    "suggested_actions": [
+      "Share referral link with friends",
+      "Post on social media",
+      "Invite contacts from address book"
+    ]
   },
   "message_template": {
-    "title": "⚡ Badge Activated!",
-    "body": "Your '{badge_name}' badge is now active for NFT upgrades. {remaining_count} more requirements to go!",
-    "action_button": "Check Progress"
+    "title": "🎪 Badge Almost Earned!",
+    "body": "You're {progress_percentage}% of the way to earning '{badge_name}'! Just {remaining_count} more to go.",
+    "action_button": "Complete Task"
   }
 }
 ```
@@ -223,7 +183,7 @@ System events and analytics that can be delivered in batches.
 
 #### 3.1 Trading Volume Milestone (⭐ High Priority)
 **Event Type:** `trading_volume_milestone`  
-**Trigger:** User reaches significant trading volume milestones  
+**Trigger:** System detects user reached significant trading volume thresholds - PASSIVE monitoring  
 **Priority:** High - Real-time delivery
 
 ```json
@@ -232,74 +192,44 @@ System events and analytics that can be delivered in batches.
   "user_id": "user123",
   "timestamp": "2024-02-05T16:20:00Z",
   "data": {
-    "previous_volume": 450000.00,
-    "current_volume": 500000.00,
-    "milestone_reached": 500000.00,
-    "milestone_name": "Volume Champion 500K",
+    "volume_milestone": {
+      "previous_volume": 450000.00,
+      "current_volume": 500000.00,
+      "milestone_reached": 500000.00,
+      "milestone_name": "Volume Champion 500K",
+      "achieved_at": "2024-02-05T16:18:00Z"
+    },
     "tier_qualification_impact": {
       "newly_qualified_tiers": [2],
       "tier_names": ["Quant Ape"],
-      "badges_earned": ["badge_002"]
+      "previous_max_tier": 1,
+      "new_max_tier": 2
+    },
+    "volume_sources": {
+      "perpetual_trading": 475000.00,
+      "strategy_trading": 25000.00,
+      "total_volume": 500000.00
     },
     "next_milestone": {
-      "target_volume": 1000000.00,
-      "milestone_name": "Volume Master 1M",
-      "estimated_days": 45
+      "target_volume": 5000000.00,
+      "milestone_name": "Volume Master 5M",
+      "tier_unlock": "On-chain Hunter",
+      "estimated_days": 120
     }
   },
   "message_template": {
-    "title": "📈 Milestone Achieved!",
+    "title": "📈 Volume Milestone Achieved!",
     "body": "Amazing! You've reached ${milestone_reached} in trading volume. You're now qualified for {tier_name} NFT!",
-    "action_button": "Upgrade NFT"
+    "action_button": "View Qualification"
   }
 }
 ```
 
-#### 3.2 Qualification Status Changed (🟡 Medium Priority)
-**Event Type:** `qualification_status_changed`  
-**Trigger:** User's NFT tier qualification status changes  
-**Priority:** Medium - Near real-time delivery
+### 3. Competition & Airdrop Events
 
-```json
-{
-  "event_type": "qualification_status_changed",
-  "user_id": "user123",
-  "timestamp": "2024-02-05T16:25:00Z",
-  "data": {
-    "previous_qualifications": [1],
-    "current_qualifications": [1, 2],
-    "newly_qualified_tiers": [
-      {
-        "tier_level": 2,
-        "tier_name": "Quant Ape",
-        "requirements_met": {
-          "trading_volume": true,
-          "badges_activated": true
-        }
-      }
-    ],
-    "qualification_summary": {
-      "total_qualified_tiers": 2,
-      "highest_tier": 2,
-      "next_tier_requirements": [
-        "Reach $750K trading volume",
-        "Activate 3 badges"
-      ]
-    }
-  },
-  "message_template": {
-    "title": "🎯 New Tier Unlocked!",
-    "body": "You're now qualified for {tier_name}! Ready to upgrade your NFT?",
-    "action_button": "Upgrade Now"
-  }
-}
-```
-
-### 4. Competition & Airdrop Events
-
-#### 4.1 Competition NFT Airdrop (🎯 Critical)
+#### 3.1 Competition NFT Airdrop (🎯 Critical)
 **Event Type:** `competition_nft_airdrop`  
-**Trigger:** User receives NFT from competition manager airdrop  
+**Trigger:** Competition manager airdrops NFT to user's wallet - PASSIVE receipt  
 **Priority:** Critical - Immediate delivery
 
 ```json
@@ -315,7 +245,7 @@ System events and analytics that can be delivered in batches.
     "nft_received": {
       "nft_id": "nft_comp_001",
       "tier_level": 3,
-      "tier_name": "Crypto Sage",
+      "tier_name": "Trophy Breeder",
       "mint_address": "7XzYwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWN",
       "special_attributes": [
         "Competition Winner Badge",
@@ -333,9 +263,9 @@ System events and analytics that can be delivered in batches.
 }
 ```
 
-#### 4.2 Competition Ranking Update (🟡 Medium Priority)
+#### 3.2 Competition Ranking Update (🟡 Medium Priority)
 **Event Type:** `competition_ranking_update`  
-**Trigger:** User's ranking changes significantly in active competitions  
+**Trigger:** User's ranking changes significantly in active competitions - PASSIVE calculation  
 **Priority:** Medium - Batched delivery (daily)
 
 ```json
@@ -360,7 +290,7 @@ System events and analytics that can be delivered in batches.
       },
       {
         "rank_range": "2nd-3rd",
-        "reward": "Crypto Sage NFT + 500 USDT"
+        "reward": "Trophy Breeder NFT + 500 USDT"
       }
     ]
   },
@@ -372,43 +302,11 @@ System events and analytics that can be delivered in batches.
 }
 ```
 
-### 5. System & Error Events
+### 4. System Events
 
-#### 5.1 Transaction Status Updates (🟡 Medium Priority)
-**Event Type:** `transaction_status_update`  
-**Trigger:** NFT transaction status changes (pending → completed/failed)  
-**Priority:** Medium - Real-time for failures, batched for success
-
-```json
-{
-  "event_type": "transaction_status_update",
-  "user_id": "user123",
-  "timestamp": "2024-02-01T11:45:00Z",
-  "data": {
-    "transaction_id": "tx_upgrade_124_20250201",
-    "transaction_type": "nft_upgrade",
-    "previous_status": "pending",
-    "current_status": "completed",
-    "blockchain_tx_id": "5Kd7zYzY8X9mNpQrStUvWxYz3HgFnRaLmPdQwErTyUiJ",
-    "processing_time": "45 seconds",
-    "gas_cost": 0.002,
-    "result_data": {
-      "old_nft_burned": "8yKYtg3CX98e98UYJTEqcE6kCifeTrB94UaSvKpthBtV",
-      "new_nft_minted": "9VzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
-      "new_tier": "Quant Ape"
-    }
-  },
-  "message_template": {
-    "title": "✅ Transaction Complete",
-    "body": "Your NFT upgrade transaction has been completed successfully! Your new {new_tier} NFT is ready.",
-    "action_button": "View NFT"
-  }
-}
-```
-
-#### 5.2 Transaction Failed (🎯 Critical)
+#### 4.1 Transaction Failed (🎯 Critical)
 **Event Type:** `transaction_failed`  
-**Trigger:** NFT transaction fails due to blockchain or system issues  
+**Trigger:** NFT transaction fails due to blockchain or system issues - PASSIVE system error  
 **Priority:** Critical - Immediate delivery
 
 ```json
@@ -438,9 +336,9 @@ System events and analytics that can be delivered in batches.
 }
 ```
 
-#### 5.3 System Maintenance Notifications (🔵 Low Priority)
+#### 4.2 System Maintenance Notifications (🔵 Low Priority)
 **Event Type:** `system_maintenance`  
-**Trigger:** Scheduled maintenance affecting NFT services  
+**Trigger:** Scheduled maintenance affecting NFT services - PASSIVE system scheduling  
 **Priority:** Low - Advance notice (24-48 hours)
 
 ```json
@@ -476,45 +374,650 @@ System events and analytics that can be delivered in batches.
 }
 ```
 
-### 6. Social & Community Events
+### 5. NFT Upgrade Qualification Events
 
-#### 6.1 Achievement Milestone (🟡 Medium Priority)
-**Event Type:** `achievement_milestone`  
-**Trigger:** User reaches significant platform milestones  
-**Priority:** Medium - Batched delivery (daily)
+#### 6.1 NFT Upgrade Conditions Met (⭐ High Priority)
+**Event Type:** `nft_upgrade_conditions_met`  
+**Trigger:** User meets all requirements for next tier NFT upgrade (volume + badges) - PASSIVE detection by system  
+**Priority:** High - Real-time delivery
 
 ```json
 {
-  "event_type": "achievement_milestone",
+  "event_type": "nft_upgrade_conditions_met",
   "user_id": "user123",
-  "timestamp": "2024-02-15T12:00:00Z",
+  "timestamp": "2024-02-20T14:30:00Z",
   "data": {
-    "milestone_type": "nft_collection",
-    "milestone_name": "NFT Collector",
-    "achievement_data": {
-      "total_nfts_owned": 5,
-      "unique_tiers_collected": 3,
-      "badges_earned": 12,
-      "competition_wins": 2
+    "current_nft": {
+      "tier_level": 1,
+      "tier_name": "Tech Chicken",
+      "nft_id": "nft_001"
     },
-    "social_recognition": {
-      "leaderboard_position": 15,
-      "community_rank": "Advanced Trader",
-      "profile_badge": "NFT Enthusiast"
+    "upgrade_target": {
+      "tier_level": 2,
+      "tier_name": "Quant Ape",
+      "benefits": [
+        "20% trading fee reduction",
+        "20 AI agent uses per week",
+        "Activate Exclusive Background"
+      ]
     },
-    "next_milestone": {
-      "name": "NFT Master",
-      "requirements": [
-        "Own 10 NFTs",
-        "Collect all 5 tiers",
-        "Win 5 competitions"
+    "conditions_met": {
+      "trading_volume": {
+        "required": 500000.00,
+        "current": 520000.00,
+        "status": "satisfied",
+        "achieved_at": "2024-02-20T12:15:00Z"
+      },
+      "badges_required": {
+        "required_count": 2,
+        "activated_count": 2,
+        "status": "satisfied",
+        "activated_badges": [
+          {"badge_id": "badge_001", "name": "The Contract Enlightener"},
+          {"badge_id": "badge_002", "name": "Platform Enlighteners"}
+        ]
+      }
+    },
+    "upgrade_benefits": {
+      "fee_reduction_increase": "10% → 20%",
+      "ai_usage_increase": "10 → 20 uses per week",
+      "new_features": ["Exclusive Background Access"]
+    }
+  },
+  "message_template": {
+    "title": "🎯 Ready to Upgrade!",
+    "body": "Great news! You've met all requirements to upgrade your {current_tier} to {upgrade_tier}. Ready to unlock {upgrade_benefits}?",
+    "action_button": "Upgrade NFT"
+  }
+}
+```
+
+#### 6.2 Badge Earning Opportunity Available (🟡 Medium Priority)
+**Event Type:** `badge_earning_opportunity_available`  
+**Trigger:** System detects user is close to earning a new badge (80-95% progress) - PASSIVE monitoring  
+**Priority:** Medium - Near real-time delivery
+
+```json
+{
+  "event_type": "badge_earning_opportunity_available",
+  "user_id": "user123",
+  "timestamp": "2024-02-18T16:45:00Z",
+  "data": {
+    "badge_opportunity": {
+      "badge_id": "badge_004", 
+      "badge_name": "Referral Master",
+      "badge_category": "referral",
+      "required_for_tier": 4,
+      "tier_name": "Alpha Alchemist"
+    },
+    "current_progress": {
+      "requirement": "Invite 2 friends to register",
+      "current_count": 1,
+      "required_count": 2,
+      "progress_percentage": 50,
+      "recent_activity": "1 friend registered in last 7 days"
+    },
+    "completion_benefit": {
+      "immediate": "Badge added to collection",
+      "nft_impact": "Can be used for Alpha Alchemist NFT upgrade",
+      "social_recognition": "Community profile badge display"
+    },
+    "suggested_actions": [
+      "Share referral link with friends",
+      "Post on social media",
+      "Invite contacts from address book"
+    ]
+  },
+  "message_template": {
+    "title": "🎪 Badge Almost Earned!",
+    "body": "You're {progress_percentage}% of the way to earning '{badge_name}'! Just {remaining_count} more to go.",
+    "action_button": "Complete Task"
+  }
+}
+```
+
+#### 6.3 Weekly AI Agent Usage Allowance Reset (🔵 Low Priority)
+**Event Type:** `weekly_ai_allowance_reset`  
+**Trigger:** Weekly reset of AI agent usage allowance for NFT holders - PASSIVE system scheduling  
+**Priority:** Low - Batched delivery (weekly)
+
+```json
+{
+  "event_type": "weekly_ai_allowance_reset",
+  "user_id": "user123",
+  "timestamp": "2024-02-19T00:00:00Z",
+  "data": {
+    "reset_period": {
+      "week_start": "2024-02-19T00:00:00Z",
+      "week_end": "2024-02-25T23:59:59Z",
+      "week_number": 8
+    },
+    "nft_benefits": {
+      "tiered_nft": {
+        "tier_name": "Quant Ape",
+        "ai_allowance": 20,
+        "tier_level": 2
+      },
+      "competition_nfts": [
+        {
+          "tier_name": "Trophy Breeder", 
+          "additional_features": ["Priority AI Queue"]
+        }
+      ]
+    },
+    "usage_summary_last_week": {
+      "total_allowance": 20,
+      "used_count": 18,
+      "remaining_count": 2,
+      "usage_percentage": 90,
+      "most_used_features": [
+        "Strategy Analysis",
+        "Market Prediction"
+      ]
+    },
+    "optimization_tips": [
+      "Use AI during peak trading hours for best results",
+      "Combine multiple queries for comprehensive analysis"
+    ]
+  },
+  "message_template": {
+    "title": "🤖 AI Usage Reset",
+    "body": "Your weekly AI agent allowance has been reset! You have {ai_allowance} uses available this week.",
+    "action_button": "Start Trading"
+  }
+}
+```
+
+#### 6.4 Competition Entry Deadline Approaching (🟡 Medium Priority)
+**Event Type:** `competition_entry_deadline_approaching`  
+**Trigger:** 48 hours before competition entry deadline - users haven't entered yet - PASSIVE monitoring  
+**Priority:** Medium - Near real-time delivery
+
+```json
+{
+  "event_type": "competition_entry_deadline_approaching",
+  "user_id": "user123",
+  "timestamp": "2024-02-22T12:00:00Z",
+  "data": {
+    "competition": {
+      "competition_id": "monthly_contest_2024_02",
+      "competition_name": "February Trading Masters",
+      "entry_deadline": "2024-02-24T12:00:00Z",
+      "hours_remaining": 48,
+      "entry_fee": 0,
+      "entry_requirements": [
+        "Minimum 1000 USDT trading volume in last 30 days",
+        "Account in good standing"
+      ]
+    },
+    "user_eligibility": {
+      "is_eligible": true,
+      "volume_last_30_days": 15000.00,
+      "account_status": "good_standing",
+      "has_entered": false
+    },
+    "competition_rewards": {
+      "first_place": "Quantum Alchemist NFT + 5000 USDT",
+      "second_place": "Alpha Alchemist NFT + 3000 USDT", 
+      "third_place": "On-chain Hunter NFT + 1000 USDT",
+      "participation_rewards": "Trading fee discount for all participants"
+    },
+    "current_stats": {
+      "total_participants": 2847,
+      "estimated_competition_level": "high",
+      "user_historical_performance": "top 25%"
+    }
+  },
+  "message_template": {
+    "title": "⏰ Competition Deadline Soon!",
+    "body": "Only {hours_remaining} hours left to enter {competition_name}! You're eligible and have a strong track record.",
+    "action_button": "Enter Competition"
+  }
+}
+```
+
+#### 6.5 Strategy Trading Volume Bonus Activated (⭐ High Priority)
+**Event Type:** `strategy_volume_bonus_activated`  
+**Trigger:** User's strategy trading volume contributes to NFT qualification milestones - PASSIVE calculation  
+**Priority:** High - Real-time delivery
+
+```json
+{
+  "event_type": "strategy_volume_bonus_activated",
+  "user_id": "user123",
+  "timestamp": "2024-02-25T09:30:00Z",
+  "data": {
+    "strategy_contribution": {
+      "strategy_name": "Conservative Growth Strategy",
+      "strategy_id": "strat_001",
+      "volume_generated": 25000.00,
+      "time_period": "last_7_days",
+      "performance_metrics": {
+        "roi_percentage": 8.5,
+        "win_rate": 73.2,
+        "trades_executed": 24
+      }
+    },
+    "nft_qualification_impact": {
+      "previous_total_volume": 475000.00,
+      "new_total_volume": 500000.00,
+      "volume_source_breakdown": {
+        "perpetual_trading": 475000.00,
+        "strategy_trading": 25000.00
+      },
+      "milestones_achieved": [
+        {
+          "milestone_volume": 500000.00,
+          "milestone_name": "Volume Champion 500K",
+          "nft_tier_unlocked": 2,
+          "tier_name": "Quant Ape"
+        }
+      ]
+    },
+    "strategy_performance_bonus": {
+      "strategy_creator_recognition": "Badge earned: Strategic experts",
+      "additional_ai_usage": "+5 uses this week",
+      "exclusive_strategy_features": "Priority strategy recommendations"
+    }
+  },
+  "message_template": {
+    "title": "📊 Strategy Milestone!",
+    "body": "Your {strategy_name} generated ${volume_generated} trading volume, unlocking {tier_name} NFT qualification!",
+    "action_button": "View Progress"
+  }
+}
+```
+
+#### 6.6 Historical Trading Volume Backfill Complete (🟡 Medium Priority)
+**Event Type:** `historical_volume_backfill_complete`  
+**Trigger:** System completes historical trading volume calculation for pre-NFT activity - PASSIVE processing  
+**Priority:** Medium - Batched delivery
+
+```json
+{
+  "event_type": "historical_volume_backfill_complete",
+  "user_id": "user123",
+  "timestamp": "2024-02-26T03:00:00Z",
+  "data": {
+    "backfill_summary": {
+      "processing_period": {
+        "start_date": "2023-01-01T00:00:00Z",
+        "end_date": "2024-01-15T00:00:00Z",
+        "total_days": 379
+      },
+      "volume_discovered": {
+        "perpetual_trading": 850000.00,
+        "strategy_trading": 125000.00,
+        "total_historical_volume": 975000.00
+      },
+      "current_volume_post_nft": 45000.00,
+      "grand_total_volume": 1020000.00
+    },
+    "nft_qualification_impact": {
+      "previous_qualification_tiers": [1],
+      "new_qualification_tiers": [1, 2, 3],
+      "newly_qualified_tiers": [
+        {"tier": 2, "name": "Quant Ape"},
+        {"tier": 3, "name": "On-chain Hunter"}
+      ]
+    },
+    "immediate_actions_available": [
+      "Upgrade to Quant Ape (if 2 badges activated)",
+      "Upgrade to On-chain Hunter (if 4 badges activated)",
+      "View complete trading history"
+    ],
+    "badge_eligibility_update": {
+      "newly_eligible_badges": [
+        {"badge_id": "badge_003", "name": "Volume Milestone 1M"},
+        {"badge_id": "badge_007", "name": "Consistent High Volume Trader"}
       ]
     }
   },
   "message_template": {
-    "title": "🌟 Achievement Unlocked!",
-    "body": "Congratulations! You've reached the {milestone_name} milestone with {total_nfts_owned} NFTs collected!",
-    "action_button": "Share Achievement"
+    "title": "📈 Historical Volume Updated!",
+    "body": "We've processed your trading history! Total volume: ${grand_total_volume}. You now qualify for {new_tiers_count} additional NFT tiers!",
+    "action_button": "View Qualifications"
+  }
+}
+```
+
+### 7. NFT Benefits & Rights Events
+
+#### 7.1 NFT Benefits Expiring (🟡 Medium Priority)
+**Event Type:** `nft_benefits_expiring`  
+**Trigger:** NFT benefits approaching expiration (Competition NFT benefits ending) - PASSIVE monitoring  
+**Priority:** Medium - 48 hours advance notice
+
+```json
+{
+  "event_type": "nft_benefits_expiring",
+  "user_id": "user123",
+  "timestamp": "2024-03-28T12:00:00Z",
+  "data": {
+    "expiring_benefits": {
+      "nft_id": "nft_comp_001",
+      "nft_name": "Trophy Breeder",
+      "nft_type": "competition",
+      "expiration_date": "2024-03-30T23:59:59Z",
+      "hours_remaining": 48
+    },
+    "benefits_affected": [
+      {
+        "benefit_type": "trading_fee_reduction",
+        "current_value": "25%",
+        "will_lose": true
+      },
+      {
+        "benefit_type": "avatar_crown",
+        "current_value": "Competition Winner Crown",
+        "will_lose": true
+      }
+    ],
+    "alternative_benefits": {
+      "tiered_nft_active": true,
+      "fallback_fee_reduction": "20%",
+      "remaining_benefits": ["20 AI agent uses per week"]
+    },
+    "recommended_actions": [
+      "Participate in upcoming competitions",
+      "Upgrade Tiered NFT for better benefits",
+      "Check competition schedule"
+    ]
+  },
+  "message_template": {
+    "title": "⏰ Benefits Expiring Soon!",
+    "body": "Your {nft_name} benefits expire in {hours_remaining} hours. Your trading fee reduction will change from {current_value} to {fallback_value}.",
+    "action_button": "View Competitions"
+  }
+}
+```
+
+#### 7.2 NFT Benefit Enhancement Opportunity (🟡 Medium Priority)
+**Event Type:** `nft_benefit_enhancement_opportunity`  
+**Trigger:** System detects user can get better benefits through optimization - PASSIVE analysis  
+**Priority:** Medium - Weekly analysis
+
+```json
+{
+  "event_type": "nft_benefit_enhancement_opportunity",
+  "user_id": "user123",
+  "timestamp": "2024-02-28T10:00:00Z",
+  "data": {
+    "current_benefits": {
+      "primary_nft": {
+        "type": "tiered",
+        "name": "Quant Ape",
+        "fee_reduction": "20%",
+        "ai_usage": 20
+      },
+      "competition_nfts": [
+        {"name": "Trophy Breeder", "fee_reduction": "25%"}
+      ],
+      "effective_fee_reduction": "25%"
+    },
+    "enhancement_opportunities": [
+      {
+        "opportunity_type": "tiered_upgrade",
+        "target_tier": "On-chain Hunter",
+        "potential_benefits": {
+          "fee_reduction": "30%",
+          "ai_usage": 30,
+          "new_features": ["Strategy Priority"]
+        },
+        "requirements_missing": {
+          "badges_needed": 2,
+          "volume_needed": 3500000.00
+        }
+      },
+      {
+        "opportunity_type": "competition_participation",
+        "upcoming_competitions": 3,
+        "potential_rewards": "Better Trophy Breeder NFT"
+      }
+    ]
+  },
+  "message_template": {
+    "title": "🚀 Enhance Your Benefits!",
+    "body": "You could increase your trading fee reduction to {potential_reduction}% by upgrading to {target_tier}. Ready to unlock more benefits?",
+    "action_button": "View Opportunities"
+  }
+}
+```
+
+### 8. Task & Badge Progress Events
+
+#### 8.1 Task Auto-Completion (⭐ High Priority)
+**Event Type:** `task_auto_completed`  
+**Trigger:** System automatically detects task completion without user action - PASSIVE monitoring  
+**Priority:** High - Real-time delivery
+
+```json
+{
+  "event_type": "task_auto_completed",
+  "user_id": "user123",
+  "timestamp": "2024-02-20T15:30:00Z",
+  "data": {
+    "completed_task": {
+      "task_id": "task_group_membership_3months",
+      "task_name": "Trading Group Veteran",
+      "task_category": "community_engagement",
+      "completion_criteria": "Join a group for 3 months",
+      "completion_detected_at": "2024-02-20T15:25:00Z"
+    },
+    "badge_awarded": {
+      "badge_id": "badge_group_veteran",
+      "badge_name": "Trading Group Veteran",
+      "required_for_tier": 5,
+      "tier_name": "Quantum Alchemist"
+    },
+    "user_progress": {
+      "group_join_date": "2023-11-20T10:00:00Z",
+      "days_in_group": 92,
+      "group_name": "Advanced Traders Hub",
+      "group_activity_level": "high"
+    },
+    "nft_upgrade_impact": {
+      "contributes_to_tier": 5,
+      "badges_needed_for_tier5": 6,
+      "user_current_badges_for_tier5": 4
+    }
+  },
+  "message_template": {
+    "title": "🏆 Task Completed!",
+    "body": "Congratulations! You've automatically earned the '{badge_name}' badge for being in {group_name} for 3 months!",
+    "action_button": "Collect Badge"
+  }
+}
+```
+
+#### 8.2 Multi-Task Progress Update (🟡 Medium Priority)
+**Event Type:** `multi_task_progress_update`  
+**Trigger:** System detects significant progress across multiple badge tasks - PASSIVE analysis  
+**Priority:** Medium - Daily batch analysis
+
+```json
+{
+  "event_type": "multi_task_progress_update",
+  "user_id": "user123",
+  "timestamp": "2024-02-25T18:00:00Z",
+  "data": {
+    "progress_summary": {
+      "analysis_period": "last_7_days",
+      "total_tasks_progressed": 4,
+      "badges_closer_to_earning": 3
+    },
+    "task_progress_details": [
+      {
+        "badge_name": "Strategic Messenger",
+        "requirement": "Create 5 strategies",
+        "current_progress": 3,
+        "target_progress": 5,
+        "progress_percentage": 60,
+        "recent_activity": "Created 2 strategies this week"
+      },
+      {
+        "badge_name": "Transaction Commander",
+        "requirement": "Invite 5 users to complete first transaction",
+        "current_progress": 2,
+        "target_progress": 5,
+        "progress_percentage": 40,
+        "recent_activity": "1 new referral completed first trade"
+      }
+    ],
+    "tier_impact": {
+      "target_tier": 5,
+      "tier_name": "Quantum Alchemist",
+      "completion_estimate": "2-3 weeks at current pace"
+    }
+  },
+  "message_template": {
+    "title": "📈 Great Progress!",
+    "body": "You're making excellent progress on {total_tasks_progressed} badge tasks! You're {completion_estimate} away from {tier_name}.",
+    "action_button": "View Progress"
+  }
+}
+```
+
+### 9. Fee Savings & Financial Events
+
+#### 9.1 Fee Savings Milestone (🟡 Medium Priority)
+**Event Type:** `fee_savings_milestone`  
+**Trigger:** User reaches significant cumulative fee savings milestones - PASSIVE calculation  
+**Priority:** Medium - Daily calculation
+
+```json
+{
+  "event_type": "fee_savings_milestone",
+  "user_id": "user123",
+  "timestamp": "2024-02-28T16:00:00Z",
+  "data": {
+    "savings_milestone": {
+      "milestone_amount": 1000.00,
+      "milestone_name": "Savings Champion - $1K",
+      "achieved_at": "2024-02-28T15:45:00Z"
+    },
+    "cumulative_savings": {
+      "total_saved_usd": 1025.50,
+      "savings_period": "since_nft_activation",
+      "start_date": "2024-01-01T00:00:00Z",
+      "days_active": 58
+    },
+    "savings_breakdown": {
+      "nft_source": {
+        "tiered_nft_savings": 425.50,
+        "competition_nft_savings": 600.00
+      },
+      "trading_volume_contributing": 4250000.00,
+      "average_daily_savings": 17.68
+    },
+    "next_milestone": {
+      "target_amount": 2500.00,
+      "milestone_name": "Savings Master - $2.5K",
+      "estimated_days": 83
+    }
+  },
+  "message_template": {
+    "title": "💰 Savings Milestone!",
+    "body": "Amazing! Your NFTs have saved you ${total_saved} in trading fees. That's ${average_daily_savings}/day!",
+    "action_button": "View Savings Details"
+  }
+}
+```
+
+### 10. Community & Social Events
+
+#### 10.1 Community Recognition Update (🟡 Medium Priority)
+**Event Type:** `community_recognition_update`  
+**Trigger:** User gains followers/recognition that affects badge progress - PASSIVE monitoring  
+**Priority:** Medium - Weekly analysis
+
+```json
+{
+  "event_type": "community_recognition_update",
+  "user_id": "user123",
+  "timestamp": "2024-03-05T12:00:00Z",
+  "data": {
+    "recognition_milestone": {
+      "milestone_type": "followers_threshold",
+      "current_followers": 28,
+      "milestone_reached": 25,
+      "milestone_name": "Influence Talent Threshold"
+    },
+    "badge_impact": {
+      "badge_unlocked": true,
+      "badge_id": "badge_influence_talent",
+      "badge_name": "Influence Talent",
+      "requirement_met": "The number of fans in the station is greater than or equal to 25",
+      "required_for_tier": 5
+    },
+    "community_stats": {
+      "followers_gained_last_week": 8,
+      "posts_engagement_rate": 15.6,
+      "community_rank": "Top 10%",
+      "profile_views_increase": 34.2
+    },
+    "tier_progression": {
+      "target_tier": "Quantum Alchemist",
+      "badges_now_earned_for_tier5": 5,
+      "badges_needed_for_tier5": 6,
+      "remaining_requirement": "1 more badge"
+    }
+  },
+  "message_template": {
+    "title": "🎆 Community Recognition!",
+    "body": "Your influence is growing! You've reached {current_followers} followers and unlocked the '{badge_name}' badge!",
+    "action_button": "View Community Stats"
+  }
+}
+```
+
+### 11. System Analysis & Optimization Events
+
+#### 11.1 Portfolio Optimization Suggestion (🔵 Low Priority)
+**Event Type:** `portfolio_optimization_suggestion`  
+**Trigger:** System analyzes user's NFT portfolio and suggests optimizations - PASSIVE analysis  
+**Priority:** Low - Weekly analysis
+
+```json
+{
+  "event_type": "portfolio_optimization_suggestion",
+  "user_id": "user123",
+  "timestamp": "2024-03-01T09:00:00Z",
+  "data": {
+    "current_portfolio": {
+      "tiered_nft": {
+        "name": "Quant Ape",
+        "level": 2,
+        "benefits_activated": false
+      },
+      "competition_nfts": [
+        {"name": "Trophy Breeder", "fee_reduction": "25%", "benefits_activated": true}
+      ]
+    },
+    "optimization_suggestions": [
+      {
+        "suggestion_type": "activate_benefits",
+        "priority": "high",
+        "description": "Activate your Quant Ape benefits to use additional features",
+        "potential_impact": "Access to 20 AI agent uses per week"
+      },
+      {
+        "suggestion_type": "badge_activation_strategy",
+        "priority": "medium",
+        "description": "You have 3 owned badges - activate 2 for next tier upgrade",
+        "potential_impact": "Unlock On-chain Hunter (30% fee reduction)"
+      }
+    ],
+    "efficiency_metrics": {
+      "portfolio_utilization": "65%",
+      "benefit_activation_rate": "50%",
+      "upgrade_readiness": "75%"
+    }
+  },
+  "message_template": {
+    "title": "🔧 Portfolio Tips!",
+    "body": "Your NFT portfolio is {portfolio_utilization}% optimized. Activate your {tiered_nft} benefits to unlock more features!",
+    "action_button": "Optimize Portfolio"
   }
 }
 ```
