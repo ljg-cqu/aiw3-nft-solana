@@ -1,71 +1,65 @@
-# NFT API Quick Reference Guide
+# NFT API Quick Reference
 
-**Version:** v1.0.0  
-**Last Updated:** 2025-01-15  
-**Purpose:** Quick reference for all NFT-related endpoints and events
+**Version:** v1.0.0 | **Last Updated:** 2025-01-15  
+**Purpose:** Quick reference for all NFT API endpoints with essential request/response patterns
 
 ---
 
 ## 🚀 **ENDPOINT QUICK REFERENCE**
 
-### **User Data Endpoints**
-```javascript
-// Complete NFT portfolio data
-GET /api/user/nft-info
-// Response: 45+ fields (UserBasicInfo + NftLevel[] + Badge[])
+### **🎯 Frontend User Endpoints**
 
-// Lightweight user data for headers
-GET /api/user/basic-nft-info  
-// Response: 9 fields (basic user info only)
+#### **NFT Data & Management**
+```javascript
+// Complete NFT portfolio + badge summary
+GET /api/user/nft-info
+// Response: 45+ fields (complete user NFT data)
 
 // Available NFT avatars for profile
 GET /api/user/nft-avatars
-// Response: 15+ fields (available NFT avatars)
-```
+// Response: 15+ fields (NFT avatar options)
 
-### **User Action Endpoints**
-```javascript
-// Claim Level 1 NFT (unlock popup)
+// Claim Level 1 NFT
 POST /api/user/nft/claim
-// Body: { nftLevel, walletAddress }
+// Body: { nftLevel: 1, walletAddress }
 
-// Upgrade NFT Level 2-10 (upgrade popup)
+// Check NFT upgrade eligibility
+GET /api/user/nft/can-upgrade?targetLevel=2
+// Response: 30+ fields (requirements & eligibility)
+
+// Upgrade to higher NFT level
 POST /api/user/nft/upgrade
 // Body: { currentNftId, targetLevel, walletAddress }
 
 // Activate NFT benefits
 POST /api/user/nft/activate
 // Body: { nftId }
+```
 
-// Activate badge for NFT progress
+#### **Badge Data & Management**
+```javascript
+// Complete badge portfolio
+GET /api/user/badges
+// Response: 50+ fields per badge (detailed collection)
+
+// Level-specific badges with progress
+GET /api/badges/:level
+// Response: 25+ fields per badge (level context)
+
+// Activate earned badge
 POST /api/user/badge/activate
 // Body: { badgeId }
 ```
 
-### **Public Data Endpoints**
+### **👑 Admin Endpoints**
 ```javascript
-// Available profile avatars (non-NFT)
-GET /api/profile-avatars/available
-// Response: 10+ fields (profile avatar options)
-
-// Competition leaderboard with NFT stats
-GET /api/competition-nfts/leaderboard?competitionId=comp_q1_2024&limit=50
-// Response: 20+ fields (leaderboard data)
-
-// Global NFT statistics
-GET /api/public/nft-stats
-// Response: 12 fields (system-wide stats)
-```
-
-### **Admin Endpoints**
-```javascript
-// Award competition NFTs to winners
-POST /api/admin/competition-nfts/award
-// Body: { competitionId, awards[] }
-
-// Get user NFT status (admin view)
+// User NFT status overview
 GET /api/admin/users/nft-status?userId=12345
 // Response: 15+ fields (admin user data)
+
+// Award competition NFTs
+POST /api/admin/competition-nfts/award
+// Body: { competitionId, awards[] }
 ```
 
 ---
@@ -74,223 +68,120 @@ GET /api/admin/users/nft-status?userId=12345
 
 ### **NFT Events (HIGH/MEDIUM Priority)**
 ```javascript
-// NFT successfully minted
-"nft_unlocked" → { nftId, level, benefits, transactionHash }
+// NFT claim completed
+'nft:claimed' => { userId, nftId, level, transactionHash }
 
-// NFT upgrade completed (old burned, new minted)
-"nft_upgrade_completed" → { oldNftId, newNftId, level, transactionHash }
+// NFT upgrade completed  
+'nft:upgraded' => { userId, fromLevel, toLevel, newNftId }
 
 // NFT benefits activated
-"nft_benefits_activated" → { nftId, benefits, activatedAt }
+'nft:activated' => { userId, nftId, benefits[] }
 
-// Transaction failed with retry info
-"transaction_failed" → { transactionHash, error, retryInfo }
+// Badge earned
+'badge:earned' => { userId, badgeId, taskId, contributionValue }
 
-// Real-time progress updates
-"nft_progress_update" → { userId, progress, requirements }
+// Badge activated
+'badge:activated' => { userId, badgeId, newTotalContribution }
 ```
 
-### **Competition Events (HIGH/MEDIUM Priority)**
+### **System Events (LOW Priority)**
 ```javascript
-// Competition registration opens
-"competition_started" → { competitionId, startTime, rules }
+// User profile updated
+'user:profile_updated' => { userId, changes[] }
 
-// Competition NFT awarded to winner
-"competition_nft_awarded" → { userId, rank, nftId, prizeAmount }
-
-// Significant rank change
-"rank_changed" → { userId, oldRank, newRank, competitionId }
-
-// Periodic leaderboard refresh
-"leaderboard_update" → { competitionId, topRanks[], userRank }
-```
-
-### **Badge Events (MEDIUM/LOW Priority)**
-```javascript
-// Badge requirements completed
-"badge_earned" → { badgeId, category, contributionValue }
-
-// Badge activated for NFT progress
-"badge_activated" → { badgeId, contributionValue, affectedNfts[] }
-
-// Progress towards badge requirements
-"badge_progress_update" → { badgeId, progress, requirements }
-```
-
-### **Avatar Events (MEDIUM/LOW Priority)**
-```javascript
-// User changes profile avatar
-"avatar_changed" → { previousAvatar, newAvatar, changeReason }
-
-// New NFT avatar unlocked
-"nft_avatar_unlocked" → { nftId, avatarUrl, rarity, totalUnlocked }
-```
-
-### **System Events (HIGH/MEDIUM Priority)**
-```javascript
-// Scheduled maintenance notice
-"maintenance_scheduled" → { scheduledTime, duration, affectedServices }
-
-// New feature announcement
-"feature_announcement" → { title, description, releaseDate }
-
-// Security alert
-"security_alert" → { alertType, severity, actionRequired }
-
-// Service performance issues
-"service_degradation" → { affectedServices, severity, estimatedResolution }
+// Trading volume milestone
+'trading:milestone_reached' => { userId, milestone, totalVolume }
 ```
 
 ---
 
-## 🔧 **INTEGRATION PATTERNS**
+## 🔐 **AUTHENTICATION QUICK REFERENCE**
 
-### **API Client Setup**
+### **Required Headers**
 ```javascript
-const apiClient = {
-  baseURL: 'https://api.lastmemefi.com',
-  headers: {
-    'Authorization': 'Bearer <jwt_token>',
-    'Content-Type': 'application/json'
-  }
-};
+{
+  "Authorization": "Bearer <jwt_token>",
+  "Content-Type": "application/json",
+  "X-Request-ID": "optional-tracking-id"
+}
 ```
 
-### **Real-time Event Handler**
-```javascript
-// Initialize ImAgoraService
-ImAgoraService.connect(userId, token);
-
-// Handle all NFT-related events
-ImAgoraService.onMessage((message) => {
-  const { eventType, category, data } = message;
-  
-  switch (category) {
-    case 'nft':
-      handleNftEvent(eventType, data);
-      break;
-    case 'competition':
-      handleCompetitionEvent(eventType, data);
-      break;
-    case 'badge':
-      handleBadgeEvent(eventType, data);
-      break;
-    case 'avatar':
-      handleAvatarEvent(eventType, data);
-      break;
-    case 'system':
-      handleSystemEvent(eventType, data);
-      break;
-  }
-});
+### **Base URL**
+```
+https://api.lastmemefi.com
 ```
 
-### **Error Handling Pattern**
+---
+
+## ❌ **ERROR QUICK REFERENCE**
+
+### **Common HTTP Status Codes**
 ```javascript
-try {
-  const response = await fetch('/api/user/nft/claim', {
-    method: 'POST',
-    headers: apiClient.headers,
-    body: JSON.stringify({ nftLevel: 1, walletAddress })
-  });
-  
-  const result = await response.json();
-  
-  if (!response.ok) {
-    // Handle specific error codes
-    switch (result.code) {
-      case 422:
-        handleValidationError(result.data.errors);
-        break;
-      case 401:
-        handleAuthError();
-        break;
-      default:
-        handleGenericError(result.message);
+200 - Success
+400 - Bad Request (validation failed)
+401 - Unauthorized (invalid/expired token)
+403 - Forbidden (insufficient permissions)
+404 - Not Found (resource doesn't exist)
+409 - Conflict (business logic conflict)
+422 - Unprocessable Entity (business rule violation)
+500 - Internal Server Error
+```
+
+### **Standard Error Format**
+```javascript
+{
+  "code": 400,
+  "message": "Validation failed",
+  "data": {},
+  "errors": [
+    {
+      "field": "nftLevel",
+      "message": "NFT level must be between 1 and 10",
+      "code": "INVALID_RANGE"
     }
-    return;
-  }
-  
-  // Success handling
-  handleNftClaimSuccess(result.data);
-  
-} catch (error) {
-  handleNetworkError(error);
+  ]
 }
 ```
 
 ---
 
-## 📊 **DATA STRUCTURE QUICK REFERENCE**
+## 📊 **DATA ENUMS QUICK REFERENCE**
 
-### **Core Objects**
+### **NFT Status**
 ```javascript
-// User Basic Info (9 fields)
-UserBasicInfo: {
-  userId, walletAddress, nickname, avatarUri, nftAvatarUri,
-  hasActiveNft, activeNftLevel, activeNftName, totalTradingVolume
-}
-
-// NFT Level (21 fields)
-NftLevel: {
-  level, name, description, imageUrl, status, id, tokenId, mintAddress,
-  tradingVolumeRequired, tradingVolumeCurrent, progressPercentage,
-  badgesRequired, badgesOwned, badgeProgressPercentage,
-  canClaim, canUpgrade, benefitsActivated, benefits,
-  claimableAt, claimedAt, activatedAt
-}
-
-// NFT Benefits (5 fields)
-NftBenefits: {
-  tradingFeeDiscount, aiAgentUses, exclusiveAccess[],
-  stakingBonus, prioritySupport
-}
-
-// Badge (12 fields)
-Badge: {
-  id, name, description, iconUrl, category, rarity, status,
-  contributionValue, requirements, progress, earnedAt, activatedAt
-}
+"Available" | "Owned" | "Active" | "Upgrading" | "Burned"
 ```
 
-### **Validation Rules**
+### **Badge Status**
 ```javascript
-// Common constraints
-userId: integer > 0
-walletAddress: string, 32-44 chars, base58
-nftLevel: integer, 1-10
-tradingVolume: number >= 0, 2 decimals
-percentage: number, 0-100, 2 decimals
-timestamp: string, ISO 8601 format
-url: string, valid HTTP/HTTPS URL
-uuid: string, UUID v4 format
+"available" | "in_progress" | "owned" | "activated" | "consumed"
+```
+
+### **Badge Rarity**
+```javascript
+"common" (1x) | "uncommon" (2x) | "rare" (3x) | "epic" (5x) | "legendary" (10x)
 ```
 
 ---
 
-## 🎯 **BUSINESS LOGIC SUMMARY**
+## 🎯 **BUSINESS LOGIC QUICK REFERENCE**
 
 ### **NFT Progression Flow**
-1. **Discovery** → `GET /api/user/nft-info` → View requirements
-2. **Claiming** → `POST /api/user/nft/claim` → `nft_unlocked` event
-3. **Upgrading** → `POST /api/user/nft/upgrade` → `nft_upgrade_completed` event
-4. **Activation** → `POST /api/user/nft/activate` → `nft_benefits_activated` event
+```
+1. User completes tasks → Earns badges
+2. User activates badges → Contributes to NFT requirements  
+3. User meets requirements → Can upgrade NFT
+4. User upgrades NFT → Gets higher level benefits
+5. Previous level badges consumed → Process repeats
+```
 
-### **Badge Contribution Flow**
-1. **Earning** → Automatic → `badge_earned` event
-2. **Activation** → `POST /api/user/badge/activate` → `badge_activated` event
-3. **Progress** → Automatic → `nft_progress_update` event
-
-### **Avatar Management Flow**
-1. **NFT Unlock** → Automatic → `nft_avatar_unlocked` event
-2. **Selection** → `GET /api/user/nft-avatars` → Available options
-3. **Change** → User action → `avatar_changed` event
-
-### **Competition Flow**
-1. **Participation** → External system → `competition_started` event
-2. **Ranking** → Real-time → `rank_changed` + `leaderboard_update` events
-3. **Awards** → `POST /api/admin/competition-nfts/award` → `competition_nft_awarded` event
+### **Key Requirements**
+- **Level 1 NFT:** Free claim (no requirements)
+- **Level 2+ NFT:** Trading volume + activated badges
+- **Badge Activation:** Manual user action required
+- **NFT Benefits:** Must be manually activated after claiming/upgrading
 
 ---
 
-**For complete specifications, see the full documentation files in this directory.**
+**Total Endpoints:** 11 (9 frontend + 2 admin)  
+**Core Focus:** NFT progression and badge achievement system

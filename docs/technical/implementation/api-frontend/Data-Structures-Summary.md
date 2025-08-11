@@ -25,7 +25,11 @@ This document provides a **complete reference** for all data structures used in 
 | `GET /api/user/nft-info` | None (JWT only) | 45+ fields across 4 objects | 401, 403, 500 |
 | `GET /api/user/basic-nft-info` | None (JWT only) | 9 basic user fields | 401, 403, 500 |
 | `GET /api/user/nft-avatars` | None (JWT only) | 15+ avatar fields | 401, 500 |
+| `GET /api/user/badges` | 3 optional params | 50+ badge fields + stats | 401, 500 |
+| `GET /api/user/badges/summary` | None (JWT only) | 10+ summary fields | 401, 500 |
+| `GET /api/user/badges/available` | None (JWT only) | 30+ available badge fields | 401, 500 |
 | `POST /api/user/nft/claim` | 2 required fields | 6 transaction fields | 401, 422, 500 |
+| `GET /api/user/nft/can-upgrade` | 1 query param | 20+ eligibility fields | 401, 422, 500 |
 | `POST /api/user/nft/upgrade` | 3 required fields | 6 transaction fields | 401, 422, 500 |
 | `POST /api/user/nft/activate` | 1 required field | 5 activation fields | 401, 422, 500 |
 | `POST /api/user/badge/activate` | 1 required field | 5 activation fields | 401, 422, 500 |

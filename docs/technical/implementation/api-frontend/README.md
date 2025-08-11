@@ -9,7 +9,7 @@
 ## 📋 **DOCUMENTATION INDEX**
 
 ### **🎯 CORE API DOCUMENTATION**
-- **[NFT-API-Complete-Guide.md](./NFT-API-Complete-Guide.md)** - Complete NFT API with detailed field specifications (12 endpoints, 250+ fields)
+- **[NFT-API-Complete-Guide.md](./NFT-API-Complete-Guide.md)** - Complete NFT & Badge API with detailed field specifications (11 endpoints, 200+ fields)
 - **[Data-Structures-Summary.md](./Data-Structures-Summary.md)** - Comprehensive field reference with validation rules
 - **[Authentication-Guide.md](./Authentication-Guide.md)** - JWT authentication and security patterns
 - **[Error-Handling-Guide.md](./Error-Handling-Guide.md)** - Complete error codes and handling (20+ error types)
@@ -60,11 +60,11 @@ ImAgoraService.onMessage(handleNFTNotifications);
 ## 📊 **API OVERVIEW**
 
 ### **Endpoint Categories**
-- **User Data** (4 endpoints) - NFT portfolio, user info, and avatars
-- **User Actions** (4 endpoints) - Claim, upgrade, activate NFTs/badges
-- **Public Data** (2 endpoints) - Profile avatars and competition leaderboards
-- **Admin Management** (7 endpoints) - System administration and competition awards
-- **Real-time** (WebSocket) - ImAgoraService notifications (18 event types)
+- **🎯 Frontend User** (9 endpoints) - NFT & badge data + management actions
+  - NFT Data & Management (6 endpoints)
+  - Badge Data & Management (3 endpoints)
+- **👑 Admin** (2 endpoints) - System administration and competition awards
+- **📡 Real-time** (WebSocket) - ImAgoraService notifications (18 event types)
 
 ### **Performance Features**
 - ✅ **Consolidated endpoints** - Reduce API calls by 60-80%

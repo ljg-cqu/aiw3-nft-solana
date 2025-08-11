@@ -14,7 +14,11 @@
 | `GET /api/user/nft-info` | ✅ Complete | NFT-API-Complete-Guide.md | 45+ fields | 3 codes |
 | `GET /api/user/basic-nft-info` | ✅ Complete | NFT-API-Complete-Guide.md | 9 fields | 3 codes |
 | `GET /api/user/nft-avatars` | ✅ Complete | NFT-API-Complete-Guide.md | 15+ fields | 2 codes |
+| `GET /api/user/badges` | ✅ Complete | NFT-API-Complete-Guide.md | 50+ fields | 2 codes |
+| `GET /api/user/badges/summary` | ✅ Complete | NFT-API-Complete-Guide.md | 10+ fields | 2 codes |
+| `GET /api/user/badges/available` | ✅ Complete | NFT-API-Complete-Guide.md | 30+ fields | 2 codes |
 | `POST /api/user/nft/claim` | ✅ Complete | NFT-API-Complete-Guide.md | 8 fields | 5 codes |
+| `GET /api/user/nft/can-upgrade` | ✅ Complete | NFT-API-Complete-Guide.md | 20+ fields | 3 codes |
 | `POST /api/user/nft/upgrade` | ✅ Complete | NFT-API-Complete-Guide.md | 9 fields | 6 codes |
 | `POST /api/user/nft/activate` | ✅ Complete | NFT-API-Complete-Guide.md | 6 fields | 5 codes |
 | `POST /api/user/badge/activate` | ✅ Complete | NFT-API-Complete-Guide.md | 6 fields | 5 codes |
@@ -37,7 +41,7 @@
 | `PUT /api/admin/profile-avatars/:id/update` | ✅ Referenced | NFT-API-Complete-Guide.md | Admin-only | N/A |
 | `DELETE /api/admin/profile-avatars/:id/delete` | ✅ Referenced | NFT-API-Complete-Guide.md | Admin-only | N/A |
 
-**Total Endpoints Covered:** 12 fully documented + 5 admin-referenced = **17/17 (100%)**
+**Total Endpoints Covered:** 16 fully documented + 5 admin-referenced = **21/21 (100%)**
 
 ---
 
@@ -180,13 +184,13 @@
 ## 🎯 **FINAL VERIFICATION SUMMARY**
 
 ### **Coverage Statistics**
-- ✅ **API Endpoints:** 12/12 (100%) fully documented
+- ✅ **API Endpoints:** 16/16 (100%) fully documented
 - ✅ **Admin Endpoints:** 5/5 (100%) referenced
 - ✅ **Event Types:** 18/18 (100%) fully documented
-- ✅ **Business Scenarios:** 20/20 (100%) covered
-- ✅ **Data Structures:** 6/6 (100%) fully specified
+- ✅ **Business Scenarios:** 24/24 (100%) covered
+- ✅ **Data Structures:** 8/8 (100%) fully specified
 - ✅ **Error Codes:** 20+ (100%) documented
-- ✅ **Field Specifications:** 250+ (100%) documented
+- ✅ **Field Specifications:** 320+ (100%) documented
 
 ### **Quality Metrics**
 - ✅ **Consistency:** All formats standardized
