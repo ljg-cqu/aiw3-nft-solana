@@ -1,19 +1,36 @@
 //----------------0. User Info--------------------
 // Business Scenario 1: User basic info should be accessible to all pages when they keep logined in 
 type UserBasicInfo struct {
-    UserId int64
+    UserId int
     WalletAddr string
     AvatarUri string
 }
 
 //----------------1. Home Page--------------------
+// Business Scenario 0: Should display user NFT related info
+// Endpoint: GET /api/v1/nfts
+type NftsRequest struct {
+    UserId int `json:"user_id, omitempty"` // 
+    MaxNum int `json:"max_num"` // Max number of NFTs to return
+}
+
+type NftsResponse struct {
+    NftLevels []TieredNftInfo
+    CompetitionNftInfo CompetitionNftInfo
+}
+
 // Business Scenario 1: Should display users cumulative saved fees
+// Pre-Conditions:
+// Post-Conditions:
+
 type FeeWaivedInfoList []FeeWaivedInfo
 type FeeWaivedInfo struct {
     UserId int64
     WalletAddr string
     Amount int64    // Cumulative saved fees
 }
+
+
 
 // Business Scenario 2: Should display users NFT portfolio
 type NftPortfolioInfoList []NftPortfolioInfo
@@ -45,7 +62,6 @@ type CompetitionNftInfo struct {
 }
 
 // Business Scenario 3: Should display users badges
-
 type BadgeList []BadgeInfo
 type BadgeInfo struct {
     Id int
@@ -55,9 +71,8 @@ type BadgeInfo struct {
     Status string // Owned, Activated, Consumed
     IconUri string
     TaskId int
-    TaskProgress int //
+    TaskProgress int
 }
-
 
 // ----------------2. PERSONAL CENTER--------------------
 
