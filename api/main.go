@@ -59,6 +59,7 @@ func main() {
 		handlers.RegisterBadgeHandlers(api)
 		handlers.RegisterFeesHandlers(api)
 		handlers.RegisterTradingHandlers(api)
+		handlers.RegisterAdminHandlers(api)
 
 		// Add health check endpoint
 		huma.Register(api, huma.Operation{

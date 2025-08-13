@@ -25,6 +25,25 @@ type User struct {
 	UpdatedAt      time.Time `json:"updated_at" doc:"Last profile update timestamp"`
 }
 
+// User Basic Info (matches lastmemefi-api format)
+type UserBasicInfo struct {
+	UserID          int    `json:"userId" example:"123" doc:"User ID"`
+	WalletAddr      string `json:"walletAddr" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" doc:"Wallet address"`
+	Nickname        string `json:"nickname" example:"CryptoTrader" doc:"User nickname"`
+	Bio             string `json:"bio" example:"Professional NFT trader" doc:"User bio"`
+	ProfilePhotoURL string `json:"profilePhotoUrl" example:"https://example.com/profile.jpg" doc:"Profile photo URL"`
+	BannerURL       string `json:"bannerUrl" example:"https://example.com/banner.jpg" doc:"Banner URL"`
+	AvatarUri       string `json:"avatarUri" example:"https://example.com/avatar.jpg" doc:"Current avatar URI"`
+	NFTAvatarUri    string `json:"nftAvatarUri" example:"https://example.com/nft-avatar.jpg" doc:"NFT avatar URI"`
+	HasActiveNft    bool   `json:"hasActiveNft" example:"true" doc:"Has active NFT"`
+	ActiveNftLevel  int    `json:"activeNftLevel" example:"2" doc:"Active NFT level"`
+	ActiveNftName   string `json:"activeNftName" example:"Quant Ape" doc:"Active NFT name"`
+	FollowersCount  int    `json:"followersCount" example:"150" doc:"Followers count"`
+	FollowingCount  int    `json:"followingCount" example:"75" doc:"Following count"`
+	IsOwnProfile    bool   `json:"isOwnProfile" example:"true" doc:"Is own profile"`
+	CanFollow       bool   `json:"canFollow" example:"false" doc:"Can follow this user"`
+}
+
 type UserProfileRequest struct {
 	UserID string `path:"user_id" example:"user123" doc:"User ID to retrieve"`
 }
@@ -49,7 +68,7 @@ type NFTLevel struct {
 	Benefits              []string `json:"benefits" example:"[\"Reduced fees\", \"Priority support\"]" doc:"NFT benefits"`
 }
 
-type SpecialNFT struct {
+type CompetitionNFT struct {
 	Name     string   `json:"name" example:"Trophy Breeder" doc:"Special NFT name"`
 	ImageURL string   `json:"image_url" example:"https://example.com/special.jpg" doc:"Special NFT image URL"`
 	Status   string   `json:"status" example:"unlocked" doc:"Special NFT status"`
@@ -58,11 +77,11 @@ type SpecialNFT struct {
 }
 
 type UserNFT struct {
-	UserID      string      `json:"user_id" doc:"User ID who owns this NFT"`
-	NFTLevels   []NFTLevel  `json:"nft_levels" doc:"User's NFT levels"`
-	SpecialNFT  *SpecialNFT `json:"special_nft,omitempty" doc:"User's special NFT"`
-	TotalValue  int64       `json:"total_value" example:"1500000" doc:"Total value of user's NFTs"`
-	LastUpdated time.Time   `json:"last_updated" doc:"Last NFT data update"`
+	UserID         string          `json:"user_id" doc:"User ID who owns this NFT"`
+	NFTLevels      []NFTLevel      `json:"nft_levels" doc:"User's NFT levels"`
+	CompetitionNFT *CompetitionNFT `json:"special_nft,omitempty" doc:"User's special NFT"`
+	TotalValue     int64           `json:"total_value" example:"1500000" doc:"Total value of user's NFTs"`
+	LastUpdated    time.Time       `json:"last_updated" doc:"Last NFT data update"`
 }
 
 type NFTUnlockRequest struct {
@@ -154,4 +173,136 @@ type ErrorResponse struct {
 	Details   map[string]string `json:"details,omitempty" doc:"Additional error details"`
 	Code      string            `json:"code,omitempty" example:"VALIDATION_ERROR" doc:"Error code"`
 	Timestamp time.Time         `json:"timestamp" doc:"Error timestamp"`
+}
+
+// New data structures matching lastmemefi-api format
+
+// NFT Portfolio response structure
+type NFTPortfolio struct {
+	NFTLevels            []NFTLevelInfo       `json:"nftLevels" doc:"All NFT tier levels"`
+	CompetitionNftInfo   *CompetitionNftInfo  `json:"competitionNftInfo,omitempty" doc:"Competition NFT info"`
+	CompetitionNfts      []CompetitionNftItem `json:"competitionNfts" doc:"List of competition NFTs"`
+	CurrentTradingVolume int64                `json:"currentTradingVolume" doc:"Current trading volume"`
+}
+
+type NFTLevelInfo struct {
+	ID                    string                 `json:"id" example:"1" doc:"NFT level ID"`
+	Level                 int                    `json:"level" example:"1" doc:"NFT level"`
+	Name                  string                 `json:"name" example:"Tech Chicken" doc:"NFT name"`
+	NftImgUrl             string                 `json:"nftImgUrl" example:"https://example.com/nft1.jpg" doc:"NFT image URL"`
+	NftLevelImgUrl        string                 `json:"nftLevelImgUrl" example:"https://example.com/level1.jpg" doc:"Level image URL"`
+	Status                string                 `json:"status" example:"Active" doc:"NFT status"`
+	TradingVolumeCurrent  int64                  `json:"tradingVolumeCurrent" doc:"Current trading volume"`
+	TradingVolumeRequired int64                  `json:"tradingVolumeRequired" doc:"Required trading volume"`
+	ProgressPercentage    int                    `json:"progressPercentage" doc:"Progress percentage"`
+	Benefits              map[string]interface{} `json:"benefits" doc:"NFT benefits"`
+	BenefitsActivated     bool                   `json:"benefitsActivated" doc:"Whether benefits are activated"`
+}
+
+type CompetitionNftInfo struct {
+	Name              string                 `json:"name" example:"Trophy Breeder" doc:"Competition NFT name"`
+	NftImgUrl         string                 `json:"nftImgUrl" example:"https://example.com/trophy.jpg" doc:"NFT image URL"`
+	Benefits          map[string]interface{} `json:"benefits" doc:"Competition NFT benefits"`
+	BenefitsActivated bool                   `json:"benefitsActivated" doc:"Whether benefits are activated"`
+}
+
+type CompetitionNftItem struct {
+	ID                string                 `json:"id" example:"comp_001" doc:"Competition NFT ID"`
+	Name              string                 `json:"name" example:"Trophy Breeder" doc:"Competition NFT name"`
+	NftImgUrl         string                 `json:"nftImgUrl" example:"https://example.com/trophy.jpg" doc:"NFT image URL"`
+	Benefits          map[string]interface{} `json:"benefits" doc:"Competition NFT benefits"`
+	BenefitsActivated bool                   `json:"benefitsActivated" doc:"Whether benefits are activated"`
+	MintAddress       string                 `json:"mintAddress" example:"7XzYwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" doc:"Solana mint address"`
+	ClaimedAt         string                 `json:"claimedAt" example:"2024-02-15T10:30:00Z" doc:"Claim timestamp"`
+}
+
+// Badge Summary structure
+type BadgeSummary struct {
+	TotalBadges            int     `json:"totalBadges" example:"15" doc:"Total badges available"`
+	ActivatedBadges        int     `json:"activatedBadges" example:"5" doc:"Activated badges count"`
+	TotalContributionValue float64 `json:"totalContributionValue" example:"12.5" doc:"Total contribution value"`
+}
+
+// Fee Waived Info structure
+type FeeWaivedInfo struct {
+	UserID     int    `json:"userId" example:"123" doc:"User ID"`
+	WalletAddr string `json:"walletAddr" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" doc:"Wallet address"`
+	Amount     int64  `json:"amount" example:"1250" doc:"Fee savings amount"`
+}
+
+// Complete NFT Info response structure
+type CompleteNFTInfoResponse struct {
+	UserBasicInfo UserBasicInfo          `json:"userBasicInfo" doc:"User basic information"`
+	NftPortfolio  NFTPortfolio           `json:"nftPortfolio" doc:"NFT portfolio data"`
+	BadgeSummary  BadgeSummary           `json:"badgeSummary" doc:"Badge summary"`
+	FeeWaivedInfo FeeWaivedInfo          `json:"feeWaivedInfo" doc:"Fee savings information"`
+	NftAvatarUrls []string               `json:"nftAvatarUrls" doc:"Available NFT avatar URLs"`
+	Metadata      map[string]interface{} `json:"metadata" doc:"Additional metadata"`
+}
+
+// NFT Avatar response structure
+type NFTAvatarResponse struct {
+	CurrentProfilePhoto string      `json:"currentProfilePhoto" doc:"Current profile photo URL"`
+	NftAvatars          []NFTAvatar `json:"nftAvatars" doc:"Available NFT avatars"`
+	TotalAvailable      int         `json:"totalAvailable" doc:"Total available avatars"`
+}
+
+type NFTAvatar struct {
+	NftID           int    `json:"nftId" example:"123" doc:"NFT ID"`
+	NftDefinitionID int    `json:"nftDefinitionId" example:"456" doc:"NFT Definition ID"`
+	Name            string `json:"name" example:"Quantum Alchemist" doc:"NFT name"`
+	Tier            int    `json:"tier" example:"5" doc:"NFT tier"`
+	AvatarUrl       string `json:"avatarUrl" example:"https://example.com/avatar.jpg" doc:"Avatar URL"`
+	NftType         string `json:"nftType" example:"tiered" doc:"NFT type"`
+	IsActive        bool   `json:"isActive" doc:"Is currently active avatar"`
+}
+
+// Badge detailed response structure
+type DetailedBadgeInfo struct {
+	ID                   int                    `json:"id" example:"1" doc:"Badge ID"`
+	NftLevel             int                    `json:"nftLevel" example:"1" doc:"NFT level this badge belongs to"`
+	Name                 string                 `json:"name" example:"Contract Enlightener" doc:"Badge name"`
+	Description          string                 `json:"description" example:"Complete contract guidance" doc:"Badge description"`
+	IconUri              string                 `json:"iconUri" example:"https://example.com/badge.jpg" doc:"Badge icon URL"`
+	TaskID               int                    `json:"taskId" example:"101" doc:"Related task ID"`
+	TaskName             string                 `json:"taskName" example:"Contract Tutorial" doc:"Task name"`
+	ContributionValue    float64                `json:"contributionValue" example:"1.0" doc:"Contribution value"`
+	Status               string                 `json:"status" example:"activated" doc:"Badge status"`
+	EarnedAt             *string                `json:"earnedAt,omitempty" doc:"When badge was earned"`
+	ActivatedAt          *string                `json:"activatedAt,omitempty" doc:"When badge was activated"`
+	ConsumedAt           *string                `json:"consumedAt,omitempty" doc:"When badge was consumed"`
+	CanActivate          bool                   `json:"canActivate" doc:"Can be activated"`
+	IsRequiredForUpgrade bool                   `json:"isRequiredForUpgrade" doc:"Required for next level upgrade"`
+	Requirements         map[string]interface{} `json:"requirements" doc:"Badge requirements"`
+}
+
+// Admin request structures
+type AdminNFTClaimRequest struct {
+	NftDefinitionID int `json:"nftDefinitionId" example:"1" doc:"NFT definition ID to claim"`
+}
+
+type AdminNFTUpgradeRequest struct {
+	UserNftID int   `json:"userNftId" example:"123" doc:"User NFT ID to upgrade"`
+	BadgeIds  []int `json:"badgeIds" example:"[1,2,3]" doc:"Badge IDs to use for upgrade"`
+}
+
+type AdminNFTActivateRequest struct {
+	UserNftID int `json:"userNftId" example:"123" doc:"User NFT ID to activate"`
+}
+
+type AdminBadgeActivateRequest struct {
+	UserBadgeID int `json:"userBadgeId" example:"456" doc:"User badge ID to activate"`
+}
+
+// Upgrade eligibility response structure
+type NFTUpgradeEligibility struct {
+	CanUpgrade      bool                   `json:"canUpgrade" doc:"Can upgrade to target level"`
+	TargetLevel     int                    `json:"targetLevel" doc:"Target level"`
+	CurrentNftLevel int                    `json:"currentNftLevel" doc:"Current NFT level"`
+	CurrentNftID    int                    `json:"currentNftId" doc:"Current NFT ID"`
+	Requirements    map[string]interface{} `json:"requirements" doc:"Upgrade requirements"`
+	EstimatedCosts  map[string]interface{} `json:"estimatedCosts,omitempty" doc:"Estimated costs"`
+	NextSteps       []string               `json:"nextSteps,omitempty" doc:"Next steps"`
+	Blockers        []string               `json:"blockers,omitempty" doc:"Upgrade blockers"`
+	Recommendations []string               `json:"recommendations,omitempty" doc:"Recommendations"`
 }
