@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/usecase"
@@ -16,11 +18,22 @@ import (
 // GetUserNftInfo returns user NFT information
 func getUserNftInfo() usecase.Interactor {
 	type getUserNftInfoRequest struct {
-		UserID *int `query:"userId" description:"User ID (optional)"`
+		Authorization string `header:"Authorization" description:"Bearer token for authentication"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req getUserNftInfoRequest, resp *GetUserNftInfoResponse) error {
-		*resp = generateMockUserNftInfoResponse()
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = GetUserNftInfoResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    GetUserNftInfoData{},
+			}
+			return nil
+		}
+
+		*resp = generateMockUserNftInfoResponse(user.ID)
 		return nil
 	})
 
@@ -34,12 +47,27 @@ func getUserNftInfo() usecase.Interactor {
 
 // GetUserNftAvatars returns available NFT avatar options
 func getUserNftAvatars() usecase.Interactor {
-	u := usecase.NewInteractor(func(ctx context.Context, req struct{}, resp *GetUserNftAvatarsResponse) error {
+	type getUserNftAvatarsRequest struct {
+		Authorization string `header:"Authorization" description:"Bearer token for authentication"`
+	}
+
+	u := usecase.NewInteractor(func(ctx context.Context, req getUserNftAvatarsRequest, resp *GetUserNftAvatarsResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = GetUserNftAvatarsResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    GetNftAvatarsData{},
+			}
+			return nil
+		}
+
 		*resp = GetUserNftAvatarsResponse{
 			Code:    200,
 			Message: "NFT avatars retrieved successfully",
 			Data: GetNftAvatarsData{
-				CurrentProfilePhoto: "https://cdn.example.com/profiles/user-123.jpg",
+				CurrentProfilePhoto: user.ProfilePhotoURL,
 				NftAvatars:          generateMockNftAvatars(),
 				TotalAvailable:      2,
 			},
@@ -58,17 +86,29 @@ func getUserNftAvatars() usecase.Interactor {
 // ClaimNft handles NFT claiming
 func claimNft() usecase.Interactor {
 	type claimNftRequest struct {
+		Authorization string `header:"Authorization" description:"Bearer token for authentication"`
 		NftLevel      int    `json:"nft_level" required:"true" minimum:"1" maximum:"5" description:"NFT level to claim (1-5)"`
 		WalletAddress string `json:"wallet_address" required:"true" minLength:"32" maxLength:"44" pattern:"^[1-9A-HJ-NP-Za-km-z]{32,44}$" description:"Solana wallet address for claiming"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req claimNftRequest, resp *ClaimNftResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = ClaimNftResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    ClaimNftData{},
+			}
+			return nil
+		}
+
 		*resp = ClaimNftResponse{
 			Code:    200,
 			Message: "NFT claimed successfully",
 			Data: ClaimNftData{
 				Success:       true,
-				TransactionID: "tx_" + fmt.Sprintf("%d", req.NftLevel) + "_claim_123456789",
+				TransactionID: fmt.Sprintf("tx_%d_%d_claim_123456789", user.ID, req.NftLevel),
 				NftLevel:      req.NftLevel,
 				MintAddress:   "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
 				ClaimedAt:     getCurrentTimestamp(),
@@ -87,7 +127,22 @@ func claimNft() usecase.Interactor {
 
 // GetCanUpgradeNft checks if user can upgrade NFT
 func getCanUpgradeNft() usecase.Interactor {
-	u := usecase.NewInteractor(func(ctx context.Context, req struct{}, resp *CanUpgradeNftResponse) error {
+	type getCanUpgradeNftRequest struct {
+		Authorization string `header:"Authorization" description:"Bearer token for authentication"`
+	}
+
+	u := usecase.NewInteractor(func(ctx context.Context, req getCanUpgradeNftRequest, resp *CanUpgradeNftResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = CanUpgradeNftResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    CanUpgradeNftData{},
+			}
+			return nil
+		}
+
 		*resp = CanUpgradeNftResponse{
 			Code:    200,
 			Message: "Upgrade eligibility checked successfully",
@@ -98,7 +153,7 @@ func getCanUpgradeNft() usecase.Interactor {
 				RequiredBadges:       2,
 				AvailableBadges:      2,
 				RequiredVolume:       2500000,
-				CurrentVolume:        2850000,
+				CurrentVolume:        user.TradingVolume,
 				MissingRequirements:  []string{},
 				EstimatedUpgradeTime: "Immediate",
 			},
@@ -117,16 +172,28 @@ func getCanUpgradeNft() usecase.Interactor {
 // UpgradeNft handles NFT upgrade
 func upgradeNft() usecase.Interactor {
 	type upgradeNftRequest struct {
-		ToLevel int `json:"to_level" required:"true" description:"Target NFT level"`
+		Authorization string `header:"Authorization" description:"Bearer token for authentication"`
+		ToLevel       int    `json:"to_level" required:"true" description:"Target NFT level"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req upgradeNftRequest, resp *UpgradeNftResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = UpgradeNftResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    UpgradeNftData{},
+			}
+			return nil
+		}
+
 		*resp = UpgradeNftResponse{
 			Code:    200,
 			Message: "NFT upgraded successfully",
 			Data: UpgradeNftData{
 				Success:        true,
-				TransactionID:  fmt.Sprintf("tx_upgrade_%d_123456789", req.ToLevel),
+				TransactionID:  fmt.Sprintf("tx_upgrade_%d_%d_123456789", user.ID, req.ToLevel),
 				FromLevel:      3,
 				ToLevel:        req.ToLevel,
 				NewMintAddress: "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
@@ -149,10 +216,22 @@ func upgradeNft() usecase.Interactor {
 // ActivateNft handles NFT activation
 func activateNft() usecase.Interactor {
 	type activateNftRequest struct {
-		NftID int `json:"nft_id" required:"true" description:"NFT ID to activate"`
+		Authorization string `header:"Authorization" description:"Bearer token for authentication"`
+		NftID         int    `json:"nft_id" required:"true" description:"NFT ID to activate"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req activateNftRequest, resp *ActivateNftResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = ActivateNftResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    ActivateNftData{},
+			}
+			return nil
+		}
+
 		*resp = ActivateNftResponse{
 			Code:    200,
 			Message: "NFT activated successfully",
@@ -163,6 +242,7 @@ func activateNft() usecase.Interactor {
 				Benefits: map[string]interface{}{
 					"tradingFeeReduction": "25%",
 					"avatarCrown":         true,
+					"userId":              user.ID,
 				},
 			},
 		}
@@ -184,13 +264,25 @@ func activateNft() usecase.Interactor {
 // GetUserBadges returns user badges with filtering and pagination
 func getUserBadges() usecase.Interactor {
 	type getUserBadgesRequest struct {
-		Limit    int     `query:"limit" default:"20" description:"Number of badges to return (max 100)"`
-		Offset   int     `query:"offset" default:"0" description:"Number of badges to skip"`
-		Status   *string `query:"status" description:"Filter by badge status (not_earned, owned, activated, consumed)"`
-		NftLevel *int    `query:"nftLevel" description:"Filter by NFT level"`
+		Authorization string  `header:"Authorization" description:"Bearer token for authentication"`
+		Limit         int     `query:"limit" default:"20" description:"Number of badges to return (max 100)"`
+		Offset        int     `query:"offset" default:"0" description:"Number of badges to skip"`
+		Status        *string `query:"status" description:"Filter by badge status (not_earned, owned, activated, consumed)"`
+		NftLevel      *int    `query:"nftLevel" description:"Filter by NFT level"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req getUserBadgesRequest, resp *GetUserBadgesResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = GetUserBadgesResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    GetUserBadgesData{},
+			}
+			return nil
+		}
+
 		if req.Limit > 100 {
 			req.Limit = 100
 		}
@@ -201,6 +293,8 @@ func getUserBadges() usecase.Interactor {
 			req.Offset = 0
 		}
 
+		// Generate mock user badges response for user ID: %d (user ID available for future customization)
+		_ = user.ID // Mark user as used for authentication purposes
 		*resp = generateMockUserBadgesResponse(req.Limit, req.Offset, req.Status, req.NftLevel)
 		return nil
 	})
@@ -249,13 +343,25 @@ func getBadgesByLevel() usecase.Interactor {
 // ActivateBadge handles badge activation
 func activateBadge() usecase.Interactor {
 	type activateBadgeRequest struct {
-		BadgeID int `json:"badge_id" required:"true" description:"Badge ID to activate"`
+		Authorization string `header:"Authorization" description:"Bearer token for authentication"`
+		BadgeID       int    `json:"badge_id" required:"true" description:"Badge ID to activate"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req activateBadgeRequest, resp *ActivateBadgeResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = ActivateBadgeResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    ActivateBadgeData{},
+			}
+			return nil
+		}
+
 		*resp = ActivateBadgeResponse{
 			Code:    200,
-			Message: "Badge activated successfully",
+			Message: fmt.Sprintf("Badge activated successfully for user %d", user.ID),
 			Data: ActivateBadgeData{
 				Success:           true,
 				BadgeID:           req.BadgeID,
@@ -328,14 +434,26 @@ func getBadgeList() usecase.Interactor {
 // Alternative completeTask endpoint (matching routes)
 func completeTaskAlternative() usecase.Interactor {
 	type completeTaskAlternativeRequest struct {
-		TaskType string                 `json:"task_type" required:"true" description:"Type of task to complete"`
-		Data     map[string]interface{} `json:"data,omitempty" description:"Additional task data"`
+		Authorization string                 `header:"Authorization" description:"Bearer token for authentication"`
+		TaskType      string                 `json:"task_type" required:"true" description:"Type of task to complete"`
+		Data          map[string]interface{} `json:"data,omitempty" description:"Additional task data"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req completeTaskAlternativeRequest, resp *CompleteTaskResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = CompleteTaskResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    CompleteTaskData{},
+			}
+			return nil
+		}
+
 		*resp = CompleteTaskResponse{
 			Code:    200,
-			Message: "Task completed successfully",
+			Message: fmt.Sprintf("Task completed successfully for user %d", user.ID),
 			Data: CompleteTaskData{
 				BadgesEarned:    generateMockBadgesEarned(),
 				ProgressUpdated: generateMockProgressUpdated(),
@@ -355,13 +473,25 @@ func completeTaskAlternative() usecase.Interactor {
 // Alternative getBadgeStatus endpoint (matching routes)
 func getBadgeStatusAlternative() usecase.Interactor {
 	type getBadgeStatusAlternativeRequest struct {
-		BadgeID *int `query:"badge_id" description:"Specific badge ID"`
+		Authorization string `header:"Authorization" description:"Bearer token for authentication"`
+		BadgeID       *int   `query:"badge_id" description:"Specific badge ID"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req getBadgeStatusAlternativeRequest, resp *GetBadgeStatusResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = GetBadgeStatusResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    BadgeStatusData{},
+			}
+			return nil
+		}
+
 		*resp = GetBadgeStatusResponse{
 			Code:    200,
-			Message: "Badge status retrieved successfully",
+			Message: fmt.Sprintf("Badge status retrieved successfully for user %d", user.ID),
 			Data: BadgeStatusData{
 				UserSummary:     generateMockUserSummary(),
 				Badges:          generateMockBadges(),
@@ -382,13 +512,25 @@ func getBadgeStatusAlternative() usecase.Interactor {
 // Activate badge for NFT upgrades
 func activateBadgeForUpgrade() usecase.Interactor {
 	type activateBadgeForUpgradeRequest struct {
-		BadgeID int `json:"badge_id" required:"true" description:"Badge ID to activate"`
+		Authorization string `header:"Authorization" description:"Bearer token for authentication"`
+		BadgeID       int    `json:"badge_id" required:"true" description:"Badge ID to activate"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req activateBadgeForUpgradeRequest, resp *ActivateBadgeResponse) error {
+		// Extract user from Authorization header
+		user, err := extractUserFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = ActivateBadgeResponse{
+				Code:    403,
+				Message: err.Error(),
+				Data:    ActivateBadgeData{},
+			}
+			return nil
+		}
+
 		*resp = ActivateBadgeResponse{
 			Code:    200,
-			Message: "Badge activated for upgrade successfully",
+			Message: fmt.Sprintf("Badge activated for upgrade successfully for user %d", user.ID),
 			Data: ActivateBadgeData{
 				BadgeID:        req.BadgeID,
 				ActivatedAt:    getCurrentTimestamp(),
@@ -856,6 +998,115 @@ func deleteProfileAvatar() usecase.Interactor {
 	u.SetExpectedErrors(status.InvalidArgument, status.NotFound, status.Internal)
 
 	return u
+}
+
+// ==========================================
+// AUTHENTICATION STRUCTURES
+// ==========================================
+
+// User represents an authenticated user (mimics original API user model)
+type User struct {
+	ID               int    `json:"id"`
+	AccessToken      string `json:"accessToken,omitempty"`
+	TwitterAccessToken string `json:"twitterAccessToken,omitempty"`
+	Nickname         string `json:"nickname"`
+	WalletAddr       string `json:"walletAddr"`
+	Email            string `json:"email,omitempty"`
+	Bio              string `json:"bio,omitempty"`
+	ProfilePhotoURL  string `json:"profilePhotoUrl,omitempty"`
+	BannerURL        string `json:"bannerUrl,omitempty"`
+	TradingVolume    int    `json:"tradingVolume"`
+	CreatedAt        string `json:"createdAt"`
+	UpdatedAt        string `json:"updatedAt"`
+}
+
+// ==========================================
+// AUTHENTICATION HELPER FUNCTIONS
+// ==========================================
+
+// extractUserFromAuthHeader extracts and validates user from Authorization header string
+// This mimics the original isAuthenticated.js policy behavior
+func extractUserFromAuthHeader(authHeader string) (*User, error) {
+	// Check if Authorization header exists and has Bearer prefix
+	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		return nil, errors.New("Authorization header is missing or invalid.(isAuth1)")
+	}
+
+	// Extract token from "Bearer <token>"
+	accessToken := strings.TrimPrefix(authHeader, "Bearer ")
+	if accessToken == "" {
+		return nil, errors.New("Access token is missing.")
+	}
+
+	// Mock user lookup by token (in real API this would query database)
+	user := mockUserLookup(accessToken)
+	if user == nil {
+		return nil, errors.New("Invalid access token.")
+	}
+
+	return user, nil
+}
+
+// mockUserLookup simulates database lookup of user by access token
+// This mimics the original User.find() logic in isAuthenticated.js
+func mockUserLookup(accessToken string) *User {
+	// Mock user database - in reality this would query the database
+	mockUsers := map[string]*User{
+		"test_token_123": {
+			ID:              12345,
+			AccessToken:     "test_token_123",
+			Nickname:        "TestUser",
+			WalletAddr:      "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+			Email:           "test@example.com",
+			Bio:             "Test user for mock API",
+			ProfilePhotoURL: "https://cdn.example.com/profiles/test-user.jpg",
+			BannerURL:       "https://cdn.example.com/banners/test-banner.jpg",
+			TradingVolume:   2850000,
+			CreatedAt:       "2024-01-01T00:00:00.000Z",
+			UpdatedAt:       getCurrentTimestamp(),
+		},
+		"admin_token_456": {
+			ID:              99999,
+			AccessToken:     "admin_token_456",
+			Nickname:        "AdminUser",
+			WalletAddr:      "AdminWallet123456789",
+			Email:           "admin@example.com",
+			Bio:             "Admin user for mock API",
+			ProfilePhotoURL: "https://cdn.example.com/profiles/admin-user.jpg",
+			TradingVolume:   10000000,
+			CreatedAt:       "2023-01-01T00:00:00.000Z",
+			UpdatedAt:       getCurrentTimestamp(),
+		},
+		// Support various token formats for testing
+		"twitter_token_789": {
+			ID:                 54321,
+			TwitterAccessToken: "twitter_token_789",
+			Nickname:           "TwitterUser",
+			WalletAddr:         "8VzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtBWWN",
+			Bio:                "Twitter authenticated user",
+			TradingVolume:      1500000,
+			CreatedAt:          "2024-02-01T00:00:00.000Z",
+			UpdatedAt:          getCurrentTimestamp(),
+		},
+	}
+
+	// Look up user by accessToken or twitterAccessToken
+	// This mimics the original isAuthenticated.js logic:
+	// User.find({ where: { or: [{ twitterAccessToken: accessToken }, { accessToken: accessToken }] }})
+	for token, user := range mockUsers {
+		if token == accessToken {
+			return user
+		}
+	}
+
+	// If no direct match, check if any user has this as their twitter token
+	for _, user := range mockUsers {
+		if user.TwitterAccessToken == accessToken {
+			return user
+		}
+	}
+
+	return nil // User not found
 }
 
 // ==========================================

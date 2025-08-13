@@ -345,7 +345,7 @@ func getCurrentTimestamp() string {
 // ==========================================
 
 // generateMockUserNftInfoResponse creates complete user NFT info response
-func generateMockUserNftInfoResponse() GetUserNftInfoResponse {
+func generateMockUserNftInfoResponse(userID int) GetUserNftInfoResponse {
 	tieredNfts := generateMockTieredNftInfo()
 	competitionNfts := generateMockCompetitionNfts()
 	badgeSummary := BadgeSummary{
@@ -354,21 +354,37 @@ func generateMockUserNftInfoResponse() GetUserNftInfoResponse {
 		TotalContributionValue: 1.0,
 	}
 
+	// Generate user-specific data based on userID
+	userBasicInfo := generateMockUserBasicInfo()
+	userBasicInfo.UserID = userID // Override with actual user ID
+
+	// Vary trading volume based on userID for different users
+	tradingVolume := 2850000
+	if userID == 99999 { // Admin user
+		tradingVolume = 10000000
+		userBasicInfo.ActiveNftLevel = 5
+		userBasicInfo.ActiveNftName = "Quantum Alchemist"
+	} else if userID == 54321 { // Twitter user
+		tradingVolume = 1500000
+		userBasicInfo.ActiveNftLevel = 2
+		userBasicInfo.ActiveNftName = "Quant Ape"
+	}
+
 	return GetUserNftInfoResponse{
 		Code:    200,
 		Message: "User NFT information retrieved successfully",
 		Data: GetUserNftInfoData{
-			UserBasicInfo: generateMockUserBasicInfo(),
+			UserBasicInfo: userBasicInfo,
 			NftPortfolio: NftPortfolio{
 				NftLevels:            tieredNfts,
 				CompetitionNftInfo:   generateMockCompetitionNftInfo(),
 				CompetitionNfts:      competitionNfts,
-				CurrentTradingVolume: 2850000,
+				CurrentTradingVolume: tradingVolume,
 			},
 			BadgeSummary: badgeSummary,
 			FeeWaivedInfo: FeeWaivedInfo{
-				UserID:     12345,
-				WalletAddr: "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+				UserID:     userID,
+				WalletAddr: userBasicInfo.WalletAddr,
 				Amount:     1250,
 			},
 			NftAvatarUrls: []string{
