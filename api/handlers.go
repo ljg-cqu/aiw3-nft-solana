@@ -37,7 +37,7 @@ func getUserNftInfo() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("User NFT")
+	u.SetTags("User NFTs")
 	u.SetTitle("Get User NFT Information")
 	u.SetDescription("Retrieves comprehensive NFT portfolio data including tiered NFTs, badges, and avatar information")
 	u.SetExpectedErrors(status.InvalidArgument, status.NotFound, status.Internal)
@@ -75,7 +75,7 @@ func getUserNftAvatars() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("User NFT")
+	u.SetTags("User NFTs")
 	u.SetTitle("Get User NFT Avatars")
 	u.SetDescription("Returns available NFT avatar options for the user")
 	u.SetExpectedErrors(status.Internal)
@@ -117,7 +117,7 @@ func claimNft() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("User NFT")
+	u.SetTags("User NFTs")
 	u.SetTitle("Claim NFT")
 	u.SetDescription("Claims an NFT for the user at specified level")
 	u.SetExpectedErrors(status.InvalidArgument, status.FailedPrecondition, status.Internal)
@@ -161,7 +161,7 @@ func getCanUpgradeNft() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("User NFT")
+	u.SetTags("User NFTs")
 	u.SetTitle("Check NFT Upgrade Eligibility")
 	u.SetDescription("Checks if user can upgrade their current NFT to the next level")
 	u.SetExpectedErrors(status.Internal)
@@ -205,7 +205,7 @@ func upgradeNft() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("User NFT")
+	u.SetTags("User NFTs")
 	u.SetTitle("Upgrade NFT")
 	u.SetDescription("Upgrades user's NFT to specified level")
 	u.SetExpectedErrors(status.InvalidArgument, status.FailedPrecondition, status.Internal)
@@ -249,7 +249,7 @@ func activateNft() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("User NFT")
+	u.SetTags("User NFTs")
 	u.SetTitle("Activate NFT")
 	u.SetDescription("Activates user's NFT to enable benefits")
 	u.SetExpectedErrors(status.InvalidArgument, status.NotFound, status.Internal)
@@ -332,7 +332,7 @@ func getBadgesByLevel() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Badges")
+	u.SetTags("Public")
 	u.SetTitle("Get Badges by Level")
 	u.SetDescription("Returns all badges available for a specific NFT level")
 	u.SetExpectedErrors(status.InvalidArgument, status.Internal)
@@ -419,7 +419,7 @@ func getBadgeList() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Badges")
+	u.SetTags("Public")
 	u.SetTitle("Get Badge List")
 	u.SetDescription("Returns complete list of available badges with optional level filtering")
 	u.SetExpectedErrors(status.Internal)
@@ -462,7 +462,7 @@ func completeTaskAlternative() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Badge Tasks")
+	u.SetTags("User Badges")
 	u.SetTitle("Complete Badge Task (Alternative)")
 	u.SetDescription("Complete badge task with anti-gaming protection")
 	u.SetExpectedErrors(status.InvalidArgument, status.Internal)
@@ -501,7 +501,7 @@ func getBadgeStatusAlternative() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Badge Status")
+	u.SetTags("User Badges")
 	u.SetTitle("Get Badge Status (Alternative)")
 	u.SetDescription("Get badge status and progress information")
 	u.SetExpectedErrors(status.Internal)
@@ -542,7 +542,7 @@ func activateBadgeForUpgrade() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Badge Activation")
+	u.SetTags("User Badges")
 	u.SetTitle("Activate Badge for Upgrade")
 	u.SetDescription("Activate badge for NFT upgrades")
 	u.SetExpectedErrors(status.InvalidArgument, status.Internal)
@@ -591,7 +591,7 @@ func uploadNftImage() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Admin NFT")
+	u.SetTags("Admin")
 	u.SetTitle("Upload NFT Image")
 	u.SetDescription("Admin endpoint to upload NFT images to IPFS")
 	u.SetExpectedErrors(status.InvalidArgument, status.Internal)
@@ -651,7 +651,7 @@ func getAdminUsersNftStatus() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Admin NFT")
+	u.SetTags("Admin")
 	u.SetTitle("Get Users NFT Status (Admin)")
 	u.SetDescription("Admin endpoint to view NFT status across all users")
 	u.SetExpectedErrors(status.Internal)
@@ -705,7 +705,7 @@ func awardCompetitionNft() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Admin Competition")
+	u.SetTags("Admin")
 	u.SetTitle("Award Competition NFTs")
 	u.SetDescription("Admin endpoint to award competition NFTs to winners")
 	u.SetExpectedErrors(status.InvalidArgument, status.Unauthenticated, status.PermissionDenied, status.Internal)
@@ -770,7 +770,7 @@ func getCompetitionNftLeaderboard() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Competition Public")
+	u.SetTags("Public")
 	u.SetTitle("Get Competition NFT Leaderboard")
 	u.SetDescription("Get public leaderboard of competition NFT holders")
 	u.SetExpectedErrors(status.NotFound, status.Internal)
@@ -807,7 +807,7 @@ func getPublicNftStats() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Public Statistics")
+	u.SetTags("Public")
 	u.SetTitle("Get Public NFT Statistics")
 	u.SetDescription("Get public NFT system statistics")
 	u.SetExpectedErrors(status.Internal)
@@ -856,7 +856,7 @@ func getProfileAvatarsAvailable() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Profile Avatars")
+	u.SetTags("Public")
 	u.SetTitle("Get Available Profile Avatars")
 	u.SetDescription("Get all available profile avatars (public)")
 	u.SetExpectedErrors(status.Internal)
@@ -906,7 +906,7 @@ func uploadProfileAvatar() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Admin Avatars")
+	u.SetTags("Admin")
 	u.SetTitle("Upload Profile Avatar")
 	u.SetDescription("Admin endpoint to upload new profile avatar images")
 	u.SetExpectedErrors(status.InvalidArgument, status.Internal)
@@ -983,7 +983,7 @@ func getProfileAvatarsList() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Admin Avatars")
+	u.SetTags("Admin")
 	u.SetTitle("Get Profile Avatars List")
 	u.SetDescription("Admin endpoint to list all profile avatars")
 	u.SetExpectedErrors(status.Internal)
@@ -1031,7 +1031,7 @@ func updateProfileAvatar() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Admin Avatars")
+	u.SetTags("Admin")
 	u.SetTitle("Update Profile Avatar")
 	u.SetDescription("Admin endpoint to update profile avatar details")
 	u.SetExpectedErrors(status.InvalidArgument, status.NotFound, status.Internal)
@@ -1069,7 +1069,7 @@ func deleteProfileAvatar() usecase.Interactor {
 		return nil
 	})
 
-	u.SetTags("Admin Avatars")
+	u.SetTags("Admin")
 	u.SetTitle("Delete Profile Avatar")
 	u.SetDescription("Admin endpoint to delete a profile avatar")
 	u.SetExpectedErrors(status.InvalidArgument, status.NotFound, status.Internal)
