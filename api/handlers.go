@@ -557,15 +557,26 @@ func activateBadgeForUpgrade() usecase.Interactor {
 // UploadNftImage handles NFT image upload (admin)
 func uploadNftImage() usecase.Interactor {
 	type uploadNftImageRequest struct {
-		ImageFile string `json:"image_file" required:"true" description:"Base64 encoded image data"`
-		NftLevel  int    `json:"nft_level" required:"true" description:"NFT level for the image"`
-		ImageType string `json:"image_type" required:"true" description:"Image type (avatar, background, etc.)"`
+		Authorization string `header:"Authorization" description:"Bearer token for admin authentication"`
+		ImageFile     string `json:"image_file" required:"true" description:"Base64 encoded image data"`
+		NftLevel      int    `json:"nft_level" required:"true" description:"NFT level for the image"`
+		ImageType     string `json:"image_type" required:"true" description:"Image type (avatar, background, etc.)"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req uploadNftImageRequest, resp *UploadNftImageResponse) error {
+		// Extract admin from Authorization header
+		admin, err := extractAdminFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = UploadNftImageResponse{
+				Code:    401,
+				Message: err.Error(),
+				Data:    UploadNftImageData{},
+			}
+			return nil
+		}
 		*resp = UploadNftImageResponse{
 			Code:    200,
-			Message: "NFT image uploaded successfully",
+			Message: fmt.Sprintf("NFT image uploaded successfully by admin %s", admin.Username),
 			Data: UploadNftImageData{
 				Success:    true,
 				ImageURL:   "https://ipfs.io/ipfs/QmNewImageHash123456789",
@@ -591,12 +602,23 @@ func uploadNftImage() usecase.Interactor {
 // GetAdminUsersNftStatus returns NFT status for all users (admin)
 func getAdminUsersNftStatus() usecase.Interactor {
 	type getAdminUsersNftStatusRequest struct {
-		Limit  int    `query:"limit" default:"50" description:"Number of users to return"`
-		Offset int    `query:"offset" default:"0" description:"Number of users to skip"`
-		Status string `query:"status" description:"Filter by NFT status"`
+		Authorization string `header:"Authorization" description:"Bearer token for admin authentication"`
+		Limit         int    `query:"limit" default:"50" description:"Number of users to return"`
+		Offset        int    `query:"offset" default:"0" description:"Number of users to skip"`
+		Status        string `query:"status" description:"Filter by NFT status"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req getAdminUsersNftStatusRequest, resp *GetAdminUsersNftStatusResponse) error {
+		// Extract admin from Authorization header
+		admin, err := extractAdminFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = GetAdminUsersNftStatusResponse{
+				Code:    401,
+				Message: err.Error(),
+				Data:    AdminUsersNftStatusData{},
+			}
+			return nil
+		}
 		if req.Limit > 100 {
 			req.Limit = 100
 		}
@@ -608,7 +630,7 @@ func getAdminUsersNftStatus() usecase.Interactor {
 
 		*resp = GetAdminUsersNftStatusResponse{
 			Code:    200,
-			Message: "Users NFT status retrieved successfully",
+			Message: fmt.Sprintf("Users NFT status retrieved successfully by admin %s", admin.Username),
 			Data: AdminUsersNftStatusData{
 				Users: users,
 				Pagination: Pagination{
@@ -640,11 +662,22 @@ func getAdminUsersNftStatus() usecase.Interactor {
 // AwardCompetitionNft awards competition NFT to winners (admin) - matching CompetitionNFTController.js
 func awardCompetitionNft() usecase.Interactor {
 	type awardCompetitionNftRequest struct {
+		Authorization string   `header:"Authorization" description:"Bearer token for admin authentication"`
 		CompetitionID int      `json:"competition_id" required:"true" description:"Competition identifier"`
 		Winners       []Winner `json:"winners" required:"true" description:"List of winners with userID, walletAddress, rank"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req awardCompetitionNftRequest, resp *AwardCompetitionNftsResponse) error {
+		// Extract admin from Authorization header
+		admin, err := extractAdminFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = AwardCompetitionNftsResponse{
+				Code:    401,
+				Message: err.Error(),
+				Data:    AwardCompetitionNftsData{},
+			}
+			return nil
+		}
 		awardedNfts := []map[string]interface{}{}
 
 		for _, winner := range req.Winners {
@@ -661,7 +694,7 @@ func awardCompetitionNft() usecase.Interactor {
 
 		*resp = AwardCompetitionNftsResponse{
 			Code:    200,
-			Message: fmt.Sprintf("Successfully awarded %d Competition NFTs", len(req.Winners)),
+			Message: fmt.Sprintf("Successfully awarded %d Competition NFTs by admin %s", len(req.Winners), admin.Username),
 			Data: AwardCompetitionNftsData{
 				CompetitionID: req.CompetitionID,
 				AwardedNfts:   awardedNfts,
@@ -838,16 +871,27 @@ func getProfileAvatarsAvailable() usecase.Interactor {
 // UploadProfileAvatar handles profile avatar upload (admin)
 func uploadProfileAvatar() usecase.Interactor {
 	type uploadProfileAvatarRequest struct {
-		ImageFile   string `json:"image_file" required:"true" description:"Base64 encoded image data"`
-		Name        string `json:"name" required:"true" description:"Avatar name"`
-		Description string `json:"description,omitempty" description:"Avatar description"`
-		Category    string `json:"category,omitempty" description:"Avatar category"`
+		Authorization string `header:"Authorization" description:"Bearer token for admin authentication"`
+		ImageFile     string `json:"image_file" required:"true" description:"Base64 encoded image data"`
+		Name          string `json:"name" required:"true" description:"Avatar name"`
+		Description   string `json:"description,omitempty" description:"Avatar description"`
+		Category      string `json:"category,omitempty" description:"Avatar category"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req uploadProfileAvatarRequest, resp *UploadProfileAvatarResponse) error {
+		// Extract admin from Authorization header
+		admin, err := extractAdminFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = UploadProfileAvatarResponse{
+				Code:    401,
+				Message: err.Error(),
+				Data:    UploadProfileAvatarData{},
+			}
+			return nil
+		}
 		*resp = UploadProfileAvatarResponse{
 			Code:    200,
-			Message: "Profile avatar uploaded successfully",
+			Message: fmt.Sprintf("Profile avatar uploaded successfully by admin %s", admin.Username),
 			Data: UploadProfileAvatarData{
 				Success:      true,
 				AvatarID:     123,
@@ -873,12 +917,23 @@ func uploadProfileAvatar() usecase.Interactor {
 // GetProfileAvatarsList returns list of profile avatars (admin)
 func getProfileAvatarsList() usecase.Interactor {
 	type getProfileAvatarsListRequest struct {
-		Limit    int     `query:"limit" default:"50" description:"Number of avatars to return"`
-		Offset   int     `query:"offset" default:"0" description:"Number of avatars to skip"`
-		Category *string `query:"category" description:"Filter by category"`
+		Authorization string  `header:"Authorization" description:"Bearer token for admin authentication"`
+		Limit         int     `query:"limit" default:"50" description:"Number of avatars to return"`
+		Offset        int     `query:"offset" default:"0" description:"Number of avatars to skip"`
+		Category      *string `query:"category" description:"Filter by category"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req getProfileAvatarsListRequest, resp *GetProfileAvatarsListResponse) error {
+		// Extract admin from Authorization header
+		admin, err := extractAdminFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = GetProfileAvatarsListResponse{
+				Code:    401,
+				Message: err.Error(),
+				Data:    ProfileAvatarsListData{},
+			}
+			return nil
+		}
 		if req.Limit > 100 {
 			req.Limit = 100
 		}
@@ -913,7 +968,7 @@ func getProfileAvatarsList() usecase.Interactor {
 
 		*resp = GetProfileAvatarsListResponse{
 			Code:    200,
-			Message: "Profile avatars list retrieved successfully",
+			Message: fmt.Sprintf("Profile avatars list retrieved successfully by admin %s", admin.Username),
 			Data: ProfileAvatarsListData{
 				Avatars: mockAvatars,
 				Pagination: Pagination{
@@ -939,17 +994,28 @@ func getProfileAvatarsList() usecase.Interactor {
 // UpdateProfileAvatar updates profile avatar (admin)
 func updateProfileAvatar() usecase.Interactor {
 	type updateProfileAvatarRequest struct {
-		ID          int     `path:"id" required:"true" description:"Avatar ID"`
-		Name        *string `json:"name,omitempty" description:"Updated avatar name"`
-		Description *string `json:"description,omitempty" description:"Updated avatar description"`
-		Category    *string `json:"category,omitempty" description:"Updated avatar category"`
-		IsActive    *bool   `json:"is_active,omitempty" description:"Updated active status"`
+		Authorization string  `header:"Authorization" description:"Bearer token for admin authentication"`
+		ID            int     `path:"id" required:"true" description:"Avatar ID"`
+		Name          *string `json:"name,omitempty" description:"Updated avatar name"`
+		Description   *string `json:"description,omitempty" description:"Updated avatar description"`
+		Category      *string `json:"category,omitempty" description:"Updated avatar category"`
+		IsActive      *bool   `json:"is_active,omitempty" description:"Updated active status"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req updateProfileAvatarRequest, resp *UpdateProfileAvatarResponse) error {
+		// Extract admin from Authorization header
+		admin, err := extractAdminFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = UpdateProfileAvatarResponse{
+				Code:    401,
+				Message: err.Error(),
+				Data:    UpdateProfileAvatarData{},
+			}
+			return nil
+		}
 		*resp = UpdateProfileAvatarResponse{
 			Code:    200,
-			Message: "Profile avatar updated successfully",
+			Message: fmt.Sprintf("Profile avatar updated successfully by admin %s", admin.Username),
 			Data: UpdateProfileAvatarData{
 				Success:   true,
 				AvatarID:  req.ID,
@@ -976,13 +1042,24 @@ func updateProfileAvatar() usecase.Interactor {
 // DeleteProfileAvatar deletes profile avatar (admin)
 func deleteProfileAvatar() usecase.Interactor {
 	type deleteProfileAvatarRequest struct {
-		ID int `path:"id" required:"true" description:"Avatar ID to delete"`
+		Authorization string `header:"Authorization" description:"Bearer token for admin authentication"`
+		ID            int    `path:"id" required:"true" description:"Avatar ID to delete"`
 	}
 
 	u := usecase.NewInteractor(func(ctx context.Context, req deleteProfileAvatarRequest, resp *DeleteProfileAvatarResponse) error {
+		// Extract admin from Authorization header
+		admin, err := extractAdminFromAuthHeader(req.Authorization)
+		if err != nil {
+			*resp = DeleteProfileAvatarResponse{
+				Code:    401,
+				Message: err.Error(),
+				Data:    DeleteProfileAvatarData{},
+			}
+			return nil
+		}
 		*resp = DeleteProfileAvatarResponse{
 			Code:    200,
-			Message: "Profile avatar deleted successfully",
+			Message: fmt.Sprintf("Profile avatar deleted successfully by admin %s", admin.Username),
 			Data: DeleteProfileAvatarData{
 				Success:   true,
 				AvatarID:  req.ID,
@@ -1018,6 +1095,18 @@ type User struct {
 	TradingVolume    int    `json:"tradingVolume"`
 	CreatedAt        string `json:"createdAt"`
 	UpdatedAt        string `json:"updatedAt"`
+}
+
+// AdminUser represents an authenticated admin user (mimics original AdminUser model)
+type AdminUser struct {
+	ID          int    `json:"id"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`
+	Role        string `json:"role"`
+	Status      int    `json:"status"` // 0 = active, 1 = disabled
+	AccessToken string `json:"accessToken,omitempty"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
 }
 
 // ==========================================
@@ -1107,6 +1196,86 @@ func mockUserLookup(accessToken string) *User {
 	}
 
 	return nil // User not found
+}
+
+// extractAdminFromAuthHeader extracts and validates admin user from Authorization header string
+// This mimics the original checkAdmin.js policy behavior
+func extractAdminFromAuthHeader(authHeader string) (*AdminUser, error) {
+	// Check if Authorization header exists and has Bearer prefix
+	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		return nil, errors.New("Missing or invalid Authorization header")
+	}
+
+	// Extract token from "Bearer <token>"
+	accessToken := strings.TrimPrefix(authHeader, "Bearer ")
+	if accessToken == "" {
+		return nil, errors.New("Access token is missing")
+	}
+
+	// Mock admin user lookup by token (in real API this would:
+	// 1. Verify JWT token
+	// 2. Check Redis cache for admin_<userId>
+	// 3. Query AdminUser database)
+	adminUser := mockAdminUserLookup(accessToken)
+	if adminUser == nil {
+		return nil, errors.New("Invalid access token")
+	}
+
+	// Check if admin user is active
+	if adminUser.Status != 0 {
+		return nil, errors.New("User does not exist or is disabled")
+	}
+
+	return adminUser, nil
+}
+
+// mockAdminUserLookup simulates database lookup of admin user by access token
+// This mimics the original AdminUser.findOne() logic in checkAdmin.js
+func mockAdminUserLookup(accessToken string) *AdminUser {
+	// Mock admin user database - in reality this would query the AdminUser table
+	mockAdminUsers := map[string]*AdminUser{
+		"admin_token_123": {
+			ID:          1,
+			Username:    "SuperAdmin",
+			Email:       "admin@aiw3.com",
+			Role:        "super_admin",
+			Status:      0, // active
+			AccessToken: "admin_token_123",
+			CreatedAt:   "2024-01-01T00:00:00.000Z",
+			UpdatedAt:   getCurrentTimestamp(),
+		},
+		"admin_token_456": {
+			ID:          2,
+			Username:    "ModeratorAdmin",
+			Email:       "mod@aiw3.com",
+			Role:        "moderator",
+			Status:      0, // active
+			AccessToken: "admin_token_456",
+			CreatedAt:   "2024-01-02T00:00:00.000Z",
+			UpdatedAt:   getCurrentTimestamp(),
+		},
+		"admin_token_disabled": {
+			ID:          3,
+			Username:    "DisabledAdmin",
+			Email:       "disabled@aiw3.com",
+			Role:        "admin",
+			Status:      1, // disabled
+			AccessToken: "admin_token_disabled",
+			CreatedAt:   "2024-01-03T00:00:00.000Z",
+			UpdatedAt:   getCurrentTimestamp(),
+		},
+	}
+
+	// Look up admin user by accessToken
+	// This mimics the original checkAdmin.js logic:
+	// AdminUser.findOne({ where: { id: userId, status: 0 } })
+	for token, adminUser := range mockAdminUsers {
+		if token == accessToken {
+			return adminUser
+		}
+	}
+
+	return nil // Admin user not found
 }
 
 // ==========================================
