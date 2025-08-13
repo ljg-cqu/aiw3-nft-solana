@@ -306,3 +306,195 @@ type NFTUpgradeEligibility struct {
 	Blockers        []string               `json:"blockers,omitempty" doc:"Upgrade blockers"`
 	Recommendations []string               `json:"recommendations,omitempty" doc:"Recommendations"`
 }
+
+// New Badge Communication Endpoint Models
+
+// Badge System Configuration Response
+type BadgeSystemConfigResponse struct {
+	BadgeSystem     BadgeSystemInfo  `json:"badgeSystem" doc:"Badge system configuration"`
+	NftLevels       []NFTLevelConfig `json:"nftLevels" doc:"NFT level configurations"`
+	BadgeCategories []string         `json:"badgeCategories" doc:"Available badge categories"`
+	Statuses        []string         `json:"statuses" doc:"Possible badge statuses"`
+	InteractionFlow []string         `json:"interactionFlow" doc:"Badge interaction flow steps"`
+	Endpoints       EndpointConfig   `json:"endpoints" doc:"Available badge endpoints"`
+}
+
+type BadgeSystemInfo struct {
+	Version            string `json:"version" example:"2.0.0" doc:"Badge system version"`
+	LastUpdate         string `json:"lastUpdate" doc:"Last configuration update"`
+	TotalBadges        int    `json:"totalBadges" example:"19" doc:"Total badges available"`
+	MaxActiveBadges    int    `json:"maxActiveBadges" example:"10" doc:"Maximum badges that can be active"`
+	ActivationCooldown string `json:"activationCooldown" example:"24h" doc:"Cooldown period between activations"`
+	ConsumptionEnabled bool   `json:"consumptionEnabled" example:"true" doc:"Whether badge consumption is enabled"`
+}
+
+type NFTLevelConfig struct {
+	Level          int    `json:"level" example:"1" doc:"NFT level"`
+	Name           string `json:"name" example:"Tech Chicken" doc:"NFT level name"`
+	RequiredBadges int    `json:"requiredBadges" example:"3" doc:"Required badges for this level"`
+	MinVolume      int64  `json:"minVolume" example:"100000" doc:"Minimum trading volume required"`
+}
+
+type EndpointConfig struct {
+	TaskComplete string `json:"taskComplete" example:"/api/badge/task-complete" doc:"Task completion endpoint"`
+	Status       string `json:"status" example:"/api/badge/status" doc:"Badge status endpoint"`
+	Activate     string `json:"activate" example:"/api/badge/activate" doc:"Badge activation endpoint"`
+	List         string `json:"list" example:"/api/badge/list" doc:"Badge listing endpoint"`
+	Progress     string `json:"progress" example:"/api/badge/progress" doc:"Progress tracking endpoint"`
+	Validate     string `json:"validate" example:"/api/badge/validate-activation" doc:"Validation endpoint"`
+}
+
+// Task Requirements Request/Response
+type TaskRequirementsRequest struct {
+	TaskID string `path:"taskId" example:"101" doc:"Task ID to get requirements for"`
+}
+
+type TaskRequirementsResponse struct {
+	TaskID        string           `json:"taskId" example:"101" doc:"Task ID"`
+	Name          string           `json:"name" example:"Contract Tutorial" doc:"Task name"`
+	Description   string           `json:"description" doc:"Task description"`
+	Category      string           `json:"category" example:"Contract" doc:"Task category"`
+	Difficulty    string           `json:"difficulty" example:"Beginner" doc:"Task difficulty level"`
+	EstimatedTime string           `json:"estimatedTime" example:"15 minutes" doc:"Estimated completion time"`
+	Requirements  TaskRequirements `json:"requirements" doc:"Task requirements details"`
+	Rewards       TaskRewards      `json:"rewards" doc:"Task rewards"`
+	HelpResources []HelpResource   `json:"helpResources" doc:"Available help resources"`
+}
+
+type TaskRequirements struct {
+	Steps         []string       `json:"steps" doc:"Required steps to complete task"`
+	Prerequisites []string       `json:"prerequisites" doc:"Prerequisites before starting task"`
+	Validation    TaskValidation `json:"validation" doc:"Validation configuration"`
+}
+
+type TaskValidation struct {
+	Method         string   `json:"method" example:"automatic" doc:"Validation method"`
+	Triggers       []string `json:"triggers" doc:"Validation triggers"`
+	AntiGaming     bool     `json:"antiGaming" example:"true" doc:"Whether anti-gaming measures are active"`
+	CooldownPeriod string   `json:"cooldownPeriod" example:"1h" doc:"Cooldown period after completion"`
+}
+
+type TaskRewards struct {
+	BadgeID           int      `json:"badgeId" example:"1" doc:"Badge ID awarded"`
+	ContributionValue float64  `json:"contributionValue" example:"1.0" doc:"Badge contribution value"`
+	ExperiencePoints  int      `json:"experiencePoints" example:"100" doc:"Experience points awarded"`
+	Unlocks           []string `json:"unlocks" doc:"Features or content unlocked"`
+}
+
+type HelpResource struct {
+	Type  string `json:"type" example:"video" doc:"Resource type"`
+	Title string `json:"title" example:"Contract Trading Basics" doc:"Resource title"`
+	URL   string `json:"url" example:"/tutorials/contracts-101" doc:"Resource URL"`
+}
+
+// Badge Progress Response
+type BadgeProgressResponse struct {
+	UserID          string           `json:"userId" example:"mock_user_123" doc:"User ID"`
+	LastUpdated     string           `json:"lastUpdated" doc:"Last progress update timestamp"`
+	OverallProgress OverallProgress  `json:"overallProgress" doc:"Overall badge progress"`
+	ActiveTasks     []ActiveTask     `json:"activeTasks" doc:"Currently active tasks"`
+	RecentActivity  []RecentActivity `json:"recentActivity" doc:"Recent badge-related activity"`
+}
+
+type OverallProgress struct {
+	TotalBadges          int `json:"totalBadges" example:"19" doc:"Total badges available"`
+	EarnedBadges         int `json:"earnedBadges" example:"4" doc:"Badges user has earned"`
+	ActivatedBadges      int `json:"activatedBadges" example:"2" doc:"Badges user has activated"`
+	ConsumedBadges       int `json:"consumedBadges" example:"1" doc:"Badges consumed in upgrades"`
+	CompletionPercentage int `json:"completionPercentage" example:"21" doc:"Overall completion percentage"`
+	CurrentLevel         int `json:"currentLevel" example:"1" doc:"User's current NFT level"`
+	NextLevelProgress    int `json:"nextLevelProgress" example:"60" doc:"Progress toward next level"`
+}
+
+type ActiveTask struct {
+	TaskID              int          `json:"taskId" example:"201" doc:"Task ID"`
+	BadgeID             int          `json:"badgeId" example:"3" doc:"Related badge ID"`
+	Name                string       `json:"name" example:"Trading Novice" doc:"Task name"`
+	Description         string       `json:"description" doc:"Task description"`
+	Progress            TaskProgress `json:"progress" doc:"Task progress details"`
+	Status              string       `json:"status" example:"in_progress" doc:"Task status"`
+	EstimatedCompletion string       `json:"estimatedCompletion" example:"2-3 days" doc:"Estimated completion time"`
+	NextMilestone       string       `json:"nextMilestone" doc:"Next milestone to reach"`
+}
+
+type TaskProgress struct {
+	Current    float64 `json:"current" example:"7" doc:"Current progress value"`
+	Required   float64 `json:"required" example:"10" doc:"Required progress value"`
+	Percentage int     `json:"percentage" example:"70" doc:"Completion percentage"`
+	Remaining  float64 `json:"remaining" example:"3" doc:"Remaining progress needed"`
+}
+
+type RecentActivity struct {
+	Timestamp   string `json:"timestamp" doc:"Activity timestamp"`
+	Action      string `json:"action" example:"badge_earned" doc:"Activity type"`
+	BadgeID     int    `json:"badgeId,omitempty" example:"2" doc:"Related badge ID"`
+	BadgeName   string `json:"badgeName,omitempty" example:"Platform Enlighteners" doc:"Related badge name"`
+	TaskID      int    `json:"taskId,omitempty" example:"201" doc:"Related task ID"`
+	Description string `json:"description" doc:"Activity description"`
+}
+
+// Badge Activation Validation Request/Response
+type BadgeActivationValidationRequest struct {
+	BadgeID int `json:"badgeId" example:"3" doc:"Badge ID to validate for activation"`
+}
+
+type BadgeActivationValidationResponse struct {
+	BadgeID          int               `json:"badgeId" example:"3" doc:"Badge ID being validated"`
+	CanActivate      bool              `json:"canActivate" example:"true" doc:"Whether badge can be activated"`
+	ValidationChecks ValidationChecks  `json:"validationChecks" doc:"Detailed validation results"`
+	Activation       ActivationDetails `json:"activation" doc:"Activation details if valid"`
+	Warnings         []string          `json:"warnings" doc:"Any warnings about activation"`
+	Recommendations  []string          `json:"recommendations" doc:"Recommendations for user"`
+}
+
+type ValidationChecks struct {
+	BadgeOwned       ValidationCheck `json:"badgeOwned" doc:"Badge ownership check"`
+	AlreadyActivated ValidationCheck `json:"alreadyActivated" doc:"Already activated check"`
+	CooldownPeriod   ValidationCheck `json:"cooldownPeriod" doc:"Cooldown period check"`
+	MaxActiveLimit   ValidationCheck `json:"maxActiveLimit" doc:"Maximum active badges check"`
+	Prerequisites    ValidationCheck `json:"prerequisites" doc:"Prerequisites check"`
+}
+
+type ValidationCheck struct {
+	Status  string `json:"status" example:"pass" doc:"Check status: pass/fail"`
+	Message string `json:"message" doc:"Check result message"`
+}
+
+type ActivationDetails struct {
+	ContributionValue     float64 `json:"contributionValue" example:"2.0" doc:"Badge contribution value"`
+	NftLevelContribution  int     `json:"nftLevelContribution" example:"2" doc:"NFT level this contributes to"`
+	EstimatedGasFeeSol    float64 `json:"estimatedGasFeeSol" example:"0.001" doc:"Estimated gas fee in SOL"`
+	ProcessingTime        string  `json:"processingTime" example:"5-15 seconds" doc:"Expected processing time"`
+	ConfirmationsRequired int     `json:"confirmationsRequired" example:"1" doc:"Required confirmations"`
+}
+
+// Batch Badge Operations Request/Response
+type BatchBadgeOperationsRequest struct {
+	Operations []BadgeOperation `json:"operations" doc:"List of badge operations to perform"`
+}
+
+type BadgeOperation struct {
+	Type    string `json:"type" example:"activate" doc:"Operation type: activate, deactivate, etc."`
+	BadgeID int    `json:"badgeId" example:"3" doc:"Badge ID for operation"`
+}
+
+type BatchBadgeOperationsResponse struct {
+	BatchID              string                 `json:"batchId" example:"batch_1234567890" doc:"Unique batch identifier"`
+	TotalOperations      int                    `json:"totalOperations" example:"3" doc:"Total operations in batch"`
+	SuccessfulOperations int                    `json:"successfulOperations" example:"3" doc:"Successfully completed operations"`
+	FailedOperations     int                    `json:"failedOperations" example:"0" doc:"Failed operations"`
+	Results              []BatchOperationResult `json:"results" doc:"Individual operation results"`
+	ExecutionTime        string                 `json:"executionTime" example:"2.3s" doc:"Total execution time"`
+	TotalGasCost         float64                `json:"totalGasCost" example:"0.003" doc:"Total gas cost in SOL"`
+}
+
+type BatchOperationResult struct {
+	OperationID     string  `json:"operationId" example:"op_1" doc:"Operation identifier"`
+	Type            string  `json:"type" example:"activate" doc:"Operation type"`
+	BadgeID         int     `json:"badgeId" example:"3" doc:"Badge ID"`
+	Status          string  `json:"status" example:"success" doc:"Operation status"`
+	Timestamp       string  `json:"timestamp" doc:"Operation timestamp"`
+	TransactionHash string  `json:"transactionHash" example:"tx_mock_1_1234567890" doc:"Transaction hash"`
+	GasUsed         float64 `json:"gasUsed" example:"0.001" doc:"Gas used in SOL"`
+	Message         string  `json:"message" example:"Operation completed successfully" doc:"Result message"`
+}

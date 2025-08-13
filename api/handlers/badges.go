@@ -738,40 +738,34 @@ func calculateCompletionPercentage(badges []models.DetailedBadgeInfo) int {
 // ==========================================
 
 // GetBadgeSystemConfig provides frontend with badge system configuration
-func GetBadgeSystemConfig(ctx context.Context, input *struct{}) (*models.APIResponse, error) {
-	config := map[string]interface{}{
-		"badgeSystem": map[string]interface{}{
-			"version":            "2.0.0",
-			"lastUpdate":         time.Now().Format(time.RFC3339),
-			"totalBadges":        19,
-			"maxActiveBadges":    10,
-			"activationCooldown": "24h",
-			"consumptionEnabled": true,
+func GetBadgeSystemConfig(ctx context.Context, input *struct{}) (*models.BadgeSystemConfigResponse, error) {
+	return &models.BadgeSystemConfigResponse{
+		BadgeSystem: models.BadgeSystemInfo{
+			Version:            "2.0.0",
+			LastUpdate:         time.Now().Format(time.RFC3339),
+			TotalBadges:        19,
+			MaxActiveBadges:    10,
+			ActivationCooldown: "24h",
+			ConsumptionEnabled: true,
 		},
-		"nftLevels": []map[string]interface{}{
-			{"level": 1, "name": "Tech Chicken", "requiredBadges": 3, "minVolume": 100000},
-			{"level": 2, "name": "Crypto Chicken", "requiredBadges": 5, "minVolume": 500000},
-			{"level": 3, "name": "Golden Chicken", "requiredBadges": 8, "minVolume": 2000000},
-			{"level": 4, "name": "Diamond Chicken", "requiredBadges": 12, "minVolume": 5000000},
-			{"level": 5, "name": "Master Chicken", "requiredBadges": 15, "minVolume": 10000000},
+		NftLevels: []models.NFTLevelConfig{
+			{Level: 1, Name: "Tech Chicken", RequiredBadges: 3, MinVolume: 100000},
+			{Level: 2, Name: "Crypto Chicken", RequiredBadges: 5, MinVolume: 500000},
+			{Level: 3, Name: "Golden Chicken", RequiredBadges: 8, MinVolume: 2000000},
+			{Level: 4, Name: "Diamond Chicken", RequiredBadges: 12, MinVolume: 5000000},
+			{Level: 5, Name: "Master Chicken", RequiredBadges: 15, MinVolume: 10000000},
 		},
-		"badgeCategories": []string{"Contract", "Platform", "Trading", "Volume", "Social", "Time", "Strategic"},
-		"statuses":        []string{"locked", "available", "owned", "activated", "consumed"},
-		"interactionFlow": []string{"earn", "activate", "contribute", "consume"},
-		"endpoints": map[string]interface{}{
-			"taskComplete": "/api/badge/task-complete",
-			"status":       "/api/badge/status",
-			"activate":     "/api/badge/activate",
-			"list":         "/api/badge/list",
-			"progress":     "/api/badge/progress",
-			"validate":     "/api/badge/validate-activation",
+		BadgeCategories: []string{"Contract", "Platform", "Trading", "Volume", "Social", "Time", "Strategic"},
+		Statuses:        []string{"locked", "available", "owned", "activated", "consumed"},
+		InteractionFlow: []string{"earn", "activate", "contribute", "consume"},
+		Endpoints: models.EndpointConfig{
+			TaskComplete: "/api/badge/task-complete",
+			Status:       "/api/badge/status",
+			Activate:     "/api/badge/activate",
+			List:         "/api/badge/list",
+			Progress:     "/api/badge/progress",
+			Validate:     "/api/badge/validate-activation",
 		},
-	}
-
-	return &models.APIResponse{
-		Success: true,
-		Data:    config,
-		Message: "Badge system configuration retrieved successfully",
 	}, nil
 }
 
