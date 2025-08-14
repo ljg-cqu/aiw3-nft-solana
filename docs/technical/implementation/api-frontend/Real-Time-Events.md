@@ -1239,7 +1239,7 @@ class CompetitionEventHandler {
         "current": 8750.25,
         "previous": 8500.00,
         "change": 250.25,
-        "progressPercentage": 87.50,
+        "thresholdProgress": 87.50,
         "completed": false
       }
     ],
@@ -1331,15 +1331,15 @@ class BadgeEventHandler {
 
   async handleProgressUpdate(data) {
     // Show progress notification for badges close to completion
-    if (data.progressPercentage >= 80 && data.progressPercentage < 100) {
+    if (data.thresholdProgress >= 80 && data.thresholdProgress < 100) {
       this.notificationService.showInfo({
         title: '🎯 Badge Progress',
-        message: `You're ${data.progressPercentage}% towards earning "${data.badgeName}"!`,
+        message: `You're ${data.thresholdProgress}% towards earning "${data.badgeName}"!`,
         duration: 4000,
         progress: {
           current: data.currentProgress,
           target: data.targetProgress,
-          percentage: data.progressPercentage
+          percentage: data.thresholdProgress
         }
       });
     }

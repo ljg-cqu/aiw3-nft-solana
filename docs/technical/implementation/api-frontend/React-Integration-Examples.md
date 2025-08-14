@@ -597,7 +597,7 @@ import ProgressBar from './ProgressBar';
 import Button from './Button';
 
 const NFTCard = ({ nft, type = 'tiered', onClaim, onUpgrade, onActivate, loading }) => {
-  const isClaimable = nft.status === 'Available' && nft.progressPercentage >= 100;
+  const isClaimable = nft.status === 'Available' && nft.thresholdProgress >= 100;
   const isUpgradeable = nft.status === 'Owned' && nft.canUpgrade;
   const isActivatable = nft.status === 'Owned' && !nft.benefitsActivated;
 
@@ -645,7 +645,7 @@ const NFTCard = ({ nft, type = 'tiered', onClaim, onUpgrade, onActivate, loading
               <ProgressBar 
                 current={nft.tradingVolumeCurrent} 
                 target={nft.tradingVolumeRequired}
-                percentage={nft.progressPercentage}
+                percentage={nft.thresholdProgress}
               />
             </div>
 

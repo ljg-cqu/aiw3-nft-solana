@@ -127,7 +127,7 @@ export const handlers = [
                 status: 'Burned',
                 tradingVolumeRequired: 100000,
                 tradingVolumeCurrent: 150000,
-                progressPercentage: 100,
+                thresholdProgress: 100.0,
                 benefits: {
                   tradingFeeDiscount: 0.10,
                   aiAgentUses: 10
@@ -139,7 +139,7 @@ export const handlers = [
                 status: 'Owned',
                 tradingVolumeRequired: 500000,
                 tradingVolumeCurrent: 300000,
-                progressPercentage: 60,
+                thresholdProgress: 60.0,
                 benefits: {
                   tradingFeeDiscount: 0.15,
                   aiAgentUses: 20
@@ -564,7 +564,7 @@ const mockNFT = {
   imageUrl: 'https://example.com/nft.png',
   tradingVolumeRequired: 100000,
   tradingVolumeCurrent: 150000,
-  progressPercentage: 100,
+  thresholdProgress: 100.0,
   benefits: {
     tradingFeeDiscount: 0.10,
     aiAgentUses: 10

@@ -49,7 +49,10 @@ type TieredNftInfo struct {
     Status string // Locked, Unlockable, Active, Burned
     TradingVolumeCurrent int64
     TradingVolumeRequired int64
-    ProgressPercentage int64 
+    ThresholdProgress float64 
+    BadgesRequired int
+    BadgesActivated int
+    BadgesProgress float64
     Benefits map[string]any  
     BenefitsActivated bool
 }

@@ -112,7 +112,7 @@ https://api.lastmemefi.com
 | `nextLevel` | `integer` | ✅ | 2-10 | Next available NFT level to upgrade to | `3` |
 | `requiredBadges` | `integer` | ✅ | >= 0 | Number of activated badges needed for next level | `8` |
 | `currentBadges` | `integer` | ✅ | >= 0 | Number of badges user currently has activated | `5` |
-| `progressPercentage` | `number` | ✅ | 0-100, 1 decimal | Percentage progress toward next level based on badges | `62.5` |
+| `thresholdProgress` | `number` | ✅ | 0-∞, 1 decimal | Progress toward meeting trading volume threshold as percentage (can exceed 100%) | `105.7` |
 
 ---
 
@@ -502,7 +502,7 @@ No parameters required.
 | `ownedBadges` | `integer` | ✅ | >= 0 | Badges user owns for this level | `5` |
 | `activatedBadges` | `integer` | ✅ | >= 0 | Badges user has activated for this level | `3` |
 | `requiredForUpgrade` | `integer` | ✅ | >= 0 | Badges needed to upgrade to this level | `8` |
-| `progressPercentage` | `number` | ✅ | 0-100, 1 decimal | Progress toward upgrade requirement | `62.5` |
+| `thresholdProgress` | `number` | ✅ | 0-∞, 1 decimal | Progress toward meeting trading volume threshold as percentage (can exceed 100%) | `105.7` |
 
 ---
 
@@ -549,7 +549,7 @@ No parameters required.
 |-------|------|----------|-------------|----------------|---------|
 | `currentLevel` | `integer` | ✅ | 1-10 | User's current NFT level | `2` |
 | `nextLevel` | `integer` | ✅ | 2-10 | Next available upgrade level | `3` |
-| `progressPercentage` | `number` | ✅ | 0-100, 1 decimal | Progress toward next level | `75.0` |
+| `thresholdProgress` | `number` | ✅ | 0-∞, 1 decimal | Progress toward meeting trading volume threshold as percentage (can exceed 100%) | `105.7` |
 | `canUpgrade` | `boolean` | ✅ | true/false | Whether user can now upgrade | `false` |
 
 ---

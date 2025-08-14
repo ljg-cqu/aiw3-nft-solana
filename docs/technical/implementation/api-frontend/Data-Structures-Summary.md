@@ -55,7 +55,7 @@ This document provides a **complete reference** for all data structures used in 
 #### **NftLevel (21 fields)**
 - Core identification: `level`, `name`, `description`, `imageUrl`
 - Status tracking: `status`, `id`, `tokenId`, `mintAddress`
-- Progress metrics: `tradingVolumeRequired`, `tradingVolumeCurrent`, `progressPercentage`
+- Progress metrics: `tradingVolumeRequired`, `tradingVolumeCurrent`, `thresholdProgress`
 - Badge requirements: `badgesRequired`, `badgesOwned`, `badgeProgressPercentage`
 - Action flags: `canClaim`, `canUpgrade`, `benefitsActivated`
 - Benefits: `benefits` (NftBenefits object)
