@@ -6,33 +6,33 @@ package badges
 
 // Badge represents a badge with user-specific data
 type Badge struct {
-	ID                   int                    `json:"id" example:"1" description:"Unique badge identifier"`
-	NftLevel             int                    `json:"nftLevel" example:"3" description:"NFT level required to earn this badge (1-5)" minimum:"1" maximum:"5"`
-	Name                 string                 `json:"name" example:"The Contract Enlightener" description:"Display name of the badge" maxLength:"100"`
-	Description          string                 `json:"description" example:"Complete the contract novice guidance tutorial" description:"Detailed description of what the badge represents" maxLength:"500"`
-	Category             string                 `json:"category" example:"Trading" description:"Badge category" maxLength:"100"`
-	Level                int                    `json:"level" example:"1" description:"Badge level/tier" minimum:"1"`
-	IconURI              string                 `json:"iconUri" example:"https://cdn.example.com/badges/contract-enlightener.png" description:"URL to badge icon/image" format:"uri"`
-	IconURL              string                 `json:"iconUrl" example:"https://cdn.example.com/badges/contract-enlightener.png" description:"URL to badge icon/image" format:"uri"`
-	TaskID               int                    `json:"taskId" example:"101" description:"Associated task identifier for earning this badge"`
-	TaskName             string                 `json:"taskName" example:"Contract Tutorial" description:"Name of the task required to earn this badge" maxLength:"100"`
-	ContributionValue    float64                `json:"contributionValue" example:"1.5" description:"Points this badge contributes toward NFT upgrades" minimum:"0"`
-	Status               string                 `json:"status" example:"owned" description:"Current status of this badge for the user" enum:"[not_earned,owned,activated,consumed]"`
-	EarnedAt             *string                `json:"earnedAt,omitempty" example:"2024-01-10T08:30:00.000Z" description:"ISO timestamp when badge was earned (null if not earned)" format:"date-time"`
-	ActivatedAt          *string                `json:"activatedAt,omitempty" example:"2024-01-12T10:15:00.000Z" description:"ISO timestamp when badge was activated (null if not activated)" format:"date-time"`
-	ConsumedAt           *string                `json:"consumedAt,omitempty" example:"2024-01-20T16:30:00.000Z" description:"ISO timestamp when badge was consumed for upgrade (null if not consumed)" format:"date-time"`
-	UnlockedAt           *string                `json:"unlockedAt,omitempty" example:"2024-01-12T10:15:00.000Z" description:"ISO timestamp when badge was unlocked" format:"date-time"`
-	CanActivate          bool                   `json:"canActivate" example:"true" description:"Whether user can currently activate this badge (only for owned badges)"`
-	IsRequiredForUpgrade bool                   `json:"isRequiredForUpgrade" example:"false" description:"Whether this badge is required for the next NFT level upgrade"`
-	Requirements         []BadgeRequirement     `json:"requirements" description:"Array of requirements to earn this badge"`
-	TaskProgress         int                    `json:"taskProgress" example:"100" description:"Current progress on the associated task (0-100)" minimum:"0" maximum:"100"`
-	TaskCompleted        bool                   `json:"taskCompleted" example:"true" description:"Whether the associated task is completed (task can be completed without badge being earned)"`
+	ID                   int                `json:"id" example:"1" description:"Unique badge identifier"`
+	NftLevel             int                `json:"nftLevel" example:"3" description:"NFT level required to earn this badge (1-5)" minimum:"1" maximum:"5"`
+	Name                 string             `json:"name" example:"The Contract Enlightener" description:"Display name of the badge" maxLength:"100"`
+	Description          string             `json:"description" example:"Complete the contract novice guidance tutorial" description:"Detailed description of what the badge represents" maxLength:"500"`
+	Category             string             `json:"category" example:"Trading" description:"Badge category" maxLength:"100"`
+	Level                int                `json:"level" example:"1" description:"Badge level/tier" minimum:"1"`
+	IconURI              string             `json:"iconUri" example:"https://cdn.example.com/badges/contract-enlightener.png" description:"URL to badge icon/image" format:"uri"`
+	IconURL              string             `json:"iconUrl" example:"https://cdn.example.com/badges/contract-enlightener.png" description:"URL to badge icon/image" format:"uri"`
+	TaskID               int                `json:"taskId" example:"101" description:"Associated task identifier for earning this badge"`
+	TaskName             string             `json:"taskName" example:"Contract Tutorial" description:"Name of the task required to earn this badge" maxLength:"100"`
+	ContributionValue    float64            `json:"contributionValue" example:"1.5" description:"Points this badge contributes toward NFT upgrades" minimum:"0"`
+	Status               string             `json:"status" example:"available" description:"Current status of this badge for the user" enum:"[not_earned,available,activated,consumed]"`
+	EarnedAt             *string            `json:"earnedAt,omitempty" example:"2024-01-10T08:30:00.000Z" description:"ISO timestamp when badge was earned (null if not earned)" format:"date-time"`
+	ActivatedAt          *string            `json:"activatedAt,omitempty" example:"2024-01-12T10:15:00.000Z" description:"ISO timestamp when badge was activated (null if not activated)" format:"date-time"`
+	ConsumedAt           *string            `json:"consumedAt,omitempty" example:"2024-01-20T16:30:00.000Z" description:"ISO timestamp when badge was consumed for upgrade (null if not consumed)" format:"date-time"`
+	UnlockedAt           *string            `json:"unlockedAt,omitempty" example:"2024-01-12T10:15:00.000Z" description:"ISO timestamp when badge was unlocked" format:"date-time"`
+	CanActivate          bool               `json:"canActivate" example:"true" description:"Whether user can currently activate this badge (only for available badges)"`
+	IsRequiredForUpgrade bool               `json:"isRequiredForUpgrade" example:"false" description:"Whether this badge is required for the next NFT level upgrade"`
+	Requirements         []BadgeRequirement `json:"requirements" description:"Array of requirements to earn this badge"`
+	TaskProgress         int                `json:"taskProgress" example:"100" description:"Current progress on the associated task (0-100)" minimum:"0" maximum:"100"`
+	TaskCompleted        bool               `json:"taskCompleted" example:"true" description:"Whether the associated task is completed (task can be completed without badge being earned)"`
 }
 
 // BadgeStats represents badge statistics
 type BadgeStats struct {
 	TotalBadges             int                       `json:"totalBadges" example:"5" description:"Total number of badges available to user" minimum:"0"`
-	OwnedBadges             int                       `json:"ownedBadges" example:"2" description:"Number of badges user has earned but not activated" minimum:"0"`
+	AvailableBadges         int                       `json:"availableBadges" example:"2" description:"Number of badges user has earned but not activated" minimum:"0"`
 	ActivatedBadges         int                       `json:"activatedBadges" example:"1" description:"Number of badges user has activated" minimum:"0"`
 	ConsumedBadges          int                       `json:"consumedBadges" example:"1" description:"Number of badges consumed for NFT upgrades" minimum:"0"`
 	TotalContributionValue  float64                   `json:"totalContributionValue" example:"1.0" description:"Total points from activated badges towards upgrades" minimum:"0"`
@@ -223,30 +223,30 @@ type BadgeListData struct {
 
 // GetBadgeStatsResponse represents wrapped badge statistics response
 type GetBadgeStatsResponse struct {
-	Code    int             `json:"code"`
-	Message string          `json:"message"`
-	Data    BadgeStatsData  `json:"data"`
+	Code    int            `json:"code"`
+	Message string         `json:"message"`
+	Data    BadgeStatsData `json:"data"`
 }
 
 // BadgeStatsData represents badge statistics data
 type BadgeStatsData struct {
-	Stats      []BadgeStat            `json:"stats"`
-	Summary    BadgeSummary           `json:"summary"`
-	Pagination Pagination             `json:"pagination"`
+	Stats      []BadgeStat  `json:"stats"`
+	Summary    BadgeSummary `json:"summary"`
+	Pagination Pagination   `json:"pagination"`
 }
 
 // BadgeStat represents statistics for a specific badge
 type BadgeStat struct {
-	Badge        Badge             `json:"badge"`
+	Badge         Badge            `json:"badge"`
 	UnlockedCount int              `json:"unlockedCount"`
-	LevelStats   []BadgeLevelStat  `json:"levelStats"`
+	LevelStats    []BadgeLevelStat `json:"levelStats"`
 }
 
-// UserBadgesData represents user badges response data  
+// UserBadgesData represents user badges response data
 type UserBadgesData struct {
-	UserID       int               `json:"userId"`
-	Badges       []Badge           `json:"badges"`
-	Summary      UserBadgeSummary  `json:"summary"`
+	UserID  int              `json:"userId"`
+	Badges  []Badge          `json:"badges"`
+	Summary UserBadgeSummary `json:"summary"`
 }
 
 // UserBadgeSummary represents user badge summary
@@ -262,9 +262,9 @@ type UserBadgeSummary struct {
 
 // TaskCompletionResponse represents task completion response
 type TaskCompletionResponse struct {
-	Code    int                 `json:"code"`
-	Message string              `json:"message"`
-	Data    TaskCompletionData  `json:"data"`
+	Code    int                `json:"code"`
+	Message string             `json:"message"`
+	Data    TaskCompletionData `json:"data"`
 }
 
 // TaskCompletionData represents task completion response data
@@ -284,9 +284,9 @@ type TaskCompletionData struct {
 
 // GetBadgeLeaderboardResponse represents badge leaderboard response
 type GetBadgeLeaderboardResponse struct {
-	Code    int                    `json:"code"`
-	Message string                 `json:"message"`
-	Data    BadgeLeaderboardData   `json:"data"`
+	Code    int                  `json:"code"`
+	Message string               `json:"message"`
+	Data    BadgeLeaderboardData `json:"data"`
 }
 
 // BadgeLeaderboardData represents badge leaderboard data
@@ -308,41 +308,41 @@ type BadgeLeaderboardData struct {
 
 // GetBadgeStatusData represents badge status data for new GetBadgeStatus handler
 type GetBadgeStatusData struct {
-	BadgeID               *int                     `json:"badgeId,omitempty"`
-	BadgeName             string                   `json:"badgeName,omitempty"`
-	Status                string                   `json:"status,omitempty"`
-	Progress              int                      `json:"progress,omitempty"`
-	MaxProgress           int                      `json:"maxProgress,omitempty"`
-	CurrentTasks          []map[string]interface{} `json:"currentTasks,omitempty"`
-	NextMilestone         string                   `json:"nextMilestone,omitempty"`
-	EstimatedCompletion   string                   `json:"estimatedCompletion,omitempty"`
-	TotalBadges           int                      `json:"totalBadges,omitempty"`
-	EarnedBadges          int                      `json:"earnedBadges,omitempty"`
-	InProgressBadges      int                      `json:"inProgressBadges,omitempty"`
-	LockedBadges          int                      `json:"lockedBadges,omitempty"`
-	OverallProgress       float64                  `json:"overallProgress,omitempty"`
-	RecentlyEarned        []map[string]interface{} `json:"recentlyEarned,omitempty"`
-	UpcomingMilestones    []string                 `json:"upcomingMilestones,omitempty"`
+	BadgeID             *int                     `json:"badgeId,omitempty"`
+	BadgeName           string                   `json:"badgeName,omitempty"`
+	Status              string                   `json:"status,omitempty"`
+	Progress            int                      `json:"progress,omitempty"`
+	MaxProgress         int                      `json:"maxProgress,omitempty"`
+	CurrentTasks        []map[string]interface{} `json:"currentTasks,omitempty"`
+	NextMilestone       string                   `json:"nextMilestone,omitempty"`
+	EstimatedCompletion string                   `json:"estimatedCompletion,omitempty"`
+	TotalBadges         int                      `json:"totalBadges,omitempty"`
+	EarnedBadges        int                      `json:"earnedBadges,omitempty"`
+	InProgressBadges    int                      `json:"inProgressBadges,omitempty"`
+	LockedBadges        int                      `json:"lockedBadges,omitempty"`
+	OverallProgress     float64                  `json:"overallProgress,omitempty"`
+	RecentlyEarned      []map[string]interface{} `json:"recentlyEarned,omitempty"`
+	UpcomingMilestones  []string                 `json:"upcomingMilestones,omitempty"`
 }
 
 // ActivateBadgeForUpgradeResponse represents badge activation for upgrade response
 type ActivateBadgeForUpgradeResponse struct {
-	Code    int                        `json:"code"`
-	Message string                     `json:"message"`
+	Code    int                         `json:"code"`
+	Message string                      `json:"message"`
 	Data    ActivateBadgeForUpgradeData `json:"data"`
 }
 
 // ActivateBadgeForUpgradeData represents badge activation for upgrade data
 type ActivateBadgeForUpgradeData struct {
-	Success               bool     `json:"success"`
-	BadgeID               int      `json:"badgeId"`
-	BadgeName             string   `json:"badgeName"`
-	ActivatedAt           string   `json:"activatedAt"`
-	UpgradeContribution   float64  `json:"upgradeContribution"`
-	QualifiedForNftLevels []int    `json:"qualifiedForNftLevels"`
-	ExpiresAt             *string  `json:"expiresAt,omitempty"`
-	CanBeConsumed         bool     `json:"canBeConsumed"`
-	ActivationType        string   `json:"activationType"`
+	Success               bool    `json:"success"`
+	BadgeID               int     `json:"badgeId"`
+	BadgeName             string  `json:"badgeName"`
+	ActivatedAt           string  `json:"activatedAt"`
+	UpgradeContribution   float64 `json:"upgradeContribution"`
+	QualifiedForNftLevels []int   `json:"qualifiedForNftLevels"`
+	ExpiresAt             *string `json:"expiresAt,omitempty"`
+	CanBeConsumed         bool    `json:"canBeConsumed"`
+	ActivationType        string  `json:"activationType"`
 }
 
 // GetBadgeListData represents complete badge list data

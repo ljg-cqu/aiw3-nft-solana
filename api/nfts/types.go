@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/aiw3/nft-solana-api/badges"
+	"github.com/aiw3/nft-solana-api/types"
 )
 
 // ==========================================
@@ -44,7 +45,7 @@ type OnChainNFTInfo struct {
 }
 
 type BadgesStats struct {
-	Owned     int `json:"owned" example:"5" description:"Number of badges currently owned by the user (not activated or consumed)" minimum:"0"`
+	Available int `json:"available" example:"5" description:"Number of badges available for activation (not yet activated or consumed)" minimum:"0"`
 	Activated int `json:"activated" example:"2" description:"Number of badges currently activated and available for NFT upgrade" minimum:"0"`
 	Consumed  int `json:"consumed" example:"1" description:"Number of badges that have been consumed for NFT upgrades" minimum:"0"`
 }
@@ -54,7 +55,7 @@ type Badge struct {
 	ID     int    `json:"id" example:"1" description:"Unique identifier for the badge"`
 	Name   string `json:"name" example:"Trading Master" description:"Display name of the badge" maxLength:"100"`
 	Url    string `json:"url" example:"https://ipfs.io/ipfs/QmBadge123456789" description:"URL for the badge image" format:"uri"`
-	Status string `json:"status" example:"activated" description:"Current status of the badge" enum:"[Owned,Activated,Consumed]"`
+	Status string `json:"status" example:"activated" description:"Current status of the badge" enum:"[Available,Activated,Consumed]"`
 }
 
 // BadgeStats represents badge-related statistics and data for an NFT level
@@ -62,7 +63,7 @@ type BadgeStats struct {
 	Required  int     `json:"badgesRequired" example:"2" description:"Number of badges required to be activated to unlock this NFT level" minimum:"0" enum:"[0,2,4,5,6]"`
 	Activated int     `json:"badgesActivated" example:"1" description:"Number of badges user has currently activated toward this level" minimum:"0"`
 	Progress  float64 `json:"badgesProgress" example:"50.0" description:"Progress toward meeting badge requirements as percentage (activatedBadges/requiredBadges * 100)" minimum:"0"`
-	Badges    []Badge `json:"badges" description:"Array of badges associated with this NFT level, showing their current status (owned/activated/consumed)"`
+	Badges    []Badge `json:"badges" description:"Array of badges associated with this NFT level, showing their current status (available/activated/consumed)"`
 }
 
 // TieredBenefitsStats represents benefits available for a tiered NFT level
@@ -91,12 +92,12 @@ type TieredNft struct {
 	Name           string     `json:"name" example:"On-chain Hunter" description:"Display name for this NFT tier (L1=Tech Chicken, L2=Quant Ape, L3=On-chain Hunter, L4=Alpha Alchemist, L5=Quantum Alchemist)" maxLength:"100"`
 	NftImgURL      string     `json:"nftImgUrl" example:"https://cdn.aiw3.com/nfts/tiered/on-chain-hunter-level3.jpg" description:"CDN URL for optimized NFT artwork image (for frontend display)" format:"uri"`
 	NftLevelImgURL string     `json:"nftLevelImgUrl" example:"https://cdn.aiw3.com/nfts/badges/level3-badge.png" description:"CDN URL for optimized level-specific badge/indicator image (for frontend display)" format:"uri"`
-	Status         string     `json:"status" example:"Active" description:"Current status of this NFT level for the user. Note: The top level of tiered NFT cannot be burned." enum:"[Locked,Unlockable,Active,Burned]"`
-	MintedAt       time.Time  `json:"mintedAt" example:"2024-01-15T23:59:59.000Z" description:"Timestamp when NFT was minted on blockchain" format:"date-time"`
+	Status         string     `json:"status" example:"Active" description:"Current status of this NFT level for the user. Locked=not eligible, Unlockable=eligible but not minted, Active=minted and usable, Burned=minted but burned for upgrade (L1-L4 only)" enum:"[Locked,Unlockable,Active,Burned]"`
+	MintedAt       *time.Time `json:"mintedAt,omitempty" example:"2024-01-15T23:59:59.000Z" description:"Timestamp when NFT was minted on blockchain. Only present when status is 'Active' or 'Burned'" format:"date-time"`
 	BurnedAt       *time.Time `json:"burnedAt,omitempty" example:"2024-02-20T14:30:00.000Z" description:"Timestamp when NFT was burned for upgrade to higher level. Only present when status is 'Burned'. Note: Level 5 (highest level) NFTs cannot be burned" format:"date-time"`
 
-	// On-chain NFT Information (only present when NFT is minted/active)
-	OnChainInfo *OnChainNFTInfo `json:"onChainInfo,omitempty" description:"On-chain NFT information including Solana addresses and IPFS storage details. Only present when NFT is minted and active."`
+	// On-chain NFT Information (only present when NFT is minted)
+	OnChainInfo *OnChainNFTInfo `json:"onChainInfo,omitempty" description:"On-chain NFT information including Solana addresses and IPFS storage details. Only present when NFT has been minted (status: 'Active' or 'Burned')"`
 
 	TradingVolumeThreshold int     `json:"tradingVolumeThreshold" example:"1000000" description:"Trading volume threshold to unlock this level in USDT" minimum:"0"`
 	TradingVolumeCurrent   int     `json:"tradingVolumeCurrent" example:"1050000" description:"User's current trading volume in USDT" minimum:"0"`
@@ -263,11 +264,11 @@ type GetNftAvatarsResponse struct {
 
 // GetNftAvatarsData represents NFT avatars data
 type GetNftAvatarsData struct {
-	CurrentProfilePhoto string      `json:"currentProfilePhoto"`
-	NftAvatars          []NftAvatar `json:"nftAvatars"`
-	TotalAvailable      int         `json:"totalAvailable"`
-	AvailableAvatars    []NftAvatar `json:"availableAvatars"`
-	TotalCount          int         `json:"totalCount"`
+	CurrentProfilePhoto string            `json:"currentProfilePhoto"`
+	NftAvatars          []types.NftAvatar `json:"nftAvatars"`
+	TotalAvailable      int               `json:"totalAvailable"`
+	AvailableAvatars    []types.NftAvatar `json:"availableAvatars"`
+	TotalCount          int               `json:"totalCount"`
 }
 
 // ClaimNftResponse represents wrapped NFT claim Response
@@ -449,7 +450,7 @@ type GetUserNftPortfolioResponse struct {
 
 // GetUserNftPortfolioData represents NFT portfolio data
 type GetUserNftPortfolioData struct {
-	NftPortfolio NftPortfolio          `json:"nftPortfolio"`
+	NftPortfolio types.NftPortfolio    `json:"nftPortfolio"`
 	Stats        NftPortfolioStatsData `json:"stats"`
 }
 

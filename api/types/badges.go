@@ -14,11 +14,11 @@ type Badge struct {
 	TaskID               int                    `json:"taskId" example:"101" description:"Associated task identifier for earning this badge"`
 	TaskName             string                 `json:"taskName" example:"Contract Tutorial" description:"Name of the task required to earn this badge" maxLength:"100"`
 	ContributionValue    float64                `json:"contributionValue" example:"1.5" description:"Points this badge contributes toward NFT upgrades" minimum:"0"`
-	Status               string                 `json:"status" example:"owned" description:"Current status of this badge for the user" enum:"[not_earned,owned,activated,consumed]"`
+	Status               string                 `json:"status" example:"available" description:"Current status of this badge for the user" enum:"[not_earned,available,activated,consumed]"`
 	EarnedAt             *string                `json:"earnedAt,omitempty" example:"2024-01-10T08:30:00.000Z" description:"ISO timestamp when badge was earned (null if not earned)" format:"date-time"`
 	ActivatedAt          *string                `json:"activatedAt,omitempty" example:"2024-01-12T10:15:00.000Z" description:"ISO timestamp when badge was activated (null if not activated)" format:"date-time"`
 	ConsumedAt           *string                `json:"consumedAt,omitempty" example:"2024-01-20T16:30:00.000Z" description:"ISO timestamp when badge was consumed for upgrade (null if not consumed)" format:"date-time"`
-	CanActivate          bool                   `json:"canActivate" example:"true" description:"Whether user can currently activate this badge (only for owned badges)"`
+	CanActivate          bool                   `json:"canActivate" example:"true" description:"Whether user can currently activate this badge (only for available badges)"`
 	IsRequiredForUpgrade bool                   `json:"isRequiredForUpgrade" example:"false" description:"Whether this badge is required for the next NFT level upgrade"`
 	Requirements         map[string]interface{} `json:"requirements" description:"Map of requirements to earn this badge" example:"{\"completeTutorial\":true,\"minimumScore\":80}"`
 	TaskProgress         int                    `json:"taskProgress" example:"100" description:"Current progress on the associated task (0-100)" minimum:"0" maximum:"100"`
@@ -28,7 +28,7 @@ type Badge struct {
 // BadgeStats represents badge statistics
 type BadgeStats struct {
 	TotalBadges             int                       `json:"totalBadges" example:"5" description:"Total number of badges available to user" minimum:"0"`
-	OwnedBadges             int                       `json:"ownedBadges" example:"2" description:"Number of badges user has earned but not activated" minimum:"0"`
+	AvailableBadges         int                       `json:"availableBadges" example:"2" description:"Number of badges user has earned but not activated" minimum:"0"`
 	ActivatedBadges         int                       `json:"activatedBadges" example:"1" description:"Number of badges user has activated" minimum:"0"`
 	ConsumedBadges          int                       `json:"consumedBadges" example:"1" description:"Number of badges consumed for NFT upgrades" minimum:"0"`
 	TotalContributionValue  float64                   `json:"totalContributionValue" example:"1.0" description:"Total points from activated badges towards upgrades" minimum:"0"`
