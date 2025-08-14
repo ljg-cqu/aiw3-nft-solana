@@ -10,6 +10,7 @@ import (
 // NFT CORE TYPES
 // ==========================================
 type UserBasicInfo struct {
+	ID           int64  `json:"id" example:"12345" description:"Internal user ID for fast database operations" minimum:"1"`
 	WalletAddr   string `json:"walletAddr" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"User's Solana wallet address (base58 encoded, 32-44 characters)" minLength:"32" maxLength:"44" pattern:"^[1-9A-HJ-NP-Za-km-z]{32,44}$"`
 	NftAvatarURL string `json:"nftAvatarURL" example:"https://cdn.example.com/nfts/quantum-alchemist.jpg" description:"NFT-based avatar image URL (may be same as avatarUri)" format:"uri"`
 }
@@ -38,8 +39,8 @@ type OnChainNFTInfo struct {
 	MintTransaction string `json:"mintTransaction,omitempty" example:"5XzYwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM123456789" description:"Solana transaction signature for the NFT minting transaction (base58 encoded)" minLength:"64" maxLength:"88"`
 
 	// On-chain Metadata (cached from blockchain)
-	Name   string `json:"name" example:"AIW3 Quantum Alchemist #1234" description:"NFT name stored on-chain" maxLength:"32"`
-	Symbol string `json:"symbol" example:"AIW3" description:"NFT symbol/collection identifier stored on-chain" maxLength:"10"`
+	Name   string `json:"name" example:"AIW3-L3-Hunter-#1234" description:"NFT name stored on-chain. Tiered NFTs: AIW3-L{1-5}-{Name}-#{Number} with separate numbering per level. Competition NFTs: AIW3-C-{Name}-#{Number}. Level names: L1=Chicken, L2=Ape, L3=Hunter, L4=Alpha, L5=Quantum. Competition names: C=Trophy (Trophy Breeder)" maxLength:"32"`
+	Symbol string `json:"symbol" example:"AIW3" description:"Unified NFT collection symbol for all AIW3 NFTs (tiered and competition)" maxLength:"10"`
 }
 
 type BadgesStats struct {
@@ -87,7 +88,7 @@ type AiAgentBenefit struct {
 type TieredNft struct {
 	ID             int        `json:"id" example:"3" description:"Unique identifier for this NFT level"`
 	Level          int        `json:"level" example:"3" description:"NFT tier level (1-5), higher levels provide better benefits" minimum:"1" maximum:"5"`
-	Name           string     `json:"name" example:"On-chain Hunter" description:"Display name for this NFT tier" maxLength:"100"`
+	Name           string     `json:"name" example:"On-chain Hunter" description:"Display name for this NFT tier (L1=Tech Chicken, L2=Quant Ape, L3=On-chain Hunter, L4=Alpha Alchemist, L5=Quantum Alchemist)" maxLength:"100"`
 	NftImgURL      string     `json:"nftImgUrl" example:"https://cdn.aiw3.com/nfts/tiered/on-chain-hunter-level3.jpg" description:"CDN URL for optimized NFT artwork image (for frontend display)" format:"uri"`
 	NftLevelImgURL string     `json:"nftLevelImgUrl" example:"https://cdn.aiw3.com/nfts/badges/level3-badge.png" description:"CDN URL for optimized level-specific badge/indicator image (for frontend display)" format:"uri"`
 	Status         string     `json:"status" example:"Active" description:"Current status of this NFT level for the user. Note: The top level of tiered NFT cannot be burned." enum:"[Locked,Unlockable,Active,Burned]"`
@@ -158,7 +159,7 @@ type ActiveTieredBenefits struct {
 type ActiveCompetitionBenefits struct {
 	BenefitsActivation
 
-	FromNftId           string `json:"fromNftId" example:"comp_001" description:"Competition NFT ID providing these benefits"`
+	FromNftId           int64  `json:"fromNftId" example:"1" description:"Competition NFT ID providing these benefits"`
 	FromCompetitionName string `json:"fromCompetitionName" example:"Q4 2024 Trading Championship" description:"Name of competition this NFT is from"`
 
 	// Always available benefits (when activated)
@@ -175,7 +176,7 @@ type ActiveCompetitionBenefits struct {
 
 // CompetitionInfo represents competition-related information
 type CompetitionInfo struct {
-	ID   string `json:"competitionId" example:"trading_contest_2024-01-15" description:"ID of the competition this NFT was earned from" maxLength:"255"`
+	ID   int64  `json:"competitionId" example:"1" description:"ID of the competition this NFT was earned from"`
 	Name string `json:"competitionName" example:"Q4 2024 Trading Championship" description:"Display name of the competition" maxLength:"255"`
 	Type string `json:"competitionType" example:"trading_contest" description:"Type of competition (trading_contest, community_event, etc.)" maxLength:"100"`
 	Rank int    `json:"rank" example:"1" description:"Rank achieved in the competition (1-3 for NFT winners)" minimum:"1" maximum:"3"`
@@ -183,8 +184,8 @@ type CompetitionInfo struct {
 
 // CompetitionNft represents individual competition NFT
 type CompetitionNft struct {
-	ID        string    `json:"id" example:"comp_001" description:"Unique identifier for this competition NFT instance"`
-	Name      string    `json:"name" example:"Trophy Breeder" description:"Display name for this competition NFT" maxLength:"100"`
+	ID        int64     `json:"id" example:"1" description:"Unique identifier for this competition NFT instance"`
+	Name      string    `json:"name" example:"Trophy Breeder" description:"Display name for this competition NFT (Trophy Breeder, etc.)" maxLength:"100"`
 	NftImgURL string    `json:"nftImgUrl" example:"https://cdn.aiw3.com/nfts/competition/trophy-breeder-001.jpg" description:"CDN URL for optimized competition NFT artwork (for frontend display)" format:"uri"`
 	MintedAt  time.Time `json:"mintedAt" example:"2024-01-15T23:59:59.000Z" description:"Timestamp when NFT was minted on blockchain" format:"date-time"`
 
