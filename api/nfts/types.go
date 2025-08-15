@@ -40,7 +40,7 @@ type OnChainNFTInfo struct {
 type Badge struct {
 	ID     int    `json:"id" example:"1" description:"Unique identifier for the badge"`
 	Name   string `json:"name" example:"Trading Master" description:"Display name of the badge" maxLength:"100"`
-	Url    string `json:"url" example:"https://ipfs.io/ipfs/QmBadge123456789" description:"URL for the badge image" format:"uri"`
+	Url    string `json:"url" example:"https://cdn.aiw3.com/badges/trading-master.png" description:"CDN URL for the badge image (for frontend display)" format:"uri"`
 	Status string `json:"status" example:"activated" description:"Current status of the badge" enum:"[Available,Activated,Consumed]"`
 }
 
@@ -122,44 +122,6 @@ type CompetitionBenefitsStats struct {
 
 	// Competition-specific benefits (grouped for frontend clarity)
 	ExtraBenefits ExtraCompetitionNFTBenefitItems `json:"extraBenefits" description:"Competition-specific benefits available for this NFT"`
-}
-
-// ActiveBenefitsSummary represents all currently activated benefits across all user's NFTs
-type ActiveBenefitsSummary struct {
-	MaxTradingFeeReduction int `json:"maxFeeReduction" example:"25" description:"Maximum transaction fee reduction percentage available to the user from all owned NFTs" minimum:"0" maximum:"100" enum:"[10,20,25,30,40,55]"`
-
-	// From Tiered NFTs (active NFT level)
-	TieredBenefits *ActiveTieredBenefits `json:"tieredBenefits,omitempty" description:"Currently active benefits from user's active tiered NFT level. Null if no active tiered NFT"`
-
-	// From Competition NFTs (all owned competition NFTs)
-	CompetitionBenefits *ActiveCompetitionBenefits `json:"competitionBenefits" description:"Currently active benefits from all owned competition NFTs"`
-}
-
-// ActiveTieredBenefits represents currently activated benefits from the user's active tiered NFT
-type ActiveTieredBenefits struct {
-	BenefitsActivation
-
-	FromNftId int `json:"fromNftId" example:"3" description:"Tiered NFT ID providing these benefits"`
-
-	// Always available benefits
-	TradingFeeReduction int `json:"tradingFeeReduction" example:"25" description:"Active trading fee reduction percentage" minimum:"0" maximum:"100"`
-
-	// Conditionally available benefits (grouped for frontend clarity)
-	ExtraBenefits ExtraTieredNFTBenefitItems `json:"extraBenefits" description:"Level-specific benefits currently active from this tiered NFT"`
-}
-
-// ActiveCompetitionBenefits represents currently activated benefits from a competition NFT
-type ActiveCompetitionBenefits struct {
-	BenefitsActivation
-
-	FromNftId           int64  `json:"fromNftId" example:"1" description:"Competition NFT ID providing these benefits"`
-	FromCompetitionName string `json:"fromCompetitionName" example:"Q4 2024 Trading Championship" description:"Name of competition this NFT is from"`
-
-	// Always available benefits (when activated)
-	TradingFeeReduction int `json:"tradingFeeReduction" example:"25" description:"Active trading fee reduction percentage from competition NFT" minimum:"0" maximum:"100"`
-
-	// Competition-specific benefits (grouped for frontend clarity)
-	ExtraBenefits ActiveExtraCompetitionNFTBenefitItems `json:"extraBenefits" description:"Competition-specific benefits currently active from this NFT"`
 }
 
 // CompetitionInfo represents competition-related information
