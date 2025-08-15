@@ -84,11 +84,11 @@ type ActiveExtraCompetitionNFTBenefitItems struct {
 
 // TieredNft represents NFT level information
 type TieredNft struct {
-	ID             int        `json:"id" example:"3" description:"Unique identifier for this NFT level"`
+	ID             *int       `json:"id,omitempty" example:"3" description:"Unique database identifier for this NFT instance. Only present when NFT has been minted (status: 'Active' or 'Burned')"`
 	Level          int        `json:"level" example:"3" description:"NFT tier level (1-5), higher levels provide better benefits" minimum:"1" maximum:"5"`
 	Name           string     `json:"name" example:"On-chain Hunter" description:"Display name for this NFT tier (L1=Tech Chicken, L2=Quant Ape, L3=On-chain Hunter, L4=Alpha Alchemist, L5=Quantum Alchemist)" maxLength:"100"`
-	NftImgURL      string     `json:"nftImgUrl" example:"https://cdn.aiw3.com/nfts/tiered/on-chain-hunter-level3.jpg" description:"CDN URL for optimized NFT artwork image (for frontend display)" format:"uri"`
-	NftLevelImgURL string     `json:"nftLevelImgUrl" example:"https://cdn.aiw3.com/nfts/badges/level3-badge.png" description:"CDN URL for optimized level-specific badge/indicator image (for frontend display)" format:"uri"`
+	NftImgURL      *string    `json:"nftImgUrl,omitempty" example:"https://cdn.aiw3.com/nfts/tiered/on-chain-hunter-level3.jpg" description:"CDN URL for optimized NFT artwork image (for frontend display). Only present for owned/previously owned NFT levels" format:"uri"`
+	NftLevelImgURL *string    `json:"nftLevelImgUrl,omitempty" example:"https://cdn.aiw3.com/nfts/badges/level3-badge.png" description:"CDN URL for optimized level-specific badge/indicator image (for frontend display). Only present for owned/previously owned NFT levels" format:"uri"`
 	Status         string     `json:"status" example:"Active" description:"Current status of this NFT level for the user. Locked=not eligible, Unlockable=eligible but not minted, Active=minted and usable, Burned=minted but burned for upgrade (L1-L4 only)" enum:"[Locked,Unlockable,Active,Burned]"`
 	MintedAt       *time.Time `json:"mintedAt,omitempty" example:"2024-01-15T23:59:59.000Z" description:"Timestamp when NFT was minted on blockchain. Only present when status is 'Active' or 'Burned'" format:"date-time"`
 	BurnedAt       *time.Time `json:"burnedAt,omitempty" example:"2024-02-20T14:30:00.000Z" description:"Timestamp when NFT was burned for upgrade to higher level. Only present when status is 'Burned'. Note: Level 5 (highest level) NFTs cannot be burned" format:"date-time"`
@@ -96,19 +96,19 @@ type TieredNft struct {
 	// On-chain NFT Information (only present when NFT is minted)
 	OnChainInfo *OnChainNFTInfo `json:"onChainInfo,omitempty" description:"On-chain NFT information including Solana addresses and IPFS storage details. Only present when NFT has been minted (status: 'Active' or 'Burned')"`
 
-	// Trading Volume Requirements
-	TradingVolumeThreshold int     `json:"tradingVolumeThreshold" example:"1000000" description:"Trading volume threshold to unlock this level in USDT" minimum:"0"`
-	TradingVolumeQualified int     `json:"tradingVolumeQualified" example:"1050000" description:"User's current trading volume that qualified/qualifies for this level in USDT" minimum:"0"`
-	TradingVolumeProgress  float64 `json:"tradingVolumeProgress" example:"105.0" description:"Progress towards meeting the trading volume threshold as percentage (TradingVolumeQualified/TradingVolumeThreshold * 100)" minimum:"0"`
+	// Trading Volume Requirements (only present for owned/previously owned levels)
+	TradingVolumeThreshold *int     `json:"tradingVolumeThreshold,omitempty" example:"1000000" description:"Trading volume threshold to unlock this level in USDT. Only present for owned/previously owned NFT levels" minimum:"0"`
+	TradingVolumeQualified *int     `json:"tradingVolumeQualified,omitempty" example:"1050000" description:"User's current trading volume that qualified/qualifies for this level in USDT. Only present for owned/previously owned NFT levels" minimum:"0"`
+	TradingVolumeProgress  *float64 `json:"tradingVolumeProgress,omitempty" example:"105.0" description:"Progress towards meeting the trading volume threshold as percentage. Only present for owned/previously owned NFT levels" minimum:"0"`
 
-	// Badge Requirements
-	ActivatedBadgesRequired int     `json:"activatedBadgesRequired" example:"2" description:"Number of badges required to be activated to unlock this NFT level" minimum:"0" enum:"[0,2,4,5,6]"`
-	ActivatedBadgesCurrent  int     `json:"activatedBadgesCurrent" example:"1" description:"Number of badges user has currently activated toward this level" minimum:"0"`
-	ActivatedBadgesProgress float64 `json:"activatedBadgesProgress" example:"50.0" description:"Progress toward meeting badge requirements as percentage (activatedBadgesCurrent/activatedBadgesRequired * 100)" minimum:"0"`
+	// Badge Requirements (only present for owned/previously owned levels)
+	ActivatedBadgesRequired *int     `json:"activatedBadgesRequired,omitempty" example:"2" description:"Number of badges required to be activated to unlock this NFT level. Only present for owned/previously owned NFT levels" minimum:"0" enum:"[0,2,4,5,6]"`
+	ActivatedBadgesCurrent  *int     `json:"activatedBadgesCurrent,omitempty" example:"1" description:"Number of badges user has currently activated toward this level. Only present for owned/previously owned NFT levels" minimum:"0"`
+	ActivatedBadgesProgress *float64 `json:"activatedBadgesProgress,omitempty" example:"50.0" description:"Progress toward meeting badge requirements as percentage. Only present for owned/previously owned NFT levels" minimum:"0"`
 
-	Badges []Badge `json:"badges" description:"Array of badges associated with this NFT level, showing their current status (available/activated/consumed)"`
+	Badges []Badge `json:"badges" description:"Array of badges associated with this NFT level, showing their current status (available/activated/consumed). Always present for badge management across all levels"`
 
-	BenefitsStats TieredBenefitsStats `json:"benefitsStats" description:"Benefits-related statistics and data for this NFT level"`
+	BenefitsStats *TieredBenefitsStats `json:"benefitsStats,omitempty" description:"Benefits-related statistics and data for this NFT level. Only present for owned/previously owned NFT levels"`
 }
 
 // CompetitionBenefitsStats represents benefits available for competition NFTs
