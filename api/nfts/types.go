@@ -36,12 +36,6 @@ type OnChainNFTInfo struct {
 	Symbol string `json:"symbol" example:"AIW3" description:"Unified NFT collection symbol for all AIW3 NFTs (tiered and competition)" maxLength:"10"`
 }
 
-type BadgesStats struct {
-	Available int `json:"available" example:"5" description:"Number of badges available for activation (not yet activated or consumed)" minimum:"0"`
-	Activated int `json:"activated" example:"2" description:"Number of badges currently activated and available for NFT upgrade" minimum:"0"`
-	Consumed  int `json:"consumed" example:"1" description:"Number of badges that have been consumed for NFT upgrades" minimum:"0"`
-}
-
 // Badge represents a badge with its status
 type Badge struct {
 	ID     int    `json:"id" example:"1" description:"Unique identifier for the badge"`
