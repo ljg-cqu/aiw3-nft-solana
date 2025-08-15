@@ -72,16 +72,35 @@ type TieredBenefitsStats struct {
 	// Common benefits (available at multiple levels)
 	TradingFeeReduction int `json:"tradingFeeReduction" example:"25" description:"Trading fee reduction percentage for each NFT level" minimum:"0" maximum:"100" enum:"[10,20,30,40,55]"`
 
-	// Level-specific benefits (only available at certain levels)
+	// Level-specific benefits (grouped for frontend clarity)
+	ExtraBenefits ExtraTieredNFTBenefitItems `json:"extraBenefits" description:"Level-specific benefits available for this tiered NFT"`
+}
+
+type AiAgentBenefit struct {
+	WeeklyTotalAvailable int `json:"weeklyTotalAvailable" example:"30" description:"Total AI agent uses available per week for this NFT level" minimum:"0"`
+	WeeklyUsed           int `json:"weeklyUsed" example:"5" description:"Number of AI agent uses already consumed this week" minimum:"0"`
+}
+
+// ==========================================
+// BENEFIT ITEM STRUCTS (ENCAPSULATED)
+// ==========================================
+
+// ExtraTieredNFTBenefitItems encapsulates level-specific benefits for tiered NFTs
+type ExtraTieredNFTBenefitItems struct {
 	AiAgent                *AiAgentBenefit `json:"aiAgent,omitempty" description:"AI agent usage benefit with weekly usage tracking. Only present if this NFT level includes AI agent access"`
 	ExclusiveBackground    *bool           `json:"exclusiveBackground,omitempty" description:"Exclusive background benefit. true=available at this level, false=not available. Only present if this NFT level includes background access"`
 	StrategyRecommendation *bool           `json:"strategyRecommendation,omitempty" description:"Strategy recommendation service benefit. true=available at this level, false=not available. Only present if this NFT level includes strategy recommendations"`
 	StrategyPriority       *bool           `json:"strategyPriority,omitempty" description:"Strategy priority support benefit. true=available at this level, false=not available. Only present if this NFT level includes priority support"`
 }
 
-type AiAgentBenefit struct {
-	WeeklyTotalAvailable int `json:"weeklyTotalAvailable" example:"30" description:"Total AI agent uses available per week for this NFT level" minimum:"0"`
-	WeeklyUsed           int `json:"weeklyUsed" example:"5" description:"Number of AI agent uses already consumed this week" minimum:"0"`
+// ExtraCompetitionNFTBenefitItems encapsulates competition-specific benefits for competition NFTs
+type ExtraCompetitionNFTBenefitItems struct {
+	CommunityTopPin bool `json:"communityTopPin" description:"Community top pin benefit. Always available for competition NFTs"`
+}
+
+// ActiveExtraCompetitionNFTBenefitItems encapsulates active competition-specific benefits (with pointer types for optional activation)
+type ActiveExtraCompetitionNFTBenefitItems struct {
+	CommunityTopPin *bool `json:"communityTopPin,omitempty" description:"Community top pin benefit if activated"`
 }
 
 // TieredNft represents NFT level information
@@ -114,8 +133,8 @@ type CompetitionBenefitsStats struct {
 	// Common benefits (available for competition NFTs)
 	TradingFeeReduction int `json:"tradingFeeReduction" example:"25" description:"Trading fee reduction percentage for competition NFTs. Always 25% for competition NFTs" minimum:"0" maximum:"100" enum:"[25]"`
 
-	// Competition-specific benefits (always available for competition NFTs)
-	CommunityTopPin bool `json:"communityTopPin" example:"true" description:"Community top pin benefit. Always available for competition NFTs"`
+	// Competition-specific benefits (grouped for frontend clarity)
+	ExtraBenefits ExtraCompetitionNFTBenefitItems `json:"extraBenefits" description:"Competition-specific benefits available for this NFT"`
 }
 
 // ActiveBenefitsSummary represents all currently activated benefits across all user's NFTs
@@ -138,11 +157,8 @@ type ActiveTieredBenefits struct {
 	// Always available benefits
 	TradingFeeReduction int `json:"tradingFeeReduction" example:"25" description:"Active trading fee reduction percentage" minimum:"0" maximum:"100"`
 
-	// Conditionally available benefits (only if activated)
-	AiAgent                *AiAgentBenefit `json:"aiAgent,omitempty" description:"AI agent benefit if available and activated at this level"`
-	ExclusiveBackground    *bool           `json:"exclusiveBackground,omitempty" description:"Exclusive background access if available and activated at this level"`
-	StrategyRecommendation *bool           `json:"strategyRecommendation,omitempty" description:"Strategy recommendation access if available and activated at this level"`
-	StrategyPriority       *bool           `json:"strategyPriority,omitempty" description:"Strategy priority support if available and activated at this level"`
+	// Conditionally available benefits (grouped for frontend clarity)
+	ExtraBenefits ExtraTieredNFTBenefitItems `json:"extraBenefits" description:"Level-specific benefits currently active from this tiered NFT"`
 }
 
 // ActiveCompetitionBenefits represents currently activated benefits from a competition NFT
@@ -155,8 +171,8 @@ type ActiveCompetitionBenefits struct {
 	// Always available benefits (when activated)
 	TradingFeeReduction int `json:"tradingFeeReduction" example:"25" description:"Active trading fee reduction percentage from competition NFT" minimum:"0" maximum:"100"`
 
-	// Competition-specific benefits (only if activated)
-	CommunityTopPin *bool `json:"communityTopPin,omitempty" description:"Community top pin benefit if activated"`
+	// Competition-specific benefits (grouped for frontend clarity)
+	ExtraBenefits ActiveExtraCompetitionNFTBenefitItems `json:"extraBenefits" description:"Competition-specific benefits currently active from this NFT"`
 }
 
 // CompetitionInfo represents competition-related information
