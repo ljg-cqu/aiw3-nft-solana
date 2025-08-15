@@ -31,13 +31,6 @@ type OnChainNFTInfo struct {
 	MetadataURI string `json:"metadataUri" example:"https://ipfs.io/ipfs/QmNftMetadata123456789abcdef" description:"IPFS URI pointing to the NFT metadata JSON file" format:"uri"`
 	ImageURI    string `json:"imageUri" example:"https://ipfs.io/ipfs/QmNftImage987654321fedcba" description:"IPFS URI pointing to the NFT image file" format:"uri"`
 
-	// Optional IPFS Hashes (for direct IPFS access)
-	MetadataIPFSHash string `json:"metadataIpfsHash,omitempty" example:"QmNftMetadata123456789abcdef" description:"IPFS hash for the metadata JSON file (without ipfs:// prefix)" pattern:"^Qm[1-9A-HJ-NP-Za-km-z]{44}$"`
-	ImageIPFSHash    string `json:"imageIpfsHash,omitempty" example:"QmNftImage987654321fedcba" description:"IPFS hash for the image file (without ipfs:// prefix)" pattern:"^Qm[1-9A-HJ-NP-Za-km-z]{44}$"`
-
-	// Blockchain Transaction Info
-	MintTransaction string `json:"mintTransaction,omitempty" example:"5XzYwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM123456789" description:"Solana transaction signature for the NFT minting transaction (base58 encoded)" minLength:"64" maxLength:"88"`
-
 	// On-chain Metadata (cached from blockchain)
 	Name   string `json:"name" example:"AIW3-L3-Hunter-#1234" description:"NFT name stored on-chain. Tiered NFTs: AIW3-L{1-5}-{Name}-#{Number} with separate numbering per level. Competition NFTs: AIW3-C-{Name}-#{Number}. Level names: L1=Chicken, L2=Ape, L3=Hunter, L4=Alpha, L5=Quantum. Competition names: C=Trophy (Trophy Breeder)" maxLength:"32"`
 	Symbol string `json:"symbol" example:"AIW3" description:"Unified NFT collection symbol for all AIW3 NFTs (tiered and competition)" maxLength:"10"`
@@ -118,8 +111,8 @@ type TieredNft struct {
 	OnChainInfo *OnChainNFTInfo `json:"onChainInfo,omitempty" description:"On-chain NFT information including Solana addresses and IPFS storage details. Only present when NFT has been minted (status: 'Active' or 'Burned')"`
 
 	TradingVolumeThreshold int     `json:"tradingVolumeThreshold" example:"1000000" description:"Trading volume threshold to unlock this level in USDT" minimum:"0"`
-	TradingVolumeCurrent   int     `json:"tradingVolumeCurrent" example:"1050000" description:"User's current trading volume in USDT" minimum:"0"`
-	ThresholdProgress      float64 `json:"thresholdProgress" example:"105.7" description:"Progress towards meeting the trading volume threshold as percentage (TradingVolumeCurrent/TradingVolumeThreshold * 100)" minimum:"0"`
+	TradingVolumeQualified int     `json:"tradingVolumeQualified" example:"1050000" description:"Trading volume that qualified/qualifies for this level in USDT." minimum:"0"`
+	ThresholdProgress      float64 `json:"thresholdProgress" example:"105.7" description:"Progress towards meeting the trading volume threshold as percentage (TradingVolumeQualified/TradingVolumeThreshold * 100)" minimum:"0"`
 
 	BadgeStats BadgeStats `json:"badgeStats" description:"Badge-related statistics and data for this NFT level"`
 

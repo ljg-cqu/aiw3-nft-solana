@@ -26,9 +26,8 @@ type GetUserNftInfoData struct {
 	// Fee Saved Information - Basic fee savings info (for detailed analytics, use dedicated endpoint)
 	FeeSavedInfo FeeSavedBasicInfo `json:"feeSavedInfo" description:"Basic fee savings information showing total saved and platform breakdown"`
 
-	TradingVolumeCurrent int  `json:"tradingVolumeCurrent" example:"1050000" description:"User's current trading volume in USDT" minimum:"0"`
-	ActiveNftLevel       int  `json:"activeNftLevel" example:"3" description:"Level of currently active NFT (1-5), 0 if no active NFT" minimum:"0" maximum:"5"`
-	NextNftLevel         *int `json:"nextNftLevel,omitempty" example:"4" description:"Target level for the next upgrade; null if not applicable (e.g., current level is 5 )" minimum:"1" maximum:"5"`
+	ActiveNftLevel int  `json:"activeNftLevel" example:"3" description:"Level of currently active NFT (1-5), 0 if no active NFT" minimum:"0" maximum:"5"`
+	NextNftLevel   *int `json:"nextNftLevel,omitempty" example:"4" description:"Target level for the next upgrade; null if not applicable (e.g., current level is 5 )" minimum:"1" maximum:"5"`
 
 	// NFT Upgrade Information
 	UpgradeEligible bool `json:"upgradeEligible" example:"true" description:"Whether user can upgrade to the next NFT level (business requirements met: trading volume threshold and required activated badges)"`
@@ -38,7 +37,17 @@ type GetUserNftInfoData struct {
 func GetUserNftInfo() usecase.Interactor {
 	u := usecase.NewInteractor(func(ctx context.Context, req GetUserNftInfoRequest, resp *GetUserNftInfoResponse) error {
 		// TODO: Implement user extraction and NFT info logic
-		*resp = GetUserNftInfoResponse{}
+		*resp = GetUserNftInfoResponse{
+			Code:    200,
+			Message: "Success",
+			Data: GetUserNftInfoData{
+				TieredNfts:      []TieredNft{},      // Empty array instead of nil
+				CompetitionNfts: []CompetitionNft{}, // Empty array instead of nil
+				ActiveNftLevel:  0,
+				UpgradeEligible: false,
+				PendingUpgrade:  false,
+			},
+		}
 		return nil
 	})
 
