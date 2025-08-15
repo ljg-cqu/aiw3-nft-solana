@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/aiw3/nft-solana-api/badges"
-	"github.com/aiw3/nft-solana-api/types"
 )
 
 // ==========================================
@@ -17,8 +16,8 @@ type UserBasicInfo struct {
 }
 
 type BenefitsActivation struct {
-	Activated   bool       `json:"benefitsActivated" example:"true" description:"Whether the benefits are currently activated by the user. Note: Activation only affects the use of benefits, won't affect NFT upgrade eligibility"`
-	ActivatedAt *time.Time `json:"benefitsActivatedAt,omitempty" example:"2024-02-15T10:30:00.000Z" description:"Timestamp when benefits were activated; null if not activated" format:"date-time"`
+	Activated bool `json:"benefitsActivated" example:"true" description:"Whether the benefits are currently activated by the user. Note: Activation only affects the use of benefits, won't affect NFT upgrade eligibility"`
+	// ActivatedAt *time.Time `json:"benefitsActivatedAt,omitempty" example:"2024-02-15T10:30:00.000Z" description:"Timestamp when benefits were activated; null if not activated" format:"date-time"`
 }
 
 // OnChainNFTInfo represents essential on-chain NFT information for Solana blockchain with IPFS storage
@@ -267,315 +266,315 @@ type NftBurnRequirement struct {
 	BurnTransactionRequired bool `json:"burnTransactionRequired" example:"true" description:"Whether a blockchain burn transaction is required"`
 }
 
-// ==========================================
-// NFT RESPONSE TYPES
-// ==========================================
+// // ==========================================
+// // NFT RESPONSE TYPES
+// // ==========================================
 
-// GetUserNftAvatarsResponse represents wrapped NFT avatars Response
-type GetUserNftAvatarsResponse struct {
-	Code    int               `json:"code"`
-	Message string            `json:"message"`
-	Data    GetNftAvatarsData `json:"data"`
-}
+// // GetUserNftAvatarsResponse represents wrapped NFT avatars Response
+// type GetUserNftAvatarsResponse struct {
+// 	Code    int               `json:"code"`
+// 	Message string            `json:"message"`
+// 	Data    GetNftAvatarsData `json:"data"`
+// }
 
-// GetNftAvatarsResponse represents wrapped NFT avatars Response
-type GetNftAvatarsResponse struct {
-	Code    int               `json:"code"`
-	Message string            `json:"message"`
-	Data    GetNftAvatarsData `json:"data"`
-}
+// // GetNftAvatarsResponse represents wrapped NFT avatars Response
+// type GetNftAvatarsResponse struct {
+// 	Code    int               `json:"code"`
+// 	Message string            `json:"message"`
+// 	Data    GetNftAvatarsData `json:"data"`
+// }
 
-// GetNftAvatarsData represents NFT avatars data
-type GetNftAvatarsData struct {
-	CurrentProfilePhoto string            `json:"currentProfilePhoto"`
-	NftAvatars          []types.NftAvatar `json:"nftAvatars"`
-	TotalAvailable      int               `json:"totalAvailable"`
-	AvailableAvatars    []types.NftAvatar `json:"availableAvatars"`
-	TotalCount          int               `json:"totalCount"`
-}
+// // GetNftAvatarsData represents NFT avatars data
+// type GetNftAvatarsData struct {
+// 	CurrentProfilePhoto string            `json:"currentProfilePhoto"`
+// 	NftAvatars          []types.NftAvatar `json:"nftAvatars"`
+// 	TotalAvailable      int               `json:"totalAvailable"`
+// 	AvailableAvatars    []types.NftAvatar `json:"availableAvatars"`
+// 	TotalCount          int               `json:"totalCount"`
+// }
 
-// ClaimNftResponse represents wrapped NFT claim Response
-type ClaimNftResponse struct {
-	Code    int          `json:"code"`
-	Message string       `json:"message"`
-	Data    ClaimNftData `json:"data"`
-}
+// // ClaimNftResponse represents wrapped NFT claim Response
+// type ClaimNftResponse struct {
+// 	Code    int          `json:"code"`
+// 	Message string       `json:"message"`
+// 	Data    ClaimNftData `json:"data"`
+// }
 
-// ClaimNftData represents NFT claim data
-type ClaimNftData struct {
-	Success       bool   `json:"success"`
-	TransactionID string `json:"transactionId"`
-	NftLevel      int    `json:"nftLevel"`
-	MintAddress   string `json:"mintAddress"`
-	ClaimedAt     string `json:"claimedAt"`
-}
+// // ClaimNftData represents NFT claim data
+// type ClaimNftData struct {
+// 	Success       bool   `json:"success"`
+// 	TransactionID string `json:"transactionId"`
+// 	NftLevel      int    `json:"nftLevel"`
+// 	MintAddress   string `json:"mintAddress"`
+// 	ClaimedAt     string `json:"claimedAt"`
+// }
 
-// GetCanUpgradeNftResponse represents wrapped upgrade eligibility Response
-type GetCanUpgradeNftResponse struct {
-	Code    int               `json:"code"`
-	Message string            `json:"message"`
-	Data    CanUpgradeNftData `json:"data"`
-}
+// // GetCanUpgradeNftResponse represents wrapped upgrade eligibility Response
+// type GetCanUpgradeNftResponse struct {
+// 	Code    int               `json:"code"`
+// 	Message string            `json:"message"`
+// 	Data    CanUpgradeNftData `json:"data"`
+// }
 
-// CanUpgradeNftResponse represents wrapped upgrade eligibility Response
-type CanUpgradeNftResponse struct {
-	Code    int               `json:"code"`
-	Message string            `json:"message"`
-	Data    CanUpgradeNftData `json:"data"`
-}
+// // CanUpgradeNftResponse represents wrapped upgrade eligibility Response
+// type CanUpgradeNftResponse struct {
+// 	Code    int               `json:"code"`
+// 	Message string            `json:"message"`
+// 	Data    CanUpgradeNftData `json:"data"`
+// }
 
-// CanUpgradeNftData represents upgrade eligibility data
-type CanUpgradeNftData struct {
-	CanUpgrade           bool     `json:"canUpgrade"`
-	CurrentLevel         int      `json:"currentLevel"`
-	NextLevel            int      `json:"nextLevel"`
-	RequiredBadges       int      `json:"requiredBadges"`
-	AvailableBadges      int      `json:"availableBadges"`
-	RequiredVolume       int      `json:"requiredVolume"`
-	CurrentVolume        int      `json:"currentVolume"`
-	MissingRequirements  []string `json:"missingRequirements"`
-	EstimatedUpgradeTime string   `json:"estimatedUpgradeTime"`
-}
+// // CanUpgradeNftData represents upgrade eligibility data
+// type CanUpgradeNftData struct {
+// 	CanUpgrade           bool     `json:"canUpgrade"`
+// 	CurrentLevel         int      `json:"currentLevel"`
+// 	NextLevel            int      `json:"nextLevel"`
+// 	RequiredBadges       int      `json:"requiredBadges"`
+// 	AvailableBadges      int      `json:"availableBadges"`
+// 	RequiredVolume       int      `json:"requiredVolume"`
+// 	CurrentVolume        int      `json:"currentVolume"`
+// 	MissingRequirements  []string `json:"missingRequirements"`
+// 	EstimatedUpgradeTime string   `json:"estimatedUpgradeTime"`
+// }
 
-// UpgradeNftResponse represents wrapped NFT upgrade Response
-type UpgradeNftResponse struct {
-	Code    int            `json:"code"`
-	Message string         `json:"message"`
-	Data    UpgradeNftData `json:"data"`
-}
+// // UpgradeNftResponse represents wrapped NFT upgrade Response
+// type UpgradeNftResponse struct {
+// 	Code    int            `json:"code"`
+// 	Message string         `json:"message"`
+// 	Data    UpgradeNftData `json:"data"`
+// }
 
-// UpgradeNftData represents NFT upgrade data
-type UpgradeNftData struct {
-	Success        bool                   `json:"success"`
-	TransactionID  string                 `json:"transactionId"`
-	FromLevel      int                    `json:"fromLevel"`
-	ToLevel        int                    `json:"toLevel"`
-	NewMintAddress string                 `json:"newMintAddress"`
-	UpgradedAt     string                 `json:"upgradedAt"`
-	ConsumedBadges []int                  `json:"consumedBadges"`
-	NewBenefits    map[string]interface{} `json:"newBenefits"`
-}
+// // UpgradeNftData represents NFT upgrade data
+// type UpgradeNftData struct {
+// 	Success        bool                   `json:"success"`
+// 	TransactionID  string                 `json:"transactionId"`
+// 	FromLevel      int                    `json:"fromLevel"`
+// 	ToLevel        int                    `json:"toLevel"`
+// 	NewMintAddress string                 `json:"newMintAddress"`
+// 	UpgradedAt     string                 `json:"upgradedAt"`
+// 	ConsumedBadges []int                  `json:"consumedBadges"`
+// 	NewBenefits    map[string]interface{} `json:"newBenefits"`
+// }
 
-// ActivateNftResponse represents wrapped NFT activation Response
-type ActivateNftResponse struct {
-	Code    int             `json:"code"`
-	Message string          `json:"message"`
-	Data    ActivateNftData `json:"data"`
-}
+// // ActivateNftResponse represents wrapped NFT activation Response
+// type ActivateNftResponse struct {
+// 	Code    int             `json:"code"`
+// 	Message string          `json:"message"`
+// 	Data    ActivateNftData `json:"data"`
+// }
 
-// ActivateNftData represents NFT activation data
-type ActivateNftData struct {
-	Success     bool                   `json:"success"`
-	NftID       int                    `json:"nftId"`
-	ActivatedAt string                 `json:"activatedAt"`
-	Benefits    map[string]interface{} `json:"benefits"`
-}
+// // ActivateNftData represents NFT activation data
+// type ActivateNftData struct {
+// 	Success     bool                   `json:"success"`
+// 	NftID       int                    `json:"nftId"`
+// 	ActivatedAt string                 `json:"activatedAt"`
+// 	Benefits    map[string]interface{} `json:"benefits"`
+// }
 
-// ==========================================
-// PROFILE AVATAR TYPES
-// ==========================================
+// // ==========================================
+// // PROFILE AVATAR TYPES
+// // ==========================================
 
-// ProfileAvatar represents a profile avatar (with admin fields)
-type ProfileAvatar struct {
-	ID           int    `json:"id"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
-	AvatarURL    string `json:"avatarUrl"`
-	ThumbnailURL string `json:"thumbnailUrl"`
-	Category     string `json:"category"`
-	IsActive     bool   `json:"isActive"`
-	CreatedAt    string `json:"createdAt"`
-	UpdatedAt    string `json:"updatedAt,omitempty"`
-}
+// // ProfileAvatar represents a profile avatar (with admin fields)
+// type ProfileAvatar struct {
+// 	ID           int    `json:"id"`
+// 	Name         string `json:"name"`
+// 	Description  string `json:"description"`
+// 	AvatarURL    string `json:"avatarUrl"`
+// 	ThumbnailURL string `json:"thumbnailUrl"`
+// 	Category     string `json:"category"`
+// 	IsActive     bool   `json:"isActive"`
+// 	CreatedAt    string `json:"createdAt"`
+// 	UpdatedAt    string `json:"updatedAt,omitempty"`
+// }
 
-// GetProfileAvatarsAvailableResponse represents profile avatars Response
-type GetProfileAvatarsAvailableResponse struct {
-	Code    int                         `json:"code"`
-	Message string                      `json:"message"`
-	Data    ProfileAvatarsAvailableData `json:"data"`
-}
+// // GetProfileAvatarsAvailableResponse represents profile avatars Response
+// type GetProfileAvatarsAvailableResponse struct {
+// 	Code    int                         `json:"code"`
+// 	Message string                      `json:"message"`
+// 	Data    ProfileAvatarsAvailableData `json:"data"`
+// }
 
-// ProfileAvatarsAvailableData represents available profile avatars data
-type ProfileAvatarsAvailableData struct {
-	Avatars    []ProfileAvatar `json:"avatars"`
-	TotalCount int             `json:"totalCount"`
-	ByCategory map[string]int  `json:"byCategory"`
-}
+// // ProfileAvatarsAvailableData represents available profile avatars data
+// type ProfileAvatarsAvailableData struct {
+// 	Avatars    []ProfileAvatar `json:"avatars"`
+// 	TotalCount int             `json:"totalCount"`
+// 	ByCategory map[string]int  `json:"byCategory"`
+// }
 
-// GetProfileAvatarsListResponse represents admin profile avatars list Response
-type GetProfileAvatarsListResponse struct {
-	Code    int                    `json:"code"`
-	Message string                 `json:"message"`
-	Data    ProfileAvatarsListData `json:"data"`
-}
+// // GetProfileAvatarsListResponse represents admin profile avatars list Response
+// type GetProfileAvatarsListResponse struct {
+// 	Code    int                    `json:"code"`
+// 	Message string                 `json:"message"`
+// 	Data    ProfileAvatarsListData `json:"data"`
+// }
 
-// ProfileAvatarsListData represents profile avatars list data
-type ProfileAvatarsListData struct {
-	Avatars    []ProfileAvatar `json:"avatars"`
-	Pagination Pagination      `json:"pagination"`
-	Categories []string        `json:"categories"`
-}
+// // ProfileAvatarsListData represents profile avatars list data
+// type ProfileAvatarsListData struct {
+// 	Avatars    []ProfileAvatar `json:"avatars"`
+// 	Pagination Pagination      `json:"pagination"`
+// 	Categories []string        `json:"categories"`
+// }
 
-// UpdateProfileAvatarResponse represents avatar update Response
-type UpdateProfileAvatarResponse struct {
-	Code    int                     `json:"code"`
-	Message string                  `json:"message"`
-	Data    UpdateProfileAvatarData `json:"data"`
-}
+// // UpdateProfileAvatarResponse represents avatar update Response
+// type UpdateProfileAvatarResponse struct {
+// 	Code    int                     `json:"code"`
+// 	Message string                  `json:"message"`
+// 	Data    UpdateProfileAvatarData `json:"data"`
+// }
 
-// UpdateProfileAvatarData represents avatar update data
-type UpdateProfileAvatarData struct {
-	Success   bool                   `json:"success"`
-	AvatarID  int                    `json:"avatarId"`
-	UpdatedAt string                 `json:"updatedAt"`
-	Changes   map[string]interface{} `json:"changes"`
-}
+// // UpdateProfileAvatarData represents avatar update data
+// type UpdateProfileAvatarData struct {
+// 	Success   bool                   `json:"success"`
+// 	AvatarID  int                    `json:"avatarId"`
+// 	UpdatedAt string                 `json:"updatedAt"`
+// 	Changes   map[string]interface{} `json:"changes"`
+// }
 
-// DeleteProfileAvatarResponse represents avatar deletion Response
-type DeleteProfileAvatarResponse struct {
-	Code    int                     `json:"code"`
-	Message string                  `json:"message"`
-	Data    DeleteProfileAvatarData `json:"data"`
-}
+// // DeleteProfileAvatarResponse represents avatar deletion Response
+// type DeleteProfileAvatarResponse struct {
+// 	Code    int                     `json:"code"`
+// 	Message string                  `json:"message"`
+// 	Data    DeleteProfileAvatarData `json:"data"`
+// }
 
-// DeleteProfileAvatarData represents avatar deletion data
-type DeleteProfileAvatarData struct {
-	Success   bool   `json:"success"`
-	AvatarID  int    `json:"avatarId"`
-	DeletedAt string `json:"deletedAt"`
-}
+// // DeleteProfileAvatarData represents avatar deletion data
+// type DeleteProfileAvatarData struct {
+// 	Success   bool   `json:"success"`
+// 	AvatarID  int    `json:"avatarId"`
+// 	DeletedAt string `json:"deletedAt"`
+// }
 
-// UploadProfileAvatarResponse represents wrapped profile avatar upload Response
-type UploadProfileAvatarResponse struct {
-	Code    int                     `json:"code"`
-	Message string                  `json:"message"`
-	Data    UploadProfileAvatarData `json:"data"`
-}
+// // UploadProfileAvatarResponse represents wrapped profile avatar upload Response
+// type UploadProfileAvatarResponse struct {
+// 	Code    int                     `json:"code"`
+// 	Message string                  `json:"message"`
+// 	Data    UploadProfileAvatarData `json:"data"`
+// }
 
-// UploadProfileAvatarData represents profile avatar upload data
-type UploadProfileAvatarData struct {
-	Success      bool   `json:"success"`
-	AvatarID     int    `json:"avatarId"`
-	Name         string `json:"name"`
-	AvatarURL    string `json:"avatarUrl"`
-	ThumbnailURL string `json:"thumbnailUrl"`
-	UploadedAt   string `json:"uploadedAt"`
-	FileSize     string `json:"fileSize"`
-	Category     string `json:"category"`
-}
+// // UploadProfileAvatarData represents profile avatar upload data
+// type UploadProfileAvatarData struct {
+// 	Success      bool   `json:"success"`
+// 	AvatarID     int    `json:"avatarId"`
+// 	Name         string `json:"name"`
+// 	AvatarURL    string `json:"avatarUrl"`
+// 	ThumbnailURL string `json:"thumbnailUrl"`
+// 	UploadedAt   string `json:"uploadedAt"`
+// 	FileSize     string `json:"fileSize"`
+// 	Category     string `json:"category"`
+// }
 
-// GetUserNftPortfolioResponse represents wrapped NFT portfolio Response
-type GetUserNftPortfolioResponse struct {
-	Code    int                     `json:"code"`
-	Message string                  `json:"message"`
-	Data    GetUserNftPortfolioData `json:"data"`
-}
+// // GetUserNftPortfolioResponse represents wrapped NFT portfolio Response
+// type GetUserNftPortfolioResponse struct {
+// 	Code    int                     `json:"code"`
+// 	Message string                  `json:"message"`
+// 	Data    GetUserNftPortfolioData `json:"data"`
+// }
 
-// GetUserNftPortfolioData represents NFT portfolio data
-type GetUserNftPortfolioData struct {
-	NftPortfolio types.NftPortfolio    `json:"nftPortfolio"`
-	Stats        NftPortfolioStatsData `json:"stats"`
-}
+// // GetUserNftPortfolioData represents NFT portfolio data
+// type GetUserNftPortfolioData struct {
+// 	NftPortfolio types.NftPortfolio    `json:"nftPortfolio"`
+// 	Stats        NftPortfolioStatsData `json:"stats"`
+// }
 
-// ClaimTieredNftResponse represents wrapped tiered NFT claim Response
-type ClaimTieredNftResponse struct {
-	Code    int                `json:"code"`
-	Message string             `json:"message"`
-	Data    ClaimTieredNftData `json:"data"`
-}
+// // ClaimTieredNftResponse represents wrapped tiered NFT claim Response
+// type ClaimTieredNftResponse struct {
+// 	Code    int                `json:"code"`
+// 	Message string             `json:"message"`
+// 	Data    ClaimTieredNftData `json:"data"`
+// }
 
-// ClaimTieredNftData represents tiered NFT claim data
-type ClaimTieredNftData struct {
-	Success       bool   `json:"success"`
-	TransactionID string `json:"transactionId"`
-	NftLevel      int    `json:"nftLevel"`
-	MintAddress   string `json:"mintAddress"`
-	ClaimedAt     string `json:"claimedAt"`
-}
+// // ClaimTieredNftData represents tiered NFT claim data
+// type ClaimTieredNftData struct {
+// 	Success       bool   `json:"success"`
+// 	TransactionID string `json:"transactionId"`
+// 	NftLevel      int    `json:"nftLevel"`
+// 	MintAddress   string `json:"mintAddress"`
+// 	ClaimedAt     string `json:"claimedAt"`
+// }
 
-// NftPortfolioStatsData represents NFT portfolio statistics
-type NftPortfolioStatsData struct {
-	TotalNfts              int     `json:"totalNfts"`
-	TieredNfts             int     `json:"tieredNfts"`
-	CompetitionNfts        int     `json:"competitionNfts"`
-	HighestTierLevel       int     `json:"highestTierLevel"`
-	CurrentTradingVolume   int     `json:"currentTradingVolume"`
-	TotalContributionValue float64 `json:"totalContributionValue"`
-	ActiveBenefits         int     `json:"activeBenefits"`
-}
+// // NftPortfolioStatsData represents NFT portfolio statistics
+// type NftPortfolioStatsData struct {
+// 	TotalNfts              int     `json:"totalNfts"`
+// 	TieredNfts             int     `json:"tieredNfts"`
+// 	CompetitionNfts        int     `json:"competitionNfts"`
+// 	HighestTierLevel       int     `json:"highestTierLevel"`
+// 	CurrentTradingVolume   int     `json:"currentTradingVolume"`
+// 	TotalContributionValue float64 `json:"totalContributionValue"`
+// 	ActiveBenefits         int     `json:"activeBenefits"`
+// }
 
-// UpgradeTieredNftResponse represents wrapped tiered NFT upgrade Response
-type UpgradeTieredNftResponse struct {
-	Code    int                  `json:"code"`
-	Message string               `json:"message"`
-	Data    UpgradeTieredNftData `json:"data"`
-}
+// // UpgradeTieredNftResponse represents wrapped tiered NFT upgrade Response
+// type UpgradeTieredNftResponse struct {
+// 	Code    int                  `json:"code"`
+// 	Message string               `json:"message"`
+// 	Data    UpgradeTieredNftData `json:"data"`
+// }
 
-// UpgradeTieredNftData represents tiered NFT upgrade data
-type UpgradeTieredNftData struct {
-	Success        bool   `json:"success"`
-	OldLevel       int    `json:"oldLevel"`
-	NewLevel       int    `json:"newLevel"`
-	OldMintAddress string `json:"oldMintAddress"`
-	NewMintAddress string `json:"newMintAddress"`
-	TransactionID  string `json:"transactionId"`
-	UpgradedAt     string `json:"upgradedAt"`
-}
+// // UpgradeTieredNftData represents tiered NFT upgrade data
+// type UpgradeTieredNftData struct {
+// 	Success        bool   `json:"success"`
+// 	OldLevel       int    `json:"oldLevel"`
+// 	NewLevel       int    `json:"newLevel"`
+// 	OldMintAddress string `json:"oldMintAddress"`
+// 	NewMintAddress string `json:"newMintAddress"`
+// 	TransactionID  string `json:"transactionId"`
+// 	UpgradedAt     string `json:"upgradedAt"`
+// }
 
-// ActivateNftAvatarResponse represents wrapped NFT avatar activation Response
-type ActivateNftAvatarResponse struct {
-	Code    int                   `json:"code"`
-	Message string                `json:"message"`
-	Data    ActivateNftAvatarData `json:"data"`
-}
+// // ActivateNftAvatarResponse represents wrapped NFT avatar activation Response
+// type ActivateNftAvatarResponse struct {
+// 	Code    int                   `json:"code"`
+// 	Message string                `json:"message"`
+// 	Data    ActivateNftAvatarData `json:"data"`
+// }
 
-// ActivateNftAvatarData represents NFT avatar activation data
-type ActivateNftAvatarData struct {
-	Success     bool   `json:"success"`
-	UserID      int    `json:"userId"`
-	ActivatedAt string `json:"activatedAt"`
-}
+// // ActivateNftAvatarData represents NFT avatar activation data
+// type ActivateNftAvatarData struct {
+// 	Success     bool   `json:"success"`
+// 	UserID      int    `json:"userId"`
+// 	ActivatedAt string `json:"activatedAt"`
+// }
 
-// GetNftPortfolioStatsResponse represents wrapped NFT portfolio stats Response
-type GetNftPortfolioStatsResponse struct {
-	Code    int                   `json:"code"`
-	Message string                `json:"message"`
-	Data    NftPortfolioStatsData `json:"data"`
-}
+// // GetNftPortfolioStatsResponse represents wrapped NFT portfolio stats Response
+// type GetNftPortfolioStatsResponse struct {
+// 	Code    int                   `json:"code"`
+// 	Message string                `json:"message"`
+// 	Data    NftPortfolioStatsData `json:"data"`
+// }
 
-// GetCompetitionNftsResponse represents wrapped competition NFTs Response
-type GetCompetitionNftsResponse struct {
-	Code    int                 `json:"code"`
-	Message string              `json:"message"`
-	Data    CompetitionNftsData `json:"data"`
-}
+// // GetCompetitionNftsResponse represents wrapped competition NFTs Response
+// type GetCompetitionNftsResponse struct {
+// 	Code    int                 `json:"code"`
+// 	Message string              `json:"message"`
+// 	Data    CompetitionNftsData `json:"data"`
+// }
 
-// CompetitionNftsData represents competition NFTs data
-type CompetitionNftsData struct {
-	CompetitionNfts []CompetitionNft       `json:"competitionNfts"`
-	TotalCount      int                    `json:"totalCount"`
-	Pagination      Pagination             `json:"pagination"`
-	Summary         map[string]interface{} `json:"summary"`
-}
+// // CompetitionNftsData represents competition NFTs data
+// type CompetitionNftsData struct {
+// 	CompetitionNfts []CompetitionNft       `json:"competitionNfts"`
+// 	TotalCount      int                    `json:"totalCount"`
+// 	Pagination      Pagination             `json:"pagination"`
+// 	Summary         map[string]interface{} `json:"summary"`
+// }
 
-// ==========================================
-// SHARED TYPES (imported from other domains)
-// ==========================================
+// // ==========================================
+// // SHARED TYPES (imported from other domains)
+// // ==========================================
 
-// Metadata represents additional metadata
-type Metadata struct {
-	TotalNfts              int     `json:"totalNfts" example:"2" description:"Total number of NFTs owned by user (tiered + competition)" minimum:"0"`
-	HighestTierLevel       int     `json:"highestTierLevel" example:"3" description:"Highest NFT tier level achieved by user" minimum:"0" maximum:"5"`
-	TotalBadges            int     `json:"totalBadges" example:"5" description:"Total badges available to user across all levels" minimum:"0"`
-	ActivatedBadges        int     `json:"activatedBadges" example:"1" description:"Number of badges currently activated" minimum:"0"`
-	TotalContributionValue float64 `json:"totalContributionValue" example:"1.0" description:"Total contribution value from all activated badges" minimum:"0"`
-	LastUpdated            string  `json:"lastUpdated" example:"2024-01-20T16:30:00.000Z" description:"ISO timestamp when data was last updated" format:"date-time"`
-}
+// // Metadata represents additional metadata
+// type Metadata struct {
+// 	TotalNfts              int     `json:"totalNfts" example:"2" description:"Total number of NFTs owned by user (tiered + competition)" minimum:"0"`
+// 	HighestTierLevel       int     `json:"highestTierLevel" example:"3" description:"Highest NFT tier level achieved by user" minimum:"0" maximum:"5"`
+// 	TotalBadges            int     `json:"totalBadges" example:"5" description:"Total badges available to user across all levels" minimum:"0"`
+// 	ActivatedBadges        int     `json:"activatedBadges" example:"1" description:"Number of badges currently activated" minimum:"0"`
+// 	TotalContributionValue float64 `json:"totalContributionValue" example:"1.0" description:"Total contribution value from all activated badges" minimum:"0"`
+// 	LastUpdated            string  `json:"lastUpdated" example:"2024-01-20T16:30:00.000Z" description:"ISO timestamp when data was last updated" format:"date-time"`
+// }
 
-// Pagination represents pagination information
-type Pagination struct {
-	Total   int  `json:"total" example:"150" description:"Total number of items available" minimum:"0"`
-	Limit   int  `json:"limit" example:"20" description:"Maximum number of items returned in this Response" minimum:"1" maximum:"100"`
-	Offset  int  `json:"offset" example:"0" description:"Number of items skipped (for pagination)" minimum:"0"`
-	HasMore bool `json:"hasMore" example:"true" description:"Whether there are more items available beyond this page"`
-}
+// // Pagination represents pagination information
+// type Pagination struct {
+// 	Total   int  `json:"total" example:"150" description:"Total number of items available" minimum:"0"`
+// 	Limit   int  `json:"limit" example:"20" description:"Maximum number of items returned in this Response" minimum:"1" maximum:"100"`
+// 	Offset  int  `json:"offset" example:"0" description:"Number of items skipped (for pagination)" minimum:"0"`
+// 	HasMore bool `json:"hasMore" example:"true" description:"Whether there are more items available beyond this page"`
+// }
