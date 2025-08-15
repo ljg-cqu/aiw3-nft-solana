@@ -20,7 +20,7 @@ type GetUserNftInfoResponse struct {
 type GetUserNftInfoData struct {
 	UserBasicInfo UserBasicInfo `json:"userBasicInfo" description:"Basic user profile information including wallet address and NFT avatar"`
 
-	TieredNfts      []TieredNft      `json:"tieredNfts" description:"List of all tiered NFT levels with their current status (Locked/Unlockable/Active/Burned)"`
+	TieredNfts      []TieredNft      `json:"tieredNfts" description:"List of all tiered NFT levels with their current status (Locked/Unlockable/Active/Burned). Always returns exactly 5 elements (levels 1-5). Each TieredNft contains level-specific information including benefits and required badges." minItems:"5" maxItems:"5"`
 	CompetitionNfts []CompetitionNft `json:"competitionNfts" description:"List of competition NFTs currently owned by the user"`
 
 	// Fee Saved Information - Basic fee savings info (for detailed analytics, use dedicated endpoint)
