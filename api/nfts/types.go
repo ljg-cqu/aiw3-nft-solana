@@ -117,21 +117,11 @@ type CompetitionBenefitsStats struct {
 
 	// Competition-specific benefits (always available for competition NFTs)
 	CommunityTopPin bool `json:"communityTopPin" example:"true" description:"Community top pin benefit. Always available for competition NFTs"`
-
-	// Future competition benefits can be added here
-	// ExclusiveRewards    *bool `json:"exclusiveRewards,omitempty" description:"Exclusive reward access benefit"`
-	// PrioritySupport     *bool `json:"prioritySupport,omitempty" description:"Priority customer support benefit"`
-	// SpecialEvents       *bool `json:"specialEvents,omitempty" description:"Special event access benefit"`
 }
 
 // ActiveBenefitsSummary represents all currently activated benefits across all user's NFTs
 type ActiveBenefitsSummary struct {
 	MaxTradingFeeReduction int `json:"maxFeeReduction" example:"25" description:"Maximum transaction fee reduction percentage available to the user from all owned NFTs" minimum:"0" maximum:"100" enum:"[10,20,25,30,40,55]"`
-
-	// AiAgent                *AiAgentBenefit `json:"aiAgent,omitempty" description:"AI agent benefit if available and activated at this level"`
-	// ExclusiveBackground    *bool           `json:"exclusiveBackground,omitempty" description:"Exclusive background access if available and activated at this level"`
-	// StrategyRecommendation *bool           `json:"strategyRecommendation,omitempty" description:"Strategy recommendation access if available and activated at this level"`
-	// StrategyPriority       *bool           `json:"strategyPriority,omitempty" description:"Strategy priority support if available and activated at this level"`
 
 	// From Tiered NFTs (active NFT level)
 	TieredBenefits *ActiveTieredBenefits `json:"tieredBenefits,omitempty" description:"Currently active benefits from user's active tiered NFT level. Null if no active tiered NFT"`
@@ -168,11 +158,6 @@ type ActiveCompetitionBenefits struct {
 
 	// Competition-specific benefits (only if activated)
 	CommunityTopPin *bool `json:"communityTopPin,omitempty" description:"Community top pin benefit if activated"`
-
-	// Future competition benefits
-	// ExclusiveRewards *bool `json:"exclusiveRewards,omitempty" description:"Exclusive reward access if activated"`
-	// PrioritySupport  *bool `json:"prioritySupport,omitempty" description:"Priority customer support if activated"`
-	// SpecialEvents    *bool `json:"specialEvents,omitempty" description:"Special event access if activated"`
 }
 
 // CompetitionInfo represents competition-related information
@@ -225,20 +210,6 @@ const (
 	PlatformOther TradingPlatform = "other" // Fallback for future platforms
 )
 
-// // PlatformFeeDetail represents fee savings details for a specific trading platform
-// // Designed to integrate with the actual legacy system: User.wallet_address, user_access_token.exchange_name, UserHyperliquid, Trades table
-// type PlatformFeeDetail struct {
-// 	Platform          TradingPlatform `json:"platform" example:"okx" description:"Trading platform identifier" enum:"[okx,bybit,binance,hyperliquid,gate,raydium,orca,jupiter,solana,other]"`
-// 	ExchangeNameID    *int            `json:"exchangeNameId,omitempty" example:"1" description:"Maps to user_access_token.exchange_name (1=OKX, currently only OKX is implemented)" minimum:"1" maximum:"3"`
-// 	WalletAddress     string          `json:"walletAddress" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"Platform-specific wallet address. CEX: User.wallet_address, Hyperliquid: UserHyperliquid.tradingwalletaddress, Solana DEX: User.wallet_address" minLength:"32" maxLength:"64"`
-// 	TradingVolume     float64         `json:"tradingVolume" example:"125000.50" description:"Total trading volume on this platform in USDT (aggregated from Trades table and trading contest data)" minimum:"0"`
-// 	StandardFeeRate   float64         `json:"standardFeeRate" example:"0.001" description:"Standard trading fee rate before NFT benefits (e.g., 0.001 = 0.1%)" minimum:"0" maximum:"1"`
-// 	DiscountedFeeRate float64         `json:"discountedFeeRate" example:"0.0008" description:"Discounted fee rate with NFT benefits applied (standardFeeRate * (1 - feeReductionRate))" minimum:"0" maximum:"1"`
-// 	FeeReductionRate  float64         `json:"feeReductionRate" example:"0.25" description:"Fee reduction percentage from NFT benefits (to be implemented in future NFT system)" minimum:"0" maximum:"1"`
-// 	FeeSaved          float64         `json:"feeSaved" example:"25.00" description:"Total fee amount saved in USDT (tradingVolume * standardFeeRate * feeReductionRate)" minimum:"0"`
-// 	LastUpdated       *time.Time      `json:"lastUpdated,omitempty" example:"2024-02-15T10:30:00.000Z" description:"Timestamp when fee savings were last calculated" format:"date-time"`
-// }
-
 // PlatformFeeBasic represents basic fee savings info per platform (minimal data for UI display)
 type PlatformFeeBasic struct {
 	Platform      TradingPlatform `json:"platform" example:"okx" description:"Trading platform identifier" enum:"[okx,bybit,binance,hyperliquid,gate,raydium,orca,jupiter,solana,other]"`
@@ -251,19 +222,6 @@ type FeeSavedBasicInfo struct {
 	TotalSaved     float64            `json:"totalSaved" example:"1250.75" description:"Total fee savings across all platforms in USDT" minimum:"0"`
 	PlatformBasics []PlatformFeeBasic `json:"platformBasics" description:"Basic fee savings per platform (wallet address + saved amount only)"`
 }
-
-// // FeeSavedSummary represents comprehensive fee savings summary for dedicated analytics endpoint
-// // Integrates with legacy system through strategic service enhancements (minimal modification approach)
-// type FeeSavedSummary struct {
-// 	UserID           int64               `json:"userId" example:"12345" description:"Internal user ID from User.id in legacy system" minimum:"1"`
-// 	MainWalletAddr   string              `json:"mainWalletAddr" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"User's main wallet address from User.wallet_address in legacy system" minLength:"32" maxLength:"44" pattern:"^[1-9A-HJ-NP-Za-km-z]{32,44}$"`
-// 	TotalSaved       float64             `json:"totalSaved" example:"1250.75" description:"Total fee savings across all platforms in USDT (calculated via new FeeWaivedService.js)" minimum:"0"`
-// 	TotalVolume      float64             `json:"totalVolume" example:"500000.00" description:"Total trading volume across all platforms in USDT (aggregated via new TradingVolumeService.js from Trades table and trading contest data)" minimum:"0"`
-// 	OverallReduction float64             `json:"overallReduction" example:"0.25" description:"Overall weighted average fee reduction percentage (calculated via NFTService.calculateCombinedBenefits)" minimum:"0" maximum:"1"`
-// 	MaxFeeReduction  float64             `json:"maxFeeReduction" example:"0.25" description:"Maximum fee reduction available from user's NFTs" minimum:"0" maximum:"1"`
-// 	PlatformDetails  []PlatformFeeDetail `json:"platformDetails" description:"Detailed fee savings breakdown by trading platform (enhanced existing services)"`
-// 	CalculatedAt     time.Time           `json:"calculatedAt" example:"2024-02-15T10:30:00.000Z" description:"Timestamp when this summary was calculated" format:"date-time"`
-// }
 
 // ==========================================
 // NFT ACTION REQUEST/RESPONSE TYPES
