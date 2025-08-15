@@ -11,7 +11,7 @@ import (
 // NFT CORE TYPES
 // ==========================================
 type UserBasicInfo struct {
-	ID           int64  `json:"id" example:"12345" description:"Internal user ID for fast database operations" minimum:"1"`
+	UserID       int64  `json:"id" example:"12345" description:"Internal user ID for fast database operations" minimum:"1"`
 	WalletAddr   string `json:"walletAddr" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"User's Solana wallet address (base58 encoded, 32-44 characters)" minLength:"32" maxLength:"44" pattern:"^[1-9A-HJ-NP-Za-km-z]{32,44}$"`
 	NftAvatarURL string `json:"nftAvatarURL" example:"https://cdn.example.com/nfts/quantum-alchemist.jpg" description:"NFT-based avatar image URL (may be same as avatarUri)" format:"uri"`
 }
@@ -198,6 +198,105 @@ type CompetitionNft struct {
 
 	// Benefits (always available for competition NFTs)
 	BenefitsStats CompetitionBenefitsStats `json:"benefitsStats" description:"Benefits available for this competition NFT with activation status"`
+}
+
+// ==========================================
+// FEE WAIVED/SAVINGS TYPES
+// ==========================================
+
+// TradingPlatform represents different trading platforms supported by AIW3
+type TradingPlatform string
+
+const (
+	// Centralized Exchanges (CEX)
+	PlatformOKX         TradingPlatform = "okx"         // exchange_name: 1 - Primary derivatives trading
+	PlatformBybit       TradingPlatform = "bybit"       // exchange_name: 2 - Derivatives trading
+	PlatformBinance     TradingPlatform = "binance"     // exchange_name: 3 - Spot and derivatives trading
+	PlatformHyperliquid TradingPlatform = "hyperliquid" // Advanced trading with builder fees
+	PlatformGate        TradingPlatform = "gate"        // Gate.io exchange
+
+	// Solana Decentralized Exchanges (DEX)
+	PlatformRaydium TradingPlatform = "raydium" // Solana DEX - AMM and liquidity
+	PlatformOrca    TradingPlatform = "orca"    // Solana DEX - AMM
+	PlatformJupiter TradingPlatform = "jupiter" // Solana DEX aggregator
+	PlatformSolana  TradingPlatform = "solana"  // General Solana on-chain trading
+
+	// Other Platforms
+	PlatformOther TradingPlatform = "other" // Fallback for future platforms
+)
+
+// PlatformFeeDetail represents fee savings details for a specific trading platform
+// Designed to integrate with the actual legacy system: User.wallet_address, user_access_token.exchange_name, UserHyperliquid, Trades table
+type PlatformFeeDetail struct {
+	Platform          TradingPlatform `json:"platform" example:"okx" description:"Trading platform identifier" enum:"[okx,bybit,binance,hyperliquid,gate,raydium,orca,jupiter,solana,other]"`
+	ExchangeNameID    *int            `json:"exchangeNameId,omitempty" example:"1" description:"Maps to user_access_token.exchange_name (1=OKX, currently only OKX is implemented)" minimum:"1" maximum:"3"`
+	WalletAddress     string          `json:"walletAddress" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"Platform-specific wallet address. CEX: User.wallet_address, Hyperliquid: UserHyperliquid.tradingwalletaddress, Solana DEX: User.wallet_address" minLength:"32" maxLength:"64"`
+	TradingVolume     float64         `json:"tradingVolume" example:"125000.50" description:"Total trading volume on this platform in USDT (aggregated from Trades table and trading contest data)" minimum:"0"`
+	StandardFeeRate   float64         `json:"standardFeeRate" example:"0.001" description:"Standard trading fee rate before NFT benefits (e.g., 0.001 = 0.1%)" minimum:"0" maximum:"1"`
+	DiscountedFeeRate float64         `json:"discountedFeeRate" example:"0.0008" description:"Discounted fee rate with NFT benefits applied (standardFeeRate * (1 - feeReductionRate))" minimum:"0" maximum:"1"`
+	FeeReductionRate  float64         `json:"feeReductionRate" example:"0.25" description:"Fee reduction percentage from NFT benefits (to be implemented in future NFT system)" minimum:"0" maximum:"1"`
+	FeeSaved          float64         `json:"feeSaved" example:"25.00" description:"Total fee amount saved in USDT (tradingVolume * standardFeeRate * feeReductionRate)" minimum:"0"`
+	BenefitSource     string          `json:"benefitSource" example:"tiered" description:"Source of fee reduction benefit (for future NFT implementation)" enum:"[tiered,competition,combined,none]"`
+	LastUpdated       *time.Time      `json:"lastUpdated,omitempty" example:"2024-02-15T10:30:00.000Z" description:"Timestamp when fee savings were last calculated" format:"date-time"`
+}
+
+// PlatformFeeBasic represents basic fee savings info per platform (minimal data for UI display)
+type PlatformFeeBasic struct {
+	Platform      TradingPlatform `json:"platform" example:"okx" description:"Trading platform identifier" enum:"[okx,bybit,binance,hyperliquid,gate,raydium,orca,jupiter,solana,other]"`
+	WalletAddress string          `json:"walletAddress" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"Platform-specific wallet address" minLength:"32" maxLength:"64"`
+	FeeSaved      float64         `json:"feeSaved" example:"900.00" description:"Total fee amount saved on this platform in USDT" minimum:"0"`
+}
+
+// FeeSavedBasicInfo represents basic fee savings information for NFT info endpoint
+type FeeSavedBasicInfo struct {
+	TotalSaved     float64            `json:"totalSaved" example:"1250.75" description:"Total fee savings across all platforms in USDT" minimum:"0"`
+	PlatformBasics []PlatformFeeBasic `json:"platformBasics" description:"Basic fee savings per platform (wallet address + saved amount only)"`
+}
+
+// FeeSavedSummary represents comprehensive fee savings summary for dedicated analytics endpoint
+// Integrates with legacy system through strategic service enhancements (minimal modification approach)
+type FeeSavedSummary struct {
+	UserID           int64               `json:"userId" example:"12345" description:"Internal user ID from User.id in legacy system" minimum:"1"`
+	MainWalletAddr   string              `json:"mainWalletAddr" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"User's main wallet address from User.wallet_address in legacy system" minLength:"32" maxLength:"44" pattern:"^[1-9A-HJ-NP-Za-km-z]{32,44}$"`
+	TotalSaved       float64             `json:"totalSaved" example:"1250.75" description:"Total fee savings across all platforms in USDT (calculated via new FeeWaivedService.js)" minimum:"0"`
+	TotalVolume      float64             `json:"totalVolume" example:"500000.00" description:"Total trading volume across all platforms in USDT (aggregated via new TradingVolumeService.js from Trades table and trading contest data)" minimum:"0"`
+	OverallReduction float64             `json:"overallReduction" example:"0.25" description:"Overall weighted average fee reduction percentage (calculated via NFTService.calculateCombinedBenefits)" minimum:"0" maximum:"1"`
+	MaxFeeReduction  float64             `json:"maxFeeReduction" example:"0.25" description:"Maximum fee reduction available from user's NFTs (from new user_nfts and nft_benefits tables)" minimum:"0" maximum:"1"`
+	BenefitSources   *NFTBenefitSources  `json:"benefitSources,omitempty" description:"Sources of NFT benefits (from NFTService.getUserNFTs)"`
+	PlatformDetails  []PlatformFeeDetail `json:"platformDetails" description:"Detailed fee savings breakdown by trading platform (enhanced existing services)"`
+	CalculatedAt     time.Time           `json:"calculatedAt" example:"2024-02-15T10:30:00.000Z" description:"Timestamp when this summary was calculated" format:"date-time"`
+	NextUpdateAt     *time.Time          `json:"nextUpdateAt,omitempty" example:"2024-02-15T11:30:00.000Z" description:"Timestamp when next update is scheduled" format:"date-time"`
+}
+
+// NFTBenefitSources represents the sources of NFT benefits for fee calculations
+// Integrates with legacy system through new NFTService.js and user_nfts table (minimal modification approach)
+type NFTBenefitSources struct {
+	TieredNFT           *TieredNFTBenefit      `json:"tieredNft,omitempty" description:"Active tiered NFT providing benefits (from user_nfts table where nft_type='tiered')"`
+	BestCompetitionNFT  *CompetitionNFTBenefit `json:"bestCompetitionNft,omitempty" description:"Best competition NFT providing benefits (from user_nfts table where nft_type='competition')"`
+	TradingFeeReduction string                 `json:"tradingFeeReduction" example:"tiered" description:"Primary source of trading fee reduction (calculated by NFTService.calculateCombinedBenefits)" enum:"[tiered,competition,none]"`
+}
+
+// TieredNFTBenefit represents tiered NFT benefit details
+// Integrates with legacy system through new user_nfts and nft_benefits tables (minimal modification approach)
+type TieredNFTBenefit struct {
+	NFTId              int64   `json:"nftId" example:"123" description:"Unique NFT identifier from user_nfts.id"`
+	DefinitionId       int64   `json:"definitionId" example:"3" description:"NFT definition identifier from nft_benefits.id"`
+	Name               string  `json:"name" example:"Gold Trading NFT" description:"Display name of the NFT (derived from tier level)"`
+	Tier               int     `json:"tier" example:"3" description:"NFT tier level from user_nfts.tier_level (1-5)"`
+	TradingFeeDiscount float64 `json:"tradingFeeDiscount" example:"0.20" description:"Fee discount percentage from nft_benefits.trading_fee_reduction"`
+	IsActivated        bool    `json:"isActivated" example:"true" description:"Whether NFT benefits are currently activated from user_nfts.is_activated"`
+	MintAddress        string  `json:"mintAddress" example:"7XzYwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"Solana NFT mint address from user_nfts.nft_mint_address"`
+}
+
+// CompetitionNFTBenefit represents competition NFT benefit details
+// Integrates with legacy system through new user_nfts and nft_benefits tables (minimal modification approach)
+type CompetitionNFTBenefit struct {
+	NFTId              int64   `json:"nftId" example:"456" description:"Unique NFT identifier from user_nfts.id"`
+	DefinitionId       int64   `json:"definitionId" example:"10" description:"NFT definition identifier from nft_benefits.id"`
+	Name               string  `json:"name" example:"Trophy Breeder" description:"Display name of the competition NFT (derived from competition source)"`
+	CompetitionSource  string  `json:"competitionSource" example:"trading_contest_2024_q1" description:"Source competition from user_nfts.competition_source"`
+	TradingFeeDiscount float64 `json:"tradingFeeDiscount" example:"0.25" description:"Fee discount percentage from nft_benefits.trading_fee_reduction"`
+	MintAddress        string  `json:"mintAddress" example:"8YzXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWN" description:"Solana NFT mint address from user_nfts.nft_mint_address"`
 }
 
 // ==========================================
@@ -538,13 +637,6 @@ type CompetitionNftsData struct {
 // ==========================================
 // SHARED TYPES (imported from other domains)
 // ==========================================
-
-// FeeWaivedInfo represents fee savings information
-type FeeWaivedInfo struct {
-	UserID     int    `json:"userId" example:"12345" description:"User identifier"`
-	WalletAddr string `json:"walletAddr" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"User's Solana wallet address" minLength:"32" maxLength:"44"`
-	Amount     int    `json:"amount" example:"1250" description:"Total fee savings in USDT from NFT benefits" minimum:"0"`
-}
 
 // Metadata represents additional metadata
 type Metadata struct {

@@ -60,17 +60,6 @@ type Pagination struct {
 }
 
 // ==========================================
-// FEE WAIVED TYPES
-// ==========================================
-
-// FeeWaivedInfo represents fee savings information
-type FeeWaivedInfo struct {
-	UserID     int    `json:"userId" example:"12345" description:"User identifier"`
-	WalletAddr string `json:"walletAddr" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"User's Solana wallet address" minLength:"32" maxLength:"44"`
-	Amount     int    `json:"amount" example:"1250" description:"Total fee savings in USD cents from NFT benefits" minimum:"0"`
-}
-
-// ==========================================
 // METADATA TYPES
 // ==========================================
 
@@ -165,11 +154,11 @@ type PublicStatsResponse struct {
 
 // PublicStatsData represents public statistics data
 type PublicStatsData struct {
-	Platform       PlatformStats                `json:"platform"`
-	RecentActivity []map[string]interface{}     `json:"recentActivity"`
-	TopCategories  []map[string]interface{}     `json:"topCategories"`
-	Growth         map[string]interface{}       `json:"growth"`
-	LastUpdated    string                       `json:"lastUpdated"`
+	Platform       PlatformStats            `json:"platform"`
+	RecentActivity []map[string]interface{} `json:"recentActivity"`
+	TopCategories  []map[string]interface{} `json:"topCategories"`
+	Growth         map[string]interface{}   `json:"growth"`
+	LastUpdated    string                   `json:"lastUpdated"`
 }
 
 // PlatformStats represents platform statistics
@@ -186,9 +175,9 @@ type PlatformStats struct {
 
 // PlatformHealthResponse represents platform health response
 type PlatformHealthResponse struct {
-	Code    int                 `json:"code"`
-	Message string              `json:"message"`
-	Data    PlatformHealthData  `json:"data"`
+	Code    int                `json:"code"`
+	Message string             `json:"message"`
+	Data    PlatformHealthData `json:"data"`
 }
 
 // PlatformHealthData represents platform health data
@@ -212,22 +201,22 @@ type UserProfileResponse struct {
 
 // UserProfileData represents user profile data
 type UserProfileData struct {
-	User         UserBasicInfo              `json:"user"`
-	Stats        UserStats                  `json:"stats"`
-	Achievements []map[string]interface{}   `json:"achievements"`
-	Preferences  map[string]interface{}     `json:"preferences"`
+	User         UserBasicInfo            `json:"user"`
+	Stats        UserStats                `json:"stats"`
+	Achievements []map[string]interface{} `json:"achievements"`
+	Preferences  map[string]interface{}   `json:"preferences"`
 }
 
 // UserStats represents user statistics
 type UserStats struct {
-	TradingVolume    float64 `json:"tradingVolume"`
-	NftCount         int     `json:"nftCount"`
-	BadgeCount       int     `json:"badgeCount"`
-	CompetitionWins  int     `json:"competitionWins"`
-	JoinedDate       string  `json:"joinedDate"`
-	LastActiveDate   string  `json:"lastActiveDate"`
-	ProfileViews     int     `json:"profileViews"`
-	Rank             int     `json:"rank"`
+	TradingVolume   float64 `json:"tradingVolume"`
+	NftCount        int     `json:"nftCount"`
+	BadgeCount      int     `json:"badgeCount"`
+	CompetitionWins int     `json:"competitionWins"`
+	JoinedDate      string  `json:"joinedDate"`
+	LastActiveDate  string  `json:"lastActiveDate"`
+	ProfileViews    int     `json:"profileViews"`
+	Rank            int     `json:"rank"`
 }
 
 // LeaderboardResponse represents leaderboard response
@@ -239,13 +228,13 @@ type LeaderboardResponse struct {
 
 // LeaderboardData represents leaderboard data
 type LeaderboardData struct {
-	Type        string                     `json:"type"`
-	Timeframe   string                     `json:"timeframe"`
-	Entries     []map[string]interface{}   `json:"entries"`
-	TotalCount  int                        `json:"totalCount"`
-	LastUpdated string                     `json:"lastUpdated"`
-	Pagination  Pagination                 `json:"pagination"`
-	Metadata    map[string]interface{}     `json:"metadata"`
+	Type        string                   `json:"type"`
+	Timeframe   string                   `json:"timeframe"`
+	Entries     []map[string]interface{} `json:"entries"`
+	TotalCount  int                      `json:"totalCount"`
+	LastUpdated string                   `json:"lastUpdated"`
+	Pagination  Pagination               `json:"pagination"`
+	Metadata    map[string]interface{}   `json:"metadata"`
 }
 
 // SearchUsersResponse represents search users response

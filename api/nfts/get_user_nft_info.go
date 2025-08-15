@@ -18,12 +18,15 @@ type GetUserNftInfoResponse struct {
 }
 
 type GetUserNftInfoData struct {
-	UserBasicInfo   UserBasicInfo    `json:"userBasicInfo" description:"Basic user profile information including wallet address and NFT avatar"`
+	UserBasicInfo UserBasicInfo `json:"userBasicInfo" description:"Basic user profile information including wallet address and NFT avatar"`
+
 	TieredNfts      []TieredNft      `json:"tieredNfts" description:"List of all tiered NFT levels with their current status (Locked/Unlockable/Active/Burned)"`
 	CompetitionNfts []CompetitionNft `json:"competitionNfts" description:"List of competition NFTs currently owned by the user"`
-	BadgesStats     BadgesStats      `json:"badgesStats" description:"Summary of badge status: available, activated, and consumed counts for the user"`
 
-	FeeWaivedInfo FeeWaivedInfo `json:"feeWaivedInfo" description:"Information about fee savings and waived fees from NFT benefits"`
+	BadgesStats BadgesStats `json:"badgesStats" description:"Summary of badge status: available, activated, and consumed counts for the user"`
+
+	// Fee Saved Information - Basic fee savings info (for detailed analytics, use dedicated endpoint)
+	FeeSavedInfo FeeSavedBasicInfo `json:"feeSavedInfo" description:"Basic fee savings information showing total saved and platform breakdown"`
 
 	TradingVolumeCurrent int  `json:"tradingVolumeCurrent" example:"1050000" description:"User's current trading volume in USDT" minimum:"0"`
 	ActiveNftLevel       int  `json:"activeNftLevel" example:"3" description:"Level of currently active NFT (1-5), 0 if no active NFT" minimum:"0" maximum:"5"`

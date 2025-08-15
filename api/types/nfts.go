@@ -1,5 +1,9 @@
 package types
 
+import (
+	"github.com/aiw3/nft-solana-api/api/nfts"
+)
+
 // ==========================================
 // NFT STRUCTURES
 // ==========================================
@@ -116,12 +120,12 @@ type GetUserNftInfoResponse struct {
 }
 
 type GetUserNftInfoData struct {
-	UserBasicInfo UserBasicInfo `json:"userBasicInfo"`
-	NftPortfolio  NftPortfolio  `json:"nftPortfolio"`
-	BadgeSummary  BadgeSummary  `json:"badgeSummary"`
-	FeeWaivedInfo FeeWaivedInfo `json:"feeWaivedInfo"`
-	NftAvatarUrls []string      `json:"nftAvatarUrls"`
-	Metadata      Metadata      `json:"metadata"`
+	UserBasicInfo UserBasicInfo          `json:"userBasicInfo"`
+	NftPortfolio  NftPortfolio           `json:"nftPortfolio"`
+	BadgeSummary  BadgeSummary           `json:"badgeSummary"`
+	FeeSavedInfo  nfts.FeeSavedBasicInfo `json:"feeSavedInfo"`
+	NftAvatarUrls []string               `json:"nftAvatarUrls"`
+	Metadata      Metadata               `json:"metadata"`
 }
 
 // GetUserNftAvatarsResponse represents wrapped NFT avatars response

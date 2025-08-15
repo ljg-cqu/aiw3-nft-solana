@@ -56,17 +56,6 @@ type Pagination struct {
 }
 
 // ==========================================
-// FEE WAIVED STRUCTURES
-// ==========================================
-
-// FeeWaivedInfo represents fee savings information
-type FeeWaivedInfo struct {
-	UserID     int    `json:"userId" example:"12345" description:"User identifier"`
-	WalletAddr string `json:"walletAddr" example:"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM" description:"User's Solana wallet address" minLength:"32" maxLength:"44"`
-	Amount     int    `json:"amount" example:"1250" description:"Total fee savings in USD cents from NFT benefits" minimum:"0"`
-}
-
-// ==========================================
 // METADATA STRUCTURES
 // ==========================================
 
