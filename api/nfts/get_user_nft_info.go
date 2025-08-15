@@ -23,8 +23,6 @@ type GetUserNftInfoData struct {
 	TieredNfts      []TieredNft      `json:"tieredNfts" description:"List of all tiered NFT levels with their current status (Locked/Unlockable/Active/Burned)"`
 	CompetitionNfts []CompetitionNft `json:"competitionNfts" description:"List of competition NFTs currently owned by the user"`
 
-	BadgesStats BadgesStats `json:"badgesStats" description:"Summary of badge status: available, activated, and consumed counts for the user"`
-
 	// Fee Saved Information - Basic fee savings info (for detailed analytics, use dedicated endpoint)
 	FeeSavedInfo FeeSavedBasicInfo `json:"feeSavedInfo" description:"Basic fee savings information showing total saved and platform breakdown"`
 
@@ -35,9 +33,6 @@ type GetUserNftInfoData struct {
 	// NFT Upgrade Information
 	UpgradeEligible bool `json:"upgradeEligible" example:"true" description:"Whether user can upgrade to the next NFT level (business requirements met: trading volume threshold and required activated badges)"`
 	PendingUpgrade  bool `json:"pendingUpgrade" example:"false" description:"Whether user has a pending upgrade (NFT burned but higher level not yet minted). When true, user can resume/retry the upgrade process"`
-
-	// Currently Active Benefits Summary
-	ActiveBenefits *ActiveBenefitsSummary `json:"activeBenefits" description:"Summary of all currently activated benefits across tiered and competition NFTs"`
 }
 
 func GetUserNftInfo() usecase.Interactor {
