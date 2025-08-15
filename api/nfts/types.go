@@ -44,14 +44,6 @@ type Badge struct {
 	Status string `json:"status" example:"activated" description:"Current status of the badge" enum:"[Available,Activated,Consumed]"`
 }
 
-// BadgeStats represents badge-related statistics and data for an NFT level
-type BadgeStats struct {
-	Required  int     `json:"badgesRequired" example:"2" description:"Number of badges required to be activated to unlock this NFT level" minimum:"0" enum:"[0,2,4,5,6]"`
-	Activated int     `json:"badgesActivated" example:"1" description:"Number of badges user has currently activated toward this level" minimum:"0"`
-	Progress  float64 `json:"badgesProgress" example:"50.0" description:"Progress toward meeting badge requirements as percentage (activatedBadges/requiredBadges * 100)" minimum:"0"`
-	Badges    []Badge `json:"badges" description:"Array of badges associated with this NFT level, showing their current status (available/activated/consumed)"`
-}
-
 // TieredBenefitsStats represents benefits available for a tiered NFT level
 type TieredBenefitsStats struct {
 	BenefitsActivation
@@ -104,11 +96,17 @@ type TieredNft struct {
 	// On-chain NFT Information (only present when NFT is minted)
 	OnChainInfo *OnChainNFTInfo `json:"onChainInfo,omitempty" description:"On-chain NFT information including Solana addresses and IPFS storage details. Only present when NFT has been minted (status: 'Active' or 'Burned')"`
 
+	// Trading Volume Requirements
 	TradingVolumeThreshold int     `json:"tradingVolumeThreshold" example:"1000000" description:"Trading volume threshold to unlock this level in USDT" minimum:"0"`
-	TradingVolumeQualified int     `json:"tradingVolumeQualified" example:"1050000" description:"Trading volume that qualified/qualifies for this level in USDT." minimum:"0"`
-	ThresholdProgress      float64 `json:"thresholdProgress" example:"105.7" description:"Progress towards meeting the trading volume threshold as percentage (TradingVolumeQualified/TradingVolumeThreshold * 100)" minimum:"0"`
+	TradingVolumeQualified int     `json:"tradingVolumeQualified" example:"1050000" description:"User's current trading volume that qualified/qualifies for this level in USDT" minimum:"0"`
+	TradingVolumeProgress  float64 `json:"tradingVolumeProgress" example:"105.0" description:"Progress towards meeting the trading volume threshold as percentage (TradingVolumeQualified/TradingVolumeThreshold * 100)" minimum:"0"`
 
-	BadgeStats BadgeStats `json:"badgeStats" description:"Badge-related statistics and data for this NFT level"`
+	// Badge Requirements
+	ActivatedBadgesRequired int     `json:"activatedBadgesRequired" example:"2" description:"Number of badges required to be activated to unlock this NFT level" minimum:"0" enum:"[0,2,4,5,6]"`
+	ActivatedBadgesCurrent  int     `json:"activatedBadgesCurrent" example:"1" description:"Number of badges user has currently activated toward this level" minimum:"0"`
+	ActivatedBadgesProgress float64 `json:"activatedBadgesProgress" example:"50.0" description:"Progress toward meeting badge requirements as percentage (activatedBadgesCurrent/activatedBadgesRequired * 100)" minimum:"0"`
+
+	Badges []Badge `json:"badges" description:"Array of badges associated with this NFT level, showing their current status (available/activated/consumed)"`
 
 	BenefitsStats TieredBenefitsStats `json:"benefitsStats" description:"Benefits-related statistics and data for this NFT level"`
 }
